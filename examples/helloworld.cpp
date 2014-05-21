@@ -1,3 +1,4 @@
+#include <silicium/process.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/variant.hpp>
@@ -8,18 +9,6 @@
 
 namespace Si
 {
-	struct process_output
-	{
-		int return_code;
-		//TODO: make stdout asynchronously readable
-		std::vector<char> stdout;
-	};
-
-	struct process
-	{
-		std::future<process_output> result;
-	};
-
 	struct build_context
 	{
 		std::function<boost::filesystem::path ()> allocate_temporary_directory;
@@ -44,11 +33,6 @@ namespace Si
 		boost::filesystem::path m_root;
 		boost::uintmax_t m_next_id = 0;
 	};
-
-	process spawn_native_process(std::string const &executable, std::vector<std::string> const &arguments)
-	{
-		throw std::logic_error("not implemented");
-	}
 
 	build_context make_native_build_context(boost::filesystem::path temporary_directory_root)
 	{
