@@ -7,6 +7,7 @@
 #include <memory>
 #include <boost/system/system_error.hpp>
 #include <boost/optional.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #ifdef __linux__
 #include <unistd.h>
@@ -69,7 +70,7 @@ namespace Si
 		}
 	}
 
-	process_output run_process(std::string executable, std::vector<std::string> arguments, bool dump_stdout)
+	process_output run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path const &current_path, bool dump_stdout)
 	{
 		std::vector<char *> argument_pointers;
 		argument_pointers.emplace_back(&executable[0]);
@@ -132,6 +133,8 @@ namespace Si
 			}
 			stdin_reading.reset();
 			stdin_writing.reset();
+
+			boost::filesystem::current_path(current_path);
 
 			execvp(executable.c_str(), argument_pointers.data());
 

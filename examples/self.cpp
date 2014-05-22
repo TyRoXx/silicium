@@ -60,8 +60,10 @@ namespace
 {
 	Si::build_result build(Si::build_context const &context, boost::filesystem::path const silicium_git)
 	{
+		boost::filesystem::path const &built_root = context.allocate_temporary_directory();
+
 		{
-			const auto cmake_result = Si::run_process("/usr/bin/cmake", {silicium_git.string()}, true);
+			const auto cmake_result = Si::run_process("/usr/bin/cmake", {silicium_git.string()}, built_root, true);
 			std::cerr.write(cmake_result.stdout->data(), cmake_result.stdout->size());
 			if (cmake_result.exit_status != 0)
 			{
@@ -70,7 +72,7 @@ namespace
 		}
 
 		{
-			const auto make_result = Si::run_process("/usr/bin/make", {}, true);
+			const auto make_result = Si::run_process("/usr/bin/make", {}, built_root, true);
 			std::cerr.write(make_result.stdout->data(), make_result.stdout->size());
 			if (make_result.exit_status != 0)
 			{
@@ -79,7 +81,7 @@ namespace
 		}
 
 		{
-			const auto test_result = Si::run_process((boost::filesystem::current_path() / "test/test").string(), {}, true);
+			const auto test_result = Si::run_process((built_root / "test/test").string(), {}, built_root, true);
 			std::cerr.write(test_result.stdout->data(), test_result.stdout->size());
 			if (test_result.exit_status != 0)
 			{

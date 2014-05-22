@@ -73,14 +73,14 @@ namespace
 		const auto build_dir = context.allocate_temporary_directory();
 		const auto executable_file = build_dir / "hello";
 		{
-			const auto compilation_result = Si::run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()}, true);
+			const auto compilation_result = Si::run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()}, build_dir, true);
 			if (compilation_result.exit_status != 0)
 			{
 				return Si::build_failure{"Compilation was not successful"};
 			}
 		}
 
-		const auto testing_result = Si::run_process(executable_file.string(), {}, true);
+		const auto testing_result = Si::run_process(executable_file.string(), {}, build_dir, true);
 		if (testing_result.exit_status != 0)
 		{
 			return Si::build_failure{"The built executable returned failure"};
