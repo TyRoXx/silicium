@@ -12,7 +12,7 @@ namespace Si
 	struct build_context
 	{
 		std::function<boost::filesystem::path ()> allocate_temporary_directory;
-		std::function<process_output (std::string const &, std::vector<std::string> const &)> run_process;
+		std::function<process_output (std::string const &, std::vector<std::string> const &, bool)> run_process;
 	};
 
 	struct temporary_directory_allocator
@@ -75,14 +75,14 @@ namespace
 		const auto build_dir = context.allocate_temporary_directory();
 		const auto executable_file = build_dir / "hello";
 		{
-			const auto compilation_result = context.run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()});
+			const auto compilation_result = context.run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()}, true);
 			if (compilation_result.exit_status != 0)
 			{
 				return Si::build_failure{"Compilation was not successful"};
 			}
 		}
 
-		const auto testing_result = context.run_process(executable_file.string(), {});
+		const auto testing_result = context.run_process(executable_file.string(), {}, true);
 		if (testing_result.exit_status != 0)
 		{
 			return Si::build_failure{"The built executable returned failure"};
@@ -123,13 +123,8 @@ namespace
 int main()
 {
 	const auto context = Si::make_native_build_context(boost::filesystem::current_path());
-	for (;;)
-	{
-		const Si::build_result result = build(context);
-		result_printer printer(std::cerr);
-		boost::apply_visitor(printer, result);
-
-		std::string ignored;
-		getline(std::cin, ignored);
-	}
+	const Si::build_result result = build(context);
+	result_printer printer(std::cerr);
+	boost::apply_visitor(printer, result);
+	std::cerr << '\n';
 }
