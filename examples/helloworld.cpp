@@ -12,7 +12,6 @@ namespace Si
 	struct build_context
 	{
 		std::function<boost::filesystem::path ()> allocate_temporary_directory;
-		std::function<process_output (std::string const &, std::vector<std::string> const &, bool)> run_process;
 	};
 
 	struct temporary_directory_allocator
@@ -41,8 +40,7 @@ namespace Si
 		const auto temporary_dirs = std::make_shared<temporary_directory_allocator>(std::move(temporary_directory_root));
 		return build_context
 		{
-			std::bind(&temporary_directory_allocator::allocate, temporary_dirs),
-			run_process
+			std::bind(&temporary_directory_allocator::allocate, temporary_dirs)
 		};
 	}
 
@@ -75,14 +73,14 @@ namespace
 		const auto build_dir = context.allocate_temporary_directory();
 		const auto executable_file = build_dir / "hello";
 		{
-			const auto compilation_result = context.run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()}, true);
+			const auto compilation_result = Si::run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()}, true);
 			if (compilation_result.exit_status != 0)
 			{
 				return Si::build_failure{"Compilation was not successful"};
 			}
 		}
 
-		const auto testing_result = context.run_process(executable_file.string(), {}, true);
+		const auto testing_result = Si::run_process(executable_file.string(), {}, true);
 		if (testing_result.exit_status != 0)
 		{
 			return Si::build_failure{"The built executable returned failure"};
