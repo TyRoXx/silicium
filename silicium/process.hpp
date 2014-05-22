@@ -133,7 +133,7 @@ namespace Si
 			stdin_reading.reset();
 			stdin_writing.reset();
 
-			execv(executable.c_str(), argument_pointers.data());
+			execvp(executable.c_str(), argument_pointers.data());
 
 			//kill the process in case execv fails
 			std::abort();
