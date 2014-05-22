@@ -129,6 +129,40 @@ namespace
 
 		std::ostream &m_out;
 	};
+
+	std::pair<Si::report, Si::report_finalizer> create_simple_file_report(boost::filesystem::path const &parent, std::string name)
+	{
+		auto const report_dir = parent / name;
+		boost::filesystem::create_directories(report_dir);
+		Si::report r
+		{
+			[report_dir](std::string name, std::vector<char> content)
+			{
+				auto const file_name = (report_dir / name).string();
+				std::ofstream file(file_name, std::ios::binary);
+				file.write(content.data(), content.size());
+				if (!file)
+				{
+					throw std::runtime_error("Could not write file " + file_name);
+				}
+			}
+		};
+		auto const handle_result = [report_dir](Si::build_result const &result)
+		{
+			auto const report_file_name = (report_dir / "report.txt").string();
+			std::ofstream file(report_file_name);
+			{
+				result_printer printer(file);
+				boost::apply_visitor(printer, result);
+				file << '\n';
+			}
+			if (!file)
+			{
+				throw std::runtime_error("Could not write report to " + report_file_name);
+			}
+		};
+		return std::make_pair(std::move(r), handle_result);
+	}
 }
 
 int main(int argc, char **argv)
@@ -144,39 +178,7 @@ int main(int argc, char **argv)
 	Si::build_context context
 	{
 		std::bind(&Si::temporary_directory_allocator::allocate, temporary_dirs),
-		[report_root](std::string name)
-		{
-			auto const report_dir = report_root / name;
-			boost::filesystem::create_directories(report_dir);
-			Si::report r
-			{
-				[report_dir](std::string name, std::vector<char> content)
-				{
-					auto const file_name = (report_dir / name).string();
-					std::ofstream file(file_name, std::ios::binary);
-					file.write(content.data(), content.size());
-					if (!file)
-					{
-						throw std::runtime_error("Could not write file " + file_name);
-					}
-				}
-			};
-			auto const handle_result = [report_dir](Si::build_result const &result)
-			{
-				auto const report_file_name = (report_dir / "report.txt").string();
-				std::ofstream file(report_file_name);
-				{
-					result_printer printer(file);
-					boost::apply_visitor(printer, result);
-					file << '\n';
-				}
-				if (!file)
-				{
-					throw std::runtime_error("Could not write report to " + report_file_name);
-				}
-			};
-			return std::make_pair(std::move(r), handle_result);
-		}
+		[report_root](std::string name) { return create_simple_file_report(report_root, std::move(name)); }
 	};
 
 	build(context, silicium_git);
