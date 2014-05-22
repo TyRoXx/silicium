@@ -49,8 +49,22 @@ namespace
 			boost::filesystem::path const &source,
 			std::string const &build_type)
 	{
+		std::string const repository_name = "si.git";
 		{
-			const auto cmake_result = Si::run_process("/usr/bin/cmake", {source.string(), ("-DCMAKE_BUILD_TYPE=" + build_type)}, build_directory, true);
+			const auto git_result = Si::run_process("/usr/bin/git", {"clone", source.string(), repository_name}, build_directory, true);
+			result.add_artifact("git.log", *git_result.stdout);
+			if (git_result.exit_status != 0)
+			{
+				return Si::build_failure{"git clone failed"};
+			}
+		}
+
+		auto const repository_path = build_directory / repository_name;
+		auto const real_build_dir = build_directory / "build";
+		boost::filesystem::create_directories(real_build_dir);
+
+		{
+			const auto cmake_result = Si::run_process("/usr/bin/cmake", {repository_path.string(), ("-DCMAKE_BUILD_TYPE=" + build_type)}, real_build_dir, true);
 			result.add_artifact("cmake.log", *cmake_result.stdout);
 			if (cmake_result.exit_status != 0)
 			{
@@ -59,7 +73,7 @@ namespace
 		}
 
 		{
-			const auto make_result = Si::run_process("/usr/bin/make", {}, build_directory, true);
+			const auto make_result = Si::run_process("/usr/bin/make", {}, real_build_dir, true);
 			result.add_artifact("make.log", *make_result.stdout);
 			if (make_result.exit_status != 0)
 			{
@@ -68,7 +82,7 @@ namespace
 		}
 
 		{
-			const auto test_result = Si::run_process((build_directory / "test/test").string(), {}, build_directory, true);
+			const auto test_result = Si::run_process((real_build_dir / "test/test").string(), {}, real_build_dir, true);
 			result.add_artifact("test.log", *test_result.stdout);
 			if (test_result.exit_status != 0)
 			{
@@ -158,7 +172,9 @@ int main(int argc, char **argv)
 	}
 	boost::filesystem::path const silicium_git = argv[1];
 
-	Si::temporary_directory_allocator temporary_dirs(boost::filesystem::current_path());
+	auto const unique_dir = boost::filesystem::current_path() / boost::lexical_cast<std::string>(std::time(0));
+
+	Si::temporary_directory_allocator temporary_dirs(unique_dir);
 	Si::directory_allocator const allocate_temporary_dir = std::bind(&Si::temporary_directory_allocator::allocate, &temporary_dirs);
 	auto const report_root = allocate_temporary_dir();
 	Si::report_creator const create_port = [report_root](std::string name) { return create_simple_file_report(report_root, std::move(name)); };
