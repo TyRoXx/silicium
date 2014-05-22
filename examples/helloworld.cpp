@@ -5,7 +5,7 @@
 #include <boost/lexical_cast.hpp>
 #include <functional>
 #include <fstream>
-#include <future>
+#include <iostream>
 
 namespace Si
 {
