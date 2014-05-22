@@ -5,8 +5,10 @@ namespace Si
 {
 	BOOST_AUTO_TEST_CASE(run_process_cat)
 	{
-		process_output output = run_process("cat", {}, true);
+		process_output output = run_process("/usr/bin/which", {"which"}, true);
 		BOOST_CHECK_EQUAL(0, output.exit_status);
-		BOOST_CHECK(std::vector<char>() == output.stdout);
+		std::string const expected = "/usr/bin/which\n";
+		BOOST_REQUIRE(output.stdout);
+		BOOST_CHECK_EQUAL(expected, std::string(begin(*output.stdout), end(*output.stdout)));
 	}
 }
