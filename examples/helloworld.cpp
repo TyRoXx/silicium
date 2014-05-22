@@ -12,7 +12,7 @@ namespace Si
 	struct build_context
 	{
 		std::function<boost::filesystem::path ()> allocate_temporary_directory;
-		std::function<process (std::string const &, std::vector<std::string> const &)> spawn_process;
+		std::function<process_output (std::string const &, std::vector<std::string> const &)> run_process;
 	};
 
 	struct temporary_directory_allocator
@@ -25,7 +25,9 @@ namespace Si
 		boost::filesystem::path allocate()
 		{
 			const auto id = m_next_id++;
-			return m_root / boost::lexical_cast<std::string>(id);
+			auto directory = m_root / boost::lexical_cast<std::string>(id);
+			boost::filesystem::create_directories(directory);
+			return directory;
 		}
 
 	private:
@@ -40,7 +42,7 @@ namespace Si
 		return build_context
 		{
 			std::bind(&temporary_directory_allocator::allocate, temporary_dirs),
-			spawn_native_process
+			run_process
 		};
 	}
 
@@ -65,24 +67,29 @@ namespace
 		{
 			std::ofstream file(source_file.string());
 			file << "#include <iostream>\nint main() { std::cout << \"Hello, world!\\n\"; }\n";
+			if (!file)
+			{
+				throw std::runtime_error("Could not write source file");
+			}
 		}
 		const auto build_dir = context.allocate_temporary_directory();
 		const auto executable_file = build_dir / "hello";
-		auto compilation = context.spawn_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()});
-		const auto compilation_result = compilation.result.get();
-		if (compilation_result.return_code != 0)
 		{
-			return Si::build_failure{"Compilation was not successful"};
+			const auto compilation_result = context.run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()});
+			if (compilation_result.exit_status != 0)
+			{
+				return Si::build_failure{"Compilation was not successful"};
+			}
 		}
 
-		auto testing = context.spawn_process(executable_file.string(), {});
-		if (compilation_result.return_code != 0)
+		const auto testing_result = context.run_process(executable_file.string(), {});
+		if (testing_result.exit_status != 0)
 		{
 			return Si::build_failure{"The built executable returned failure"};
 		}
 
 		std::string const expected_output = "Hello, world!\n";
-		if (compilation_result.stdout != std::vector<char>(begin(expected_output), end(expected_output)))
+		if (testing_result.stdout != std::vector<char>(begin(expected_output), end(expected_output)))
 		{
 			return Si::build_failure{"The built executable did not print the expected text to stdout"};
 		}
