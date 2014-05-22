@@ -161,11 +161,19 @@ int main(int argc, char **argv)
 					}
 				}
 			};
-			auto const handle_result = [](Si::build_result const &result)
+			auto const handle_result = [report_dir](Si::build_result const &result)
 			{
-				result_printer printer(std::cerr);
-				boost::apply_visitor(printer, result);
-				std::cerr << '\n';
+				auto const report_file_name = (report_dir / "report.txt").string();
+				std::ofstream file(report_file_name);
+				{
+					result_printer printer(file);
+					boost::apply_visitor(printer, result);
+					file << '\n';
+				}
+				if (!file)
+				{
+					throw std::runtime_error("Could not write report to " + report_file_name);
+				}
 			};
 			return std::make_pair(std::move(r), handle_result);
 		}
