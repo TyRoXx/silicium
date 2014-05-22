@@ -1,4 +1,5 @@
 #include <silicium/process.hpp>
+#include <silicium/build_result.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/variant.hpp>
@@ -9,17 +10,6 @@
 
 namespace Si
 {
-	struct build_success
-	{
-	};
-
-	struct build_failure
-	{
-		std::string short_description;
-	};
-
-	typedef boost::variant<build_success, build_failure> build_result;
-
 	struct report
 	{
 		std::function<void (std::string, std::vector<char>)> add_artifact;
