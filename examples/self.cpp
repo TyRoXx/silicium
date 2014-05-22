@@ -26,12 +26,8 @@ namespace Si
 	};
 
 	typedef std::function<void (build_result)> report_finalizer;
-
-	struct build_context
-	{
-		std::function<boost::filesystem::path ()> allocate_temporary_directory;
-		std::function<std::pair<report, report_finalizer> (std::string)> create_report;
-	};
+	typedef std::function<std::pair<report, report_finalizer> (std::string)> report_creator;
+	typedef std::function<boost::filesystem::path ()> directory_allocator;
 
 	struct temporary_directory_allocator
 	{
@@ -93,16 +89,15 @@ namespace
 		return Si::build_success{};
 	}
 
-	void build(Si::build_context const &context, boost::filesystem::path const silicium_git)
+	void build(Si::report_creator const &create_report, boost::filesystem::path const &build_root, boost::filesystem::path const silicium_git)
 	{
-		boost::filesystem::path const &build_root = context.allocate_temporary_directory();
 		std::vector<std::string> const build_types = {"DEBUG", "RELEASE"};
 		for (auto &build_type : build_types)
 		{
 			auto const build_dir = build_root / build_type;
 			boost::filesystem::create_directories(build_dir);
 
-			auto const report_and_finalizer = context.create_report(build_type);
+			auto const report_and_finalizer = create_report(build_type);
 			auto const result = build_configuration(report_and_finalizer.first, build_dir, silicium_git, build_type);
 			report_and_finalizer.second(result);
 		}
@@ -173,13 +168,10 @@ int main(int argc, char **argv)
 	}
 	boost::filesystem::path const silicium_git = argv[1];
 
-	const auto temporary_dirs = std::make_shared<Si::temporary_directory_allocator>(boost::filesystem::current_path());
-	auto const report_root = temporary_dirs->allocate();
-	Si::build_context context
-	{
-		std::bind(&Si::temporary_directory_allocator::allocate, temporary_dirs),
-		[report_root](std::string name) { return create_simple_file_report(report_root, std::move(name)); }
-	};
+	Si::temporary_directory_allocator temporary_dirs(boost::filesystem::current_path());
+	Si::directory_allocator const allocate_temporary_dir = std::bind(&Si::temporary_directory_allocator::allocate, &temporary_dirs);
+	auto const report_root = allocate_temporary_dir();
+	Si::report_creator const create_port = [report_root](std::string name) { return create_simple_file_report(report_root, std::move(name)); };
 
-	build(context, silicium_git);
+	build(create_port, allocate_temporary_dir(), silicium_git);
 }
