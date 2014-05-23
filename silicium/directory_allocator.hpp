@@ -10,9 +10,9 @@ namespace Si
 {
 	typedef std::function<boost::filesystem::path ()> directory_allocator;
 
-	struct temporary_directory_allocator
+	struct incrementing_directory_allocator
 	{
-		explicit temporary_directory_allocator(boost::filesystem::path root);
+		explicit incrementing_directory_allocator(boost::filesystem::path root);
 		boost::filesystem::path allocate();
 
 	private:

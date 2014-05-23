@@ -73,8 +73,8 @@ namespace
 
 int main()
 {
-	Si::temporary_directory_allocator temporary_dirs(boost::filesystem::current_path());
-	Si::directory_allocator const allocate_temporary_dir = std::bind(&Si::temporary_directory_allocator::allocate, &temporary_dirs);
+	Si::incrementing_directory_allocator temporary_dirs(boost::filesystem::current_path());
+	Si::directory_allocator const allocate_temporary_dir = std::bind(&Si::incrementing_directory_allocator::allocate, &temporary_dirs);
 	const Si::build_result result = build(allocate_temporary_dir);
 	result_printer printer(std::cerr);
 	boost::apply_visitor(printer, result);

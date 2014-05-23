@@ -2,12 +2,12 @@
 
 namespace Si
 {
-	temporary_directory_allocator::temporary_directory_allocator(boost::filesystem::path root)
+	incrementing_directory_allocator::incrementing_directory_allocator(boost::filesystem::path root)
 		: m_root(std::move(root))
 	{
 	}
 
-	boost::filesystem::path temporary_directory_allocator::allocate()
+	boost::filesystem::path incrementing_directory_allocator::allocate()
 	{
 		const auto id = m_next_id++;
 		auto directory = m_root / boost::lexical_cast<std::string>(id);

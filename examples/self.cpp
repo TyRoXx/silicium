@@ -137,8 +137,8 @@ int main(int argc, char **argv)
 	}
 	boost::filesystem::path const silicium_git = argv[1];
 
-	Si::temporary_directory_allocator temporary_dirs(boost::filesystem::current_path());
-	Si::directory_allocator const allocate_temporary_dir = std::bind(&Si::temporary_directory_allocator::allocate, &temporary_dirs);
+	Si::incrementing_directory_allocator temporary_dirs(boost::filesystem::current_path());
+	Si::directory_allocator const allocate_temporary_dir = std::bind(&Si::incrementing_directory_allocator::allocate, &temporary_dirs);
 	auto const report_root = allocate_temporary_dir();
 	Si::report_creator const create_port = [report_root](std::string name) { return create_simple_file_report(report_root, std::move(name)); };
 
