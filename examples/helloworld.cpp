@@ -1,5 +1,6 @@
 #include <silicium/process.hpp>
 #include <silicium/build_result.hpp>
+#include <silicium/directory_allocator.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/variant.hpp>
@@ -13,27 +14,6 @@ namespace Si
 	struct build_context
 	{
 		std::function<boost::filesystem::path ()> allocate_temporary_directory;
-	};
-
-	struct temporary_directory_allocator
-	{
-		explicit temporary_directory_allocator(boost::filesystem::path root)
-			: m_root(std::move(root))
-		{
-		}
-
-		boost::filesystem::path allocate()
-		{
-			const auto id = m_next_id++;
-			auto directory = m_root / boost::lexical_cast<std::string>(id);
-			boost::filesystem::create_directories(directory);
-			return directory;
-		}
-
-	private:
-
-		boost::filesystem::path m_root;
-		boost::uintmax_t m_next_id = 0;
 	};
 
 	build_context make_native_build_context(boost::filesystem::path temporary_directory_root)
