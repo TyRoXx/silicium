@@ -1,19 +1,5 @@
-#include <silicium/process.hpp>
-#include <git2.h>
-
-namespace Si
-{
-	namespace git
-	{
-		struct repository_deleter
-		{
-			void operator()(git_repository *repository)
-			{
-				git_repository_free(repository);
-			}
-		};
-	}
-}
+#include <silicium/git/repository.hpp>
+#include <boost/filesystem/operations.hpp>
 
 int main(int argc, char **argv)
 {
@@ -26,7 +12,7 @@ int main(int argc, char **argv)
 	const char *url = argv[1];
 	auto const destination = (boost::filesystem::current_path() / "si.git").string();
 	int const error = git_clone(&repo, url, destination.c_str(), NULL);
-	std::unique_ptr<git_repository, Si::git::repository_deleter> repo2(repo);
+	Si::git::unique_repository repo2(repo);
 	repo = nullptr;
 	if (error)
 	{
