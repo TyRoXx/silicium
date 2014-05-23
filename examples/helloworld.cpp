@@ -9,29 +9,11 @@
 #include <fstream>
 #include <iostream>
 
-namespace Si
-{
-	struct build_context
-	{
-		std::function<boost::filesystem::path ()> allocate_temporary_directory;
-	};
-
-	build_context make_native_build_context(boost::filesystem::path temporary_directory_root)
-	{
-		const auto temporary_dirs = std::make_shared<temporary_directory_allocator>(std::move(temporary_directory_root));
-		return build_context
-		{
-			std::bind(&temporary_directory_allocator::allocate, temporary_dirs)
-		};
-	}
-
-}
-
 namespace
 {
-	Si::build_result build(Si::build_context const &context)
+	Si::build_result build(Si::directory_allocator const &allocate_temporary_dir)
 	{
-		const auto source_dir = context.allocate_temporary_directory();
+		const auto source_dir = allocate_temporary_dir();
 		const auto source_file = (source_dir / "hello.cpp");
 		{
 			std::ofstream file(source_file.string());
@@ -41,7 +23,7 @@ namespace
 				throw std::runtime_error("Could not write source file");
 			}
 		}
-		const auto build_dir = context.allocate_temporary_directory();
+		const auto build_dir = allocate_temporary_dir();
 		const auto executable_file = build_dir / "hello";
 		{
 			const auto compilation_result = Si::run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()}, build_dir, true);
@@ -91,8 +73,9 @@ namespace
 
 int main()
 {
-	const auto context = Si::make_native_build_context(boost::filesystem::current_path());
-	const Si::build_result result = build(context);
+	Si::temporary_directory_allocator temporary_dirs(boost::filesystem::current_path());
+	Si::directory_allocator const allocate_temporary_dir = std::bind(&Si::temporary_directory_allocator::allocate, &temporary_dirs);
+	const Si::build_result result = build(allocate_temporary_dir);
 	result_printer printer(std::cerr);
 	boost::apply_visitor(printer, result);
 	std::cerr << '\n';
