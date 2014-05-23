@@ -13,5 +13,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package(Libgit2)
 
 include_directories(".")
+add_subdirectory("silicium")
 add_subdirectory("test")
 add_subdirectory("examples")

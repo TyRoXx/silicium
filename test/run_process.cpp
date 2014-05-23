@@ -1,5 +1,6 @@
 #include <silicium/process.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/filesystem/operations.hpp>
 
 namespace Si
 {
