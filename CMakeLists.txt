@@ -4,7 +4,7 @@ if(UNIX)
 	add_definitions("-Wall -Wextra -pedantic -std=c++1y -Wconversion -Wvla")
 endif()
 
-find_package(Boost REQUIRED unit_test_framework filesystem system)
+find_package(Boost REQUIRED unit_test_framework filesystem iostreams system)
 if(UNIX)
 	add_definitions("-DBOOST_TEST_DYN_LINK")
 endif()

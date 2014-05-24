@@ -49,6 +49,13 @@ namespace Si
 			return unique_repository(repo);
 		}
 
+		unique_repository clone(std::string const &source, boost::filesystem::path const &destination, git_clone_options const *options)
+		{
+			git_repository *repo = nullptr;
+			throw_if_libgit2_error(git_clone(&repo, source.c_str(), destination.string().c_str(), options));
+			return unique_repository(repo);
+		}
+
 		unique_reference lookup(git_repository &repository, char const *name)
 		{
 			git_reference *ref = nullptr;

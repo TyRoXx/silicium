@@ -34,6 +34,7 @@ namespace Si
 
 		void throw_if_libgit2_error(int error);
 		unique_repository open_repository(boost::filesystem::path const &where);
+		unique_repository clone(std::string const &source, boost::filesystem::path const &destination, git_clone_options const *options);
 		unique_reference lookup(git_repository &repository, char const *name);
 	}
 }
