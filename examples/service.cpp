@@ -29,14 +29,10 @@ namespace
 	}
 
 	void set_last_built(
-			git_repository &repository,
 			boost::filesystem::path const &last_build_file_name,
-			git_reference const &built)
+			git_oid const &built)
 	{
-		char const * const name = git_reference_name(&built);
-		git_oid commit_id;
-		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&commit_id, &repository, name));
-		auto const id_str = Si::git::format_oid(commit_id);
+		auto const id_str = Si::git::format_oid(built);
 		Si::write_file(last_build_file_name, id_str.data(), id_str.size());
 	}
 
@@ -131,39 +127,51 @@ namespace
 		return run_tests(cloned_dir, build_dir, reports, parallelization);
 	}
 
+	boost::optional<git_oid> find_new_commit(
+			git_repository &source,
+			std::string const &branch,
+			boost::filesystem::path const &results_repository,
+			boost::filesystem::path const &last_built_file_name)
+	{
+		auto const full_branch_name = ("refs/heads/" + branch);
+		auto const ref_to_build = Si::git::lookup(source, full_branch_name.c_str());
+		if (!ref_to_build)
+		{
+			throw std::runtime_error(branch + " branch does not exist");
+		}
+		git_oid oid_to_build;
+		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&oid_to_build, &source, full_branch_name.c_str()));
+		auto const ref_last_built = get_last_built(last_built_file_name);
+		if (!ref_last_built || !git_oid_equal(&*ref_last_built, &oid_to_build))
+		{
+			return oid_to_build;
+		}
+		return boost::none;
+	}
+
 	void check_build(
 			boost::filesystem::path const &source_location,
 			std::string const &branch,
 			boost::filesystem::path const &workspace,
 			unsigned parallelization)
 	{
-		auto const source = Si::git::open_repository(source_location);
-		auto const full_branch_name = ("refs/heads/" + branch);
-		auto const ref_to_build = Si::git::lookup(*source, full_branch_name.c_str());
-		if (!ref_to_build)
-		{
-			throw std::runtime_error(branch + " branch does not exist");
-		}
-		git_oid oid_to_build;
-		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&oid_to_build, source.get(), full_branch_name.c_str()));
 		auto const results_repository = workspace / "results.git";
 		auto const last_built_file_name = make_last_built_file_name(results_repository);
-		auto const ref_last_built = get_last_built(last_built_file_name);
-		if (ref_last_built &&
-			git_oid_equal(&*ref_last_built, &oid_to_build))
+		auto const source = Si::git::open_repository(source_location);
+		auto const new_commit = find_new_commit(*source, branch, results_repository, last_built_file_name);
+		if (!new_commit)
 		{
-			//nothing to do
 			return;
 		}
 
-		auto const formatted_build_oid = Si::git::format_oid(oid_to_build);
+		auto const formatted_build_oid = Si::git::format_oid(*new_commit);
 		auto const temporary_location = workspace / formatted_build_oid;
 		boost::filesystem::create_directories(temporary_location);
 
 		Si::filesystem_directory_builder results(results_repository);
 		auto const reports = results.create_subdirectory(formatted_build_oid);
 		build_commit(branch, source_location.string(), temporary_location, *reports, parallelization);
-		set_last_built(*source, last_built_file_name, *ref_to_build);
+		set_last_built(last_built_file_name, *new_commit);
 
 		auto git_log = Si::make_file_sink(temporary_location / "git_commit.log");
 		push(results_repository, git_log.get(), "built by silicium");
