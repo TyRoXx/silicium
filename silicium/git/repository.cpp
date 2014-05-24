@@ -68,5 +68,13 @@ namespace Si
 			throw_if_libgit2_error(error);
 			return unique_reference(ref);
 		}
+
+		std::string format_oid(git_oid const &id)
+		{
+			std::array<char, 41> str;
+			git_oid_fmt(str.data(), &id);
+			str[40] = 0;
+			return str.data();
+		}
 	}
 }

@@ -82,14 +82,6 @@ namespace
 		}
 	}
 
-	std::string format_oid(git_oid const &id)
-	{
-		std::array<char, 41> str;
-		git_oid_fmt(str.data(), &id);
-		str[40] = 0;
-		return str.data();
-	}
-
 	void set_last_built(
 			git_repository &repository,
 			boost::filesystem::path const &last_build_file_name,
@@ -98,7 +90,7 @@ namespace
 		char const * const name = git_reference_name(&built);
 		git_oid commit_id;
 		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&commit_id, &repository, name));
-		auto const id_str = format_oid(commit_id);
+		auto const id_str = Si::git::format_oid(commit_id);
 		write_file(last_build_file_name, id_str.data(), id_str.size());
 	}
 
@@ -233,11 +225,12 @@ namespace
 			return;
 		}
 
-		auto const temporary_location = workspace / format_oid(oid_to_build);
+		auto const formatted_build_oid = Si::git::format_oid(oid_to_build);
+		auto const temporary_location = workspace / formatted_build_oid;
 		boost::filesystem::create_directories(temporary_location);
 
 		filesystem_directory_builder results(results_repository);
-		auto const reports = results.create_subdirectory(format_oid(oid_to_build));
+		auto const reports = results.create_subdirectory(formatted_build_oid);
 		build_commit(branch, source_location, temporary_location, *reports);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
 	}
