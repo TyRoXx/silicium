@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 if(UNIX)
-	add_definitions("-Wall -Wextra -pedantic -std=c++0x -Wconversion -Wvla")
+	add_definitions("-Wall -Wextra -pedantic -std=c++1y -Wconversion -Wvla")
 endif()
 
 find_package(Boost REQUIRED unit_test_framework filesystem system)
