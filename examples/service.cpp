@@ -8,6 +8,7 @@
 #include <silicium/git/repository.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/format.hpp>
 #include <fstream>
 
 namespace Si
@@ -145,32 +146,41 @@ namespace Si
 			return boost::none;
 		}
 
+		typedef std::function<std::string (Si::build_result result, git_commit const &source)> commit_message_formatter;
+
 		void check_build(
 				boost::filesystem::path const &source_location,
 				boost::filesystem::path const &results_repository,
 				std::string const &branch,
 				boost::filesystem::path const &workspace,
 				boost::filesystem::path const &git_executable,
-				std::string const &commit_message,
+				commit_message_formatter const &make_commit_message,
 				test_runner const &run_tests)
 		{
 			auto const last_built_file_name = make_last_built_file_name(results_repository);
 			auto const source = Si::git::open_repository(source_location);
-			auto const new_commit = find_new_commit(*source, branch, last_built_file_name);
-			if (!new_commit)
+			auto const new_commit_id = find_new_commit(*source, branch, last_built_file_name);
+			if (!new_commit_id)
 			{
 				return;
 			}
 
-			auto const formatted_build_oid = Si::git::format_oid(*new_commit);
+			auto const new_commit = git::lookup_commit(*source, *new_commit_id);
+			if (!new_commit)
+			{
+				throw std::runtime_error("Head of branch " + branch + " is not a commit");
+			}
+
+			auto const formatted_build_oid = Si::git::format_oid(*new_commit_id);
 			auto const temporary_location = workspace / formatted_build_oid;
 			boost::filesystem::create_directories(temporary_location);
 
 			Si::filesystem_directory_builder results(results_repository);
 			auto const reports = results.create_subdirectory(formatted_build_oid);
-			build_commit(branch, source_location.string(), temporary_location, *reports, run_tests);
-			set_last_built(last_built_file_name, *new_commit);
+			auto const result = build_commit(branch, source_location.string(), temporary_location, *reports, run_tests);
+			set_last_built(last_built_file_name, *new_commit_id);
 
+			auto const commit_message = make_commit_message(result, *new_commit);
 			push(git_executable, results_repository, commit_message);
 		}
 	}
@@ -198,6 +208,19 @@ namespace
 		}
 		return Si::build_success{};
 	}
+
+	struct result_to_short_string_converter : boost::static_visitor<std::string>
+	{
+		std::string operator()(Si::build_success const &) const
+		{
+			return "success";
+		}
+
+		std::string operator()(Si::build_failure const &) const
+		{
+			return "failure";
+		}
+	};
 }
 
 int main(int argc, char **argv)
@@ -229,7 +252,14 @@ int main(int argc, char **argv)
 		{
 			auto const run_tests2 = std::bind(run_tests, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, parallelization);
 			auto const results_repository = workspace / "results.git";
-			Si::oxid::check_build(source_location, results_repository, "master", workspace, "git", "built by silicium", run_tests2);
+			auto const format_commit_message = [](Si::build_result result, git_commit const &source)
+			{
+				auto const result_str = boost::apply_visitor(result_to_short_string_converter{}, result);
+				auto const author = git_commit_author(&source)->name;
+				auto const original_message = git_commit_message(&source);
+				return boost::str(boost::format("%1% - %2% - %3%") % result_str % author % original_message);
+			};
+			Si::oxid::check_build(source_location, results_repository, "master", workspace, "git", format_commit_message, run_tests2);
 		}
 		catch (std::exception const &ex)
 		{

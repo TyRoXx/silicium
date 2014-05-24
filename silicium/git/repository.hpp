@@ -21,6 +21,12 @@ namespace Si
 		};
 		typedef std::unique_ptr<git_reference, reference_deleter> unique_reference;
 
+		struct commit_deleter
+		{
+			void operator()(git_commit *commit);
+		};
+		typedef std::unique_ptr<git_commit, commit_deleter> unique_commit;
+
 		struct git_error : std::runtime_error
 		{
 			explicit git_error(int code, std::string message);
@@ -36,6 +42,7 @@ namespace Si
 		unique_repository open_repository(boost::filesystem::path const &where);
 		unique_repository clone(std::string const &source, boost::filesystem::path const &destination, git_clone_options const *options);
 		unique_reference lookup(git_repository &repository, char const *name);
+		unique_commit lookup_commit(git_repository &repository, git_oid const &id);
 		std::string format_oid(git_oid const &id);
 	}
 }

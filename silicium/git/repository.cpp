@@ -15,6 +15,11 @@ namespace Si
 			git_reference_free(reference);
 		}
 
+		void commit_deleter::operator()(git_commit *commit)
+		{
+			git_commit_free(commit);
+		}
+
 		git_error::git_error(int code, std::string message)
 			: std::runtime_error(std::move(message))
 			, m_code(code)
@@ -62,11 +67,22 @@ namespace Si
 			auto const error = git_reference_lookup(&ref, &repository, name);
 			if (error == GIT_ENOTFOUND)
 			{
-				assert(!ref);
 				return nullptr;
 			}
 			throw_if_libgit2_error(error);
 			return unique_reference(ref);
+		}
+
+		unique_commit lookup_commit(git_repository &repository, git_oid const &id)
+		{
+			git_commit *commit = nullptr;
+			auto const error = git_commit_lookup(&commit, &repository, &id);
+			if (error == GIT_ENOTFOUND)
+			{
+				return nullptr;
+			}
+			throw_if_libgit2_error(error);
+			return unique_commit(commit);
 		}
 
 		std::string format_oid(git_oid const &id)
