@@ -7,6 +7,63 @@
 #include <boost/asio.hpp>
 #include <fstream>
 
+namespace Si
+{
+	void write_file(boost::filesystem::path const &name, char const *data, std::size_t size)
+	{
+		std::ofstream file(name.string(), std::ios::binary);
+		if (!file)
+		{
+			throw std::runtime_error("Could not open file " + name.string() + " for writing");
+		}
+		file.write(data, size);
+		if (!file)
+		{
+			throw std::runtime_error("Could not write to file " + name.string());
+		}
+	}
+
+	struct directory_builder
+	{
+		virtual ~directory_builder()
+		{
+		}
+
+		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) = 0;
+		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) = 0;
+	};
+
+	struct filesystem_directory_builder : directory_builder
+	{
+		explicit filesystem_directory_builder(boost::filesystem::path destination)
+			: m_destination(std::move(destination))
+		{
+		}
+
+		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) override
+		{
+			auto const file_name = m_destination / name;
+			std::unique_ptr<std::ostream> file(new std::ofstream(file_name.string(), std::ios::binary));
+			if (!*file)
+			{
+				throw std::runtime_error("Cannot open file for writing: " + file_name.string());
+			}
+			return std::unique_ptr<Si::sink<char>>(new Si::ostream_sink(std::move(file)));
+		}
+
+		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) override
+		{
+			auto sub = m_destination / name;
+			boost::filesystem::create_directories(sub);
+			return std::unique_ptr<directory_builder>(new filesystem_directory_builder(sub));
+		}
+
+	private:
+
+		boost::filesystem::path m_destination;
+	};
+}
+
 namespace
 {
 	struct tcp_trigger
@@ -68,20 +125,6 @@ namespace
 		return id;
 	}
 
-	void write_file(boost::filesystem::path const &name, char const *data, std::size_t size)
-	{
-		std::ofstream file(name.string(), std::ios::binary);
-		if (!file)
-		{
-			throw std::runtime_error("Could not open file " + name.string() + " for writing");
-		}
-		file.write(data, size);
-		if (!file)
-		{
-			throw std::runtime_error("Could not write to file " + name.string());
-		}
-	}
-
 	void set_last_built(
 			git_repository &repository,
 			boost::filesystem::path const &last_build_file_name,
@@ -91,23 +134,13 @@ namespace
 		git_oid commit_id;
 		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&commit_id, &repository, name));
 		auto const id_str = Si::git::format_oid(commit_id);
-		write_file(last_build_file_name, id_str.data(), id_str.size());
+		Si::write_file(last_build_file_name, id_str.data(), id_str.size());
 	}
-
-	struct directory_builder
-	{
-		virtual ~directory_builder()
-		{
-		}
-
-		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) = 0;
-		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) = 0;
-	};
 
 	Si::build_result make(
 			boost::filesystem::path const &source,
 			boost::filesystem::path const &build_dir,
-			directory_builder &artifacts)
+			Si::directory_builder &artifacts)
 	{
 		{
 			Si::process_parameters parameters;
@@ -147,36 +180,6 @@ namespace
 		return Si::build_success{};
 	}
 
-	struct filesystem_directory_builder : directory_builder
-	{
-		explicit filesystem_directory_builder(boost::filesystem::path destination)
-			: m_destination(std::move(destination))
-		{
-		}
-
-		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) override
-		{
-			auto const file_name = m_destination / name;
-			std::unique_ptr<std::ostream> file(new std::ofstream(file_name.string(), std::ios::binary));
-			if (!*file)
-			{
-				throw std::runtime_error("Cannot open file for writing: " + file_name.string());
-			}
-			return std::unique_ptr<Si::sink<char>>(new Si::ostream_sink(std::move(file)));
-		}
-
-		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) override
-		{
-			auto sub = m_destination / name;
-			boost::filesystem::create_directories(sub);
-			return std::unique_ptr<directory_builder>(new filesystem_directory_builder(sub));
-		}
-
-	private:
-
-		boost::filesystem::path m_destination;
-	};
-
 	void clone(
 			std::string const &branch,
 			boost::filesystem::path const &source_location,
@@ -191,7 +194,7 @@ namespace
 			std::string const &branch,
 			boost::filesystem::path const &source_location,
 			boost::filesystem::path const &commit_dir,
-			directory_builder &reports)
+			Si::directory_builder &reports)
 	{
 		auto const cloned_dir = commit_dir / "source";
 		clone(branch, source_location, cloned_dir);
@@ -229,7 +232,7 @@ namespace
 		auto const temporary_location = workspace / formatted_build_oid;
 		boost::filesystem::create_directories(temporary_location);
 
-		filesystem_directory_builder results(results_repository);
+		Si::filesystem_directory_builder results(results_repository);
 		auto const reports = results.create_subdirectory(formatted_build_oid);
 		build_commit(branch, source_location, temporary_location, *reports);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
