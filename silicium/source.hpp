@@ -2,6 +2,8 @@
 #define SILICIUM_SOURCE_HPP
 
 #include <boost/range/iterator_range.hpp>
+#include <boost/optional.hpp>
+#include <boost/cstdint.hpp>
 
 namespace Si
 {
@@ -14,6 +16,8 @@ namespace Si
 
 		virtual boost::iterator_range<Element const *> map_next(std::size_t size) = 0;
 		virtual Element *copy_next(boost::iterator_range<Element *> destination) = 0;
+		virtual boost::uintmax_t minimum_size() = 0;
+		virtual boost::optional<boost::uintmax_t> maximum_size() = 0;
 	};
 
 	template <class Element>

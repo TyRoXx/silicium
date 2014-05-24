@@ -102,6 +102,78 @@ namespace
 		write_file(last_build_file_name, id_str.data(), id_str.size());
 	}
 
+	struct directory_builder
+	{
+		virtual ~directory_builder()
+		{
+		}
+
+		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) = 0;
+		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) = 0;
+	};
+
+	Si::build_result make(
+			boost::filesystem::path const &source,
+			boost::filesystem::path const &build_dir,
+			directory_builder &artifacts)
+	{
+		{
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/cmake";
+			parameters.arguments = {source.string()};
+			parameters.current_path = build_dir;
+			parameters.stdout = artifacts.begin_artifact("cmake.log");
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				return Si::build_failure{"CMake failed"};
+			}
+		}
+		{
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/make";
+			parameters.arguments = {"-j4"};
+			parameters.current_path = build_dir;
+			parameters.stdout = artifacts.begin_artifact("make.log");
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				return Si::build_failure{"make failed"};
+			}
+		}
+		return Si::build_success{};
+	}
+
+	struct filesystem_directory_builder : directory_builder
+	{
+		explicit filesystem_directory_builder(boost::filesystem::path destination)
+			: m_destination(std::move(destination))
+		{
+		}
+
+		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) override
+		{
+			auto const file_name = m_destination / name;
+			std::unique_ptr<std::ostream> file(new std::ofstream(file_name.string(), std::ios::binary));
+			if (!*file)
+			{
+				throw std::runtime_error("Cannot open file for writing: " + file_name.string());
+			}
+			return std::unique_ptr<Si::sink<char>>(new Si::ostream_sink(std::move(file)));
+		}
+
+		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) override
+		{
+			auto sub = m_destination / name;
+			boost::filesystem::create_directories(sub);
+			return std::unique_ptr<directory_builder>(new filesystem_directory_builder(sub));
+		}
+
+	private:
+
+		boost::filesystem::path m_destination;
+	};
+
 	Si::build_result build_commit(
 			git_repository &repository,
 			git_reference &commit_to_build,
@@ -117,26 +189,11 @@ namespace
 		git_clone_options options = GIT_CLONE_OPTIONS_INIT;
 		options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
 		Si::git::clone(source_location.string(), cloned_dir, &options);
+
 		auto const build_dir = commit_dir / "build";
 		boost::filesystem::create_directories(build_dir);
-		{
-			auto const cmake = Si::run_process("/usr/bin/cmake", {cloned_dir.string()}, build_dir);
-			write_file(commit_dir / "cmake.log", cmake.output.data(), cmake.output.size());
-			if (cmake.exit_code != 0)
-			{
-				return Si::build_failure{"CMake failed"};
-			}
-		}
-		{
-			auto const make = Si::run_process("/usr/bin/make", {"-j4"}, build_dir);
-			write_file(commit_dir / "make.log", make.output.data(), make.output.size());
-			if (make.exit_code != 0)
-			{
-				return Si::build_failure{"make failed"};
-			}
-		}
-		//TODO: tests
-		return Si::build_success{};
+		filesystem_directory_builder artifacts(commit_dir);
+		return make(cloned_dir, build_dir, artifacts);
 	}
 
 	void check_build(

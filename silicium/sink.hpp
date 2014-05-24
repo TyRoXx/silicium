@@ -3,6 +3,8 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/algorithm/copy.hpp>
+#include <ostream>
+#include <memory>
 
 namespace Si
 {
@@ -112,6 +114,34 @@ namespace Si
 	{
 		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
 	}
+
+	struct ostream_sink : sink<char>
+	{
+		//unique_ptr to make ostreams movable
+		explicit ostream_sink(std::unique_ptr<std::ostream> file)
+			: m_file(std::move(file))
+		{
+			m_file->exceptions(std::ios::failbit | std::ios::badbit);
+		}
+
+		virtual boost::iterator_range<char *> make_append_space(std::size_t) override
+		{
+			return {};
+		}
+
+		virtual void flush_append_space() override
+		{
+		}
+
+		virtual void append(boost::iterator_range<char const *> data) override
+		{
+			m_file->write(data.begin(), data.size());
+		}
+
+	private:
+
+		std::unique_ptr<std::ostream> m_file;
+	};
 }
 
 #endif
