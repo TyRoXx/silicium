@@ -9,7 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 
-namespace
+namespace Si
 {
 	boost::filesystem::path make_last_built_file_name(boost::filesystem::path const &output_location)
 	{
@@ -161,7 +161,10 @@ namespace
 		auto git_log = Si::make_file_sink(temporary_location / "git_commit.log");
 		push(results_repository, git_log.get(), commit_message);
 	}
+}
 
+namespace
+{
 	Si::build_result run_tests(
 			boost::filesystem::path const &source,
 			boost::filesystem::path const &build_dir,
@@ -204,7 +207,7 @@ int main(int argc, char **argv)
 		{
 			auto const run_tests2 = std::bind(run_tests, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, parallelization);
 			auto const results_repository = workspace / "results.git";
-			check_build(source_location, results_repository, "master", workspace, "built by silicium", run_tests2);
+			Si::check_build(source_location, results_repository, "master", workspace, "built by silicium", run_tests2);
 		}
 		catch (std::exception const &ex)
 		{
