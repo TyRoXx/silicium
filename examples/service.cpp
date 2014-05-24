@@ -6,6 +6,7 @@
 #include <silicium/directory_builder.hpp>
 #include <silicium/tcp_trigger.hpp>
 #include <silicium/git/repository.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 
 namespace
@@ -94,16 +95,17 @@ namespace
 		}
 	}
 
-	Si::build_result make(
+	Si::build_result run_tests(
 			boost::filesystem::path const &source,
 			boost::filesystem::path const &build_dir,
-			Si::directory_builder &artifacts)
+			Si::directory_builder &artifacts,
+			unsigned parallelization)
 	{
 		if (Si::run_process("/usr/bin/cmake", {source.string()}, build_dir, *artifacts.begin_artifact("cmake.log")) != 0)
 		{
 			return Si::build_failure{"CMake failed"};
 		}
-		if (Si::run_process("/usr/bin/make", {"-j2"}, build_dir, *artifacts.begin_artifact("make.log")) != 0)
+		if (Si::run_process("/usr/bin/make", {"-j" + boost::lexical_cast<std::string>(parallelization)}, build_dir, *artifacts.begin_artifact("make.log")) != 0)
 		{
 			return Si::build_failure{"make failed"};
 		}
@@ -118,20 +120,22 @@ namespace
 			std::string const &branch,
 			std::string const &source_location,
 			boost::filesystem::path const &commit_dir,
-			Si::directory_builder &reports)
+			Si::directory_builder &reports,
+			unsigned parallelization)
 	{
 		auto const cloned_dir = commit_dir / "source";
 		clone(branch, source_location, cloned_dir);
 
 		auto const build_dir = commit_dir / "build";
 		boost::filesystem::create_directories(build_dir);
-		return make(cloned_dir, build_dir, reports);
+		return run_tests(cloned_dir, build_dir, reports, parallelization);
 	}
 
 	void check_build(
 			boost::filesystem::path const &source_location,
 			std::string const &branch,
-			boost::filesystem::path const &workspace)
+			boost::filesystem::path const &workspace,
+			unsigned parallelization)
 	{
 		auto const source = Si::git::open_repository(source_location);
 		auto const full_branch_name = ("refs/heads/" + branch);
@@ -158,7 +162,7 @@ namespace
 
 		Si::filesystem_directory_builder results(results_repository);
 		auto const reports = results.create_subdirectory(formatted_build_oid);
-		build_commit(branch, source_location.string(), temporary_location, *reports);
+		build_commit(branch, source_location.string(), temporary_location, *reports, parallelization);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
 
 		auto git_log = Si::make_file_sink(temporary_location / "git_commit.log");
@@ -174,12 +178,17 @@ int main(int argc, char **argv)
 	}
 	boost::filesystem::path const source_location = argv[1];
 	boost::filesystem::path const workspace = argv[2];
+	unsigned parallelization = 1;
+	if (argc >= 4)
+	{
+		parallelization = boost::lexical_cast<unsigned>(argv[3]);
+	}
 
 	auto const build = [&]
 	{
 		try
 		{
-			check_build(source_location, "master", workspace);
+			check_build(source_location, "master", workspace, parallelization);
 		}
 		catch (std::exception const &ex)
 		{
