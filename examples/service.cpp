@@ -10,11 +10,9 @@
 
 namespace
 {
-	boost::filesystem::path make_last_built_file_name(
-			boost::filesystem::path const &output_location,
-			std::string const &branch)
+	boost::filesystem::path make_last_built_file_name(boost::filesystem::path const &output_location)
 	{
-		return output_location / (branch + ".lastbuild.txt");
+		return output_location / ("lastbuild.txt");
 	}
 
 	boost::optional<git_oid> get_last_built(boost::filesystem::path const &last_build_file_name)
@@ -43,17 +41,32 @@ namespace
 
 	void clone(
 			std::string const &branch,
-			boost::filesystem::path const &source_location,
+			std::string const &source_location,
 			boost::filesystem::path const &cloned_dir)
 	{
 		git_clone_options options = GIT_CLONE_OPTIONS_INIT;
 		options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
-		Si::git::clone(source_location.string(), cloned_dir, &options);
+		Si::git::clone(source_location, cloned_dir, &options);
+	}
+
+	int run_process(
+			boost::filesystem::path executable,
+			std::vector<std::string> arguments,
+			boost::filesystem::path current_path,
+			std::unique_ptr<Si::sink<char>> output)
+	{
+		Si::process_parameters parameters;
+		parameters.executable = std::move(executable);
+		parameters.arguments = std::move(arguments);
+		parameters.current_path = std::move(current_path);
+		parameters.stdout = std::move(output);
+		return Si::run_process(parameters);
 	}
 
 	void push(
 			boost::filesystem::path const &results_repository,
-			std::unique_ptr<Si::sink<char>> git_log)
+			std::unique_ptr<Si::sink<char>> git_log,
+			std::string message)
 	{
 		{
 			Si::process_parameters parameters;
@@ -71,7 +84,7 @@ namespace
 		{
 			Si::process_parameters parameters;
 			parameters.executable = "/usr/bin/git";
-			parameters.arguments = {"commit", "-m", "built by silicium"};
+			parameters.arguments = {"commit", "-m", std::move(message)};
 			parameters.current_path = results_repository;
 			parameters.stdout = std::move(git_log);
 			int const exit_code = Si::run_process(parameters);
@@ -100,47 +113,24 @@ namespace
 			boost::filesystem::path const &build_dir,
 			Si::directory_builder &artifacts)
 	{
+		if (run_process("/usr/bin/cmake", {source.string()}, build_dir, artifacts.begin_artifact("cmake.log")) != 0)
 		{
-			Si::process_parameters parameters;
-			parameters.executable = "/usr/bin/cmake";
-			parameters.arguments = {source.string()};
-			parameters.current_path = build_dir;
-			parameters.stdout = artifacts.begin_artifact("cmake.log");
-			int const exit_code = Si::run_process(parameters);
-			if (exit_code != 0)
-			{
-				return Si::build_failure{"CMake failed"};
-			}
+			return Si::build_failure{"CMake failed"};
 		}
+		if (run_process("/usr/bin/make", {"-j2"}, build_dir, artifacts.begin_artifact("make.log")) != 0)
 		{
-			Si::process_parameters parameters;
-			parameters.executable = "/usr/bin/make";
-			parameters.arguments = {"-j4"};
-			parameters.current_path = build_dir;
-			parameters.stdout = artifacts.begin_artifact("make.log");
-			int const exit_code = Si::run_process(parameters);
-			if (exit_code != 0)
-			{
-				return Si::build_failure{"make failed"};
-			}
+			return Si::build_failure{"make failed"};
 		}
+		if (run_process("test/test", {}, build_dir, artifacts.begin_artifact("test.log")) != 0)
 		{
-			Si::process_parameters parameters;
-			parameters.executable = build_dir / "test/test";
-			parameters.current_path = build_dir / "test";
-			parameters.stdout = artifacts.begin_artifact("test.log");
-			int const exit_code = Si::run_process(parameters);
-			if (exit_code != 0)
-			{
-				return Si::build_failure{"tests failed"};
-			}
+			return Si::build_failure{"tests failed"};
 		}
 		return Si::build_success{};
 	}
 
 	Si::build_result build_commit(
 			std::string const &branch,
-			boost::filesystem::path const &source_location,
+			std::string const &source_location,
 			boost::filesystem::path const &commit_dir,
 			Si::directory_builder &reports)
 	{
@@ -167,7 +157,7 @@ namespace
 		git_oid oid_to_build;
 		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&oid_to_build, source.get(), full_branch_name.c_str()));
 		auto const results_repository = workspace / "results.git";
-		auto const last_built_file_name = make_last_built_file_name(results_repository, branch);
+		auto const last_built_file_name = make_last_built_file_name(results_repository);
 		auto const ref_last_built = get_last_built(last_built_file_name);
 		if (ref_last_built &&
 			git_oid_equal(&*ref_last_built, &oid_to_build))
@@ -182,10 +172,10 @@ namespace
 
 		Si::filesystem_directory_builder results(results_repository);
 		auto const reports = results.create_subdirectory(formatted_build_oid);
-		build_commit(branch, source_location, temporary_location, *reports);
+		build_commit(branch, source_location.string(), temporary_location, *reports);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
 
-		push(results_repository, Si::make_file_sink(temporary_location / "git_commit.log"));
+		push(results_repository, Si::make_file_sink(temporary_location / "git_commit.log"), "built by silicium");
 	}
 }
 
