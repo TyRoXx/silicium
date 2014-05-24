@@ -23,6 +23,10 @@ namespace Si
 	template <class Element>
 	struct memory_source : source<Element>
 	{
+		memory_source()
+		{
+		}
+
 		explicit memory_source(boost::iterator_range<Element const *> elements)
 			: m_elements(std::move(elements))
 		{
@@ -30,6 +34,7 @@ namespace Si
 
 		virtual boost::iterator_range<Element const *> map_next(std::size_t size) override
 		{
+			(void)size;
 			return m_elements;
 		}
 
@@ -42,6 +47,16 @@ namespace Si
 				m_elements.pop_front();
 			}
 			return destination.begin();
+		}
+
+		virtual boost::uintmax_t minimum_size() override
+		{
+			return static_cast<boost::uintmax_t>(m_elements.size());
+		}
+
+		virtual boost::optional<boost::uintmax_t> maximum_size() override
+		{
+			return static_cast<boost::uintmax_t>(m_elements.size());
 		}
 
 	private:
