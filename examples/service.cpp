@@ -185,6 +185,16 @@ namespace
 		boost::filesystem::path m_destination;
 	};
 
+	void clone(
+			std::string const &branch,
+			boost::filesystem::path const &source_location,
+			boost::filesystem::path const &cloned_dir)
+	{
+		git_clone_options options = GIT_CLONE_OPTIONS_INIT;
+		options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
+		Si::git::clone(source_location.string(), cloned_dir, &options);
+	}
+
 	Si::build_result build_commit(
 			std::string const &branch,
 			boost::filesystem::path const &source_location,
@@ -192,9 +202,7 @@ namespace
 			boost::filesystem::path const &report_location)
 	{
 		auto const cloned_dir = commit_dir / "source";
-		git_clone_options options = GIT_CLONE_OPTIONS_INIT;
-		options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
-		Si::git::clone(source_location.string(), cloned_dir, &options);
+		clone(branch, source_location, cloned_dir);
 
 		auto const build_dir = commit_dir / "build";
 		boost::filesystem::create_directories(build_dir);
