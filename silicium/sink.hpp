@@ -25,43 +25,53 @@ namespace Si
 		destination.flush_append_space();
 	}
 
-	template <class Element, std::size_t BufferSize>
-	struct appender
+	template <class Element, class Buffer = std::array<Element, ((1U << 13U) / sizeof(Element))>>
+	struct buffering_sink : sink<Element>
 	{
-		explicit appender(sink<Element> &destination)
+		explicit buffering_sink(sink<Element> &destination, Buffer buffer = Buffer())
 			: m_destination(destination)
+			, m_fallback_buffer(std::move(buffer))
 		{
 		}
 
-		boost::iterator_range<Element *> make_append_space(std::size_t size)
+		boost::iterator_range<Element *> make_append_space(std::size_t size) override
 		{
 			auto first_try = m_destination.make_append_space(size);
 			if (!first_try.empty())
 			{
+				auto const copied = (std::min)(static_cast<std::ptrdiff_t>(m_buffer_used), first_try.size());
+				std::copy(m_fallback_buffer.begin(), m_fallback_buffer.begin() + copied, first_try.begin());
+				m_buffer_used = 0;
 				return first_try;
 			}
-			m_using_fallback = true;
-			return boost::make_iterator_range(m_fallback_buffer);
+			m_buffer_used = (std::min)(size, m_fallback_buffer.size());
+			return boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used);
 		}
 
-		void commit(std::size_t count)
+		void flush_append_space() override
 		{
-			if (m_using_fallback)
+			if (m_buffer_used)
 			{
-				assert(count < m_fallback_buffer.size());
-				m_destination.append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + count));
+				m_destination.append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used));
+				m_buffer_used = 0;
 			}
 			else
 			{
-				Si::commit(m_destination, count);
+				m_destination.flush_append_space();
 			}
+		}
+
+		void append(boost::iterator_range<Element const *> data) override
+		{
+			m_destination.append(data);
+			m_buffer_used = 0;
 		}
 
 	private:
 
 		sink<Element> &m_destination;
-		std::array<Element, BufferSize> m_fallback_buffer;
-		bool m_using_fallback = false;
+		Buffer m_fallback_buffer;
+		std::size_t m_buffer_used = 0;
 	};
 
 	template <class Element, class OutputIterator>

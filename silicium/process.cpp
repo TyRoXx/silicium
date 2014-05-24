@@ -62,9 +62,8 @@ namespace Si
 			{
 				for (;;)
 				{
-					constexpr std::size_t buffer_size = 1U << 14U;
-					appender<char, buffer_size> buffer_helper(destination);
-					auto const buffer = buffer_helper.make_append_space(buffer_size);
+					buffering_sink<char> buffer_helper(destination);
+					auto const buffer = buffer_helper.make_append_space(std::numeric_limits<std::size_t>::max());
 					assert(!buffer.empty());
 					auto const rc = read(source, buffer.begin(), buffer.size());
 					if (rc == 0)
@@ -75,7 +74,7 @@ namespace Si
 					{
 						throw boost::system::system_error(errno, boost::system::system_category());
 					}
-					buffer_helper.commit(static_cast<std::size_t>(rc));
+					commit(buffer_helper, static_cast<std::size_t>(rc));
 				}
 			}
 		}
