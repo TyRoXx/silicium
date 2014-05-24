@@ -57,10 +57,7 @@ namespace Si
 
 		boost::filesystem::path m_destination;
 	};
-}
 
-namespace
-{
 	struct tcp_trigger
 	{
 		explicit tcp_trigger(boost::asio::io_service &io, boost::asio::ip::tcp::endpoint address)
@@ -100,7 +97,10 @@ namespace
 		boost::asio::ip::tcp::acceptor m_acceptor;
 		std::unique_ptr<boost::asio::ip::tcp::socket> m_accepting;
 	};
+}
 
+namespace
+{
 	boost::filesystem::path make_last_built_file_name(
 			boost::filesystem::path const &output_location,
 			std::string const &branch)
@@ -303,7 +303,7 @@ int main(int argc, char **argv)
 	};
 
 	boost::asio::io_service io;
-	tcp_trigger external_build_trigger(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 12345));
+	Si::tcp_trigger external_build_trigger(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 12345));
 	std::function<void ()> wait_for_trigger;
 	wait_for_trigger = [&wait_for_trigger, &external_build_trigger, &build]
 	{
