@@ -91,46 +91,30 @@ namespace
 		}
 	}
 
-	Si::build_result run_tests(
-			boost::filesystem::path const &source,
-			boost::filesystem::path const &build_dir,
-			Si::directory_builder &artifacts,
-			unsigned parallelization)
-	{
-		if (Si::run_process("/usr/bin/cmake", {source.string()}, build_dir, *artifacts.begin_artifact("cmake.log")) != 0)
-		{
-			return Si::build_failure{"CMake failed"};
-		}
-		if (Si::run_process("/usr/bin/make", {"-j" + boost::lexical_cast<std::string>(parallelization)}, build_dir, *artifacts.begin_artifact("make.log")) != 0)
-		{
-			return Si::build_failure{"make failed"};
-		}
-		if (Si::run_process("test/test", {}, build_dir, *artifacts.begin_artifact("test.log")) != 0)
-		{
-			return Si::build_failure{"tests failed"};
-		}
-		return Si::build_success{};
-	}
+	typedef std::function<Si::build_result (
+			boost::filesystem::path const &cloned,
+			boost::filesystem::path const &build,
+			Si::directory_builder &artifacts
+			)> test_runner;
 
 	Si::build_result build_commit(
 			std::string const &branch,
 			std::string const &source_location,
 			boost::filesystem::path const &commit_dir,
 			Si::directory_builder &reports,
-			unsigned parallelization)
+			test_runner const &run_tests)
 	{
 		auto const cloned_dir = commit_dir / "source";
 		clone(branch, source_location, cloned_dir);
 
 		auto const build_dir = commit_dir / "build";
 		boost::filesystem::create_directories(build_dir);
-		return run_tests(cloned_dir, build_dir, reports, parallelization);
+		return run_tests(cloned_dir, build_dir, reports);
 	}
 
 	boost::optional<git_oid> find_new_commit(
 			git_repository &source,
 			std::string const &branch,
-			boost::filesystem::path const &results_repository,
 			boost::filesystem::path const &last_built_file_name)
 	{
 		auto const full_branch_name = ("refs/heads/" + branch);
@@ -151,14 +135,15 @@ namespace
 
 	void check_build(
 			boost::filesystem::path const &source_location,
+			boost::filesystem::path const &results_repository,
 			std::string const &branch,
 			boost::filesystem::path const &workspace,
-			unsigned parallelization)
+			std::string const &commit_message,
+			test_runner const &run_tests)
 	{
-		auto const results_repository = workspace / "results.git";
 		auto const last_built_file_name = make_last_built_file_name(results_repository);
 		auto const source = Si::git::open_repository(source_location);
-		auto const new_commit = find_new_commit(*source, branch, results_repository, last_built_file_name);
+		auto const new_commit = find_new_commit(*source, branch, last_built_file_name);
 		if (!new_commit)
 		{
 			return;
@@ -170,11 +155,32 @@ namespace
 
 		Si::filesystem_directory_builder results(results_repository);
 		auto const reports = results.create_subdirectory(formatted_build_oid);
-		build_commit(branch, source_location.string(), temporary_location, *reports, parallelization);
+		build_commit(branch, source_location.string(), temporary_location, *reports, run_tests);
 		set_last_built(last_built_file_name, *new_commit);
 
 		auto git_log = Si::make_file_sink(temporary_location / "git_commit.log");
-		push(results_repository, git_log.get(), "built by silicium");
+		push(results_repository, git_log.get(), commit_message);
+	}
+
+	Si::build_result run_tests(
+			boost::filesystem::path const &source,
+			boost::filesystem::path const &build_dir,
+			Si::directory_builder &artifacts,
+			unsigned parallelization)
+	{
+		if (Si::run_process("/usr/bin/cmake", {source.string()}, build_dir, *artifacts.begin_artifact("cmake.log")) != 0)
+		{
+			return Si::build_failure{"CMake failed"};
+		}
+		if (Si::run_process("/usr/bin/make", {"-j" + boost::lexical_cast<std::string>(parallelization)}, build_dir, *artifacts.begin_artifact("make.log")) != 0)
+		{
+			return Si::build_failure{"make failed"};
+		}
+		if (Si::run_process("test/test", {}, build_dir, *artifacts.begin_artifact("test.log")) != 0)
+		{
+			return Si::build_failure{"tests failed"};
+		}
+		return Si::build_success{};
 	}
 }
 
@@ -196,7 +202,9 @@ int main(int argc, char **argv)
 	{
 		try
 		{
-			check_build(source_location, "master", workspace, parallelization);
+			auto const run_tests2 = std::bind(run_tests, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, parallelization);
+			auto const results_repository = workspace / "results.git";
+			check_build(source_location, results_repository, "master", workspace, "built by silicium", run_tests2);
 		}
 		catch (std::exception const &ex)
 		{
