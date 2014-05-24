@@ -28,7 +28,14 @@ namespace Si
 		std::vector<char> output;
 	};
 
+	//TODO: remove this overload
 	process_results run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path current_path);
+
+	int run_process(
+			boost::filesystem::path executable,
+			std::vector<std::string> arguments,
+			boost::filesystem::path current_path,
+			std::unique_ptr<Si::sink<char>> output);
 }
 
 #endif

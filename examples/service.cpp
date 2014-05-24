@@ -49,20 +49,6 @@ namespace
 		Si::git::clone(source_location, cloned_dir, &options);
 	}
 
-	int run_process(
-			boost::filesystem::path executable,
-			std::vector<std::string> arguments,
-			boost::filesystem::path current_path,
-			std::unique_ptr<Si::sink<char>> output)
-	{
-		Si::process_parameters parameters;
-		parameters.executable = std::move(executable);
-		parameters.arguments = std::move(arguments);
-		parameters.current_path = std::move(current_path);
-		parameters.stdout = std::move(output);
-		return Si::run_process(parameters);
-	}
-
 	void push(
 			boost::filesystem::path const &results_repository,
 			std::unique_ptr<Si::sink<char>> git_log,
@@ -113,15 +99,15 @@ namespace
 			boost::filesystem::path const &build_dir,
 			Si::directory_builder &artifacts)
 	{
-		if (run_process("/usr/bin/cmake", {source.string()}, build_dir, artifacts.begin_artifact("cmake.log")) != 0)
+		if (Si::run_process("/usr/bin/cmake", {source.string()}, build_dir, artifacts.begin_artifact("cmake.log")) != 0)
 		{
 			return Si::build_failure{"CMake failed"};
 		}
-		if (run_process("/usr/bin/make", {"-j2"}, build_dir, artifacts.begin_artifact("make.log")) != 0)
+		if (Si::run_process("/usr/bin/make", {"-j2"}, build_dir, artifacts.begin_artifact("make.log")) != 0)
 		{
 			return Si::build_failure{"make failed"};
 		}
-		if (run_process("test/test", {}, build_dir, artifacts.begin_artifact("test.log")) != 0)
+		if (Si::run_process("test/test", {}, build_dir, artifacts.begin_artifact("test.log")) != 0)
 		{
 			return Si::build_failure{"tests failed"};
 		}
