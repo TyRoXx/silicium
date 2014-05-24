@@ -177,7 +177,15 @@ int main(int argc, char **argv)
 
 	auto const build = [&]
 	{
-		check_build(source_location, workspace);
+		try
+		{
+			check_build(source_location, workspace);
+		}
+		catch (std::exception const &ex)
+		{
+			//continue to run
+			std::cerr << ex.what() << '\n';
+		}
 	};
 
 	boost::asio::io_service io;
