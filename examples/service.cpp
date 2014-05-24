@@ -49,13 +49,14 @@ namespace Si
 		}
 
 		void push(
+				boost::filesystem::path const &git_executable,
 				boost::filesystem::path const &repository,
 				Si::sink<char> *git_log,
 				std::string message)
 		{
 			{
 				Si::process_parameters parameters;
-				parameters.executable = "/usr/bin/git";
+				parameters.executable = git_executable;
 				parameters.arguments = {"add", "-A", "."};
 				parameters.current_path = repository;
 				parameters.stdout = git_log;
@@ -68,7 +69,7 @@ namespace Si
 
 			{
 				Si::process_parameters parameters;
-				parameters.executable = "/usr/bin/git";
+				parameters.executable = git_executable;
 				parameters.arguments = {"commit", "-m", std::move(message)};
 				parameters.current_path = repository;
 				parameters.stdout = git_log;
@@ -81,7 +82,7 @@ namespace Si
 
 			{
 				Si::process_parameters parameters;
-				parameters.executable = "/usr/bin/git";
+				parameters.executable = git_executable;
 				parameters.arguments = {"push"};
 				parameters.current_path = repository;
 				parameters.stdout = git_log;
@@ -140,6 +141,7 @@ namespace Si
 				boost::filesystem::path const &results_repository,
 				std::string const &branch,
 				boost::filesystem::path const &workspace,
+				boost::filesystem::path const &git_executable,
 				std::string const &commit_message,
 				test_runner const &run_tests)
 		{
@@ -161,7 +163,7 @@ namespace Si
 			set_last_built(last_built_file_name, *new_commit);
 
 			auto git_log = Si::make_file_sink(temporary_location / "git_commit.log");
-			push(results_repository, git_log.get(), commit_message);
+			push(git_executable, results_repository, git_log.get(), commit_message);
 		}
 	}
 }
@@ -210,7 +212,7 @@ int main(int argc, char **argv)
 		{
 			auto const run_tests2 = std::bind(run_tests, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, parallelization);
 			auto const results_repository = workspace / "results.git";
-			Si::oxid::check_build(source_location, results_repository, "master", workspace, "built by silicium", run_tests2);
+			Si::oxid::check_build(source_location, results_repository, "master", workspace, "git", "built by silicium", run_tests2);
 		}
 		catch (std::exception const &ex)
 		{
