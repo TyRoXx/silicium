@@ -58,7 +58,7 @@ namespace Si
 
 	int run_process(process_parameters const &parameters)
 	{
-		auto executable = parameters.executable;
+		auto executable = parameters.executable.string();
 		auto arguments = parameters.arguments;
 		std::vector<char *> argument_pointers;
 		argument_pointers.emplace_back(&executable[0]);

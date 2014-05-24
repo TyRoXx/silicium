@@ -12,7 +12,7 @@ namespace Si
 {
 	struct process_parameters
 	{
-		std::string executable;
+		boost::filesystem::path executable;
 		std::vector<std::string> arguments;
 		boost::filesystem::path current_path;
 		std::unique_ptr<sink<char>> stdout;

@@ -141,6 +141,17 @@ namespace
 				return Si::build_failure{"make failed"};
 			}
 		}
+		{
+			Si::process_parameters parameters;
+			parameters.executable = build_dir / "test/test";
+			parameters.current_path = build_dir / "test";
+			parameters.stdout = artifacts.begin_artifact("test.log");
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				return Si::build_failure{"tests failed"};
+			}
+		}
 		return Si::build_success{};
 	}
 
