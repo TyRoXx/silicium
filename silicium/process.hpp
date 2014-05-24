@@ -10,15 +10,6 @@
 
 namespace Si
 {
-	struct process_output
-	{
-		int exit_status;
-		//TODO: make stdout asynchronously readable
-		boost::optional<std::vector<char>> stdout;
-	};
-
-	process_output run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path const &current_path, bool dump_stdout);
-
 	struct process_parameters
 	{
 		std::string executable;
@@ -30,6 +21,14 @@ namespace Si
 	};
 
 	int run_process(process_parameters const &parameters);
+
+	struct process_results
+	{
+		int exit_code;
+		std::vector<char> output;
+	};
+
+	process_results run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path current_path);
 }
 
 #endif

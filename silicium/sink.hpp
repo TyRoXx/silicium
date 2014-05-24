@@ -106,6 +106,12 @@ namespace Si
 	{
 		return iterator_sink<Element, typename std::decay<OutputIterator>::type>(std::move(out));
 	}
+
+	template <class Container>
+	auto make_container_sink(Container &destination)
+	{
+		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
+	}
 }
 
 #endif

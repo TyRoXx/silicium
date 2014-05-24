@@ -1,6 +1,7 @@
 #include <silicium/process.hpp>
 #include <silicium/build_result.hpp>
 #include <silicium/directory_allocator.hpp>
+#include <silicium/to_unique.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/variant.hpp>
@@ -26,21 +27,30 @@ namespace
 		const auto build_dir = allocate_temporary_dir();
 		const auto executable_file = build_dir / "hello";
 		{
-			const auto compilation_result = Si::run_process("/usr/bin/c++", {source_file.string(), "-o", executable_file.string()}, build_dir, true);
-			if (compilation_result.exit_status != 0)
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/c++";
+			parameters.arguments = {source_file.string(), "-o", executable_file.string()};
+			parameters.current_path = build_dir;
+			const auto compilation_result = Si::run_process(parameters);
+			if (compilation_result != 0)
 			{
 				return Si::build_failure{"Compilation was not successful"};
 			}
 		}
 
-		const auto testing_result = Si::run_process(executable_file.string(), {}, build_dir, true);
-		if (testing_result.exit_status != 0)
+		std::vector<char> stdout;
+		Si::process_parameters parameters;
+		parameters.executable = executable_file.string();
+		parameters.current_path = build_dir;
+		parameters.stdout = Si::to_unique(Si::make_iterator_sink<char>(std::back_inserter(stdout)));
+		const auto testing_result = Si::run_process(parameters);
+		if (testing_result != 0)
 		{
 			return Si::build_failure{"The built executable returned failure"};
 		}
 
 		std::string const expected_output = "Hello, world!\n";
-		if (testing_result.stdout != std::vector<char>(begin(expected_output), end(expected_output)))
+		if (stdout != std::vector<char>(begin(expected_output), end(expected_output)))
 		{
 			return Si::build_failure{"The built executable did not print the expected text to stdout"};
 		}

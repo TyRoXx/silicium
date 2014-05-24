@@ -34,31 +34,6 @@ namespace Si
 				}
 			};
 
-			std::vector<char> read_all(int source)
-			{
-				std::vector<char> content;
-				std::size_t used_content = 0;
-				std::size_t const buffer_size = 1U << 14U;
-				for (;;)
-				{
-					content.resize(used_content + buffer_size);
-					auto const rc = read(source, content.data() + used_content, buffer_size);
-					if (rc == 0)
-					{
-						//end of file
-						break;
-					}
-					if (rc < 0)
-					{
-						throw boost::system::system_error(errno, boost::system::system_category());
-					}
-					assert(static_cast<std::size_t>(rc) <= buffer_size);
-					used_content += static_cast<std::size_t>(rc);
-				}
-				content.resize(used_content);
-				return content;
-			}
-
 			void copy_all(int source, sink<char> &destination)
 			{
 				for (;;)
@@ -79,22 +54,6 @@ namespace Si
 				}
 			}
 		}
-	}
-
-	process_output run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path const &current_path, bool dump_stdout)
-	{
-		process_parameters parameters;
-		parameters.executable = executable;
-		parameters.arguments = arguments;
-		parameters.current_path = current_path;
-		boost::optional<std::vector<char>> stdout;
-		if (dump_stdout)
-		{
-			stdout = std::vector<char>();
-			parameters.stdout = to_unique(make_iterator_sink<char>(std::back_inserter(*stdout)));
-		}
-		int result = run_process(parameters);
-		return process_output{result, std::move(stdout)};
 	}
 
 	int run_process(process_parameters const &parameters)
@@ -190,5 +149,17 @@ namespace Si
 			int const exit_status = WEXITSTATUS(status);
 			return exit_status;
 		}
+	}
+
+	process_results run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path current_path)
+	{
+		process_parameters parameters;
+		parameters.executable = std::move(executable);
+		parameters.arguments = std::move(arguments);
+		parameters.current_path = std::move(current_path);
+		std::vector<char> stdout;
+		parameters.stdout = to_unique(make_container_sink(stdout));
+		auto const result = run_process(parameters);
+		return process_results{result, std::move(stdout)};
 	}
 }

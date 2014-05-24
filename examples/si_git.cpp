@@ -30,9 +30,9 @@ namespace
 	{
 		std::string const repository_name = "si.git";
 		{
-			const auto git_result = Si::run_process("/usr/bin/git", {"clone", source.string(), repository_name}, build_directory, true);
-			result.add_artifact("git.log", *git_result.stdout);
-			if (git_result.exit_status != 0)
+			const auto git_result = Si::run_process("/usr/bin/git", {"clone", source.string(), repository_name}, build_directory);
+			result.add_artifact("git.log", git_result.output);
+			if (git_result.exit_code != 0)
 			{
 				return Si::build_failure{"git clone failed"};
 			}
@@ -43,27 +43,27 @@ namespace
 		boost::filesystem::create_directories(real_build_dir);
 
 		{
-			const auto cmake_result = Si::run_process("/usr/bin/cmake", {repository_path.string(), ("-DCMAKE_BUILD_TYPE=" + build_type)}, real_build_dir, true);
-			result.add_artifact("cmake.log", *cmake_result.stdout);
-			if (cmake_result.exit_status != 0)
+			const auto cmake_result = Si::run_process("/usr/bin/cmake", {repository_path.string(), ("-DCMAKE_BUILD_TYPE=" + build_type)}, real_build_dir);
+			result.add_artifact("cmake.log", cmake_result.output);
+			if (cmake_result.exit_code != 0)
 			{
 				return Si::build_failure{"CMake failed"};
 			}
 		}
 
 		{
-			const auto make_result = Si::run_process("/usr/bin/make", {}, real_build_dir, true);
-			result.add_artifact("make.log", *make_result.stdout);
-			if (make_result.exit_status != 0)
+			const auto make_result = Si::run_process("/usr/bin/make", {}, real_build_dir);
+			result.add_artifact("make.log", make_result.output);
+			if (make_result.exit_code != 0)
 			{
 				return Si::build_failure{"Make failed"};
 			}
 		}
 
 		{
-			const auto test_result = Si::run_process((real_build_dir / "test/test").string(), {}, real_build_dir, true);
-			result.add_artifact("test.log", *test_result.stdout);
-			if (test_result.exit_status != 0)
+			const auto test_result = Si::run_process((real_build_dir / "test/test").string(), {}, real_build_dir);
+			result.add_artifact("test.log", test_result.output);
+			if (test_result.exit_code != 0)
 			{
 				return Si::build_failure{"Test failed"};
 			}
