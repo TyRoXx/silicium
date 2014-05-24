@@ -43,12 +43,7 @@ namespace Si
 		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) override
 		{
 			auto const file_name = m_destination / name;
-			std::unique_ptr<std::ostream> file(new std::ofstream(file_name.string(), std::ios::binary));
-			if (!*file)
-			{
-				throw std::runtime_error("Cannot open file for writing: " + file_name.string());
-			}
-			return std::unique_ptr<Si::sink<char>>(new Si::ostream_sink(std::move(file)));
+			return make_file_sink(file_name);
 		}
 
 		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) override
@@ -204,6 +199,50 @@ namespace
 		return make(cloned_dir, build_dir, reports);
 	}
 
+	void push(
+			boost::filesystem::path const &results_repository,
+			std::unique_ptr<Si::sink<char>> git_log)
+	{
+		{
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/git";
+			parameters.arguments = {"add", "-A", "."};
+			parameters.current_path = results_repository;
+			parameters.stdout = std::move(git_log);
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				throw std::runtime_error{"git add failed"};
+			}
+		}
+
+		{
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/git";
+			parameters.arguments = {"commit", "-m", "built by silicium"};
+			parameters.current_path = results_repository;
+			parameters.stdout = std::move(git_log);
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				throw std::runtime_error{"git commit failed"};
+			}
+		}
+
+		{
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/git";
+			parameters.arguments = {"push"};
+			parameters.current_path = results_repository;
+			parameters.stdout = std::move(git_log);
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				throw std::runtime_error{"git push failed"};
+			}
+		}
+	}
+
 	void check_build(
 			boost::filesystem::path const &source_location,
 			boost::filesystem::path const &workspace)
@@ -236,6 +275,8 @@ namespace
 		auto const reports = results.create_subdirectory(formatted_build_oid);
 		build_commit(branch, source_location, temporary_location, *reports);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
+
+		push(results_repository, Si::make_file_sink(temporary_location / "git_commit.log"));
 	}
 }
 

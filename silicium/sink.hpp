@@ -3,6 +3,7 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/algorithm/copy.hpp>
+#include <boost/filesystem/path.hpp>
 #include <ostream>
 #include <memory>
 
@@ -142,6 +143,8 @@ namespace Si
 
 		std::unique_ptr<std::ostream> m_file;
 	};
+
+	std::unique_ptr<sink<char>> make_file_sink(boost::filesystem::path const &name);
 }
 
 #endif
