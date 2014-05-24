@@ -5,45 +5,12 @@
 #include <silicium/git/repository.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/write_file.hpp>
+#include <silicium/directory_builder.hpp>
 #include <boost/asio.hpp>
 #include <fstream>
 
 namespace Si
 {
-	struct directory_builder
-	{
-		virtual ~directory_builder()
-		{
-		}
-
-		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) = 0;
-		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) = 0;
-	};
-
-	struct filesystem_directory_builder : directory_builder
-	{
-		explicit filesystem_directory_builder(boost::filesystem::path destination)
-			: m_destination(std::move(destination))
-		{
-		}
-
-		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) override
-		{
-			auto const file_name = m_destination / name;
-			return make_file_sink(file_name);
-		}
-
-		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) override
-		{
-			auto sub = m_destination / name;
-			boost::filesystem::create_directories(sub);
-			return std::unique_ptr<directory_builder>(new filesystem_directory_builder(sub));
-		}
-
-	private:
-
-		boost::filesystem::path m_destination;
-	};
 
 	struct tcp_trigger
 	{
