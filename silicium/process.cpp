@@ -158,7 +158,8 @@ namespace Si
 		parameters.arguments = std::move(arguments);
 		parameters.current_path = std::move(current_path);
 		std::vector<char> stdout;
-		parameters.stdout = to_unique(make_container_sink(stdout));
+		auto sink = make_container_sink(stdout);
+		parameters.stdout = &sink;
 		auto const result = run_process(parameters);
 		return process_results{result, std::move(stdout)};
 	}
@@ -167,13 +168,13 @@ namespace Si
 			boost::filesystem::path executable,
 			std::vector<std::string> arguments,
 			boost::filesystem::path current_path,
-			std::unique_ptr<Si::sink<char>> output)
+			Si::sink<char> &output)
 	{
 		Si::process_parameters parameters;
 		parameters.executable = std::move(executable);
 		parameters.arguments = std::move(arguments);
 		parameters.current_path = std::move(current_path);
-		parameters.stdout = std::move(output);
+		parameters.stdout = &output;
 		return Si::run_process(parameters);
 	}
 }

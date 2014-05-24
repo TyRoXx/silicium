@@ -42,7 +42,8 @@ namespace
 		Si::process_parameters parameters;
 		parameters.executable = executable_file.string();
 		parameters.current_path = build_dir;
-		parameters.stdout = Si::to_unique(Si::make_iterator_sink<char>(std::back_inserter(stdout)));
+		auto stdout_sink = Si::make_iterator_sink<char>(std::back_inserter(stdout));
+		parameters.stdout = &stdout_sink;
 		const auto testing_result = Si::run_process(parameters);
 		if (testing_result != 0)
 		{

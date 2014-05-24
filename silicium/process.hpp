@@ -15,9 +15,9 @@ namespace Si
 		boost::filesystem::path executable;
 		std::vector<std::string> arguments;
 		boost::filesystem::path current_path;
-		std::unique_ptr<sink<char>> stdout;
-		std::unique_ptr<sink<char>> stderr;
-		std::unique_ptr<source<char>> stdin;
+		sink<char> *stdout;
+		sink<char> *stderr;
+		source<char> *stdin;
 	};
 
 	int run_process(process_parameters const &parameters);
@@ -35,7 +35,7 @@ namespace Si
 			boost::filesystem::path executable,
 			std::vector<std::string> arguments,
 			boost::filesystem::path current_path,
-			std::unique_ptr<Si::sink<char>> output);
+			Si::sink<char> &output);
 }
 
 #endif

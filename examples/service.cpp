@@ -50,16 +50,16 @@ namespace
 	}
 
 	void push(
-			boost::filesystem::path const &results_repository,
-			std::unique_ptr<Si::sink<char>> git_log,
+			boost::filesystem::path const &repository,
+			Si::sink<char> *git_log,
 			std::string message)
 	{
 		{
 			Si::process_parameters parameters;
 			parameters.executable = "/usr/bin/git";
 			parameters.arguments = {"add", "-A", "."};
-			parameters.current_path = results_repository;
-			parameters.stdout = std::move(git_log);
+			parameters.current_path = repository;
+			parameters.stdout = git_log;
 			int const exit_code = Si::run_process(parameters);
 			if (exit_code != 0)
 			{
@@ -71,8 +71,8 @@ namespace
 			Si::process_parameters parameters;
 			parameters.executable = "/usr/bin/git";
 			parameters.arguments = {"commit", "-m", std::move(message)};
-			parameters.current_path = results_repository;
-			parameters.stdout = std::move(git_log);
+			parameters.current_path = repository;
+			parameters.stdout = git_log;
 			int const exit_code = Si::run_process(parameters);
 			if (exit_code != 0)
 			{
@@ -84,8 +84,8 @@ namespace
 			Si::process_parameters parameters;
 			parameters.executable = "/usr/bin/git";
 			parameters.arguments = {"push"};
-			parameters.current_path = results_repository;
-			parameters.stdout = std::move(git_log);
+			parameters.current_path = repository;
+			parameters.stdout = git_log;
 			int const exit_code = Si::run_process(parameters);
 			if (exit_code != 0)
 			{
@@ -99,15 +99,15 @@ namespace
 			boost::filesystem::path const &build_dir,
 			Si::directory_builder &artifacts)
 	{
-		if (Si::run_process("/usr/bin/cmake", {source.string()}, build_dir, artifacts.begin_artifact("cmake.log")) != 0)
+		if (Si::run_process("/usr/bin/cmake", {source.string()}, build_dir, *artifacts.begin_artifact("cmake.log")) != 0)
 		{
 			return Si::build_failure{"CMake failed"};
 		}
-		if (Si::run_process("/usr/bin/make", {"-j2"}, build_dir, artifacts.begin_artifact("make.log")) != 0)
+		if (Si::run_process("/usr/bin/make", {"-j2"}, build_dir, *artifacts.begin_artifact("make.log")) != 0)
 		{
 			return Si::build_failure{"make failed"};
 		}
-		if (Si::run_process("test/test", {}, build_dir, artifacts.begin_artifact("test.log")) != 0)
+		if (Si::run_process("test/test", {}, build_dir, *artifacts.begin_artifact("test.log")) != 0)
 		{
 			return Si::build_failure{"tests failed"};
 		}
@@ -161,7 +161,8 @@ namespace
 		build_commit(branch, source_location.string(), temporary_location, *reports);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
 
-		push(results_repository, Si::make_file_sink(temporary_location / "git_commit.log"), "built by silicium");
+		auto git_log = Si::make_file_sink(temporary_location / "git_commit.log");
+		push(results_repository, git_log.get(), "built by silicium");
 	}
 }
 
