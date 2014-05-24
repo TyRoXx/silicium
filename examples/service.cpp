@@ -199,15 +199,14 @@ namespace
 			std::string const &branch,
 			boost::filesystem::path const &source_location,
 			boost::filesystem::path const &commit_dir,
-			boost::filesystem::path const &report_location)
+			directory_builder &reports)
 	{
 		auto const cloned_dir = commit_dir / "source";
 		clone(branch, source_location, cloned_dir);
 
 		auto const build_dir = commit_dir / "build";
 		boost::filesystem::create_directories(build_dir);
-		filesystem_directory_builder artifacts(report_location);
-		return make(cloned_dir, build_dir, artifacts);
+		return make(cloned_dir, build_dir, reports);
 	}
 
 	void check_build(
@@ -237,10 +236,9 @@ namespace
 		auto const temporary_location = workspace / format_oid(oid_to_build);
 		boost::filesystem::create_directories(temporary_location);
 
-		auto const report_location = results_repository / format_oid(oid_to_build);
-		boost::filesystem::create_directories(report_location);
-
-		build_commit(branch, source_location, temporary_location, report_location);
+		filesystem_directory_builder results(results_repository);
+		auto const reports = results.create_subdirectory(format_oid(oid_to_build));
+		build_commit(branch, source_location, temporary_location, *reports);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
 	}
 }
