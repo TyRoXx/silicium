@@ -1,6 +1,7 @@
 #ifndef SILICIUM_PROCESS_HPP
 #define SILICIUM_PROCESS_HPP
 
+#include <silicium/source.hpp>
 #include <silicium/sink.hpp>
 #include <vector>
 #include <string>
@@ -17,17 +18,6 @@ namespace Si
 	};
 
 	process_output run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path const &current_path, bool dump_stdout);
-
-	template <class Element>
-	struct source
-	{
-		virtual ~source()
-		{
-		}
-
-		virtual boost::iterator_range<Element const *> map_next(std::size_t size) = 0;
-		virtual Element *copy_next(boost::iterator_range<Element *> destination) = 0;
-	};
 
 	struct process_parameters
 	{
