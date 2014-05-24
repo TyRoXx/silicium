@@ -8,6 +8,7 @@
 #include <silicium/git/repository.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <fstream>
 
 namespace Si
 {
@@ -51,19 +52,27 @@ namespace Si
 		void push(
 				boost::filesystem::path const &git_executable,
 				boost::filesystem::path const &repository,
-				Si::sink<char> *git_log,
 				std::string message)
 		{
+			std::vector<char> output;
+			auto output_sink = make_container_sink(output);
+			auto const fail = [&output](std::string const &description)
+			{
+				std::string what = description;
+				what += "\n\n";
+				what.append(begin(output), end(output));
+				throw std::runtime_error(std::move(what));
+			};
 			{
 				Si::process_parameters parameters;
 				parameters.executable = git_executable;
 				parameters.arguments = {"add", "-A", "."};
 				parameters.current_path = repository;
-				parameters.stdout = git_log;
+				parameters.stdout = &output_sink;
 				int const exit_code = Si::run_process(parameters);
 				if (exit_code != 0)
 				{
-					throw std::runtime_error{"git add failed"};
+					fail("git add failed");
 				}
 			}
 
@@ -72,11 +81,11 @@ namespace Si
 				parameters.executable = git_executable;
 				parameters.arguments = {"commit", "-m", std::move(message)};
 				parameters.current_path = repository;
-				parameters.stdout = git_log;
+				parameters.stdout = &output_sink;
 				int const exit_code = Si::run_process(parameters);
 				if (exit_code != 0)
 				{
-					throw std::runtime_error{"git commit failed"};
+					fail("git commit failed");
 				}
 			}
 
@@ -85,11 +94,11 @@ namespace Si
 				parameters.executable = git_executable;
 				parameters.arguments = {"push"};
 				parameters.current_path = repository;
-				parameters.stdout = git_log;
+				parameters.stdout = &output_sink;
 				int const exit_code = Si::run_process(parameters);
 				if (exit_code != 0)
 				{
-					throw std::runtime_error{"git push failed"};
+					fail("git push failed");
 				}
 			}
 		}
@@ -162,8 +171,7 @@ namespace Si
 			build_commit(branch, source_location.string(), temporary_location, *reports, run_tests);
 			set_last_built(last_built_file_name, *new_commit);
 
-			auto git_log = Si::make_file_sink(temporary_location / "git_commit.log");
-			push(git_executable, results_repository, git_log.get(), commit_message);
+			push(git_executable, results_repository, commit_message);
 		}
 	}
 }
@@ -196,6 +204,7 @@ int main(int argc, char **argv)
 {
 	if (argc < 3)
 	{
+		std::cerr << "At least two arguments required (source path, workspace path)\n";
 		return 1;
 	}
 	boost::filesystem::path const source_location = argv[1];
@@ -204,6 +213,14 @@ int main(int argc, char **argv)
 	if (argc >= 4)
 	{
 		parallelization = boost::lexical_cast<unsigned>(argv[3]);
+	}
+
+	auto const log_file = workspace / "error.log";
+	std::ofstream log(log_file.string());
+	if (!log)
+	{
+		std::cerr << "Could not open log " << log_file << '\n';
+		return 1;
 	}
 
 	auto const build = [&]
@@ -216,8 +233,8 @@ int main(int argc, char **argv)
 		}
 		catch (std::exception const &ex)
 		{
-			//continue to run
-			std::cerr << ex.what() << '\n';
+			log << ex.what() << "\n\n";
+			log.flush();
 		}
 	};
 
