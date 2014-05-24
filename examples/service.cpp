@@ -186,18 +186,11 @@ namespace
 	};
 
 	Si::build_result build_commit(
-			git_repository &repository,
-			git_reference &commit_to_build,
 			std::string const &branch,
 			boost::filesystem::path const &source_location,
-			boost::filesystem::path const &workspace,
-			boost::filesystem::path const &reports_location)
+			boost::filesystem::path const &commit_dir,
+			boost::filesystem::path const &report_location)
 	{
-		git_oid commit_id;
-		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&commit_id, &repository, git_reference_name(&commit_to_build)));
-		auto const report_dir = reports_location / format_oid(commit_id);
-		boost::filesystem::create_directories(report_dir);
-		auto const commit_dir = workspace / format_oid(commit_id);
 		auto const cloned_dir = commit_dir / "source";
 		git_clone_options options = GIT_CLONE_OPTIONS_INIT;
 		options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
@@ -205,7 +198,7 @@ namespace
 
 		auto const build_dir = commit_dir / "build";
 		boost::filesystem::create_directories(build_dir);
-		filesystem_directory_builder artifacts(report_dir);
+		filesystem_directory_builder artifacts(report_location);
 		return make(cloned_dir, build_dir, artifacts);
 	}
 
@@ -232,7 +225,14 @@ namespace
 			//nothing to do
 			return;
 		}
-		build_commit(*source, *ref_to_build, branch, source_location, workspace, results_repository);
+
+		auto const temporary_location = workspace / format_oid(oid_to_build);
+		boost::filesystem::create_directories(temporary_location);
+
+		auto const report_location = results_repository / format_oid(oid_to_build);
+		boost::filesystem::create_directories(report_location);
+
+		build_commit(branch, source_location, temporary_location, report_location);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
 	}
 }
