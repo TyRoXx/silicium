@@ -56,9 +56,7 @@ namespace
 		return output_location / (branch + ".lastbuild.txt");
 	}
 
-	boost::optional<git_oid> get_last_built(
-			git_repository &repository,
-			boost::filesystem::path const &last_build_file_name)
+	boost::optional<git_oid> get_last_built(boost::filesystem::path const &last_build_file_name)
 	{
 		if (!boost::filesystem::exists(last_build_file_name))
 		{
@@ -156,14 +154,12 @@ namespace
 		git_oid oid_to_build;
 		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&oid_to_build, source.get(), full_branch_name.c_str()));
 		auto const last_built_file_name = make_last_built_file_name(workspace, branch);
-		auto const ref_last_built = get_last_built(*source, last_built_file_name);
-		if (ref_last_built)
+		auto const ref_last_built = get_last_built(last_built_file_name);
+		if (ref_last_built &&
+			git_oid_equal(&*ref_last_built, &oid_to_build))
 		{
-			if (git_oid_equal(&*ref_last_built, &oid_to_build))
-			{
-				//nothing to do
-				return;
-			}
+			//nothing to do
+			return;
 		}
 		build_commit(*source, *ref_to_build, branch, source_location, workspace);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
