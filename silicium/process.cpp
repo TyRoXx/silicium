@@ -57,6 +57,27 @@ namespace Si
 				content.resize(used_content);
 				return content;
 			}
+
+			void copy_all(int source, sink<char> &destination)
+			{
+				for (;;)
+				{
+					constexpr std::size_t buffer_size = 1U << 14U;
+					appender<char, buffer_size> buffer_helper(destination);
+					auto const buffer = buffer_helper.make_append_space(buffer_size);
+					assert(!buffer.empty());
+					auto const rc = read(source, buffer.begin(), buffer.size());
+					if (rc == 0)
+					{
+						break;
+					}
+					if (rc < 0)
+					{
+						throw boost::system::system_error(errno, boost::system::system_category());
+					}
+					buffer_helper.commit(static_cast<std::size_t>(rc));
+				}
+			}
 		}
 	}
 
@@ -151,6 +172,101 @@ namespace Si
 
 			int const exit_status = WEXITSTATUS(status);
 			return process_output{exit_status, std::move(all_stdout)};
+		}
+	}
+
+	int run_process(process_parameters const &parameters)
+	{
+		auto executable = parameters.executable;
+		auto arguments = parameters.arguments;
+		std::vector<char *> argument_pointers;
+		argument_pointers.emplace_back(&executable[0]);
+		std::transform(begin(arguments), end(arguments), std::back_inserter(argument_pointers), [](std::string &arg)
+		{
+			return &arg[0];
+		});
+		argument_pointers.emplace_back(nullptr);
+
+		std::array<int, 2> stdout;
+		std::unique_ptr<int, detail::file_closer> stdout_reading;
+		std::unique_ptr<int, detail::file_closer> stdout_writing;
+
+		if (parameters.stdout)
+		{
+			if (pipe(stdout.data()) < 0)
+			{
+				throw boost::system::system_error(errno, boost::system::system_category());
+			}
+			stdout_reading.reset(stdout.data() + 0);
+			stdout_writing.reset(stdout.data() + 1);
+		}
+
+		std::array<int, 2> stdin;
+		std::unique_ptr<int, detail::file_closer> stdin_reading;
+		std::unique_ptr<int, detail::file_closer> stdin_writing;
+		if (pipe(stdin.data()) < 0)
+		{
+			throw boost::system::system_error(errno, boost::system::system_category());
+		}
+		stdin_reading.reset(stdin.data() + 0);
+		stdin_writing.reset(stdin.data() + 1);
+
+		pid_t const forked = fork();
+		if (forked < 0)
+		{
+			throw boost::system::system_error(errno, boost::system::system_category());
+		}
+
+		//child
+		if (forked == 0)
+		{
+			if (parameters.stdout)
+			{
+				if (dup2(*stdout_writing, STDOUT_FILENO) < 0)
+				{
+					std::abort();
+				}
+				if (dup2(*stdout_writing, STDERR_FILENO) < 0)
+				{
+					std::abort();
+				}
+				stdout_writing.reset();
+				stdout_reading.reset();
+			}
+
+			if (dup2(*stdin_reading, STDIN_FILENO) < 0)
+			{
+				std::abort();
+			}
+			stdin_reading.reset();
+			stdin_writing.reset();
+
+			boost::filesystem::current_path(parameters.current_path);
+
+			execvp(parameters.executable.c_str(), argument_pointers.data());
+
+			//kill the process in case execv fails
+			std::abort();
+		}
+
+		//parent
+		else
+		{
+			if (parameters.stdout)
+			{
+				stdout_writing.reset();
+				detail::copy_all(*stdout_reading, *parameters.stdout);
+			}
+			stdin_reading.reset();
+
+			int status = 0;
+			if (waitpid(forked, &status, 0) < 0)
+			{
+				throw boost::system::system_error(errno, boost::system::system_category());
+			}
+
+			int const exit_status = WEXITSTATUS(status);
+			return exit_status;
 		}
 	}
 }
