@@ -41,49 +41,6 @@ namespace
 		Si::write_file(last_build_file_name, id_str.data(), id_str.size());
 	}
 
-	Si::build_result make(
-			boost::filesystem::path const &source,
-			boost::filesystem::path const &build_dir,
-			Si::directory_builder &artifacts)
-	{
-		{
-			Si::process_parameters parameters;
-			parameters.executable = "/usr/bin/cmake";
-			parameters.arguments = {source.string()};
-			parameters.current_path = build_dir;
-			parameters.stdout = artifacts.begin_artifact("cmake.log");
-			int const exit_code = Si::run_process(parameters);
-			if (exit_code != 0)
-			{
-				return Si::build_failure{"CMake failed"};
-			}
-		}
-		{
-			Si::process_parameters parameters;
-			parameters.executable = "/usr/bin/make";
-			parameters.arguments = {"-j4"};
-			parameters.current_path = build_dir;
-			parameters.stdout = artifacts.begin_artifact("make.log");
-			int const exit_code = Si::run_process(parameters);
-			if (exit_code != 0)
-			{
-				return Si::build_failure{"make failed"};
-			}
-		}
-		{
-			Si::process_parameters parameters;
-			parameters.executable = build_dir / "test/test";
-			parameters.current_path = build_dir / "test";
-			parameters.stdout = artifacts.begin_artifact("test.log");
-			int const exit_code = Si::run_process(parameters);
-			if (exit_code != 0)
-			{
-				return Si::build_failure{"tests failed"};
-			}
-		}
-		return Si::build_success{};
-	}
-
 	void clone(
 			std::string const &branch,
 			boost::filesystem::path const &source_location,
@@ -92,20 +49,6 @@ namespace
 		git_clone_options options = GIT_CLONE_OPTIONS_INIT;
 		options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
 		Si::git::clone(source_location.string(), cloned_dir, &options);
-	}
-
-	Si::build_result build_commit(
-			std::string const &branch,
-			boost::filesystem::path const &source_location,
-			boost::filesystem::path const &commit_dir,
-			Si::directory_builder &reports)
-	{
-		auto const cloned_dir = commit_dir / "source";
-		clone(branch, source_location, cloned_dir);
-
-		auto const build_dir = commit_dir / "build";
-		boost::filesystem::create_directories(build_dir);
-		return make(cloned_dir, build_dir, reports);
 	}
 
 	void push(
@@ -152,11 +95,68 @@ namespace
 		}
 	}
 
+	Si::build_result make(
+			boost::filesystem::path const &source,
+			boost::filesystem::path const &build_dir,
+			Si::directory_builder &artifacts)
+	{
+		{
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/cmake";
+			parameters.arguments = {source.string()};
+			parameters.current_path = build_dir;
+			parameters.stdout = artifacts.begin_artifact("cmake.log");
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				return Si::build_failure{"CMake failed"};
+			}
+		}
+		{
+			Si::process_parameters parameters;
+			parameters.executable = "/usr/bin/make";
+			parameters.arguments = {"-j4"};
+			parameters.current_path = build_dir;
+			parameters.stdout = artifacts.begin_artifact("make.log");
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				return Si::build_failure{"make failed"};
+			}
+		}
+		{
+			Si::process_parameters parameters;
+			parameters.executable = build_dir / "test/test";
+			parameters.current_path = build_dir / "test";
+			parameters.stdout = artifacts.begin_artifact("test.log");
+			int const exit_code = Si::run_process(parameters);
+			if (exit_code != 0)
+			{
+				return Si::build_failure{"tests failed"};
+			}
+		}
+		return Si::build_success{};
+	}
+
+	Si::build_result build_commit(
+			std::string const &branch,
+			boost::filesystem::path const &source_location,
+			boost::filesystem::path const &commit_dir,
+			Si::directory_builder &reports)
+	{
+		auto const cloned_dir = commit_dir / "source";
+		clone(branch, source_location, cloned_dir);
+
+		auto const build_dir = commit_dir / "build";
+		boost::filesystem::create_directories(build_dir);
+		return make(cloned_dir, build_dir, reports);
+	}
+
 	void check_build(
 			boost::filesystem::path const &source_location,
+			std::string const &branch,
 			boost::filesystem::path const &workspace)
 	{
-		std::string const branch = "master";
 		auto const source = Si::git::open_repository(source_location);
 		auto const full_branch_name = ("refs/heads/" + branch);
 		auto const ref_to_build = Si::git::lookup(*source, full_branch_name.c_str());
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 	{
 		try
 		{
-			check_build(source_location, workspace);
+			check_build(source_location, "master", workspace);
 		}
 		catch (std::exception const &ex)
 		{
