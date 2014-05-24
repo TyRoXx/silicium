@@ -10,4 +10,7 @@ target_link_libraries(si_git silicium ${Boost_LIBRARIES})
 if(LIBGIT2_FOUND)
 	add_executable(si_libgit2 "libgit2.cpp")
 	target_link_libraries(si_libgit2 silicium ${Boost_LIBRARIES} ${LIBGIT2_LIBRARIES})
+
+	add_executable(service "service.cpp")
+	target_link_libraries(service silicium ${Boost_LIBRARIES} ${LIBGIT2_LIBRARIES})
 endif()

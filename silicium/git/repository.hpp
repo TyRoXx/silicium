@@ -1,8 +1,9 @@
-#ifndef SILICIUM_BUILD_RESULT_HPP
-#define SILICIUM_BUILD_RESULT_HPP
+#ifndef SILICIUM_GIT_REPOSITORY_HPP
+#define SILICIUM_GIT_REPOSITORY_HPP
 
 #include <git2.h>
 #include <memory>
+#include <boost/filesystem/path.hpp>
 
 namespace Si
 {
@@ -10,13 +11,30 @@ namespace Si
 	{
 		struct repository_deleter
 		{
-			void operator()(git_repository *repository)
-			{
-				git_repository_free(repository);
-			}
+			void operator()(git_repository *repository);
+		};
+		typedef std::unique_ptr<git_repository, repository_deleter> unique_repository;
+
+		struct reference_deleter
+		{
+			void operator()(git_reference *reference);
+		};
+		typedef std::unique_ptr<git_reference, reference_deleter> unique_reference;
+
+		struct git_error : std::runtime_error
+		{
+			explicit git_error(int code, std::string message);
+			int code() const;
+
+		private:
+
+			int m_code;
 		};
 
-		typedef std::unique_ptr<git_repository, repository_deleter> unique_repository;
+
+		void throw_if_libgit2_error(int error);
+		unique_repository open_repository(boost::filesystem::path const &where);
+		unique_reference lookup(git_repository &repository, char const *name);
 	}
 }
 
