@@ -1,4 +1,5 @@
 #include <silicium/process.hpp>
+#include <silicium/to_unique.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/system/system_error.hpp>
 #include <algorithm>
@@ -82,96 +83,18 @@ namespace Si
 
 	process_output run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path const &current_path, bool dump_stdout)
 	{
-		std::vector<char *> argument_pointers;
-		argument_pointers.emplace_back(&executable[0]);
-		std::transform(begin(arguments), end(arguments), std::back_inserter(argument_pointers), [](std::string &arg)
-		{
-			return &arg[0];
-		});
-		argument_pointers.emplace_back(nullptr);
-
-		std::array<int, 2> stdout;
-		std::unique_ptr<int, detail::file_closer> stdout_reading;
-		std::unique_ptr<int, detail::file_closer> stdout_writing;
-
+		process_parameters parameters;
+		parameters.executable = executable;
+		parameters.arguments = arguments;
+		parameters.current_path = current_path;
+		boost::optional<std::vector<char>> stdout;
 		if (dump_stdout)
 		{
-			if (pipe(stdout.data()) < 0)
-			{
-				throw boost::system::system_error(errno, boost::system::system_category());
-			}
-			stdout_reading.reset(stdout.data() + 0);
-			stdout_writing.reset(stdout.data() + 1);
+			stdout = std::vector<char>();
+			parameters.stdout = to_unique(make_iterator_sink<char>(std::back_inserter(*stdout)));
 		}
-
-		std::array<int, 2> stdin;
-		std::unique_ptr<int, detail::file_closer> stdin_reading;
-		std::unique_ptr<int, detail::file_closer> stdin_writing;
-		if (pipe(stdin.data()) < 0)
-		{
-			throw boost::system::system_error(errno, boost::system::system_category());
-		}
-		stdin_reading.reset(stdin.data() + 0);
-		stdin_writing.reset(stdin.data() + 1);
-
-		pid_t const forked = fork();
-		if (forked < 0)
-		{
-			throw boost::system::system_error(errno, boost::system::system_category());
-		}
-
-		//child
-		if (forked == 0)
-		{
-			if (dump_stdout)
-			{
-				if (dup2(*stdout_writing, STDOUT_FILENO) < 0)
-				{
-					std::abort();
-				}
-				if (dup2(*stdout_writing, STDERR_FILENO) < 0)
-				{
-					std::abort();
-				}
-				stdout_writing.reset();
-				stdout_reading.reset();
-			}
-
-			if (dup2(*stdin_reading, STDIN_FILENO) < 0)
-			{
-				std::abort();
-			}
-			stdin_reading.reset();
-			stdin_writing.reset();
-
-			boost::filesystem::current_path(current_path);
-
-			execvp(executable.c_str(), argument_pointers.data());
-
-			//kill the process in case execv fails
-			std::abort();
-		}
-
-		//parent
-		else
-		{
-			boost::optional<std::vector<char>> all_stdout;
-			if (dump_stdout)
-			{
-				stdout_writing.reset();
-				all_stdout = detail::read_all(*stdout_reading);
-			}
-			stdin_reading.reset();
-
-			int status = 0;
-			if (waitpid(forked, &status, 0) < 0)
-			{
-				throw boost::system::system_error(errno, boost::system::system_category());
-			}
-
-			int const exit_status = WEXITSTATUS(status);
-			return process_output{exit_status, std::move(all_stdout)};
-		}
+		int result = run_process(parameters);
+		return process_output{result, std::move(stdout)};
 	}
 
 	int run_process(process_parameters const &parameters)

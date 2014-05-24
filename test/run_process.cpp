@@ -1,4 +1,5 @@
 #include <silicium/process.hpp>
+#include <silicium/to_unique.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 
@@ -11,12 +12,6 @@ namespace Si
 		std::string const expected = "/usr/bin/which\n";
 		BOOST_REQUIRE(output.stdout);
 		BOOST_CHECK_EQUAL(expected, std::string(begin(*output.stdout), end(*output.stdout)));
-	}
-
-	template <class T>
-	std::unique_ptr<T> to_unique(T value)
-	{
-		return std::unique_ptr<T>(new T(std::move(value)));
 	}
 
 	BOOST_AUTO_TEST_CASE(run_process_which_2)
