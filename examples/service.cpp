@@ -190,12 +190,14 @@ namespace
 			git_reference &commit_to_build,
 			std::string const &branch,
 			boost::filesystem::path const &source_location,
-			boost::filesystem::path const &workspace)
+			boost::filesystem::path const &workspace,
+			boost::filesystem::path const &reports_location)
 	{
 		git_oid commit_id;
 		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&commit_id, &repository, git_reference_name(&commit_to_build)));
+		auto const report_dir = reports_location / format_oid(commit_id);
+		boost::filesystem::create_directories(report_dir);
 		auto const commit_dir = workspace / format_oid(commit_id);
-		boost::filesystem::create_directories(commit_dir);
 		auto const cloned_dir = commit_dir / "source";
 		git_clone_options options = GIT_CLONE_OPTIONS_INIT;
 		options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
@@ -203,7 +205,7 @@ namespace
 
 		auto const build_dir = commit_dir / "build";
 		boost::filesystem::create_directories(build_dir);
-		filesystem_directory_builder artifacts(commit_dir);
+		filesystem_directory_builder artifacts(report_dir);
 		return make(cloned_dir, build_dir, artifacts);
 	}
 
@@ -221,7 +223,8 @@ namespace
 		}
 		git_oid oid_to_build;
 		Si::git::throw_if_libgit2_error(git_reference_name_to_id(&oid_to_build, source.get(), full_branch_name.c_str()));
-		auto const last_built_file_name = make_last_built_file_name(workspace, branch);
+		auto const results_repository = workspace / "results.git";
+		auto const last_built_file_name = make_last_built_file_name(results_repository, branch);
 		auto const ref_last_built = get_last_built(last_built_file_name);
 		if (ref_last_built &&
 			git_oid_equal(&*ref_last_built, &oid_to_build))
@@ -229,7 +232,7 @@ namespace
 			//nothing to do
 			return;
 		}
-		build_commit(*source, *ref_to_build, branch, source_location, workspace);
+		build_commit(*source, *ref_to_build, branch, source_location, workspace, results_repository);
 		set_last_built(*source, last_built_file_name, *ref_to_build);
 	}
 }
