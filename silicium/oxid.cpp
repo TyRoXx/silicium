@@ -38,13 +38,20 @@ namespace Si
 			}
 
 			void clone(
+					boost::filesystem::path const &git_executable,
 					std::string const &branch,
 					std::string const &source_location,
 					boost::filesystem::path const &cloned_dir)
 			{
-				git_clone_options options = GIT_CLONE_OPTIONS_INIT;
-				options.checkout_branch = branch.c_str(); //TODO: clone the reference directly without repeating the branch name
-				Si::git::clone(source_location, cloned_dir, &options);
+				std::vector<char> output;
+				auto output_sink = make_container_sink(output);
+				if (0 != run_process(git_executable, {"clone", "-b", branch, "--depth", "1", source_location, cloned_dir.string()}, boost::filesystem::current_path(), output_sink))
+				{
+					std::string what = "git clone failed";
+					what += "\n";
+					what.append(begin(output), end(output));
+					throw std::runtime_error(std::move(what));
+				}
 			}
 
 			void push(
@@ -57,7 +64,7 @@ namespace Si
 				auto const fail = [&output](std::string const &description)
 				{
 					std::string what = description;
-					what += "\n\n";
+					what += "\n";
 					what.append(begin(output), end(output));
 					throw std::runtime_error(std::move(what));
 				};
@@ -102,6 +109,7 @@ namespace Si
 			}
 
 			Si::build_result build_commit(
+					boost::filesystem::path const &git_executable,
 					std::string const &branch,
 					std::string const &source_location,
 					boost::filesystem::path const &commit_dir,
@@ -109,7 +117,7 @@ namespace Si
 					test_runner const &run_tests)
 			{
 				auto const cloned_dir = commit_dir / "source";
-				clone(branch, source_location, cloned_dir);
+				clone(git_executable, branch, source_location, cloned_dir);
 
 				auto const build_dir = commit_dir / "build";
 				boost::filesystem::create_directories(build_dir);
@@ -167,7 +175,7 @@ namespace Si
 
 			Si::filesystem_directory_builder results(results_repository);
 			auto const reports = results.create_subdirectory(formatted_build_oid);
-			auto const result = build_commit(branch, source_location.string(), temporary_location, *reports, run_tests);
+			auto const result = build_commit(git_executable, branch, source_location.string(), temporary_location, *reports, run_tests);
 			set_last_built(last_built_file_name, *new_commit_id);
 
 			auto const commit_message = make_commit_message(result, *new_commit);
