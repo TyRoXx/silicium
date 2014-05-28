@@ -18,7 +18,7 @@ namespace Si
 	private:
 
 		boost::filesystem::path m_root;
-		boost::uintmax_t m_next_id = 0;
+		boost::uintmax_t m_next_id;
 	};
 }
 

@@ -4,6 +4,7 @@ namespace Si
 {
 	incrementing_directory_allocator::incrementing_directory_allocator(boost::filesystem::path root)
 		: m_root(std::move(root))
+		, m_next_id(0)
 	{
 	}
 

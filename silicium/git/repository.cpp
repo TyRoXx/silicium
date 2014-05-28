@@ -1,5 +1,6 @@
 #include <silicium/git/repository.hpp>
 #include <git2/errors.h>
+#include <array>
 
 namespace Si
 {

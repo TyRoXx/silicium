@@ -16,8 +16,8 @@ namespace Si
 	struct filesystem_directory_builder : directory_builder
 	{
 		explicit filesystem_directory_builder(boost::filesystem::path destination);
-		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) override;
-		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) override;
+		virtual std::unique_ptr<Si::sink<char>> begin_artifact(std::string const &name) SILICIUM_OVERRIDE;
+		virtual std::unique_ptr<directory_builder> create_subdirectory(std::string const &name) SILICIUM_OVERRIDE;
 
 	private:
 

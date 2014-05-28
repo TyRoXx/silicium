@@ -1,6 +1,7 @@
 #ifndef SILICIUM_SOURCE_HPP
 #define SILICIUM_SOURCE_HPP
 
+#include <silicium/override.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/optional.hpp>
 #include <boost/cstdint.hpp>
@@ -32,13 +33,13 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<Element const *> map_next(std::size_t size) override
+		virtual boost::iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			(void)size;
 			return m_elements;
 		}
 
-		virtual Element *copy_next(boost::iterator_range<Element *> destination) override
+		virtual Element *copy_next(boost::iterator_range<Element *> destination) SILICIUM_OVERRIDE
 		{
 			while (!m_elements.empty() && !destination.empty())
 			{
@@ -49,12 +50,12 @@ namespace Si
 			return destination.begin();
 		}
 
-		virtual boost::uintmax_t minimum_size() override
+		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
 		{
 			return static_cast<boost::uintmax_t>(m_elements.size());
 		}
 
-		virtual boost::optional<boost::uintmax_t> maximum_size() override
+		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
 		{
 			return static_cast<boost::uintmax_t>(m_elements.size());
 		}

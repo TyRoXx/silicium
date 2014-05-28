@@ -1,10 +1,12 @@
 #ifndef SILICIUM_SINK_HPP
 #define SILICIUM_SINK_HPP
 
+#include <silicium/override.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
 #include <ostream>
+#include <array>
 #include <memory>
 
 namespace Si
@@ -34,10 +36,11 @@ namespace Si
 		explicit buffering_sink(sink<Element> &destination, Buffer buffer = Buffer())
 			: m_destination(destination)
 			, m_fallback_buffer(std::move(buffer))
+			, m_buffer_used(0)
 		{
 		}
 
-		boost::iterator_range<Element *> make_append_space(std::size_t size) override
+		boost::iterator_range<Element *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
 		{
 			auto first_try = m_destination.make_append_space(size);
 			if (!first_try.empty())
@@ -51,7 +54,7 @@ namespace Si
 			return boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used);
 		}
 
-		void flush_append_space() override
+		void flush_append_space() SILICIUM_OVERRIDE
 		{
 			if (m_buffer_used)
 			{
@@ -64,7 +67,7 @@ namespace Si
 			}
 		}
 
-		void append(boost::iterator_range<Element const *> data) override
+		void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
 			m_destination.append(data);
 			m_buffer_used = 0;
@@ -74,7 +77,7 @@ namespace Si
 
 		sink<Element> &m_destination;
 		Buffer m_fallback_buffer;
-		std::size_t m_buffer_used = 0;
+		std::size_t m_buffer_used;
 	};
 
 	template <class Element, class OutputIterator>
@@ -85,16 +88,16 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<Element *> make_append_space(std::size_t) override
+		virtual boost::iterator_range<Element *> make_append_space(std::size_t) SILICIUM_OVERRIDE
 		{
 			return {};
 		}
 
-		virtual void flush_append_space() override
+		virtual void flush_append_space() SILICIUM_OVERRIDE
 		{
 		}
 
-		virtual void append(boost::iterator_range<Element const *> data) override
+		virtual void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
 			boost::range::copy(data, m_out);
 		}
@@ -127,16 +130,16 @@ namespace Si
 			m_file->exceptions(std::ios::failbit | std::ios::badbit);
 		}
 
-		virtual boost::iterator_range<char *> make_append_space(std::size_t) override
+		virtual boost::iterator_range<char *> make_append_space(std::size_t) SILICIUM_OVERRIDE
 		{
 			return {};
 		}
 
-		virtual void flush_append_space() override
+		virtual void flush_append_space() SILICIUM_OVERRIDE
 		{
 		}
 
-		virtual void append(boost::iterator_range<char const *> data) override
+		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
 		{
 			m_file->write(data.begin(), data.size());
 		}
