@@ -34,6 +34,24 @@ namespace Si
 	{
 		return boost::apply_visitor(result_to_short_string_converter{}, result);
 	}
+
+	struct result_to_long_string_converter : boost::static_visitor<std::string>
+	{
+		std::string operator()(Si::build_success const &) const
+		{
+			return "success";
+		}
+
+		std::string operator()(Si::build_failure const &failure) const
+		{
+			return "failure(" + failure.short_description + ")";
+		}
+	};
+
+	inline std::string to_long_string(build_result const &result)
+	{
+		return boost::apply_visitor(result_to_long_string_converter{}, result);
+	}
 }
 
 #endif
