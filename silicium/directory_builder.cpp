@@ -13,7 +13,7 @@ namespace Si
 	{
 	}
 
-	std::unique_ptr<Si::sink<char>> filesystem_directory_builder::begin_artifact(std::string const &name)
+	std::unique_ptr<Si::flushable_sink<char>> filesystem_directory_builder::begin_artifact(std::string const &name)
 	{
 		auto const file_name = m_destination / name;
 		return make_file_sink(file_name);

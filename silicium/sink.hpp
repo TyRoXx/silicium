@@ -24,6 +24,12 @@ namespace Si
 	};
 
 	template <class Element>
+	struct flushable_sink : sink<Element>
+	{
+		virtual void flush() = 0;
+	};
+
+	template <class Element>
 	void commit(sink<Element> &destination, std::size_t count)
 	{
 		destination.make_append_space(count);
@@ -121,7 +127,7 @@ namespace Si
 		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
 	}
 
-	struct ostream_sink : sink<char>
+	struct ostream_sink : flushable_sink<char>
 	{
 		//unique_ptr to make ostreams movable
 		explicit ostream_sink(std::unique_ptr<std::ostream> file)
@@ -144,12 +150,61 @@ namespace Si
 			m_file->write(data.begin(), data.size());
 		}
 
+		virtual void flush() SILICIUM_OVERRIDE
+		{
+			m_file->flush();
+		}
+
 	private:
 
 		std::unique_ptr<std::ostream> m_file;
 	};
 
-	std::unique_ptr<sink<char>> make_file_sink(boost::filesystem::path const &name);
+	std::unique_ptr<flushable_sink<char>> make_file_sink(boost::filesystem::path const &name);
+
+	template <class Element>
+	struct auto_flush_sink : sink<Element>
+	{
+		auto_flush_sink()
+			: m_next(nullptr)
+		{
+		}
+
+		explicit auto_flush_sink(flushable_sink<Element> &next)
+			: m_next(&next)
+		{
+		}
+
+		virtual boost::iterator_range<char *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		{
+			assert(m_next);
+			return m_next->make_append_space(size);
+		}
+
+		virtual void flush_append_space() SILICIUM_OVERRIDE
+		{
+			assert(m_next);
+			m_next->flush_append_space();
+			m_next->flush();
+		}
+
+		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
+		{
+			assert(m_next);
+			m_next->append(data);
+			m_next->flush();
+		}
+
+	private:
+
+		flushable_sink<Element> *m_next;
+	};
+
+	template <class Element>
+	auto_flush_sink<Element> make_auto_flush_sink(flushable_sink<Element> &next)
+	{
+		return auto_flush_sink<Element>(next);
+	}
 }
 
 #endif

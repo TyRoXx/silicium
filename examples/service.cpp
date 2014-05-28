@@ -7,21 +7,33 @@
 
 namespace
 {
+	bool run_logging_process(
+			std::string executable,
+			std::vector<std::string> arguments,
+			boost::filesystem::path const &build_dir,
+			Si::directory_builder &artifacts,
+			std::string const &log_name)
+	{
+		auto log = artifacts.begin_artifact(log_name);
+		auto flushing_log = Si::make_auto_flush_sink(*log);
+		return Si::run_process(executable, arguments, build_dir, flushing_log) == 0;
+	}
+
 	Si::build_result run_tests(
 			boost::filesystem::path const &source,
 			boost::filesystem::path const &build_dir,
 			Si::directory_builder &artifacts,
 			unsigned parallelization)
 	{
-		if (Si::run_process("/usr/bin/cmake", {source.string()}, build_dir, *artifacts.begin_artifact("cmake.log")) != 0)
+		if (!run_logging_process("/usr/bin/cmake", {source.string()}, build_dir, artifacts, "cmake.log") != 0)
 		{
 			return Si::build_failure{"CMake failed"};
 		}
-		if (Si::run_process("/usr/bin/make", {"-j" + boost::lexical_cast<std::string>(parallelization)}, build_dir, *artifacts.begin_artifact("make.log")) != 0)
+		if (!run_logging_process("/usr/bin/make", {"-j" + boost::lexical_cast<std::string>(parallelization)}, build_dir, artifacts, "make.log"))
 		{
 			return Si::build_failure{"make failed"};
 		}
-		if (Si::run_process("test/test", {}, build_dir, *artifacts.begin_artifact("test.log")) != 0)
+		if (!run_logging_process("test/test", {}, build_dir, artifacts, "test.log"))
 		{
 			return Si::build_failure{"tests failed"};
 		}
