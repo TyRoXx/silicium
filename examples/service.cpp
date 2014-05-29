@@ -56,6 +56,91 @@ namespace
 			std::unique_ptr<boost::asio::ip::tcp::socket> m_client;
 			boost::asio::ip::tcp::acceptor m_listener;
 		};
+
+		namespace html
+		{
+			template <class OutputIterator>
+			void write(char const *c_str, OutputIterator out)
+			{
+				std::copy(c_str, c_str + std::strlen(c_str), out);
+			}
+
+			template <class Char, class OutputIterator>
+			void write_char(Char in, OutputIterator out)
+			{
+				switch (in)
+				{
+				case '&': write("&amp;", out); break;
+				case '<': write("&lt;", out); break;
+				case '>': write("&gt;", out); break;
+				case '\'': write("&quot;", out); break;
+				case '"': write("&apos;", out); break;
+				default:
+					*out = in;
+					++out;
+					break;
+				}
+			}
+
+			template <class OutputIterator>
+			void write_string(
+					std::string const &text,
+					OutputIterator out)
+			{
+				for (auto c : text)
+				{
+					write_char(c, out);
+				}
+			}
+
+			template <class OutputIterator>
+			void open_attributed_element(
+					std::string const &name,
+					OutputIterator out)
+			{
+				*out++ = '<';
+				boost::range::copy(name, out);
+			}
+
+			template <class OutputIterator>
+			void finish_attributes(OutputIterator out)
+			{
+				*out++ = '>';
+			}
+
+			template <class OutputIterator>
+			void add_attribute(
+					std::string const &key,
+					std::string const &value,
+					OutputIterator out)
+			{
+				boost::range::copy(key, out);
+				*out++ = '=';
+				*out++ = '"';
+				write_escaped(value, out);
+				*out++ = '"';
+			}
+
+			template <class OutputIterator>
+			void open_element(
+					std::string const &name,
+					OutputIterator out)
+			{
+				open_attributed_element(name, out);
+				finish_attributes(out);
+			}
+
+			template <class OutputIterator>
+			void close_element(
+					std::string const &name,
+					OutputIterator out)
+			{
+				*out++ = '<';
+				*out++ = '/';
+				boost::range::copy(name, out);
+				*out++ = '>';
+			}
+		}
 	}
 
 	bool run_logging_process(
@@ -119,7 +204,27 @@ namespace
 					return;
 				}
 
-				std::string const body = "Hello, world!";
+				std::string body;
+				{
+					auto page = std::back_inserter(body);
+					using namespace web::html;
+					open_element("html", page);
+					{
+						open_element("head", page);
+						{
+							open_element("title", page);
+							write_string("silicium", page);
+							close_element("title", page);
+						}
+						close_element("head", page);
+						open_element("body", page);
+						{
+							write_string("Hello, world!", page);
+						}
+						close_element("body", page);
+					}
+					close_element("html", page);
+				}
 
 				Si::http::response_header response;
 				response.status = 200;
