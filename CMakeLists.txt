@@ -4,7 +4,7 @@ if(UNIX)
 	add_definitions("-Wall -Wextra -pedantic -std=c++0x -Wconversion -Wvla")
 endif()
 
-find_package(Boost REQUIRED unit_test_framework filesystem iostreams system)
+find_package(Boost REQUIRED unit_test_framework filesystem iostreams system coroutine)
 if(UNIX)
 	add_definitions("-DBOOST_TEST_DYN_LINK")
 endif()

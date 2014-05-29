@@ -3,10 +3,151 @@
 #include <silicium/tcp_trigger.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/asio/spawn.hpp>
 #include <fstream>
 
 namespace
 {
+	namespace web
+	{
+		struct socket_sink : Si::sink<char>
+		{
+			explicit socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
+			virtual boost::iterator_range<char *> make_append_space(std::size_t size) SILICIUM_OVERRIDE;
+			virtual void flush_append_space() SILICIUM_OVERRIDE;
+			virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE;
+
+		private:
+
+			boost::asio::ip::tcp::socket &m_socket;
+			boost::asio::yield_context &m_yield;
+		};
+
+		socket_sink::socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
+			: m_socket(socket)
+			, m_yield(yield)
+		{
+		}
+
+		boost::iterator_range<char *> socket_sink::make_append_space(std::size_t)
+		{
+			return boost::iterator_range<char *>();
+		}
+
+		void socket_sink::flush_append_space()
+		{
+		}
+
+		void socket_sink::append(boost::iterator_range<char const *> data)
+		{
+			boost::asio::async_write(m_socket, boost::asio::buffer(data.begin(), data.size()), m_yield);
+		}
+
+		struct socket_source : Si::source<char>
+		{
+			explicit socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
+			virtual boost::iterator_range<char const *> map_next(std::size_t size) SILICIUM_OVERRIDE;
+			virtual char *copy_next(boost::iterator_range<char *> destination) SILICIUM_OVERRIDE;
+			virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE;
+			virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE;
+
+		private:
+
+			boost::asio::ip::tcp::socket &m_socket;
+			boost::asio::yield_context &m_yield;
+		};
+
+		socket_source::socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
+			: m_socket(socket)
+			, m_yield(yield)
+		{
+		}
+
+		boost::iterator_range<char const *> socket_source::map_next(std::size_t)
+		{
+			return boost::iterator_range<char const *>();
+		}
+
+		char *socket_source::copy_next(boost::iterator_range<char *> destination)
+		{
+			size_t const read = m_socket.async_read_some(boost::asio::buffer(destination.begin(), destination.size()), m_yield);
+			return destination.begin() + read;
+		}
+
+		boost::uintmax_t socket_source::minimum_size()
+		{
+			return 0;
+		}
+
+		boost::optional<boost::uintmax_t> socket_source::maximum_size()
+		{
+			return boost::none;
+		}
+
+		struct acceptor
+		{
+			explicit acceptor(boost::asio::ip::tcp::acceptor listener)
+				: m_listener(std::move(listener))
+			{
+			}
+
+			template <class RequestHandler>
+			void async_accept(RequestHandler handle_request)
+			{
+				m_client.reset(new boost::asio::ip::tcp::socket(m_listener.get_io_service()));
+				m_listener.async_accept(*m_client, [this, handle_request](boost::system::error_code error)
+				{
+					if (error)
+					{
+						//TODO
+						return;
+					}
+
+					//TODO: remove the shared_ptr when we can move the unique_ptr into the callback
+					std::shared_ptr<boost::asio::ip::tcp::socket> client(std::move(m_client));
+
+					boost::asio::spawn(m_listener.get_io_service(), [client, handle_request](boost::asio::yield_context yield)
+					{
+						try
+						{
+							socket_source request_source(*client, yield);
+							socket_sink response_sink(*client, yield);
+							handle_request(request_source, response_sink, yield);
+						}
+						catch (boost::system::system_error const &)
+						{
+							//socket disconnect
+						}
+					});
+				});
+			}
+
+		private:
+
+			std::unique_ptr<boost::asio::ip::tcp::socket> m_client;
+			boost::asio::ip::tcp::acceptor m_listener;
+		};
+
+		struct request_header
+		{
+			std::map<std::string, std::string> arguments;
+		};
+
+		boost::optional<request_header> parse_header(Si::source<char> &in)
+		{
+			Si::line_source lines(in);
+			auto first_line = get(lines);
+			throw std::logic_error("not implemented");
+		}
+
+		struct response_header
+		{
+			std::map<std::string, std::string> arguments;
+		};
+
+		void write_header(Si::sink<char> &out, response_header const &header);
+	}
+
 	bool run_logging_process(
 			std::string executable,
 			std::vector<std::string> arguments,
@@ -47,6 +188,33 @@ namespace
 		auto const original_message = git_commit_message(&source);
 		return boost::str(boost::format("%1% - %2% - %3%") % result_str % author % original_message);
 	}
+
+	struct web_server
+	{
+		explicit web_server(boost::asio::io_service &io)
+			: m_acceptor(boost::asio::ip::tcp::acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080)))
+		{
+		}
+
+		void start()
+		{
+			m_acceptor.async_accept([this](Si::source<char> &in, Si::sink<char> &out, boost::asio::yield_context &yield)
+			{
+				start();
+
+				auto request = web::parse_header(in);
+				if (!request)
+				{
+					//TODO
+					return;
+				}
+			});
+		}
+
+	private:
+
+		web::acceptor m_acceptor;
+	};
 }
 
 int main(int argc, char **argv)
@@ -99,6 +267,9 @@ int main(int argc, char **argv)
 		});
 	};
 	wait_for_trigger();
+
+	web_server web(io);
+	web.start();
 
 	build();
 	io.run();
