@@ -42,9 +42,8 @@ namespace
 						try
 						{
 							Si::socket_source request_source(*client, yield);
-							Si::buffering_source<char> buffered_source(request_source, 1U << 14U);
 							Si::socket_sink response_sink(*client, yield);
-							handle_request(buffered_source, response_sink, yield);
+							handle_request(request_source, response_sink, yield);
 						}
 						catch (boost::system::system_error const &)
 						{
@@ -237,7 +236,8 @@ namespace
 			{
 				start();
 
-				auto request = Si::http::parse_header(in);
+				Si::buffering_source<char> buffered_in(in, 1U << 14U);
+				auto request = Si::http::parse_header(buffered_in);
 				if (!request)
 				{
 					//TODO
@@ -270,6 +270,7 @@ namespace
 				response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
 				response.arguments["Content-Type"] = "text/html";
 				response.arguments["Connection"] = "close";
+
 				write_header(out, response);
 				append(out, body);
 			});
