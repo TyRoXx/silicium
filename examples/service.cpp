@@ -24,7 +24,8 @@ namespace
 			void async_accept(RequestHandler handle_request)
 			{
 				m_client.reset(new boost::asio::ip::tcp::socket(m_listener.get_io_service()));
-				m_listener.async_accept(*m_client, [this, handle_request](boost::system::error_code error)
+				auto &listener = m_listener;
+				m_listener.async_accept(*m_client, [this, &listener, handle_request](boost::system::error_code error)
 				{
 					if (error)
 					{
@@ -35,7 +36,8 @@ namespace
 					//TODO: remove the shared_ptr when we can move the unique_ptr into the callback
 					std::shared_ptr<boost::asio::ip::tcp::socket> client(std::move(m_client));
 
-					boost::asio::spawn(m_listener.get_io_service(), [client, handle_request](boost::asio::yield_context yield)
+					auto &io = listener.get_io_service();
+					boost::asio::spawn(io, [client, handle_request](boost::asio::yield_context yield)
 					{
 						try
 						{
