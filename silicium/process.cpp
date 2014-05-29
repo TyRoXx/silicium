@@ -90,6 +90,7 @@ namespace Si
 				file_descriptor &operator = (file_descriptor &&other) BOOST_NOEXCEPT
 				{
 					swap(other);
+					return *this;
 				}
 
 				void swap(file_descriptor &other) BOOST_NOEXCEPT
@@ -161,15 +162,7 @@ namespace Si
 			stdout = detail::make_pipe();
 		}
 
-		std::array<int, 2> stdin;
-		std::unique_ptr<int, detail::file_closer> stdin_reading;
-		std::unique_ptr<int, detail::file_closer> stdin_writing;
-		if (pipe(stdin.data()) < 0)
-		{
-			throw boost::system::system_error(errno, boost::system::system_category());
-		}
-		stdin_reading.reset(stdin.data() + 0);
-		stdin_writing.reset(stdin.data() + 1);
+		auto stdin = detail::make_pipe();
 
 		std::array<int, 2> child_error;
 		std::unique_ptr<int, detail::file_closer> child_error_reading;
@@ -203,12 +196,11 @@ namespace Si
 				stdout.close();
 			}
 
-			if (dup2(*stdin_reading, STDIN_FILENO) < 0)
+			if (dup2(stdin.read.handle, STDIN_FILENO) < 0)
 			{
 				std::abort();
 			}
-			stdin_reading.reset();
-			stdin_writing.reset();
+			stdin.close();
 
 			child_error_reading.reset();
 			detail::set_close_on_exec(*child_error_writing);
@@ -239,7 +231,7 @@ namespace Si
 				stdout.write.close();
 				detail::copy_all(stdout.read.handle, *parameters.stdout);
 			}
-			stdin_reading.reset();
+			stdin.read.close();
 
 			int status = 0;
 			if (waitpid(forked, &status, 0) < 0)
