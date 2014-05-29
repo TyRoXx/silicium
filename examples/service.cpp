@@ -2,6 +2,8 @@
 #include <silicium/process.hpp>
 #include <silicium/tcp_trigger.hpp>
 #include <silicium/http/http.hpp>
+#include <silicium/asio/socket_sink.hpp>
+#include <silicium/asio/socket_source.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/asio/spawn.hpp>
@@ -11,80 +13,6 @@ namespace
 {
 	namespace web
 	{
-		struct socket_sink : Si::sink<char>
-		{
-			explicit socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
-			virtual boost::iterator_range<char *> make_append_space(std::size_t size) SILICIUM_OVERRIDE;
-			virtual void flush_append_space() SILICIUM_OVERRIDE;
-			virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE;
-
-		private:
-
-			boost::asio::ip::tcp::socket &m_socket;
-			boost::asio::yield_context &m_yield;
-		};
-
-		socket_sink::socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
-			: m_socket(socket)
-			, m_yield(yield)
-		{
-		}
-
-		boost::iterator_range<char *> socket_sink::make_append_space(std::size_t)
-		{
-			return boost::iterator_range<char *>();
-		}
-
-		void socket_sink::flush_append_space()
-		{
-		}
-
-		void socket_sink::append(boost::iterator_range<char const *> data)
-		{
-			boost::asio::async_write(m_socket, boost::asio::buffer(data.begin(), data.size()), m_yield);
-		}
-
-		struct socket_source : Si::source<char>
-		{
-			explicit socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
-			virtual boost::iterator_range<char const *> map_next(std::size_t size) SILICIUM_OVERRIDE;
-			virtual char *copy_next(boost::iterator_range<char *> destination) SILICIUM_OVERRIDE;
-			virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE;
-			virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE;
-
-		private:
-
-			boost::asio::ip::tcp::socket &m_socket;
-			boost::asio::yield_context &m_yield;
-		};
-
-		socket_source::socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
-			: m_socket(socket)
-			, m_yield(yield)
-		{
-		}
-
-		boost::iterator_range<char const *> socket_source::map_next(std::size_t)
-		{
-			return boost::iterator_range<char const *>();
-		}
-
-		char *socket_source::copy_next(boost::iterator_range<char *> destination)
-		{
-			size_t const read = m_socket.async_read_some(boost::asio::buffer(destination.begin(), destination.size()), m_yield);
-			return destination.begin() + read;
-		}
-
-		boost::uintmax_t socket_source::minimum_size()
-		{
-			return 0;
-		}
-
-		boost::optional<boost::uintmax_t> socket_source::maximum_size()
-		{
-			return boost::none;
-		}
-
 		struct acceptor
 		{
 			explicit acceptor(boost::asio::ip::tcp::acceptor listener)
@@ -111,8 +39,8 @@ namespace
 					{
 						try
 						{
-							socket_source request_source(*client, yield);
-							socket_sink response_sink(*client, yield);
+							Si::socket_source request_source(*client, yield);
+							Si::socket_sink response_sink(*client, yield);
 							handle_request(request_source, response_sink, yield);
 						}
 						catch (boost::system::system_error const &)
