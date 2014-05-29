@@ -163,16 +163,7 @@ namespace Si
 		}
 
 		auto stdin = detail::make_pipe();
-
-		std::array<int, 2> child_error;
-		std::unique_ptr<int, detail::file_closer> child_error_reading;
-		std::unique_ptr<int, detail::file_closer> child_error_writing;
-		if (pipe(child_error.data()) < 0)
-		{
-			throw boost::system::system_error(errno, boost::system::system_category());
-		}
-		child_error_reading.reset(child_error.data() + 0);
-		child_error_writing.reset(child_error.data() + 1);
+		auto child_error = detail::make_pipe();
 
 		pid_t const forked = fork();
 		if (forked < 0)
@@ -202,20 +193,20 @@ namespace Si
 			}
 			stdin.close();
 
-			child_error_reading.reset();
-			detail::set_close_on_exec(*child_error_writing);
+			child_error.read.close();
+			detail::set_close_on_exec(child_error.write.handle);
 
 			boost::filesystem::current_path(parameters.current_path);
 
 			execvp(parameters.executable.c_str(), argument_pointers.data());
 
 			int error = errno;
-			ssize_t written = write(*child_error_writing, &error, sizeof(error));
+			ssize_t written = write(child_error.write.handle, &error, sizeof(error));
 			if (written != sizeof(error))
 			{
 				_exit(1);
 			}
-			child_error_writing.reset();
+			child_error.write.close();
 
 			//kill the process in case execv fails
 			_exit(0);
@@ -224,7 +215,7 @@ namespace Si
 		//parent
 		else
 		{
-			child_error_writing.reset();
+			child_error.write.close();
 
 			if (parameters.stdout)
 			{
@@ -240,7 +231,7 @@ namespace Si
 			}
 
 			int error = 0;
-			ssize_t read_error = read(*child_error_reading, &error, sizeof(error));
+			ssize_t read_error = read(child_error.read.handle, &error, sizeof(error));
 			if (read_error < 0)
 			{
 				throw boost::system::system_error(errno, boost::system::system_category());
