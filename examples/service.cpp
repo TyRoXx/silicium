@@ -42,8 +42,9 @@ namespace
 						try
 						{
 							Si::socket_source request_source(*client, yield);
+							Si::buffering_source<char> buffered_source(request_source, 1U << 14U);
 							Si::socket_sink response_sink(*client, yield);
-							handle_request(request_source, response_sink, yield);
+							handle_request(buffered_source, response_sink, yield);
 						}
 						catch (boost::system::system_error const &)
 						{
