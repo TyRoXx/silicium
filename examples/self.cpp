@@ -29,27 +29,33 @@ namespace
 			std::string const &build_type)
 	{
 		{
-			const auto cmake_result = Si::run_process("/usr/bin/cmake", {source.string(), ("-DCMAKE_BUILD_TYPE=" + build_type)}, build_directory);
-			result.add_artifact("cmake.log", cmake_result.output);
-			if (cmake_result.exit_code != 0)
+			std::vector<char> output;
+			auto stdout = Si::make_container_sink(output);
+			const auto cmake_result = Si::run_process("/usr/bin/cmake", {source.string(), ("-DCMAKE_BUILD_TYPE=" + build_type)}, build_directory, stdout);
+			result.add_artifact("cmake.log", output);
+			if (cmake_result != 0)
 			{
 				return Si::build_failure{"CMake failed"};
 			}
 		}
 
 		{
-			const auto make_result = Si::run_process("/usr/bin/make", {}, build_directory);
-			result.add_artifact("make.log", make_result.output);
-			if (make_result.exit_code != 0)
+			std::vector<char> output;
+			auto stdout = Si::make_container_sink(output);
+			const auto make_result = Si::run_process("/usr/bin/make", {}, build_directory, stdout);
+			result.add_artifact("make.log", output);
+			if (make_result != 0)
 			{
 				return Si::build_failure{"Make failed"};
 			}
 		}
 
 		{
-			const auto test_result = Si::run_process((build_directory / "test/test").string(), {}, build_directory);
-			result.add_artifact("test.log", test_result.output);
-			if (test_result.exit_code != 0)
+			std::vector<char> output;
+			auto stdout = Si::make_container_sink(output);
+			const auto test_result = Si::run_process((build_directory / "test/test").string(), {}, build_directory, stdout);
+			result.add_artifact("test.log", output);
+			if (test_result != 0)
 			{
 				return Si::build_failure{"Test failed"};
 			}

@@ -5,14 +5,6 @@
 
 namespace Si
 {
-	BOOST_AUTO_TEST_CASE(run_process_3_which)
-	{
-		auto const results = run_process("/usr/bin/which", {"which"}, "/");
-		BOOST_CHECK_EQUAL(0, results.exit_code);
-		std::string const expected = "/usr/bin/which\n";
-		BOOST_CHECK_EQUAL(expected, std::string(begin(results.output), end(results.output)));
-	}
-
 	BOOST_AUTO_TEST_CASE(run_process_1_which)
 	{
 		process_parameters parameters;

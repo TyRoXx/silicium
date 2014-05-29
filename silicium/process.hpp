@@ -24,15 +24,6 @@ namespace Si
 
 	int run_process(process_parameters const &parameters);
 
-	struct process_results
-	{
-		int exit_code;
-		std::vector<char> output;
-	};
-
-	//TODO: remove this overload
-	process_results run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path current_path);
-
 	int run_process(
 			boost::filesystem::path executable,
 			std::vector<std::string> arguments,

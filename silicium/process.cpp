@@ -199,19 +199,6 @@ namespace Si
 		}
 	}
 
-	process_results run_process(std::string executable, std::vector<std::string> arguments, boost::filesystem::path current_path)
-	{
-		process_parameters parameters;
-		parameters.executable = std::move(executable);
-		parameters.arguments = std::move(arguments);
-		parameters.current_path = std::move(current_path);
-		std::vector<char> stdout;
-		auto sink = make_container_sink(stdout);
-		parameters.stdout = &sink;
-		auto const result = run_process(parameters);
-		return process_results{result, std::move(stdout)};
-	}
-
 	int run_process(
 			boost::filesystem::path executable,
 			std::vector<std::string> arguments,
