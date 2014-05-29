@@ -176,6 +176,10 @@ namespace Si
 			Si::filesystem_directory_builder results(results_repository);
 			auto const reports = results.create_subdirectory(formatted_build_oid);
 			auto const result = build_commit(git_executable, branch, source_location.string(), temporary_location, *reports, run_tests);
+
+			//delete all the temporary files first
+			boost::filesystem::remove_all(temporary_location);
+
 			set_last_built(last_built_file_name, *new_commit_id);
 
 			auto const commit_message = make_commit_message(result, *new_commit);
