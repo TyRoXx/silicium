@@ -18,6 +18,8 @@ namespace Si
 		sink<char> *stdout;
 		sink<char> *stderr;
 		source<char> *stdin;
+
+		process_parameters();
 	};
 
 	int run_process(process_parameters const &parameters);

@@ -12,6 +12,13 @@
 
 namespace Si
 {
+	process_parameters::process_parameters()
+		: stdout(nullptr)
+		, stderr(nullptr)
+		, stdin(nullptr)
+	{
+	}
+
 	namespace
 	{
 		namespace detail
