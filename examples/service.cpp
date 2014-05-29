@@ -185,18 +185,6 @@ namespace
 			std::map<std::string, std::string> arguments;
 		};
 
-		template <class Element>
-		void append(Si::sink<Element> &out, std::basic_string<Element> const &str)
-		{
-			out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
-		}
-
-		template <class Element>
-		void append(Si::sink<Element> &out, Element const *c_str)
-		{
-			out.append(boost::make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
-		}
-
 		void write_header(Si::sink<char> &out, response_header const &header)
 		{
 			append(out, header.http_version);
@@ -268,7 +256,7 @@ namespace
 
 		void start()
 		{
-			m_acceptor.async_accept([this](Si::source<char> &in, Si::sink<char> &out, boost::asio::yield_context &yield)
+			m_acceptor.async_accept([this](Si::source<char> &in, Si::sink<char> &out, boost::asio::yield_context &)
 			{
 				start();
 
@@ -288,8 +276,8 @@ namespace
 				response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
 				response.arguments["Content-Type"] = "text/html";
 				response.arguments["Connection"] = "close";
-				web::write_header(out, response);
-				web::append(out, body);
+				write_header(out, response);
+				append(out, body);
 			});
 		}
 

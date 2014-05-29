@@ -205,6 +205,18 @@ namespace Si
 	{
 		return auto_flush_sink<Element>(next);
 	}
+
+	template <class Element>
+	void append(Si::sink<Element> &out, std::basic_string<Element> const &str)
+	{
+		out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
+	}
+
+	template <class Element>
+	void append(Si::sink<Element> &out, Element const *c_str)
+	{
+		out.append(boost::make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
+	}
 }
 
 #endif
