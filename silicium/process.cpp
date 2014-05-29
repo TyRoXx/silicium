@@ -7,6 +7,7 @@
 
 #ifdef __linux__
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #endif
 
@@ -60,6 +61,11 @@ namespace Si
 					commit(buffer_helper, static_cast<std::size_t>(rc));
 				}
 			}
+
+			void set_close_on_exec(int file)
+			{
+				fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
+			}
 		}
 	}
 
@@ -99,6 +105,16 @@ namespace Si
 		stdin_reading.reset(stdin.data() + 0);
 		stdin_writing.reset(stdin.data() + 1);
 
+		std::array<int, 2> child_error;
+		std::unique_ptr<int, detail::file_closer> child_error_reading;
+		std::unique_ptr<int, detail::file_closer> child_error_writing;
+		if (pipe(child_error.data()) < 0)
+		{
+			throw boost::system::system_error(errno, boost::system::system_category());
+		}
+		child_error_reading.reset(child_error.data() + 0);
+		child_error_writing.reset(child_error.data() + 1);
+
 		pid_t const forked = fork();
 		if (forked < 0)
 		{
@@ -129,17 +145,30 @@ namespace Si
 			stdin_reading.reset();
 			stdin_writing.reset();
 
+			child_error_reading.reset();
+			detail::set_close_on_exec(*child_error_writing);
+
 			boost::filesystem::current_path(parameters.current_path);
 
 			execvp(parameters.executable.c_str(), argument_pointers.data());
 
+			int error = errno;
+			ssize_t written = write(*child_error_writing, &error, sizeof(error));
+			if (written != sizeof(error))
+			{
+				_exit(1);
+			}
+			child_error_writing.reset();
+
 			//kill the process in case execv fails
-			std::abort();
+			_exit(0);
 		}
 
 		//parent
 		else
 		{
+			child_error_writing.reset();
+
 			if (parameters.stdout)
 			{
 				stdout_writing.reset();
@@ -151,6 +180,18 @@ namespace Si
 			if (waitpid(forked, &status, 0) < 0)
 			{
 				throw boost::system::system_error(errno, boost::system::system_category());
+			}
+
+			int error = 0;
+			ssize_t read_error = read(*child_error_reading, &error, sizeof(error));
+			if (read_error < 0)
+			{
+				throw boost::system::system_error(errno, boost::system::system_category());
+			}
+			if (read_error != 0)
+			{
+				assert(read_error == sizeof(error));
+				throw boost::system::system_error(error, boost::system::system_category());
 			}
 
 			int const exit_status = WEXITSTATUS(status);
