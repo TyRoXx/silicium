@@ -140,6 +140,43 @@ namespace
 				boost::range::copy(name, out);
 				*out++ = '>';
 			}
+
+			template <class OutputIterator>
+			struct generator
+			{
+				generator()
+				{
+				}
+
+				explicit generator(OutputIterator out)
+					: m_out(out)
+				{
+				}
+
+				template <class ContentMaker>
+				void element(std::string const &name, ContentMaker make_content) const
+				{
+					open_element(name, m_out);
+					make_content();
+					close_element(name, m_out);
+				}
+
+				void write(std::string const &text) const
+				{
+					write_string(text, m_out);
+				}
+
+			private:
+
+				OutputIterator m_out;
+			};
+
+			template <class OutputIterator>
+			auto make_generator(OutputIterator out)
+				-> generator<typename std::decay<OutputIterator>::type>
+			{
+				return generator<typename std::decay<OutputIterator>::type>(out);
+			}
 		}
 	}
 
@@ -206,24 +243,21 @@ namespace
 
 				std::string body;
 				{
-					auto page = std::back_inserter(body);
-					using namespace web::html;
-					open_element("html", page);
+					auto page = web::html::make_generator(std::back_inserter(body));
+					page.element("html", [&]
 					{
-						open_element("head", page);
+						page.element("head", [&]
 						{
-							open_element("title", page);
-							write_string("silicium", page);
-							close_element("title", page);
-						}
-						close_element("head", page);
-						open_element("body", page);
+							page.element("title", [&]
+							{
+								page.write("silicium");
+							});
+						});
+						page.element("body", [&]
 						{
-							write_string("Hello, world!", page);
-						}
-						close_element("body", page);
-					}
-					close_element("html", page);
+							page.write("Hello, world!");
+						});
+					});
 				}
 
 				Si::http::response_header response;
