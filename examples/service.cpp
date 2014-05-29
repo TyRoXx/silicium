@@ -1,10 +1,10 @@
 #include <silicium/oxid.hpp>
 #include <silicium/process.hpp>
 #include <silicium/tcp_trigger.hpp>
+#include <silicium/http/http.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/asio/spawn.hpp>
-#include <boost/range/algorithm.hpp>
 #include <fstream>
 
 namespace
@@ -128,82 +128,6 @@ namespace
 			std::unique_ptr<boost::asio::ip::tcp::socket> m_client;
 			boost::asio::ip::tcp::acceptor m_listener;
 		};
-
-		struct request_header
-		{
-			std::string method;
-			std::string path;
-			std::string http_version;
-			std::map<std::string, std::string> arguments;
-		};
-
-		template <class CharRange>
-		std::pair<std::string, std::string> split_value_line(CharRange const &line)
-		{
-			auto colon = boost::range::find(line, ':');
-			auto second_begin = colon + 1;
-			if (*second_begin == ' ')
-			{
-				++second_begin;
-			}
-			return std::make_pair(std::string(begin(line), colon), std::string(second_begin, end(line)));
-		}
-
-		boost::optional<request_header> parse_header(Si::source<char> &in)
-		{
-			Si::line_source lines(in);
-			auto first_line = get(lines);
-			if (!first_line)
-			{
-				return boost::none;
-			}
-			request_header header;
-			//TODO split first_line
-
-			for (;;)
-			{
-				auto value_line = get(lines);
-				if (!value_line)
-				{
-					return boost::none;
-				}
-				if (value_line->empty())
-				{
-					break;
-				}
-				auto value = split_value_line(*value_line);
-				header.arguments[value.first] = std::move(value.second);
-			}
-			return std::move(header);
-		}
-
-		struct response_header
-		{
-			std::string http_version;
-			int status;
-			std::string status_text;
-			std::map<std::string, std::string> arguments;
-		};
-
-		void write_header(Si::sink<char> &out, response_header const &header)
-		{
-			append(out, header.http_version);
-			append(out, " ");
-			append(out, boost::lexical_cast<std::string>(header.status));
-			append(out, " ");
-			append(out, header.status_text);
-			append(out, "\r\n");
-
-			for (auto const &argument : header.arguments)
-			{
-				append(out, argument.first);
-				append(out, ": ");
-				append(out, argument.second);
-				append(out, "\r\n");
-			}
-
-			append(out, "\r\n");
-		}
 	}
 
 	bool run_logging_process(
@@ -260,7 +184,7 @@ namespace
 			{
 				start();
 
-				auto request = web::parse_header(in);
+				auto request = Si::http::parse_header(in);
 				if (!request)
 				{
 					//TODO
@@ -269,7 +193,7 @@ namespace
 
 				std::string const body = "Hello, world!";
 
-				web::response_header response;
+				Si::http::response_header response;
 				response.status = 200;
 				response.status_text = "OK";
 				response.http_version = "HTTP/1.0";
