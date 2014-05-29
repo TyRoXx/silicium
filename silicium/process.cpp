@@ -174,22 +174,34 @@ namespace Si
 		//child
 		if (forked == 0)
 		{
+			auto const fail = [&child_error]() __attribute__ ((__noreturn__))
+			{
+				int error = errno;
+				ssize_t written = write(child_error.write.handle, &error, sizeof(error));
+				if (written != sizeof(error))
+				{
+					_exit(1);
+				}
+				child_error.write.close();
+				_exit(0);
+			};
+
 			if (parameters.stdout)
 			{
 				if (dup2(stdout.write.handle, STDOUT_FILENO) < 0)
 				{
-					std::abort();
+					fail();
 				}
 				if (dup2(stdout.write.handle, STDERR_FILENO) < 0)
 				{
-					std::abort();
+					fail();
 				}
 				stdout.close();
 			}
 
 			if (dup2(stdin.read.handle, STDIN_FILENO) < 0)
 			{
-				std::abort();
+				fail();
 			}
 			stdin.close();
 
@@ -199,17 +211,7 @@ namespace Si
 			boost::filesystem::current_path(parameters.current_path);
 
 			execvp(parameters.executable.c_str(), argument_pointers.data());
-
-			int error = errno;
-			ssize_t written = write(child_error.write.handle, &error, sizeof(error));
-			if (written != sizeof(error))
-			{
-				_exit(1);
-			}
-			child_error.write.close();
-
-			//kill the process in case execv fails
-			_exit(0);
+			fail();
 		}
 
 		//parent
