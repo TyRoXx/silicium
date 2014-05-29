@@ -66,6 +66,80 @@ namespace Si
 			{
 				fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
 			}
+
+			struct file_descriptor : private boost::noncopyable
+			{
+				int handle;
+
+				file_descriptor() BOOST_NOEXCEPT
+					: handle(-1)
+				{
+				}
+
+				file_descriptor(file_descriptor &&other) BOOST_NOEXCEPT
+					: handle(-1)
+				{
+					swap(other);
+				}
+
+				explicit file_descriptor(int handle) BOOST_NOEXCEPT
+					: handle(handle)
+				{
+				}
+
+				file_descriptor &operator = (file_descriptor &&other) BOOST_NOEXCEPT
+				{
+					swap(other);
+				}
+
+				void swap(file_descriptor &other) BOOST_NOEXCEPT
+				{
+					using std::swap;
+					swap(handle, other.handle);
+				}
+
+				void close() BOOST_NOEXCEPT
+				{
+					file_descriptor().swap(*this);
+				}
+
+				~file_descriptor() BOOST_NOEXCEPT
+				{
+					if (handle >= 0)
+					{
+						terminating_close(handle);
+					}
+				}
+			};
+
+			struct pipe
+			{
+				file_descriptor write, read;
+
+				void close() BOOST_NOEXCEPT
+				{
+					pipe().swap(*this);
+				}
+
+				void swap(pipe &other) BOOST_NOEXCEPT
+				{
+					write.swap(other.write);
+					read.swap(other.read);
+				}
+			};
+
+			pipe make_pipe()
+			{
+				std::array<int, 2> fds;
+				if (::pipe(fds.data()) < 0)
+				{
+					throw boost::system::system_error(errno, boost::system::system_category());
+				}
+				pipe result;
+				result.read  = file_descriptor(fds[0]);
+				result.write = file_descriptor(fds[1]);
+				return result;
+			}
 		}
 	}
 
@@ -81,18 +155,10 @@ namespace Si
 		});
 		argument_pointers.emplace_back(nullptr);
 
-		std::array<int, 2> stdout;
-		std::unique_ptr<int, detail::file_closer> stdout_reading;
-		std::unique_ptr<int, detail::file_closer> stdout_writing;
-
+		detail::pipe stdout;
 		if (parameters.stdout)
 		{
-			if (pipe(stdout.data()) < 0)
-			{
-				throw boost::system::system_error(errno, boost::system::system_category());
-			}
-			stdout_reading.reset(stdout.data() + 0);
-			stdout_writing.reset(stdout.data() + 1);
+			stdout = detail::make_pipe();
 		}
 
 		std::array<int, 2> stdin;
@@ -126,16 +192,15 @@ namespace Si
 		{
 			if (parameters.stdout)
 			{
-				if (dup2(*stdout_writing, STDOUT_FILENO) < 0)
+				if (dup2(stdout.write.handle, STDOUT_FILENO) < 0)
 				{
 					std::abort();
 				}
-				if (dup2(*stdout_writing, STDERR_FILENO) < 0)
+				if (dup2(stdout.write.handle, STDERR_FILENO) < 0)
 				{
 					std::abort();
 				}
-				stdout_writing.reset();
-				stdout_reading.reset();
+				stdout.close();
 			}
 
 			if (dup2(*stdin_reading, STDIN_FILENO) < 0)
@@ -171,8 +236,8 @@ namespace Si
 
 			if (parameters.stdout)
 			{
-				stdout_writing.reset();
-				detail::copy_all(*stdout_reading, *parameters.stdout);
+				stdout.write.close();
+				detail::copy_all(stdout.read.handle, *parameters.stdout);
 			}
 			stdin_reading.reset();
 
