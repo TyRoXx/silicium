@@ -309,6 +309,18 @@ namespace Si
 			}
 		}
 	};
+
+	template <class Element>
+	mutable_source_iterator<Element> begin(mutable_source<Element> &source)
+	{
+		return mutable_source_iterator<Element>(source);
+	}
+
+	template <class Element>
+	mutable_source_iterator<Element> end(mutable_source<Element> &)
+	{
+		return mutable_source_iterator<Element>();
+	}
 }
 
 #endif

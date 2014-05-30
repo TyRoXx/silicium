@@ -352,8 +352,7 @@ int main(int argc, char **argv)
 	{
 		socket_accepting_source clients(acceptor, yield);
 		Si::buffering_source<socket_accepting_source::element_type> client_buffer(clients, 1);
-		Si::mutable_source_iterator<socket_accepting_source::element_type> begin(client_buffer), end;
-		for (auto client : boost::make_iterator_range(begin, end))
+		for (auto client : client_buffer)
 		{
 			(void)client;
 			auto new_build = std::make_shared<boost::posix_time::ptime>(boost::posix_time::microsec_clock::local_time());
