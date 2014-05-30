@@ -258,6 +258,12 @@ namespace Si
 	};
 
 	template <class Element>
+	buffering_source<Element> make_buffer(source<Element> &buffered, std::size_t capacity)
+	{
+		return buffering_source<Element>(buffered, capacity);
+	}
+
+	template <class Element>
 	struct mutable_source_iterator : boost::iterator_facade<mutable_source_iterator<Element>, Element, std::input_iterator_tag>
 	{
 		mutable_source_iterator() BOOST_NOEXCEPT

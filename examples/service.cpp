@@ -4,6 +4,7 @@
 #include <silicium/http/http.hpp>
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
+#include <silicium/asio/accepting_source.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -249,60 +250,6 @@ namespace
 		web::acceptor m_acceptor;
 		request_responder m_respond;
 	};
-
-	struct socket_accepting_source : Si::source<std::shared_ptr<boost::asio::ip::tcp::socket>>
-	{
-		typedef std::shared_ptr<boost::asio::ip::tcp::socket> element_type;
-
-		explicit socket_accepting_source(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context &yield)
-			: m_acceptor(acceptor)
-			, m_yield(yield)
-		{
-		}
-
-		virtual boost::iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE
-		{
-			return boost::iterator_range<element_type const *>();
-		}
-
-		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
-		{
-			for (auto &client : destination)
-			{
-				client = std::make_shared<boost::asio::ip::tcp::socket>(m_acceptor.get_io_service());
-				m_acceptor.async_accept(*client, m_yield);
-			}
-			return destination.end();
-		}
-
-		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
-		{
-			return 0;
-		}
-
-		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
-		{
-			return boost::none;
-		}
-
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
-		{
-			for (size_t i = 0; i < count; ++i)
-			{
-				element_type thrown_away;
-				if (copy_next(boost::make_iterator_range(&thrown_away, &thrown_away + 1)) == &thrown_away)
-				{
-					return i;
-				}
-			}
-			return count;
-		}
-
-	private:
-
-		boost::asio::ip::tcp::acceptor &m_acceptor;
-		boost::asio::yield_context &m_yield;
-	};
 }
 
 int main(int argc, char **argv)
@@ -350,8 +297,8 @@ int main(int argc, char **argv)
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 12345));
 	boost::asio::spawn(io, [&acceptor, &current_build, &build](boost::asio::yield_context yield)
 	{
-		socket_accepting_source clients(acceptor, yield);
-		Si::buffering_source<socket_accepting_source::element_type> client_buffer(clients, 1);
+		Si::accepting_source clients(acceptor, yield);
+		auto client_buffer = Si::make_buffer(clients, 1);
 		for (auto client : client_buffer)
 		{
 			(void)client;
