@@ -364,8 +364,10 @@ int main(int argc, char **argv)
 		response.arguments["Content-Type"] = "text/html";
 		response.arguments["Connection"] = "close";
 
-		write_header(out, response);
-		append(out, body);
+		Si::buffering_sink<char> buffered_out(out);
+		write_header(buffered_out, response);
+		append(buffered_out, body);
+		buffered_out.flush();
 	};
 
 	web_server web(io, respond_web_request);
