@@ -37,7 +37,7 @@ namespace Si
 	}
 
 	template <class Element, class Buffer = std::array<Element, ((1U << 13U) / sizeof(Element))>>
-	struct buffering_sink : sink<Element>
+	struct buffering_sink : flushable_sink<Element>
 	{
 		explicit buffering_sink(sink<Element> &destination, Buffer buffer = Buffer())
 			: m_destination(destination)
@@ -64,8 +64,7 @@ namespace Si
 		{
 			if (m_buffer_used)
 			{
-				m_destination.append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used));
-				m_buffer_used = 0;
+				flush();
 			}
 			else
 			{
@@ -75,7 +74,20 @@ namespace Si
 
 		void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
+			if (data.size() <= (m_fallback_buffer.size() - m_buffer_used))
+			{
+				boost::range::copy(data, m_fallback_buffer.begin() + m_buffer_used);
+				m_buffer_used += data.size();
+				return;
+			}
+
+			flush();
 			m_destination.append(data);
+		}
+
+		void flush() SILICIUM_OVERRIDE
+		{
+			m_destination.append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used));
 			m_buffer_used = 0;
 		}
 
