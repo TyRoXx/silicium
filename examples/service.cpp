@@ -290,7 +290,7 @@ int main(int argc, char **argv)
 		}
 	};
 
-	std::weak_ptr<boost::posix_time::ptime> current_build;
+	std::weak_ptr<boost::posix_time::ptime const> current_build;
 
 	boost::asio::io_service io;
 
@@ -301,7 +301,7 @@ int main(int argc, char **argv)
 		for (auto client : (clients | Si::buffered(1)))
 		{
 			(void)client;
-			auto new_build = std::make_shared<boost::posix_time::ptime>(boost::posix_time::microsec_clock::local_time());
+			auto new_build = std::make_shared<boost::posix_time::ptime const>(boost::posix_time::microsec_clock::local_time());
 			std::thread([new_build, &build]
 			{
 				build();
