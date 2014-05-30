@@ -298,8 +298,7 @@ int main(int argc, char **argv)
 	boost::asio::spawn(io, [&acceptor, &current_build, &build](boost::asio::yield_context yield)
 	{
 		Si::accepting_source clients(acceptor, yield);
-		auto client_buffer = Si::make_buffer(clients, 1);
-		for (auto client : client_buffer)
+		for (auto client : (clients | Si::buffered(1)))
 		{
 			(void)client;
 			auto new_build = std::make_shared<boost::posix_time::ptime>(boost::posix_time::microsec_clock::local_time());

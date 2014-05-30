@@ -20,9 +20,9 @@ namespace Si
 	{
 	}
 
-	namespace
+	namespace detail
 	{
-		namespace detail
+		namespace
 		{
 			void terminating_close(int file) noexcept
 			{
