@@ -6,8 +6,10 @@
 #include <silicium/asio/socket_source.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/asio/spawn.hpp>
 #include <fstream>
+#include <thread>
 
 namespace
 {
@@ -225,60 +227,27 @@ namespace
 
 	struct web_server
 	{
-		explicit web_server(boost::asio::io_service &io)
+		typedef std::function<void (Si::source<char> &, Si::sink<char> &, boost::asio::yield_context &)> request_responder;
+
+		explicit web_server(boost::asio::io_service &io, request_responder respond)
 			: m_acceptor(boost::asio::ip::tcp::acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080)))
+			, m_respond(std::move(respond))
 		{
 		}
 
 		void start()
 		{
-			m_acceptor.async_accept([this](Si::source<char> &in, Si::sink<char> &out, boost::asio::yield_context &)
+			m_acceptor.async_accept([this](Si::source<char> &in, Si::sink<char> &out, boost::asio::yield_context &yield)
 			{
 				start();
-
-				Si::buffering_source<char> buffered_in(in, 1U << 14U);
-				auto request = Si::http::parse_header(buffered_in);
-				if (!request)
-				{
-					//TODO
-					return;
-				}
-
-				std::string body;
-				{
-					auto page = web::html::make_generator(std::back_inserter(body));
-					page.element("html", [&]
-					{
-						page.element("head", [&]
-						{
-							page.element("title", [&]
-							{
-								page.write("silicium");
-							});
-						});
-						page.element("body", [&]
-						{
-							page.write("Hello, world!");
-						});
-					});
-				}
-
-				Si::http::response_header response;
-				response.status = 200;
-				response.status_text = "OK";
-				response.http_version = "HTTP/1.0";
-				response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
-				response.arguments["Content-Type"] = "text/html";
-				response.arguments["Connection"] = "close";
-
-				write_header(out, response);
-				append(out, body);
+				m_respond(in, out, yield);
 			});
 		}
 
 	private:
 
 		web::acceptor m_acceptor;
+		request_responder m_respond;
 	};
 }
 
@@ -320,20 +289,86 @@ int main(int argc, char **argv)
 		}
 	};
 
+	std::weak_ptr<boost::posix_time::ptime> current_build;
+
 	boost::asio::io_service io;
 	Si::tcp_trigger external_build_trigger(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 12345));
 	std::function<void ()> wait_for_trigger;
-	wait_for_trigger = [&wait_for_trigger, &external_build_trigger, &build]
+	wait_for_trigger = [&wait_for_trigger, &external_build_trigger, &build, &current_build]
 	{
-		external_build_trigger.async_wait([&wait_for_trigger, &build]
+		external_build_trigger.async_wait([&wait_for_trigger, &build, &current_build]
 		{
-			build();
+			if (!current_build.lock())
+			{
+				auto new_build = std::make_shared<boost::posix_time::ptime>(boost::posix_time::microsec_clock::local_time());
+				std::thread([new_build, &build]
+				{
+					build();
+				}).detach();
+				current_build = new_build;
+			}
 			wait_for_trigger();
 		});
 	};
 	wait_for_trigger();
 
-	web_server web(io);
+	auto const respond_web_request = [&current_build](Si::source<char> &in, Si::sink<char> &out, boost::asio::yield_context &)
+	{
+		Si::buffering_source<char> buffered_in(in, 1U << 14U);
+		auto request = Si::http::parse_header(buffered_in);
+		if (!request)
+		{
+			//TODO
+			return;
+		}
+
+		std::string body;
+		{
+			auto page = web::html::make_generator(std::back_inserter(body));
+			page.element("html", [&]
+			{
+				page.element("head", [&]
+				{
+					page.element("title", [&]
+					{
+						page.write("silicium");
+					});
+				});
+				page.element("body", [&]
+				{
+					page.element("h1", [&]
+					{
+						page.write("Hello, world!");
+					});
+					page.element("p", [&]
+					{
+						auto const current = current_build.lock();
+						if (current)
+						{
+							page.write("build running since " + boost::lexical_cast<std::string>(*current));
+						}
+						else
+						{
+							page.write("no active build");
+						}
+					});
+				});
+			});
+		}
+
+		Si::http::response_header response;
+		response.status = 200;
+		response.status_text = "OK";
+		response.http_version = "HTTP/1.0";
+		response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
+		response.arguments["Content-Type"] = "text/html";
+		response.arguments["Connection"] = "close";
+
+		write_header(out, response);
+		append(out, body);
+	};
+
+	web_server web(io, respond_web_request);
 	web.start();
 
 	build();
