@@ -14,6 +14,7 @@ namespace Si
 		virtual char *copy_next(boost::iterator_range<char *> destination) SILICIUM_OVERRIDE;
 		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE;
 		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE;
+		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE;
 
 	private:
 

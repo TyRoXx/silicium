@@ -28,4 +28,21 @@ namespace Si
 	{
 		return boost::none;
 	}
+
+	std::size_t socket_source::skip(std::size_t count)
+	{
+		std::size_t skipped = 0;
+		while (skipped < count)
+		{
+			std::array<char, 1U << 12U> thrown_away;
+			auto const rest = (count - skipped);
+			auto const read = m_socket.async_read_some(boost::asio::buffer(thrown_away.data(), std::min(rest, thrown_away.size())), m_yield);
+			skipped += read;
+			if (read == 0)
+			{
+				break;
+			}
+		}
+		return skipped;
+	}
 }
