@@ -6,7 +6,14 @@ if(UNIX)
 endif()
 
 if(MSVC)
+	#make Visual C++ 2013 build in parallel
+	add_definitions("/MP")
+
+	#we want more warnings
 	add_definitions("/W4")
+
+	#workaround for Boost 1.55 Context error LNK2026
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 endif()
 
 if(UNIX)

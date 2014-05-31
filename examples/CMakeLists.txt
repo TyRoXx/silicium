@@ -1,6 +1,9 @@
 add_executable(helloworld "helloworld.cpp")
 target_link_libraries(helloworld silicium ${Boost_LIBRARIES})
 
+add_executable(hellohttp "hellohttp.cpp")
+target_link_libraries(hellohttp silicium silicium_asio ${Boost_LIBRARIES})
+
 if(NOT MSVC) #disabled because VC++ 2013 crashes with "internal compiler error in self.cpp"
 	add_executable(self "self.cpp")
 	target_link_libraries(self silicium ${Boost_LIBRARIES})
