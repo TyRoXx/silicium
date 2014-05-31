@@ -1,5 +1,5 @@
-#ifndef SILICIUM_OXID_HPP
-#define SILICIUM_OXID_HPP
+#ifndef SILICIUM_GIT_OXID_HPP
+#define SILICIUM_GIT_OXID_HPP
 
 #include <silicium/build_result.hpp>
 #include <silicium/directory_builder.hpp>

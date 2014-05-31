@@ -11,13 +11,13 @@ namespace Si
 		parameters.executable = "/usr/bin/which";
 		parameters.arguments.emplace_back("which");
 		parameters.current_path = boost::filesystem::current_path();
-		std::vector<char> stdout;
-		auto sink = make_iterator_sink<char>(std::back_inserter(stdout));
-		parameters.stdout = &sink;
+		std::vector<char> out;
+		auto sink = make_iterator_sink<char>(std::back_inserter(out));
+		parameters.out = &sink;
 		int result = run_process(parameters);
 		BOOST_CHECK_EQUAL(0, result);
 		std::string const expected = "/usr/bin/which\n";
-		BOOST_CHECK_EQUAL(expected, std::string(begin(stdout), end(stdout)));
+		BOOST_CHECK_EQUAL(expected, std::string(begin(out), end(out)));
 	}
 
 	BOOST_AUTO_TEST_CASE(run_process_from_nonexecutable)

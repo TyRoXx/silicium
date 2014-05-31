@@ -38,12 +38,12 @@ namespace
 			}
 		}
 
-		std::vector<char> stdout;
+		std::vector<char> out;
 		Si::process_parameters parameters;
 		parameters.executable = executable_file.string();
 		parameters.current_path = build_dir;
-		auto stdout_sink = Si::make_iterator_sink<char>(std::back_inserter(stdout));
-		parameters.stdout = &stdout_sink;
+		auto stdout_sink = Si::make_iterator_sink<char>(std::back_inserter(out));
+		parameters.out = &stdout_sink;
 		const auto testing_result = Si::run_process(parameters);
 		if (testing_result != 0)
 		{
@@ -51,7 +51,7 @@ namespace
 		}
 
 		std::string const expected_output = "Hello, world!\n";
-		if (stdout != std::vector<char>(begin(expected_output), end(expected_output)))
+		if (out != std::vector<char>(begin(expected_output), end(expected_output)))
 		{
 			return Si::build_failure{"The built executable did not print the expected text to stdout"};
 		}

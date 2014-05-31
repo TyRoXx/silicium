@@ -7,6 +7,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+#include <vector>
 
 namespace Si
 {

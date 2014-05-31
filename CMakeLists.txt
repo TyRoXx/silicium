@@ -1,12 +1,22 @@
 cmake_minimum_required(VERSION 2.8)
+project(silicium)
 
 if(UNIX)
 	add_definitions("-Wall -Wextra -pedantic -std=c++0x -Wconversion -Wvla")
 endif()
 
-find_package(Boost REQUIRED unit_test_framework filesystem iostreams system coroutine)
+if(MSVC)
+	add_definitions("/W4")
+endif()
+
 if(UNIX)
+	find_package(Boost REQUIRED unit_test_framework filesystem iostreams system coroutine)
 	add_definitions("-DBOOST_TEST_DYN_LINK")
+endif()
+
+if(WIN32)
+	#Boost.Asio wants this for no reason
+	add_definitions("-D_WIN32_WINDOWS")
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")

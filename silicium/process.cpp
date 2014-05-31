@@ -14,17 +14,18 @@
 namespace Si
 {
 	process_parameters::process_parameters()
-		: stdout(nullptr)
-		, stderr(nullptr)
-		, stdin(nullptr)
+		: out(nullptr)
+		, err(nullptr)
+		, in(nullptr)
 	{
 	}
 
+#ifdef __linux__
 	namespace detail
 	{
 		namespace
 		{
-			void terminating_close(int file) noexcept
+			void terminating_close(int file) BOOST_NOEXCEPT
 			{
 				if (close(file) < 0)
 				{
@@ -248,6 +249,14 @@ namespace Si
 			return exit_status;
 		}
 	}
+#endif //__linux__
+
+#ifdef _WIN32
+	int run_process(process_parameters const &)
+	{
+		throw std::logic_error("Si::run_process is not yet implemented on WIN32");
+	}
+#endif
 
 	int run_process(
 			boost::filesystem::path executable,
@@ -259,7 +268,7 @@ namespace Si
 		parameters.executable = std::move(executable);
 		parameters.arguments = std::move(arguments);
 		parameters.current_path = std::move(current_path);
-		parameters.stdout = &output;
+		parameters.out = &output;
 		return Si::run_process(parameters);
 	}
 }

@@ -13,6 +13,12 @@ namespace Si
 	struct build_failure
 	{
 		std::string short_description;
+
+		build_failure() {}
+		explicit build_failure(std::string short_description)
+			: short_description(std::move(short_description))
+		{
+		}
 	};
 
 	typedef boost::variant<build_success, build_failure> build_result;
