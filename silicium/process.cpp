@@ -158,7 +158,7 @@ namespace Si
 		argument_pointers.emplace_back(nullptr);
 
 		detail::pipe stdout;
-		if (parameters.stdout)
+		if (parameters.out)
 		{
 			stdout = detail::make_pipe();
 		}
@@ -187,7 +187,7 @@ namespace Si
 				_exit(0);
 			};
 
-			if (parameters.stdout)
+			if (parameters.out)
 			{
 				if (dup2(stdout.write.handle, STDOUT_FILENO) < 0)
 				{
@@ -220,10 +220,10 @@ namespace Si
 		{
 			child_error.write.close();
 
-			if (parameters.stdout)
+			if (parameters.out)
 			{
 				stdout.write.close();
-				detail::copy_all(stdout.read.handle, *parameters.stdout);
+				detail::copy_all(stdout.read.handle, *parameters.out);
 			}
 			stdin.read.close();
 

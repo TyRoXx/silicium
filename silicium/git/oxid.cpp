@@ -1,4 +1,4 @@
-#include <silicium/oxid.hpp>
+#include <silicium/git/oxid.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/write_file.hpp>
 #include <silicium/process.hpp>
@@ -73,7 +73,7 @@ namespace Si
 					parameters.executable = git_executable;
 					parameters.arguments = {"add", "-A", "."};
 					parameters.current_path = repository;
-					parameters.stdout = &output_sink;
+					parameters.out = &output_sink;
 					int const exit_code = Si::run_process(parameters);
 					if (exit_code != 0)
 					{
@@ -86,7 +86,7 @@ namespace Si
 					parameters.executable = git_executable;
 					parameters.arguments = {"commit", "-m", std::move(message)};
 					parameters.current_path = repository;
-					parameters.stdout = &output_sink;
+					parameters.out = &output_sink;
 					int const exit_code = Si::run_process(parameters);
 					if (exit_code != 0)
 					{
@@ -99,7 +99,7 @@ namespace Si
 					parameters.executable = git_executable;
 					parameters.arguments = {"push"};
 					parameters.current_path = repository;
-					parameters.stdout = &output_sink;
+					parameters.out = &output_sink;
 					int const exit_code = Si::run_process(parameters);
 					if (exit_code != 0)
 					{
