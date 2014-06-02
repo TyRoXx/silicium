@@ -175,7 +175,10 @@ namespace Si
 		//child
 		if (forked == 0)
 		{
-			auto const fail = [&child_error]() __attribute__ ((__noreturn__))
+			auto const fail = [&child_error]()
+#if defined(__GNUC__) && !defined(__clang__)
+				__attribute__ ((__noreturn__))
+#endif
 			{
 				int error = errno;
 				ssize_t written = write(child_error.write.handle, &error, sizeof(error));
