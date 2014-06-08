@@ -139,6 +139,37 @@ namespace Si
 		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
 	}
 
+	struct ostream_ref_sink : flushable_sink<char>
+	{
+		explicit ostream_ref_sink(std::ostream &file)
+		   : m_file(file)
+		{
+		}
+
+		virtual boost::iterator_range<char *> make_append_space(std::size_t) SILICIUM_OVERRIDE
+		{
+		   return {};
+		}
+
+		virtual void flush_append_space() SILICIUM_OVERRIDE
+		{
+		}
+
+		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
+		{
+		   m_file.write(data.begin(), data.size());
+		}
+
+		virtual void flush() SILICIUM_OVERRIDE
+		{
+		   m_file.flush();
+		}
+
+	private:
+
+		std::ostream &m_file;
+	};
+
 	struct ostream_sink : flushable_sink<char>
 	{
 		//unique_ptr to make ostreams movable
