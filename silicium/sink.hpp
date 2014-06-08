@@ -229,6 +229,12 @@ namespace Si
 	{
 		out.append(boost::make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
 	}
+
+	template <class Element>
+	void append(Si::sink<Element> &out, Element const &single)
+	{
+		out.append(boost::make_iterator_range(&single, &single + 1));
+	}
 }
 
 #endif
