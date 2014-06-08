@@ -73,4 +73,45 @@ namespace Si
 		++begin;
 		BOOST_CHECK(begin == end);
 	}
+
+	struct element
+	{
+	};
+
+	BOOST_AUTO_TEST_CASE(generator_source_empty)
+	{
+		auto source = Si::make_generator_source<element>([]() -> boost::optional<element>
+		{
+			return boost::none;
+		});
+		BOOST_CHECK(!Si::get(source));
+	}
+
+	BOOST_AUTO_TEST_CASE(generator_source_limited)
+	{
+		bool first = true;
+		auto source = Si::make_generator_source<int>([&first]() -> boost::optional<int>
+		{
+			auto result = first ? boost::make_optional(12) : boost::none;
+			first = false;
+			return result;
+		});
+		BOOST_REQUIRE(12 == Si::get(source));
+		BOOST_REQUIRE(!Si::get(source));
+		BOOST_REQUIRE(!Si::get(source));
+	}
+
+	BOOST_AUTO_TEST_CASE(generator_source_never_empty)
+	{
+		int next = 0;
+		auto source = Si::make_generator_source<int>([&next]() -> boost::optional<int>
+		{
+			return next++;
+		});
+		auto buffer = Si::make_buffer(source, 2);
+		for (int i = 0; i < 10; ++i)
+		{
+			BOOST_REQUIRE(i == Si::get(buffer));
+		}
+	}
 }
