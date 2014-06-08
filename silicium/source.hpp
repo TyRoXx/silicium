@@ -179,9 +179,14 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<Element const *> map_next(std::size_t) SILICIUM_OVERRIDE
+		virtual boost::iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
-			return boost::iterator_range<Element const *>(); //TODO
+			if (m_buffer.empty())
+			{
+				pull();
+			}
+			auto one = m_buffer.array_one();
+			return boost::make_iterator_range(one.first, one.first + std::min(size, one.second));
 		}
 
 		virtual Element *copy_next(boost::iterator_range<Element *> destination) SILICIUM_OVERRIDE
