@@ -312,7 +312,7 @@ namespace Si
 			}
 		};
 
-		typedef std::unique_ptr<VOID, handle_closer> unique_handle;
+		typedef std::unique_ptr<std::remove_pointer<HANDLE>::type, handle_closer> unique_handle;
 
 		struct pipe
 		{
