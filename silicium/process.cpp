@@ -303,6 +303,55 @@ namespace Si
 			}
 			return command_line;
 		}
+
+		struct handle_closer
+		{
+			void operator()(HANDLE h) const
+			{
+				CloseHandle(h);
+			}
+		};
+
+		typedef std::unique_ptr<VOID, handle_closer> unique_handle;
+
+		struct pipe
+		{
+			unique_handle read, write;
+
+			pipe() BOOST_NOEXCEPT
+			{
+			}
+
+			pipe(pipe &&other) BOOST_NOEXCEPT
+			{
+				swap(other);
+			}
+
+			pipe &operator = (pipe &&other) BOOST_NOEXCEPT
+			{
+				swap(other);
+				return *this;
+			}
+
+			void swap(pipe &other) BOOST_NOEXCEPT
+			{
+				read.swap(other.read);
+				write.swap(other.write);
+			}
+		};
+
+		pipe create_anonymous_pipe()
+		{
+			HANDLE read, write;
+			if (!CreatePipe(&read, &write, nullptr, 0))
+			{
+				throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+			}
+			pipe result;
+			result.read.reset(read);
+			result.write.reset(write);
+			return result;
+		}
 	}
 
 	int run_process(process_parameters const &parameters)
@@ -310,15 +359,55 @@ namespace Si
 		winapi_string const executable = utf8_to_winapi_string(parameters.executable.string());
 		winapi_string command_line = build_command_line(parameters.arguments);
 		SECURITY_ATTRIBUTES security{};
+		auto output = create_anonymous_pipe();
 		STARTUPINFOW startup{};
 		startup.cb = sizeof(startup);
-		startup.hStdError = INVALID_HANDLE_VALUE;
+		startup.dwFlags |= STARTF_USESTDHANDLES;
+		startup.hStdError = output.write.get();
 		startup.hStdInput = INVALID_HANDLE_VALUE;
-		startup.hStdOutput = INVALID_HANDLE_VALUE;
+		startup.hStdOutput = output.write.get();
 		PROCESS_INFORMATION process{};
 		if (!CreateProcessW(executable.c_str(), &command_line[0], &security, nullptr, FALSE, 0, nullptr, parameters.current_path.c_str(), &startup, &process))
 		{
 			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+		}
+		if (parameters.out)
+		{
+			Si::buffering_sink<char> buffered_out(*parameters.out);
+			for (;;)
+			{
+				auto buffer = buffered_out.make_append_space((std::numeric_limits<DWORD>::max)());
+				DWORD read_bytes = 0;
+				DWORD available = 0;
+				DWORD left = 0;
+				if (!PeekNamedPipe(output.read.get(), buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left))
+				{
+					auto error = ::GetLastError();
+					if (error == ERROR_BROKEN_PIPE)
+					{
+						buffered_out.make_append_space(read_bytes);
+						buffered_out.flush_append_space();
+						break;
+					}
+					throw boost::system::system_error(error, boost::system::native_ecat);
+				}
+				if (available == 0)
+				{
+					buffered_out.make_append_space(0);
+					break;
+				}
+				if (ReadFile(output.read.get(), buffer.begin(), available, &read_bytes, nullptr))
+				{
+					assert(available == read_bytes);
+					buffered_out.make_append_space(read_bytes);
+					buffered_out.flush_append_space();
+				}
+				else
+				{
+					throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+				}
+			}
+			buffered_out.flush();
 		}
 		WaitForSingleObject(process.hProcess, INFINITE);
 		DWORD exit_code = 1;
