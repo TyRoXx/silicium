@@ -11,6 +11,10 @@
 #include <sys/wait.h>
 #endif
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 namespace Si
 {
 	process_parameters::process_parameters()
@@ -255,9 +259,76 @@ namespace Si
 #endif //__linux__
 
 #ifdef _WIN32
-	int run_process(process_parameters const &)
+	namespace
 	{
-		throw std::logic_error("Si::run_process is not yet implemented on WIN32");
+		typedef std::basic_string<WCHAR> winapi_string;
+
+		winapi_string utf8_to_winapi_string(char const *original, size_t length)
+		{
+			if (length > static_cast<size_t>((std::numeric_limits<int>::max)()))
+			{
+				throw std::invalid_argument("Input string is too long for WinAPI");
+			}
+			int const output_size = MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), nullptr, 0);
+			assert(output_size >= 0);
+			if (output_size == 0)
+			{
+				assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
+				throw std::invalid_argument("Input string is not UTF-8");
+			}
+			winapi_string result;
+			result.resize(static_cast<size_t>(output_size));
+			if (!result.empty())
+			{
+				MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), &result[0], result.size());
+			}
+			return result;
+		}
+
+		winapi_string utf8_to_winapi_string(std::string const &str)
+		{
+			return utf8_to_winapi_string(str.data(), str.size());
+		}
+
+		winapi_string build_command_line(std::vector<std::string> const &arguments)
+		{
+			winapi_string command_line;
+			for (auto a = begin(arguments); a != end(arguments); ++a)
+			{
+				if ((a + 1) != end(arguments))
+				{
+					command_line += L" ";
+				}
+				command_line += utf8_to_winapi_string(a->data(), a->size());
+			}
+			return command_line;
+		}
+	}
+
+	int run_process(process_parameters const &parameters)
+	{
+		winapi_string const executable = utf8_to_winapi_string(parameters.executable.string());
+		winapi_string command_line = build_command_line(parameters.arguments);
+		SECURITY_ATTRIBUTES security{};
+		STARTUPINFOW startup{};
+		startup.cb = sizeof(startup);
+		startup.hStdError = INVALID_HANDLE_VALUE;
+		startup.hStdInput = INVALID_HANDLE_VALUE;
+		startup.hStdOutput = INVALID_HANDLE_VALUE;
+		PROCESS_INFORMATION process{};
+		if (!CreateProcessW(executable.c_str(), &command_line[0], &security, nullptr, FALSE, 0, nullptr, parameters.current_path.c_str(), &startup, &process))
+		{
+			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+		}
+		WaitForSingleObject(process.hProcess, INFINITE);
+		DWORD exit_code = 1;
+		if (!GetExitCodeProcess(process.hProcess, &exit_code))
+		{
+			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+		}
+		CloseHandle(process.hThread);
+		CloseHandle(process.hProcess);
+		return exit_code;
 	}
 #endif
 

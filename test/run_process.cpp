@@ -5,7 +5,8 @@
 
 namespace Si
 {
-	BOOST_AUTO_TEST_CASE(run_process_1_which)
+#ifndef _WIN32
+	BOOST_AUTO_TEST_CASE(run_process_1_unix_which)
 	{
 		process_parameters parameters;
 		parameters.executable = "/usr/bin/which";
@@ -19,6 +20,23 @@ namespace Si
 		std::string const expected = "/usr/bin/which\n";
 		BOOST_CHECK_EQUAL(expected, std::string(begin(out), end(out)));
 	}
+#endif
+
+#ifdef _WIN32
+	BOOST_AUTO_TEST_CASE(run_process_1_win32_cmd)
+	{
+		process_parameters parameters;
+		parameters.executable = "C:\\Windows\\System32\\where.exe";
+		parameters.current_path = boost::filesystem::current_path();
+		std::vector<char> out;
+		auto sink = make_iterator_sink<char>(std::back_inserter(out));
+		parameters.out = &sink;
+		int result = run_process(parameters);
+		BOOST_CHECK_EQUAL(0, result);
+		std::string const expected = "TODO";
+		BOOST_CHECK_EQUAL(expected, std::string(begin(out), end(out)));
+	}
+#endif
 
 	BOOST_AUTO_TEST_CASE(run_process_from_nonexecutable)
 	{
