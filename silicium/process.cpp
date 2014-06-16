@@ -342,8 +342,11 @@ namespace Si
 
 		pipe create_anonymous_pipe()
 		{
+			SECURITY_ATTRIBUTES security{};
+			security.nLength = sizeof(security);
+			security.bInheritHandle = TRUE;
 			HANDLE read, write;
-			if (!CreatePipe(&read, &write, nullptr, 0))
+			if (!CreatePipe(&read, &write, &security, 0))
 			{
 				throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
 			}
@@ -373,7 +376,7 @@ namespace Si
 		{
 			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
 		}
-		//output.write.reset();
+		output.write.reset();
 		if (parameters.out)
 		{
 			Si::buffering_sink<char> buffered_out(*parameters.out);
