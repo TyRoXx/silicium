@@ -31,8 +31,8 @@ namespace
 		std::string const repository_name = "si.git";
 		{
 			std::vector<char> output;
-			auto stdout = Si::make_container_sink(output);
-			const auto git_result = Si::run_process("/usr/bin/git", {"clone", source.string(), repository_name}, build_directory, stdout);
+			auto out = Si::make_container_sink(output);
+			const auto git_result = Si::run_process("/usr/bin/git", { "clone", source.string(), repository_name }, build_directory, out);
 			result.add_artifact("git.log", output);
 			if (git_result != 0)
 			{
@@ -46,8 +46,8 @@ namespace
 
 		{
 			std::vector<char> output;
-			auto stdout = Si::make_container_sink(output);
-			const auto cmake_result = Si::run_process("/usr/bin/cmake", {repository_path.string(), ("-DCMAKE_BUILD_TYPE=" + build_type)}, real_build_dir, stdout);
+			auto out = Si::make_container_sink(output);
+			const auto cmake_result = Si::run_process("/usr/bin/cmake", { repository_path.string(), ("-DCMAKE_BUILD_TYPE=" + build_type) }, real_build_dir, out);
 			result.add_artifact("cmake.log", output);
 			if (cmake_result != 0)
 			{
@@ -57,8 +57,8 @@ namespace
 
 		{
 			std::vector<char> output;
-			auto stdout = Si::make_container_sink(output);
-			const auto make_result = Si::run_process("/usr/bin/make", {}, real_build_dir, stdout);
+			auto out = Si::make_container_sink(output);
+			const auto make_result = Si::run_process("/usr/bin/make", {}, real_build_dir, out);
 			result.add_artifact("make.log", output);
 			if (make_result != 0)
 			{
@@ -68,8 +68,8 @@ namespace
 
 		{
 			std::vector<char> output;
-			auto stdout = Si::make_container_sink(output);
-			const auto test_result = Si::run_process((real_build_dir / "test/test").string(), {}, real_build_dir, stdout);
+			auto out = Si::make_container_sink(output);
+			const auto test_result = Si::run_process((real_build_dir / "test/test").string(), std::vector<std::string>(), real_build_dir, out);
 			result.add_artifact("test.log", output);
 			if (test_result != 0)
 			{

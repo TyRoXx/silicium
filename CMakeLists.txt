@@ -28,6 +28,9 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package(Libgit2)
+if(LIBGIT2_FOUND)
+	include_directories(${LIBGIT2_INCLUDE_DIR})
+endif()
 
 include_directories(".")
 add_subdirectory("silicium")
