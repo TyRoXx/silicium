@@ -359,6 +359,8 @@ namespace Si
 		winapi_string const executable = utf8_to_winapi_string(parameters.executable.string());
 		winapi_string command_line = build_command_line(parameters.arguments);
 		SECURITY_ATTRIBUTES security{};
+		security.nLength = sizeof(security);
+		security.bInheritHandle = TRUE;
 		auto output = create_anonymous_pipe();
 		STARTUPINFOW startup{};
 		startup.cb = sizeof(startup);
@@ -367,10 +369,11 @@ namespace Si
 		startup.hStdInput = INVALID_HANDLE_VALUE;
 		startup.hStdOutput = output.write.get();
 		PROCESS_INFORMATION process{};
-		if (!CreateProcessW(executable.c_str(), &command_line[0], &security, nullptr, FALSE, 0, nullptr, parameters.current_path.c_str(), &startup, &process))
+		if (!CreateProcessW(executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, parameters.current_path.c_str(), &startup, &process))
 		{
 			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
 		}
+		//output.write.reset();
 		if (parameters.out)
 		{
 			Si::buffering_sink<char> buffered_out(*parameters.out);
@@ -380,7 +383,8 @@ namespace Si
 				DWORD read_bytes = 0;
 				DWORD available = 0;
 				DWORD left = 0;
-				if (!PeekNamedPipe(output.read.get(), buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left))
+				BOOL const peeked = PeekNamedPipe(output.read.get(), buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left);
+				if (!peeked)
 				{
 					auto error = ::GetLastError();
 					if (error == ERROR_BROKEN_PIPE)
@@ -393,8 +397,25 @@ namespace Si
 				}
 				if (available == 0)
 				{
-					buffered_out.make_append_space(0);
-					break;
+					auto buffer = buffered_out.make_append_space(1);
+					DWORD read_bytes = 0;
+					BOOL const read_result = ReadFile(output.read.get(), buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, nullptr);
+					if (read_result)
+					{
+						buffered_out.flush_append_space();
+						continue;
+					}
+					else
+					{
+						auto error = ::GetLastError();
+						if (error == ERROR_BROKEN_PIPE)
+						{
+							buffered_out.make_append_space(read_bytes);
+							buffered_out.flush_append_space();
+							break;
+						}
+						throw boost::system::system_error(error, boost::system::native_ecat);
+					}
 				}
 				if (ReadFile(output.read.get(), buffer.begin(), available, &read_bytes, nullptr))
 				{
