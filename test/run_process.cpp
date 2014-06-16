@@ -32,9 +32,9 @@ namespace Si
 		auto sink = make_iterator_sink<char>(std::back_inserter(out));
 		parameters.out = &sink;
 		int result = run_process(parameters);
-		BOOST_CHECK_EQUAL(0, result);
-		std::string const expected = "TODO";
-		BOOST_CHECK_EQUAL(expected, std::string(begin(out), end(out)));
+		BOOST_CHECK_EQUAL(2, result);
+		std::size_t const windows7whereHelpSize = 1830;
+		BOOST_CHECK_EQUAL(windows7whereHelpSize, out.size());
 	}
 #endif
 
