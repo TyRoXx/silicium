@@ -376,6 +376,8 @@ namespace Si
 		{
 			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
 		}
+		unique_handle thread_closer(process.hThread);
+		unique_handle process_closer(process.hThread);
 		output.write.reset();
 		if (parameters.out)
 		{
@@ -439,8 +441,6 @@ namespace Si
 		{
 			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
 		}
-		CloseHandle(process.hThread);
-		CloseHandle(process.hProcess);
 		return exit_code;
 	}
 #endif
