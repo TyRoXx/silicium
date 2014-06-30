@@ -205,24 +205,31 @@ namespace Si
 		};
 
 		template <class Element>
+		boost::optional<Element> get_immediate(observable<Element> &from)
+		{
+			optional_observer<Element> current;
+			from.async_get_one(current);
+			return std::move(current.element);
+		}
+
+		template <class Element>
 		std::vector<Element> take(observable<Element> &from, std::size_t count)
 		{
 			std::vector<Element> taken;
-			optional_observer<Element> current;
 			for (std::size_t i = 0; i < count; ++i)
 			{
-				from.async_get_one(current);
-				if (!current.element)
+				auto current = get_immediate(from);
+				if (!current)
 				{
 					break;
 				}
-				taken.emplace_back(std::move(*current.element));
+				taken.emplace_back(std::move(*current));
 			}
 			return taken;
 		}
 	}
 
-	BOOST_AUTO_TEST_CASE(reactive_)
+	BOOST_AUTO_TEST_CASE(reactive_take)
 	{
 		auto zeros = rx::make_generator([]{ return 0; });
 		auto ones  = rx::make_generator([]{ return 1; });
