@@ -58,23 +58,49 @@ namespace Si
 		};
 
 		template <class Generated>
-		auto make_generator(Generated &&generate)
+		auto generate(Generated &&generate)
 		{
 			return generator<typename std::decay<Generated>::type>(std::forward<Generated>(generate));
 		}
 
-		template <class E>
-		struct boxed_observable : observable<E>
+		template <class Element, class Ptr>
+		struct ptr_observable : observable<Element>
 		{
-			explicit boxed_observable(std::unique_ptr<observable<E>> content)
+			typedef Element element_type;
+
+			explicit ptr_observable(Ptr content)
 				: content(std::move(content))
 			{
 			}
 
+			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+			{
+				assert(content);
+				return content->async_get_one(receiver);
+			}
+
+			virtual void cancel() SILICIUM_OVERRIDE
+			{
+				assert(content);
+				return content->cancel();
+			}
+
 		private:
 
-			std::unique_ptr<observable<E>> content;
+			Ptr content;
 		};
+
+		template <class Element, class Content>
+		auto box(Content &&content)
+		{
+			return ptr_observable<Element, std::unique_ptr<observable<Element>>>(std::unique_ptr<observable<Element>>(new typename std::decay<Content>::type(std::forward<Content>(content))));
+		}
+
+		template <class Element, class Content>
+		auto wrap(Content &&content)
+		{
+			return ptr_observable<Element, std::shared_ptr<observable<Element>>>(std::make_shared<typename std::decay<Content>::type>(std::forward<Content>(content)));
+		}
 
 		template <class ...Parts>
 		struct and_combinator : observable<std::tuple<typename Parts::element_type...>>
@@ -183,7 +209,7 @@ namespace Si
 		};
 
 		template <class ...Parts>
-		auto and_(Parts &&...parts)
+		auto make_tuple(Parts &&...parts)
 		{
 			return and_combinator<typename std::decay<Parts>::type...>(std::make_tuple(std::forward<Parts>(parts)...));
 		}
@@ -227,15 +253,184 @@ namespace Si
 			}
 			return taken;
 		}
+
+		template <class Transform, class Original>
+		struct transformation
+				: public observable<typename std::result_of<Transform (typename Original::element_type)>::type>
+				, private observer<typename Original::element_type>
+		{
+			typedef typename std::result_of<Transform (typename Original::element_type)>::type element_type;
+			typedef typename Original::element_type from_type;
+
+			explicit transformation(Transform transform, Original original)
+				: transform(std::move(transform))
+				, original(std::move(original))
+			{
+			}
+
+			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+			{
+				assert(!this->receiver);
+				this->receiver = &receiver;
+				original.async_get_one(*this);
+			}
+
+			virtual void cancel() SILICIUM_OVERRIDE
+			{
+				return original.cancel();
+			}
+
+		private:
+
+			Transform transform; //TODO empty base optimization
+			Original original;
+			observer<element_type> *receiver = nullptr;
+
+			virtual void got_element(from_type value) SILICIUM_OVERRIDE
+			{
+				assert(receiver);
+				auto *receiver_copy = receiver;
+				receiver = nullptr;
+				receiver_copy->got_element(transform(std::move(value)));
+			}
+
+			virtual void ended() SILICIUM_OVERRIDE
+			{
+				assert(receiver);
+				auto *receiver_copy = receiver;
+				receiver = nullptr;
+				receiver_copy->ended();
+			}
+		};
+
+		template <class Transform, class Original>
+		auto transform(Original &&original, Transform &&transform)
+		{
+			return transformation<
+					typename std::decay<Transform>::type,
+					typename std::decay<Original>::type
+					>(std::forward<Transform>(transform), std::forward<Original>(original));
+		}
+
+		template <class T, class U>
+		T exchange(T &dest, U &&source)
+		{
+			auto old = dest;
+			dest = std::forward<U>(source);
+			return old;
+		}
+
+		template <class Element>
+		struct bridge : observable<Element>, observer<Element>
+		{
+			typedef Element element_type;
+
+			virtual void got_element(element_type value) SILICIUM_OVERRIDE
+			{
+				assert(receiver);
+				exchange(receiver, nullptr)->got_element(std::move(value));
+			}
+
+			virtual void ended() SILICIUM_OVERRIDE
+			{
+				assert(receiver);
+				exchange(receiver, nullptr)->ended();
+			}
+
+			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+			{
+				assert(!this->receiver);
+				this->receiver = &receiver;
+			}
+
+			virtual void cancel() SILICIUM_OVERRIDE
+			{
+				assert(receiver);
+				receiver = nullptr;
+			}
+
+		private:
+
+			observer<element_type> *receiver = nullptr;
+		};
+
+		template <class Element, class Consume>
+		struct consumer : observer<Element>
+		{
+			typedef Element element_type;
+
+			explicit consumer(Consume consume)
+				: consume(std::move(consume))
+			{
+			}
+
+			virtual void got_element(element_type value) SILICIUM_OVERRIDE
+			{
+				consume(std::move(value));
+			}
+
+			virtual void ended() SILICIUM_OVERRIDE
+			{
+			}
+
+		private:
+
+			Consume consume;
+		};
+
+		template <class Element, class Consume>
+		auto consume(Consume con)
+		{
+			return consumer<Element, typename std::decay<Consume>::type>(std::move(con));
+		}
 	}
 
 	BOOST_AUTO_TEST_CASE(reactive_take)
 	{
-		auto zeros = rx::make_generator([]{ return 0; });
-		auto ones  = rx::make_generator([]{ return 1; });
-		auto both = rx::and_(zeros, ones);
+		auto zeros = rx::generate([]{ return 0; });
+		auto ones  = rx::generate([]{ return 1; });
+		auto both = rx::make_tuple(zeros, ones);
 		std::vector<std::tuple<int, int>> const expected(4, std::make_tuple(0, 1));
 		std::vector<std::tuple<int, int>> const generated = rx::take(both, expected.size());
+		BOOST_CHECK(expected == generated);
+	}
+
+	BOOST_AUTO_TEST_CASE(reactive_transform)
+	{
+		auto twos = rx::generate([]{ return 2; });
+		auto ones  = rx::generate([]{ return 1; });
+		auto both = rx::make_tuple(twos, ones);
+		auto added = rx::transform(both, [](std::tuple<int, int> const &element)
+		{
+			return std::get<0>(element) + std::get<1>(element);
+		});
+		std::vector<int> const expected(4, 3);
+		std::vector<int> const generated = rx::take(added, expected.size());
+		BOOST_CHECK(expected == generated);
+	}
+
+	BOOST_AUTO_TEST_CASE(reactive_bridge)
+	{
+		auto bridge = std::make_shared<rx::bridge<int>>();
+		rx::ptr_observable<int, std::shared_ptr<rx::observable<int>>> first(bridge);
+		auto ones  = rx::generate([]{ return 1; });
+		auto both = rx::make_tuple(first, ones);
+		auto added = rx::transform(both, [](std::tuple<int, int> const &element)
+		{
+			return std::get<0>(element) + std::get<1>(element);
+		});
+		std::vector<int> generated;
+		auto consumer = rx::consume<int>([&generated](int element)
+		{
+			generated.emplace_back(element);
+		});
+		BOOST_CHECK(generated.empty());
+
+		added.async_get_one(consumer);
+		BOOST_CHECK(generated.empty());
+
+		bridge->got_element(2);
+		std::vector<int> const expected(1, 3);
 		BOOST_CHECK(expected == generated);
 	}
 }
