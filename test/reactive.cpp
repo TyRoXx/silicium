@@ -3,6 +3,7 @@
 #include <tuple>
 #include <bitset>
 #include <utility>
+#include <boost/circular_buffer.hpp>
 #include "integer_sequence.hpp"
 
 namespace Si
@@ -325,6 +326,11 @@ namespace Si
 		{
 			typedef Element element_type;
 
+			bool is_waiting() const
+			{
+				return receiver != nullptr;
+			}
+
 			virtual void got_element(element_type value) SILICIUM_OVERRIDE
 			{
 				assert(receiver);
@@ -383,6 +389,105 @@ namespace Si
 		{
 			return consumer<Element, typename std::decay<Consume>::type>(std::move(con));
 		}
+
+		template <class Element, class Original>
+		struct buffer
+				: public observable<Element>
+				, private observer<Element>
+		{
+			typedef Element element_type;
+
+			explicit buffer(Original from, std::size_t size)
+				: from(std::move(from))
+				, elements(size)
+			{
+				check_fetch();
+			}
+
+			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+			{
+				assert(!this->receiver);
+				this->receiver = &receiver;
+				if (elements.empty())
+				{
+					return check_fetch();
+				}
+				else
+				{
+					return deliver_front();
+				}
+			}
+
+			virtual void cancel() SILICIUM_OVERRIDE
+			{
+				assert(receiver);
+				assert(fetching);
+				return from.cancel();
+			}
+
+		private:
+
+			Original from;
+			boost::circular_buffer<Element> elements;
+			observer<element_type> *receiver = nullptr;
+			bool fetching = false;
+
+			virtual void got_element(element_type value) SILICIUM_OVERRIDE
+			{
+				assert(!elements.full());
+				assert(fetching);
+				fetching = false;
+				if (elements.empty() &&
+					receiver)
+				{
+					exchange(receiver, nullptr)->got_element(std::move(value));
+					return check_fetch();
+				}
+				elements.push_back(std::move(value));
+				if (!receiver)
+				{
+					return check_fetch();
+				}
+				deliver_front();
+				return check_fetch();
+			}
+
+			virtual void ended() SILICIUM_OVERRIDE
+			{
+				assert(fetching);
+				assert(receiver);
+				exchange(receiver, nullptr)->ended();
+			}
+
+			void deliver_front()
+			{
+				auto front = std::move(elements.front());
+				elements.pop_front();
+				exchange(receiver, nullptr)->got_element(std::move(front));
+			}
+
+			void check_fetch()
+			{
+				if (elements.full())
+				{
+					return;
+				}
+				if (fetching)
+				{
+					return;
+				}
+				fetching = true;
+				from.async_get_one(*this);
+			}
+		};
+
+		template <class Original>
+		auto make_buffer(Original &&from, std::size_t size)
+		{
+			typedef typename std::decay<Original>::type clean_original;
+			typedef typename clean_original::element_type element;
+			return buffer<element, clean_original>(std::forward<Original>(from), size);
+		}
 	}
 
 	BOOST_AUTO_TEST_CASE(reactive_take)
@@ -431,6 +536,39 @@ namespace Si
 
 		bridge->got_element(2);
 		std::vector<int> const expected(1, 3);
+		BOOST_CHECK(expected == generated);
+	}
+
+	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
+	{
+		auto bridge = std::make_shared<rx::bridge<int>>();
+		rx::ptr_observable<int, std::shared_ptr<rx::observable<int>>> first{bridge};
+		auto buf = rx::make_buffer(first, 2);
+
+		std::vector<int> generated;
+		auto consumer = rx::consume<int>([&generated](int element)
+		{
+			generated.emplace_back(element);
+		});
+		BOOST_CHECK(generated.empty());
+
+		for (size_t i = 0; i < 2; ++i)
+		{
+			BOOST_REQUIRE(bridge->is_waiting());
+			bridge->got_element(7);
+		}
+		BOOST_CHECK(!bridge->is_waiting());
+		BOOST_CHECK(generated.empty());
+
+		buf.async_get_one(consumer);
+		std::vector<int> expected(1, 7);
+		BOOST_CHECK(expected == generated);
+
+		buf.async_get_one(consumer);
+		expected.emplace_back(7);
+		BOOST_CHECK(expected == generated);
+
+		buf.async_get_one(consumer);
 		BOOST_CHECK(expected == generated);
 	}
 }
