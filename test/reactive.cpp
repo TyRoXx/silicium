@@ -1,4 +1,11 @@
-#include <reactive/observable.hpp>
+#include <reactive/buffer.hpp>
+#include <reactive/generate.hpp>
+#include <reactive/consume.hpp>
+#include <reactive/tuple.hpp>
+#include <reactive/ptr_observable.hpp>
+#include <reactive/transform.hpp>
+#include <reactive/bridge.hpp>
+#include <reactive/take.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si

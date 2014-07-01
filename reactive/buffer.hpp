@@ -2,6 +2,9 @@
 #define SILICIUM_REACTIVE_BUFFER_HPP
 
 #include <reactive/observable.hpp>
+#include <silicium/override.hpp>
+#include <cstddef>
+#include <boost/circular_buffer.hpp>
 
 namespace rx
 {
