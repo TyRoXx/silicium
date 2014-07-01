@@ -32,6 +32,11 @@ if(LIBGIT2_FOUND)
 	include_directories(${LIBGIT2_INCLUDE_DIR})
 endif()
 
+find_package(SDL2)
+if(SDL2_FOUND)
+	include_directories(${LIBSDL2_INCLUDE_DIR})
+endif()
+
 include_directories(".")
 add_subdirectory("silicium")
 add_subdirectory("test")

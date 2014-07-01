@@ -19,3 +19,8 @@ if(LIBGIT2_FOUND)
 	add_executable(service "service.cpp")
 	target_link_libraries(service silicium_git silicium_asio ${Boost_LIBRARIES} ${LIBGIT2_LIBRARIES})
 endif()
+
+if(SDL2_FOUND)
+	add_executable(react "react.cpp")
+	target_link_libraries(react ${Boost_LIBRARIES} ${SDL2_LIBRARY})
+endif()
