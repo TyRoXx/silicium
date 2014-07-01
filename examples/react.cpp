@@ -354,6 +354,8 @@ int main()
 	frame_renderer frame_renderer_(*renderer);
 	for (;;)
 	{
+		frames.async_get_one(frame_renderer_);
+
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -362,11 +364,7 @@ int main()
 			case SDL_QUIT:
 				return 0;
 			}
-			if (input.is_waiting())
-			{
-				input.got_element(event);
-			}
+			input.got_element(event);
 		}
-		frames.async_get_one(frame_renderer_);
 	}
 }
