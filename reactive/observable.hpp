@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_OBSERVABLE_HPP
 
 #include <silicium/override.hpp>
-#include "integer_sequence.hpp"
+#include "detail/integer_sequence.hpp"
 #include <tuple>
 #include <bitset>
 #include <utility>
