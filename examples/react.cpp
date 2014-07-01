@@ -80,6 +80,63 @@ namespace rx
 	{
 		return rx::ptr_observable<Element, rx::observable<Element> *>(&identity);
 	}
+
+	template <class Input, class Predicate>
+	struct filter_observable
+			: public observable<typename Input::element_type>
+			, private observer<typename Input::element_type>
+	{
+		typedef typename Input::element_type element_type;
+
+		filter_observable(Input input, Predicate is_propagated)
+			: input(std::move(input))
+			, is_propagated(std::move(is_propagated))
+		{
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			assert(!receiver_);
+			receiver_ = &receiver;
+			input.async_get_one(*this);
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+		}
+
+	private:
+
+		Input input;
+		Predicate is_propagated;
+		observer<element_type> *receiver_ = nullptr;
+
+		virtual void got_element(element_type value) SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			if (!is_propagated(static_cast<typename std::add_const<element_type>::type>(value)))
+			{
+				input.async_get_one(*this);
+				return;
+			}
+			exchange(receiver_, nullptr)->got_element(std::move(value));
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			exchange(receiver_, nullptr)->ended();
+		}
+	};
+
+	template <class Input, class Predicate>
+	auto filter(Input &&input, Predicate &&is_propagated)
+	{
+		return filter_observable<
+				typename std::decay<Input>::type,
+				typename std::decay<Predicate>::type>(std::forward<Input>(input), std::forward<Predicate>(is_propagated));
+	}
 }
 
 namespace
@@ -215,7 +272,11 @@ namespace
 	auto make_frames(rx::observable<SDL_Event> &input)
 	{
 		game_state initial_state;
-		return rx::transform(rx::make_var(rx::ref(input), initial_state, step_game_state), draw_game_state);
+		auto interesting_input = rx::filter(rx::ref(input), [](SDL_Event const &event_)
+		{
+			return event_.type == SDL_KEYUP;
+		});
+		return rx::transform(rx::make_var(interesting_input, initial_state, step_game_state), draw_game_state);
 	}
 
 	void set_render_draw_color(SDL_Renderer &renderer, SDL_Color color)
