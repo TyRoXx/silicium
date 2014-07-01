@@ -151,15 +151,26 @@ namespace
 	struct game_state
 	{
 		int x = 100;
+		int y = 100;
+		int count = 1;
 	};
+
+	int const max_rect_count = 5;
 
 	frame draw_game_state(game_state const &state)
 	{
+		std::vector<draw_operation> operations;
+		for (int i = 0; i < state.count; ++i)
+		{
+			int const max_width = 80;
+			int const single_offset = (max_width / 2) / max_rect_count;
+			int const total_offset = single_offset * i;
+			int const width = max_width - total_offset * 2;
+			operations.emplace_back(draw_filled_rect{make_color(0xff, 0x00, 0x00, 0xff), make_rect(state.x + total_offset, state.y + total_offset, width, width)});
+		}
 		return frame
 		{
-			{
-				draw_filled_rect{make_color(0xff, 0x00, 0x00, 0xff), make_rect(state.x, 100, 200, 125)}
-			}
+			std::move(operations)
 		};
 	}
 
@@ -177,6 +188,22 @@ namespace
 
 				case SDLK_RIGHT:
 					previous.x += 10;
+					break;
+
+				case SDLK_UP:
+					previous.y -= 10;
+					break;
+
+				case SDLK_DOWN:
+					previous.y += 10;
+					break;
+
+				case SDLK_PLUS:
+					previous.count = std::min(max_rect_count, previous.count + 1);
+					break;
+
+				case SDLK_MINUS:
+					previous.count = std::max(1, previous.count - 1);
 					break;
 				}
 				break;
