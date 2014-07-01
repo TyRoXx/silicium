@@ -366,5 +366,7 @@ int main()
 			}
 			input.got_element(event);
 		}
+
+		SDL_Delay(16);
 	}
 }
