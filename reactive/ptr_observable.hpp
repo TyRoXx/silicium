@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_PTR_OBSERVABLE_HPP
 
 #include <reactive/observable.hpp>
+#include <memory>
 
 namespace rx
 {
