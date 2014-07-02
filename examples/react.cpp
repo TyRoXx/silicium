@@ -235,18 +235,26 @@ int main()
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
 	rx::bridge<SDL_Event> frame_events;
-	auto frames = rx::wrap<frame>(make_frames(while_(rx::ref(frame_events), [](SDL_Event const &event_)
+	auto is_no_quit = [](SDL_Event const &event_) -> bool
 	{
-		bool continue_ = event_.type != SDL_QUIT;
-		return continue_;
-	})));
+		switch (event_.type)
+		{
+		case SDL_QUIT:
+			return false;
+
+		case SDL_KEYUP:
+			return (event_.key.keysym.sym != SDLK_ESCAPE);
+		}
+		return true;
+	};
+	auto frames = rx::wrap<frame>(make_frames(while_(rx::ref(frame_events), is_no_quit)));
 
 	boost::asio::io_service io;
 
 	frame_renderer frame_renderer_(*renderer);
 	rx::timer frame_rate_limiter(io, boost::posix_time::milliseconds(16));
 
-	auto all_rendered = make_total_consumer(rx::transform(rx::make_tuple(rx::ref(frame_rate_limiter), frames), [&renderer, &frame_events](std::tuple<rx::timer_elapsed, frame> const &ready_frame)
+	auto all_rendered = rx::make_total_consumer(rx::transform(rx::make_tuple(rx::ref(frame_rate_limiter), frames), [&renderer, &frame_events](std::tuple<rx::timer_elapsed, frame> const &ready_frame)
 	{
 		SDL_Event event;
 		while (frame_events.is_waiting() &&
