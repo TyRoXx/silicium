@@ -12,6 +12,19 @@
 #include <boost/system/system_error.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
+#include <silicium/source.hpp>
+
+namespace rx
+{
+	template <class Observable, class SyncGetter>
+	auto to_source(Observable original, SyncGetter sync_get)
+	{
+		return Si::make_generator_source([original, sync_get]
+		{
+			return sync_get(original);
+		});
+	}
+}
 
 namespace
 {
@@ -235,7 +248,7 @@ int main()
 		}
 		return nothing{};
 	});
-	auto delayed_input_polled = rx::delay(input_polled, io, boost::posix_time::milliseconds(16));
+	auto delayed_input_polled = rx::delay(input_polled, io, std::chrono::milliseconds(16));
 	auto rendered = rx::transform(
 		rx::make_tuple(
 			delayed_input_polled,

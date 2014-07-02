@@ -3,7 +3,8 @@
 
 #include <reactive/observable.hpp>
 #include <reactive/exchange.hpp>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/chrono/duration.hpp>
 
 namespace rx
 {
@@ -14,10 +15,13 @@ namespace rx
 	struct timer : observable<timer_elapsed>
 	{
 		typedef timer_elapsed element_type;
+		typedef boost::asio::steady_timer timer_impl;
+		typedef timer_impl::duration duration;
 
-		explicit timer(boost::asio::io_service &io, boost::posix_time::time_duration delay)
+		template <class Duration>
+		explicit timer(boost::asio::io_service &io, Duration delay)
 			: impl(io)
-			, delay(delay)
+			, delay(std::chrono::duration_cast<duration>(delay))
 		{
 		}
 
@@ -47,8 +51,8 @@ namespace rx
 
 	private:
 
-		boost::asio::deadline_timer impl;
-		boost::posix_time::time_duration delay;
+		timer_impl impl;
+		duration delay;
 		observer<element_type> *receiver_ = nullptr;
 	};
 }

@@ -6,8 +6,8 @@
 
 namespace rx
 {
-	template <class Input>
-	auto delay(Input &&input, boost::asio::io_service &io, boost::posix_time::time_duration duration)
+	template <class Input, class Duration>
+	auto delay(Input &&input, boost::asio::io_service &io, Duration duration)
 	{
 		typedef typename std::remove_reference<Input>::type clean_input;
 		typedef typename clean_input::element_type element_type;
