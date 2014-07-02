@@ -8,7 +8,6 @@
 
 namespace Si
 {
-
 	struct accepting_source : Si::source<std::shared_ptr<boost::asio::ip::tcp::socket>>
 	{
 		typedef std::shared_ptr<boost::asio::ip::tcp::socket> element_type;
