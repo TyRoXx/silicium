@@ -4,6 +4,7 @@
 #include <reactive/generate.hpp>
 #include <reactive/tuple.hpp>
 #include <reactive/transform.hpp>
+#include <reactive/while.hpp>
 #include <SDL2/SDL.h>
 #include <boost/system/system_error.hpp>
 #include <boost/scope_exit.hpp>
@@ -433,67 +434,6 @@ namespace
 	auto make_total_consumer(Input &&input)
 	{
 		return total_consumer<typename std::decay<Input>::type>(std::forward<Input>(input));
-	}
-
-	template <class Input, class ElementPredicate>
-	struct while_observable
-			: public rx::observable<typename Input::element_type>
-			, private rx::observer<typename Input::element_type>
-	{
-		typedef typename Input::element_type element_type;
-
-		while_observable(Input input, ElementPredicate is_not_end)
-			: input(std::move(input))
-			, is_not_end(std::move(is_not_end))
-		{
-		}
-
-		virtual void async_get_one(rx::observer<element_type> &receiver) SILICIUM_OVERRIDE
-		{
-			assert(!receiver_);
-			receiver_ = &receiver;
-			input.async_get_one(*this);
-		}
-
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-			assert(receiver_);
-			receiver_ = nullptr;
-			return input.cancel();
-		}
-
-	private:
-
-		Input input;
-		ElementPredicate is_not_end;
-		rx::observer<element_type> *receiver_ = nullptr;
-
-		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
-		{
-			assert(receiver_);
-			if (is_not_end(value))
-			{
-				rx::exchange(receiver_, nullptr)->got_element(std::move(value));
-			}
-			else
-			{
-				rx::exchange(receiver_, nullptr)->ended();
-			}
-		}
-
-		virtual void ended() SILICIUM_OVERRIDE
-		{
-			assert(receiver_);
-			rx::exchange(receiver_, nullptr)->ended();
-		}
-	};
-
-	template <class Input, class ElementPredicate>
-	auto while_(Input &&input, ElementPredicate &&is_not_end)
-	{
-		return while_observable<
-				typename std::decay<Input>::type,
-				typename std::decay<ElementPredicate>::type>(std::forward<Input>(input), std::forward<ElementPredicate>(is_not_end));
 	}
 }
 
