@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_TIMER_HPP
 
 #include <reactive/observable.hpp>
+#include <reactive/exchange.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
 namespace rx

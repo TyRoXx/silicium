@@ -3,20 +3,12 @@
 
 #include <reactive/observer.hpp>
 #include <reactive/observable.hpp>
-#include <utility>
+#include <reactive/exchange.hpp>
 #include <silicium/override.hpp>
 #include <cassert>
 
 namespace rx
 {
-	template <class T, class U>
-	T exchange(T &dest, U &&source)
-	{
-		auto old = dest;
-		dest = std::forward<U>(source);
-		return old;
-	}
-
 	template <class Element>
 	struct bridge : observable<Element>, observer<Element>
 	{

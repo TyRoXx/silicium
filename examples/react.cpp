@@ -1,7 +1,5 @@
 #include <reactive/bridge.hpp>
 #include <reactive/ptr_observable.hpp>
-#include <reactive/buffer.hpp>
-#include <reactive/generate.hpp>
 #include <reactive/tuple.hpp>
 #include <reactive/transform.hpp>
 #include <reactive/while.hpp>
@@ -13,7 +11,6 @@
 #include <boost/system/system_error.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
-#include <boost/asio.hpp>
 
 namespace
 {
@@ -46,20 +43,10 @@ namespace
 		}
 	};
 
-	struct draw_filled_rect
+	void set_render_draw_color(SDL_Renderer &renderer, SDL_Color color)
 	{
-		SDL_Color color;
-		SDL_Rect where;
-	};
-
-	typedef boost::variant<
-		draw_filled_rect
-	> draw_operation;
-
-	struct frame
-	{
-		std::vector<draw_operation> operations;
-	};
+		SDL_SetRenderDrawColor(&renderer, color.r, color.g, color.b, color.a);
+	}
 
 	SDL_Color make_color(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
 	{
@@ -79,6 +66,50 @@ namespace
 		result.w = w;
 		result.h = h;
 		return result;
+	}
+
+	struct draw_filled_rect
+	{
+		SDL_Color color;
+		SDL_Rect where;
+	};
+
+	typedef boost::variant<
+		draw_filled_rect
+	> draw_operation;
+
+	struct frame
+	{
+		std::vector<draw_operation> operations;
+	};
+
+	struct draw_operation_renderer : boost::static_visitor<>
+	{
+		explicit draw_operation_renderer(SDL_Renderer &sdl)
+			: sdl(&sdl)
+		{
+		}
+
+		void operator()(draw_filled_rect const &operation) const
+		{
+			set_render_draw_color(*sdl, operation.color);
+			SDL_RenderDrawRect(sdl, &operation.where);
+		}
+
+	private:
+
+		SDL_Renderer *sdl;
+	};
+
+	void render_frame(SDL_Renderer &sdl, frame const &frame_)
+	{
+		set_render_draw_color(sdl, make_color(0, 0, 0, 0xff));
+		SDL_RenderClear(&sdl);
+		for (auto const &operation : frame_.operations)
+		{
+			boost::apply_visitor(draw_operation_renderer{sdl}, operation);
+		}
+		SDL_RenderPresent(&sdl);
 	}
 
 	struct game_state
@@ -156,61 +187,6 @@ namespace
 		return rx::transform(rx::make_finite_state_machine(interesting_input, initial_state, step_game_state), draw_game_state);
 	}
 
-	void set_render_draw_color(SDL_Renderer &renderer, SDL_Color color)
-	{
-		SDL_SetRenderDrawColor(&renderer, color.r, color.g, color.b, color.a);
-	}
-
-	struct draw_operation_renderer : boost::static_visitor<>
-	{
-		explicit draw_operation_renderer(SDL_Renderer &sdl)
-			: sdl(&sdl)
-		{
-		}
-
-		void operator()(draw_filled_rect const &operation) const
-		{
-			set_render_draw_color(*sdl, operation.color);
-			SDL_RenderDrawRect(sdl, &operation.where);
-		}
-
-	private:
-
-		SDL_Renderer *sdl;
-	};
-
-	void render_frame(SDL_Renderer &sdl, frame const &frame_)
-	{
-		set_render_draw_color(sdl, make_color(0, 0, 0, 0xff));
-		SDL_RenderClear(&sdl);
-		for (auto const &operation : frame_.operations)
-		{
-			boost::apply_visitor(draw_operation_renderer{sdl}, operation);
-		}
-		SDL_RenderPresent(&sdl);
-	}
-
-	struct frame_renderer : rx::observer<frame>
-	{
-		explicit frame_renderer(SDL_Renderer &sdl)
-			: sdl(&sdl)
-		{
-		}
-
-		virtual void got_element(frame value) SILICIUM_OVERRIDE
-		{
-			render_frame(*sdl, value);
-		}
-
-		virtual void ended() SILICIUM_OVERRIDE
-		{
-		}
-
-	private:
-
-		SDL_Renderer *sdl;
-	};
-
 	struct frame_rendered
 	{
 	};
@@ -251,7 +227,6 @@ int main()
 
 	boost::asio::io_service io;
 
-	frame_renderer frame_renderer_(*renderer);
 	rx::timer frame_rate_limiter(io, boost::posix_time::milliseconds(16));
 
 	auto all_rendered = rx::make_total_consumer(rx::transform(rx::make_tuple(rx::ref(frame_rate_limiter), frames), [&renderer, &frame_events](std::tuple<rx::timer_elapsed, frame> const &ready_frame)

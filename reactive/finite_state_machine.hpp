@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_FINITE_STATE_MACHINE_HPP
 
 #include <reactive/observable.hpp>
+#include <cassert>
 
 namespace rx
 {
