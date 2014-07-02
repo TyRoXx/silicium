@@ -181,12 +181,21 @@ namespace
 	auto make_frames(Events &&input)
 	{
 		game_state initial_state;
-		return rx::transform(rx::make_finite_state_machine(std::forward<Events>(input), initial_state, step_game_state), draw_game_state);
-	}
+		auto is_no_quit = [](SDL_Event const &event_) -> bool
+		{
+			switch (event_.type)
+			{
+			case SDL_QUIT:
+				return false;
 
-	struct frame_rendered
-	{
-	};
+			case SDL_KEYUP:
+				return (event_.key.keysym.sym != SDLK_ESCAPE);
+			}
+			return true;
+		};
+		auto model = rx::make_finite_state_machine(rx::while_(std::forward<Events>(input), is_no_quit), initial_state, step_game_state);
+		return rx::transform(std::move(model), draw_game_state);
+	}
 
 	struct nothing
 	{
@@ -212,19 +221,7 @@ int main()
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
 	rx::bridge<SDL_Event> frame_events;
-	auto is_no_quit = [](SDL_Event const &event_) -> bool
-	{
-		switch (event_.type)
-		{
-		case SDL_QUIT:
-			return false;
-
-		case SDL_KEYUP:
-			return (event_.key.keysym.sym != SDLK_ESCAPE);
-		}
-		return true;
-	};
-	auto frames = rx::wrap<frame>(make_frames(while_(rx::ref(frame_events), is_no_quit)));
+	auto frames = rx::wrap<frame>(make_frames(rx::ref(frame_events)));
 
 	boost::asio::io_service io;
 
