@@ -2,11 +2,13 @@
 #include <reactive/ptr_observable.hpp>
 #include <reactive/buffer.hpp>
 #include <reactive/generate.hpp>
+#include <reactive/tuple.hpp>
 #include <reactive/transform.hpp>
 #include <SDL2/SDL.h>
 #include <boost/system/system_error.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
+#include <boost/asio.hpp>
 
 namespace rx
 {
@@ -26,8 +28,15 @@ namespace rx
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
-			check_fetch();
-			receiver.got_element(state);
+			if (has_ended)
+			{
+				receiver.ended();
+			}
+			else
+			{
+				check_fetch();
+				receiver.got_element(state);
+			}
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
@@ -40,6 +49,7 @@ namespace rx
 		element_type state;
 		Step step;
 		bool fetching = false;
+		bool has_ended = false;
 
 		virtual void got_element(typename In::element_type value) SILICIUM_OVERRIDE
 		{
@@ -53,7 +63,8 @@ namespace rx
 		{
 			assert(fetching);
 			fetching = false;
-			check_fetch();
+			assert(!has_ended);
+			has_ended = true;
 		}
 
 		void check_fetch()
@@ -137,6 +148,51 @@ namespace rx
 				typename std::decay<Input>::type,
 				typename std::decay<Predicate>::type>(std::forward<Input>(input), std::forward<Predicate>(is_propagated));
 	}
+
+	struct timer_elapsed
+	{
+	};
+
+	struct timer : observable<timer_elapsed>
+	{
+		typedef timer_elapsed element_type;
+
+		explicit timer(boost::asio::io_service &io, boost::posix_time::time_duration delay)
+			: impl(io)
+			, delay(delay)
+		{
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			assert(!receiver_);
+			receiver_ = &receiver;
+			impl.expires_from_now(delay);
+			impl.async_wait([this](boost::system::error_code error)
+			{
+				if (error)
+				{
+					assert(error == boost::asio::error::operation_aborted); //TODO: remove this assumption
+					assert(!receiver_); //cancel() should have reset the receiver already
+					return;
+				}
+				exchange(receiver_, nullptr)->got_element(timer_elapsed{});
+			});
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			impl.cancel();
+			receiver_ = nullptr;
+		}
+
+	private:
+
+		boost::asio::deadline_timer impl;
+		boost::posix_time::time_duration delay;
+		observer<element_type> *receiver_ = nullptr;
+	};
 }
 
 namespace
@@ -269,10 +325,11 @@ namespace
 		return previous;
 	}
 
-	auto make_frames(rx::observable<SDL_Event> &input)
+	template <class Events>
+	auto make_frames(Events &&input)
 	{
 		game_state initial_state;
-		auto interesting_input = rx::filter(rx::ref(input), [](SDL_Event const &event_)
+		auto interesting_input = rx::filter(std::forward<Events>(input), [](SDL_Event const &event_)
 		{
 			return event_.type == SDL_KEYUP;
 		});
@@ -302,6 +359,17 @@ namespace
 		SDL_Renderer *sdl;
 	};
 
+	void render_frame(SDL_Renderer &sdl, frame const &frame_)
+	{
+		set_render_draw_color(sdl, make_color(0, 0, 0, 0xff));
+		SDL_RenderClear(&sdl);
+		for (auto const &operation : frame_.operations)
+		{
+			boost::apply_visitor(draw_operation_renderer{sdl}, operation);
+		}
+		SDL_RenderPresent(&sdl);
+	}
+
 	struct frame_renderer : rx::observer<frame>
 	{
 		explicit frame_renderer(SDL_Renderer &sdl)
@@ -311,13 +379,7 @@ namespace
 
 		virtual void got_element(frame value) SILICIUM_OVERRIDE
 		{
-			set_render_draw_color(*sdl, make_color(0, 0, 0, 0xff));
-			SDL_RenderClear(sdl);
-			for (auto const &operation : value.operations)
-			{
-				boost::apply_visitor(draw_operation_renderer{*sdl}, operation);
-			}
-			SDL_RenderPresent(sdl);
+			render_frame(*sdl, value);
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
@@ -328,6 +390,111 @@ namespace
 
 		SDL_Renderer *sdl;
 	};
+
+	struct quitting
+	{
+	};
+
+	struct frame_rendered
+	{
+	};
+
+	template <class Input>
+	struct total_consumer : private rx::observer<typename Input::element_type>
+	{
+		typedef typename Input::element_type element_type;
+
+		explicit total_consumer(Input input)
+			: input(std::move(input))
+		{
+		}
+
+		void start()
+		{
+			input.async_get_one(*this);
+		}
+
+	private:
+
+		Input input;
+
+		virtual void got_element(element_type value) SILICIUM_OVERRIDE
+		{
+			(void)value; //ignore result
+			return start();
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+		}
+	};
+
+	template <class Input>
+	auto make_total_consumer(Input &&input)
+	{
+		return total_consumer<typename std::decay<Input>::type>(std::forward<Input>(input));
+	}
+
+	template <class Input, class ElementPredicate>
+	struct while_observable
+			: public rx::observable<typename Input::element_type>
+			, private rx::observer<typename Input::element_type>
+	{
+		typedef typename Input::element_type element_type;
+
+		while_observable(Input input, ElementPredicate is_not_end)
+			: input(std::move(input))
+			, is_not_end(std::move(is_not_end))
+		{
+		}
+
+		virtual void async_get_one(rx::observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			assert(!receiver_);
+			receiver_ = &receiver;
+			input.async_get_one(*this);
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			receiver_ = nullptr;
+			return input.cancel();
+		}
+
+	private:
+
+		Input input;
+		ElementPredicate is_not_end;
+		rx::observer<element_type> *receiver_ = nullptr;
+
+		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			if (is_not_end(value))
+			{
+				rx::exchange(receiver_, nullptr)->got_element(std::move(value));
+			}
+			else
+			{
+				rx::exchange(receiver_, nullptr)->ended();
+			}
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			rx::exchange(receiver_, nullptr)->ended();
+		}
+	};
+
+	template <class Input, class ElementPredicate>
+	auto while_(Input &&input, ElementPredicate &&is_not_end)
+	{
+		return while_observable<
+				typename std::decay<Input>::type,
+				typename std::decay<ElementPredicate>::type>(std::forward<Input>(input), std::forward<ElementPredicate>(is_not_end));
+	}
 }
 
 int main()
@@ -348,25 +515,31 @@ int main()
 
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
-	rx::bridge<SDL_Event> input;
-	auto frames = rx::wrap<frame>(make_frames(input));
+	rx::bridge<SDL_Event> frame_events;
+	auto frames = rx::wrap<frame>(make_frames(while_(rx::ref(frame_events), [](SDL_Event const &event_)
+	{
+		bool continue_ = event_.type != SDL_QUIT;
+		return continue_;
+	})));
+
+	boost::asio::io_service io;
 
 	frame_renderer frame_renderer_(*renderer);
-	for (;;)
-	{
-		frames.async_get_one(frame_renderer_);
+	rx::timer frame_rate_limiter(io, boost::posix_time::milliseconds(16));
 
+	auto all_rendered = make_total_consumer(rx::transform(rx::make_tuple(rx::ref(frame_rate_limiter), frames), [&renderer, &frame_events](std::tuple<rx::timer_elapsed, frame> const &ready_frame)
+	{
 		SDL_Event event;
-		while (SDL_PollEvent(&event))
+		while (frame_events.is_waiting() &&
+			   SDL_PollEvent(&event))
 		{
-			switch (event.type)
-			{
-			case SDL_QUIT:
-				return 0;
-			}
-			input.got_element(event);
+			frame_events.got_element(event);
 		}
 
-		SDL_Delay(16);
-	}
+		render_frame(*renderer, std::get<1>(ready_frame));
+		return frame_rendered{};
+	}));
+	all_rendered.start();
+
+	io.run();
 }
