@@ -12,6 +12,21 @@
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
 
+namespace rx
+{
+	template <class Input>
+	auto delay(Input &&input, boost::asio::io_service &io, boost::posix_time::time_duration duration)
+	{
+		typedef typename Input::element_type element_type;
+		auto delaying_timer = make_wrapped<timer>(io, duration);
+		auto unpack = [](std::tuple<timer_elapsed, element_type> value)
+		{
+			return std::move(std::get<1>(value));
+		};
+		return transform(make_tuple(delaying_timer, std::forward<Input>(input)), unpack);
+	}
+}
+
 namespace
 {
 	void throw_error()
