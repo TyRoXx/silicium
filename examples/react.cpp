@@ -180,11 +180,7 @@ namespace
 	auto make_frames(Events &&input)
 	{
 		game_state initial_state;
-		auto interesting_input = rx::filter(std::forward<Events>(input), [](SDL_Event const &event_)
-		{
-			return event_.type == SDL_KEYUP;
-		});
-		return rx::transform(rx::make_finite_state_machine(interesting_input, initial_state, step_game_state), draw_game_state);
+		return rx::transform(rx::make_finite_state_machine(std::forward<Events>(input), initial_state, step_game_state), draw_game_state);
 	}
 
 	struct frame_rendered
