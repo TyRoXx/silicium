@@ -229,7 +229,9 @@ int main()
 
 	rx::timer frame_rate_limiter(io, boost::posix_time::milliseconds(16));
 
-	auto all_rendered = rx::make_total_consumer(rx::transform(rx::make_tuple(rx::ref(frame_rate_limiter), frames), [&renderer, &frame_events](std::tuple<rx::timer_elapsed, frame> const &ready_frame)
+	auto input_polled = rx::transform(
+		rx::ref(frame_rate_limiter),
+		[&frame_events](rx::timer_elapsed) -> rx::timer_elapsed
 	{
 		SDL_Event event;
 		while (frame_events.is_waiting() &&
@@ -237,10 +239,20 @@ int main()
 		{
 			frame_events.got_element(event);
 		}
+		return rx::timer_elapsed{};
+	});
 
+	auto rendered = rx::transform(
+		rx::make_tuple(
+			rx::ref(input_polled),
+			frames),
+		[&renderer](std::tuple<rx::timer_elapsed, frame> const &ready_frame)
+	{
 		render_frame(*renderer, std::get<1>(ready_frame));
 		return frame_rendered{};
-	}));
+	});
+
+	auto all_rendered = rx::make_total_consumer(rx::ref(rendered));
 	all_rendered.start();
 
 	io.run();
