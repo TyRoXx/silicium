@@ -12,19 +12,6 @@
 #include <boost/system/system_error.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
-#include <silicium/source.hpp>
-
-namespace rx
-{
-	template <class Observable, class SyncGetter>
-	auto to_source(Observable original, SyncGetter sync_get)
-	{
-		return Si::make_generator_source([original, sync_get]
-		{
-			return sync_get(original);
-		});
-	}
-}
 
 namespace
 {
