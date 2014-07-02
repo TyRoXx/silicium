@@ -6,6 +6,7 @@
 #include <reactive/finite_state_machine.hpp>
 #include <reactive/filter.hpp>
 #include <reactive/timer.hpp>
+#include <reactive/generate.hpp>
 #include <reactive/total_consumer.hpp>
 #include <SDL2/SDL.h>
 #include <boost/system/system_error.hpp>
@@ -17,13 +18,14 @@ namespace rx
 	template <class Input>
 	auto delay(Input &&input, boost::asio::io_service &io, boost::posix_time::time_duration duration)
 	{
-		typedef typename Input::element_type element_type;
+		typedef typename std::remove_reference<Input>::type clean_input;
+		typedef typename clean_input::element_type element_type;
 		auto delaying_timer = make_wrapped<timer>(io, duration);
 		auto unpack = [](std::tuple<timer_elapsed, element_type> value)
 		{
 			return std::move(std::get<1>(value));
 		};
-		return transform(make_tuple(delaying_timer, std::forward<Input>(input)), unpack);
+		return transform(rx::make_tuple(delaying_timer, std::forward<Input>(input)), unpack);
 	}
 }
 
@@ -201,6 +203,10 @@ namespace
 	struct frame_rendered
 	{
 	};
+
+	struct nothing
+	{
+	};
 }
 
 int main()
@@ -238,11 +244,7 @@ int main()
 
 	boost::asio::io_service io;
 
-	rx::timer frame_rate_limiter(io, boost::posix_time::milliseconds(16));
-
-	auto input_polled = rx::transform(
-		rx::ref(frame_rate_limiter),
-		[&frame_events](rx::timer_elapsed) -> rx::timer_elapsed
+	auto input_polled = rx::generate([&frame_events]
 	{
 		SDL_Event event;
 		while (frame_events.is_waiting() &&
@@ -250,17 +252,17 @@ int main()
 		{
 			frame_events.got_element(event);
 		}
-		return rx::timer_elapsed{};
+		return nothing{};
 	});
-
+	auto delayed_input_polled = rx::delay(input_polled, io, boost::posix_time::milliseconds(16));
 	auto rendered = rx::transform(
 		rx::make_tuple(
-			rx::ref(input_polled),
+			delayed_input_polled,
 			frames),
-		[&renderer](std::tuple<rx::timer_elapsed, frame> const &ready_frame)
+		[&renderer](std::tuple<nothing, frame> const &ready_frame)
 	{
 		render_frame(*renderer, std::get<1>(ready_frame));
-		return frame_rendered{};
+		return nothing{};
 	});
 
 	auto all_rendered = rx::make_total_consumer(rx::ref(rendered));
