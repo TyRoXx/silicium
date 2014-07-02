@@ -51,6 +51,14 @@ namespace rx
 	{
 		return rx::ptr_observable<Element, rx::observable<Element> *>(&identity);
 	}
+
+	template <class Observable, class ...Args>
+	auto make_wrapped(Args &&...args)
+	{
+		typedef typename Observable::element_type element_type;
+		typedef std::shared_ptr<Observable> ptr_type;
+		return ptr_observable<element_type, ptr_type>(std::make_shared<Observable>(std::forward<Args>(args)...));
+	}
 }
 
 #endif
