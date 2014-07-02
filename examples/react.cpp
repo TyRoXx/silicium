@@ -14,12 +14,6 @@
 
 namespace rx
 {
-	template <class Element>
-	auto ref(rx::observable<Element> &identity)
-	{
-		return rx::ptr_observable<Element, rx::observable<Element> *>(&identity);
-	}
-
 	template <class Input, class Predicate>
 	struct filter_observable
 			: public observable<typename Input::element_type>

@@ -44,6 +44,12 @@ namespace rx
 	{
 		return ptr_observable<Element, std::shared_ptr<observable<Element>>>(std::make_shared<typename std::decay<Content>::type>(std::forward<Content>(content)));
 	}
+
+	template <class Element>
+	auto ref(rx::observable<Element> &identity)
+	{
+		return rx::ptr_observable<Element, rx::observable<Element> *>(&identity);
+	}
 }
 
 #endif
