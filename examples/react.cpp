@@ -211,10 +211,6 @@ namespace
 		SDL_Renderer *sdl;
 	};
 
-	struct quitting
-	{
-	};
-
 	struct frame_rendered
 	{
 	};
