@@ -5,6 +5,7 @@
 #include <reactive/tuple.hpp>
 #include <reactive/transform.hpp>
 #include <reactive/while.hpp>
+#include <reactive/finite_state_machine.hpp>
 #include <SDL2/SDL.h>
 #include <boost/system/system_error.hpp>
 #include <boost/scope_exit.hpp>
@@ -13,80 +14,6 @@
 
 namespace rx
 {
-	template <class In, class State, class Step>
-	struct variable
-			: public observable<State>
-			, private observer<typename In::element_type>
-	{
-		typedef State element_type;
-
-		variable(In in, element_type initial_state, Step step)
-			: in(std::move(in))
-			, state(std::move(initial_state))
-			, step(std::move(step))
-		{
-		}
-
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
-		{
-			if (has_ended)
-			{
-				receiver.ended();
-			}
-			else
-			{
-				check_fetch();
-				receiver.got_element(state);
-			}
-		}
-
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-		}
-
-	private:
-
-		In in;
-		element_type state;
-		Step step;
-		bool fetching = false;
-		bool has_ended = false;
-
-		virtual void got_element(typename In::element_type value) SILICIUM_OVERRIDE
-		{
-			assert(fetching);
-			fetching = false;
-			check_fetch();
-			state = step(std::move(state), std::move(value));
-		}
-
-		virtual void ended() SILICIUM_OVERRIDE
-		{
-			assert(fetching);
-			fetching = false;
-			assert(!has_ended);
-			has_ended = true;
-		}
-
-		void check_fetch()
-		{
-			if (!fetching)
-			{
-				fetching = true;
-				in.async_get_one(*this);
-			}
-		}
-	};
-
-	template <class In, class State, class Step>
-	auto make_var(In &&in, State &&initial_state, Step &&step)
-	{
-		return variable<
-				typename std::decay<In>::type,
-				typename std::decay<State>::type,
-				typename std::decay<Step>::type>(std::forward<In>(in), std::forward<State>(initial_state), std::forward<Step>(step));
-	}
-
 	template <class Element>
 	auto ref(rx::observable<Element> &identity)
 	{
@@ -334,7 +261,7 @@ namespace
 		{
 			return event_.type == SDL_KEYUP;
 		});
-		return rx::transform(rx::make_var(interesting_input, initial_state, step_game_state), draw_game_state);
+		return rx::transform(rx::make_finite_state_machine(interesting_input, initial_state, step_game_state), draw_game_state);
 	}
 
 	void set_render_draw_color(SDL_Renderer &renderer, SDL_Color color)
