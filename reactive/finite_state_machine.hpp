@@ -3,6 +3,7 @@
 
 #include <reactive/observable.hpp>
 #include <cassert>
+#include <boost/optional.hpp>
 
 namespace rx
 {
@@ -44,8 +45,16 @@ namespace rx
 		virtual void got_element(typename In::element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
-			state = step(std::move(state), std::move(value));
-			exchange(receiver_, nullptr)->got_element(state);
+			boost::optional<element_type> next = step(std::move(state), std::move(value));
+			if (next)
+			{
+				state = std::move(*next);
+				exchange(receiver_, nullptr)->got_element(state);
+			}
+			else
+			{
+				exchange(receiver_, nullptr)->ended();
+			}
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
