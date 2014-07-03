@@ -5,37 +5,11 @@
 #include <reactive/finite_state_machine.hpp>
 #include <reactive/filter.hpp>
 #include <reactive/generate.hpp>
-#include <reactive/total_consumer.hpp>
 #include <reactive/cache.hpp>
+#include <reactive/get.hpp>
 #include <SDL2/SDL.h>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
-
-namespace rx
-{
-	template <class Element>
-	struct visitor : observer<Element>
-	{
-		boost::optional<Element> result;
-
-		virtual void got_element(Element value) SILICIUM_OVERRIDE
-		{
-			result = std::move(value);
-		}
-
-		virtual void ended() SILICIUM_OVERRIDE
-		{
-		}
-	};
-
-	template <class Input>
-	auto get(Input &from)
-	{
-		visitor<typename Input::element_type> v;
-		from.async_get_one(v);
-		return std::move(v.result);
-	}
-}
 
 namespace
 {
