@@ -582,5 +582,7 @@ int main()
 		}
 
 		render_frame(*renderer, *f);
+
+		SDL_Delay(16);
 	}
 }
