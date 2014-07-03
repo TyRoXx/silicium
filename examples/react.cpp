@@ -40,7 +40,9 @@ namespace rx
 	auto deref_optional(Input &&input)
 	{
 		typedef boost::optional<typename Input::element_type> optional_type;
-		return transform(while_(std::forward<Input>(input), [](optional_type const &element) { return element.is_initialized(); }), [](optional_type element) { return std::move(*element); });
+		auto is_set = [](optional_type const &element) { return element.is_initialized(); };
+		auto deref = [](optional_type element) { return std::move(*element); };
+		return transform(while_(std::forward<Input>(input), is_set), deref);
 	}
 }
 
