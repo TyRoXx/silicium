@@ -10,6 +10,7 @@
 #include <reactive/cache.hpp>
 #include <reactive/connector.hpp>
 #include <reactive/receiver.hpp>
+#include <reactive/deref_optional.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
