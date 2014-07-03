@@ -102,6 +102,15 @@ namespace rx
 		}
 	};
 
+	template <class SharedSocketFactory, class EndpointObservable>
+	auto connect(SharedSocketFactory create_socket, EndpointObservable destination)
+	{
+		return connector<
+				typename std::decay<SharedSocketFactory>::type,
+				typename std::decay<EndpointObservable>::type>
+				(std::forward<SharedSocketFactory>(create_socket), std::forward<EndpointObservable>(destination));
+	}
+
 	struct socket_receiver : observable<char>
 	{
 		typedef char element_type;
@@ -375,7 +384,6 @@ int main()
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
 	rx::bridge<SDL_Event> frame_events;
-	auto frames = rx::wrap<frame>(make_frames(rx::ref(frame_events)));
 
 	boost::asio::io_service io;
 
@@ -389,6 +397,8 @@ int main()
 		}
 		return nothing{};
 	});
+
+	auto frames = rx::wrap<frame>(make_frames(rx::ref(frame_events)));
 	auto delayed_input_polled = rx::delay(input_polled, io, std::chrono::milliseconds(16));
 	auto rendered = rx::transform(
 		rx::make_tuple(
