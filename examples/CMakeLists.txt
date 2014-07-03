@@ -21,6 +21,6 @@ if(LIBGIT2_FOUND)
 endif()
 
 if(SDL2_FOUND)
-	add_executable(react "react.cpp")
-	target_link_libraries(react ${Boost_LIBRARIES} ${SDL2_LIBRARY})
+	add_executable(sdl "sdl.cpp")
+	target_link_libraries(sdl ${Boost_LIBRARIES} ${SDL2_LIBRARY})
 endif()
