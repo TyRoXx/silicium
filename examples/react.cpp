@@ -220,10 +220,6 @@ namespace
 		auto model = rx::make_finite_state_machine(rx::while_(std::forward<Events>(input), is_no_quit), initial_state, step_game_state);
 		return rx::transform(std::move(model), draw_game_state);
 	}
-
-	struct nothing
-	{
-	};
 }
 
 int main()
@@ -245,7 +241,7 @@ int main()
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
 	rx::bridge<SDL_Event> frame_events;
-	auto frames = rx::cache(make_frames(rx::ref(frame_events)), frame{});
+	auto frames = rx::cache(make_frames(rx::ref(frame_events)), frame{{}});
 
 	for (;;)
 	{
