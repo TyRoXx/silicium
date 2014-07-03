@@ -6,6 +6,10 @@
 #include <reactive/transform.hpp>
 #include <reactive/bridge.hpp>
 #include <reactive/take.hpp>
+#include <reactive/enumerate.hpp>
+#include <reactive/cache.hpp>
+#include <reactive/connector.hpp>
+#include <reactive/receiver.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
