@@ -264,8 +264,9 @@ namespace rx
 	{
 		typedef typename Input::element_type element_type;
 
-		explicit cache_observable(Input input)
+		explicit cache_observable(Input input, boost::optional<element_type> cached)
 			: input(std::move(input))
+			, cached(std::move(cached))
 		{
 		}
 
@@ -276,11 +277,14 @@ namespace rx
 			if (cached)
 			{
 				exchange(receiver_, nullptr)->got_element(*cached);
+				if (is_fetching)
+				{
+					return;
+				}
 			}
-			else
-			{
-				input.async_get_one(*this);
-			}
+
+			input.async_get_one(*this);
+			is_fetching = true;
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
@@ -295,6 +299,7 @@ namespace rx
 		Input input;
 		observer<element_type> *receiver_ = nullptr;
 		boost::optional<element_type> cached;
+		bool is_fetching = false;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{
@@ -319,7 +324,36 @@ namespace rx
 	template <class Input>
 	auto cache(Input &&input)
 	{
-		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input));
+		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input), boost::none);
+	}
+
+	template <class Input, class Cached>
+	auto cache(Input &&input, Cached &&initially)
+	{
+		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input), std::forward<Cached>(initially));
+	}
+
+	template <class Element>
+	struct visitor : observer<Element>
+	{
+		boost::optional<Element> result;
+
+		virtual void got_element(Element value) SILICIUM_OVERRIDE
+		{
+			result = std::move(value);
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+		}
+	};
+
+	template <class Input>
+	auto get(Input &from)
+	{
+		visitor<typename Input::element_type> v;
+		from.async_get_one(v);
+		return std::move(v.result);
 	}
 }
 
@@ -503,7 +537,7 @@ namespace
 			}
 			return true;
 		};
-		auto model = rx::make_finite_state_machine(rx::while_(std::forward<Events>(input), is_no_quit), initial_state, step_game_state);
+		auto model = rx::cache(rx::make_finite_state_machine(rx::while_(std::forward<Events>(input), is_no_quit), initial_state, step_game_state), initial_state);
 		return rx::transform(std::move(model), draw_game_state);
 	}
 
@@ -531,34 +565,22 @@ int main()
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
 	rx::bridge<SDL_Event> frame_events;
+	auto frames = make_frames(rx::ref(frame_events));
 
-	boost::asio::io_service io;
-
-	auto input_polled = rx::generate([&frame_events]
+	for (;;)
 	{
-		SDL_Event event;
-		while (frame_events.is_waiting() &&
-			   SDL_PollEvent(&event))
+		SDL_Event event{};
+		while (frame_events.is_waiting() && SDL_PollEvent(&event))
 		{
 			frame_events.got_element(event);
 		}
-		return nothing{};
-	});
 
-	auto frames = rx::wrap<frame>(make_frames(rx::ref(frame_events)));
-	auto delayed_input_polled = rx::delay(input_polled, io, std::chrono::milliseconds(16));
-	auto rendered = rx::transform(
-		rx::make_tuple(
-			delayed_input_polled,
-			frames),
-		[&renderer](std::tuple<nothing, frame> const &ready_frame)
-	{
-		render_frame(*renderer, std::get<1>(ready_frame));
-		return nothing{};
-	});
+		auto f = rx::get(frames);
+		if (!f)
+		{
+			break;
+		}
 
-	auto all_rendered = rx::make_total_consumer(rx::ref(rendered));
-	all_rendered.start();
-
-	io.run();
+		render_frame(*renderer, *f);
+	}
 }

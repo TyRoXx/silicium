@@ -22,19 +22,14 @@ namespace rx
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
-			if (has_ended)
-			{
-				receiver.ended();
-			}
-			else
-			{
-				check_fetch();
-				receiver.got_element(state);
-			}
+			assert(!receiver_);
+			receiver_ = &receiver;
+			in.async_get_one(*this);
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
 		{
+			//TODO
 		}
 
 	private:
@@ -44,21 +39,19 @@ namespace rx
 		Step step;
 		bool fetching = false;
 		bool has_ended = false;
+		observer<element_type> *receiver_ = nullptr;
 
 		virtual void got_element(typename In::element_type value) SILICIUM_OVERRIDE
 		{
-			assert(fetching);
-			fetching = false;
-			check_fetch();
+			assert(receiver_);
 			state = step(std::move(state), std::move(value));
+			exchange(receiver_, nullptr)->got_element(state);
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			assert(fetching);
-			fetching = false;
-			assert(!has_ended);
-			has_ended = true;
+			assert(receiver_);
+			exchange(receiver_, nullptr)->ended();
 		}
 
 		void check_fetch()
