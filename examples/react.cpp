@@ -283,8 +283,8 @@ namespace rx
 				}
 			}
 
-			input.async_get_one(*this);
 			is_fetching = true;
+			input.async_get_one(*this);
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
@@ -537,7 +537,7 @@ namespace
 			}
 			return true;
 		};
-		auto model = rx::cache(rx::make_finite_state_machine(rx::while_(std::forward<Events>(input), is_no_quit), initial_state, step_game_state), initial_state);
+		auto model = rx::make_finite_state_machine(rx::while_(std::forward<Events>(input), is_no_quit), initial_state, step_game_state);
 		return rx::transform(std::move(model), draw_game_state);
 	}
 
@@ -565,7 +565,7 @@ int main()
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
 	rx::bridge<SDL_Event> frame_events;
-	auto frames = make_frames(rx::ref(frame_events));
+	auto frames = rx::cache(make_frames(rx::ref(frame_events)), frame{});
 
 	for (;;)
 	{
