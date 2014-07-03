@@ -35,6 +35,13 @@ namespace rx
 		from.async_get_one(v);
 		return std::move(v.result);
 	}
+
+	template <class Input>
+	auto deref_optional(Input &&input)
+	{
+		typedef typename Input::element_type optional_type;
+		return transform(while_(std::forward<Input>(input), [](optional_type const &element) { return element.is_initialized(); }), [](optional_type element) { return std::move(*element); });
+	}
 }
 
 namespace
@@ -163,37 +170,44 @@ namespace
 		};
 	}
 
-	game_state step_game_state(game_state previous, SDL_Event event_)
+	boost::optional<game_state> step_game_state(boost::optional<game_state> previous, SDL_Event event_)
 	{
+		assert(previous);
 		switch (event_.type)
 		{
+		case SDL_QUIT:
+			return boost::none;
+
 		case SDL_KEYUP:
 			{
 				switch (event_.key.keysym.sym)
 				{
 				case SDLK_LEFT:
-					previous.x -= 10;
+					previous->x -= 10;
 					break;
 
 				case SDLK_RIGHT:
-					previous.x += 10;
+					previous->x += 10;
 					break;
 
 				case SDLK_UP:
-					previous.y -= 10;
+					previous->y -= 10;
 					break;
 
 				case SDLK_DOWN:
-					previous.y += 10;
+					previous->y += 10;
 					break;
 
 				case SDLK_PLUS:
-					previous.count = std::min(max_rect_count, previous.count + 1);
+					previous->count = std::min(max_rect_count, previous->count + 1);
 					break;
 
 				case SDLK_MINUS:
-					previous.count = std::max(1, previous.count - 1);
+					previous->count = std::max(1, previous->count - 1);
 					break;
+
+				case SDLK_ESCAPE:
+					return boost::none;
 				}
 				break;
 			}
@@ -205,20 +219,8 @@ namespace
 	auto make_frames(Events &&input)
 	{
 		game_state initial_state;
-		auto is_no_quit = [](SDL_Event const &event_) -> bool
-		{
-			switch (event_.type)
-			{
-			case SDL_QUIT:
-				return false;
-
-			case SDL_KEYUP:
-				return (event_.key.keysym.sym != SDLK_ESCAPE);
-			}
-			return true;
-		};
-		auto model = rx::make_finite_state_machine(rx::while_(std::forward<Events>(input), is_no_quit), initial_state, step_game_state);
-		return rx::transform(std::move(model), draw_game_state);
+		auto model = rx::make_finite_state_machine(std::forward<Events>(input), boost::make_optional(initial_state), step_game_state);
+		return rx::transform(rx::deref_optional(std::move(model)), draw_game_state);
 	}
 }
 
