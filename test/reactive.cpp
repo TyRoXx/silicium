@@ -12,6 +12,7 @@
 #include <reactive/receiver.hpp>
 #include <reactive/deref_optional.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/coroutine/all.hpp>
 
 namespace Si
 {
@@ -94,6 +95,135 @@ namespace Si
 		BOOST_CHECK(expected == generated);
 
 		buf.async_get_one(consumer);
+		BOOST_CHECK(expected == generated);
+	}
+
+	namespace detail
+	{
+		template <class Element>
+		struct result
+		{
+			Element value;
+		};
+
+		struct nothing
+		{
+		};
+
+		struct yield
+		{
+			rx::observable<nothing> *target;
+		};
+
+		template <class Element>
+		struct make_command
+		{
+			typedef boost::variant<result<Element>, yield> type;
+		};
+	}
+
+	template <class Element>
+	struct coroutine_observable
+			: public rx::observable<Element>
+			, private rx::observer<detail::nothing>
+			, public boost::static_visitor<> //TODO make private
+	{
+		typedef Element element_type;
+
+		template <class Action>
+		explicit coroutine_observable(Action &&action)
+			: coro(std::forward<Action>(action))
+		{
+		}
+
+		virtual void async_get_one(rx::observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			receiver_ = &receiver;
+			next();
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			throw std::logic_error("not implemented");
+		}
+
+		//TODO make private
+		void operator()(detail::result<element_type> command)
+		{
+			return rx::exchange(receiver_, nullptr)->got_element(std::move(command.value));
+		}
+
+		//TODO make private
+		void operator()(detail::yield command)
+		{
+			command.target->async_get_one(*this);
+		}
+
+	private:
+
+		typedef typename detail::make_command<element_type>::type command_type;
+
+		typename boost::coroutines::coroutine<command_type>::pull_type coro;
+		rx::observer<Element> *receiver_ = nullptr;
+		bool first = true;
+
+		virtual void got_element(detail::nothing) SILICIUM_OVERRIDE
+		{
+			next();
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+			exchange(receiver_, nullptr)->ended();
+		}
+
+		void next()
+		{
+			if (!rx::exchange(first, false))
+			{
+				coro();
+			}
+			if (coro)
+			{
+				command_type command = coro.get();
+				return boost::apply_visitor(*this, command);
+			}
+			else
+			{
+				rx::exchange(receiver_, nullptr)->ended();
+			}
+		}
+	};
+
+	template <class Element, class Action>
+	auto make_coroutine(Action &&action)
+	{
+		return coroutine_observable<Element>(std::forward<Action>(action));
+	}
+
+	BOOST_AUTO_TEST_CASE(reactive_coroutine)
+	{
+		auto co = make_coroutine<int>([](boost::coroutines::coroutine<detail::make_command<int>::type>::push_type &yield) -> void
+		{
+			yield(detail::result<int>{1});
+			yield(detail::result<int>{2});
+		});
+		std::vector<int> generated;
+		auto collector = rx::consume<int>([&generated](int element)
+		{
+			generated.emplace_back(element);
+		});
+		for (;;)
+		{
+			auto old_size = generated.size();
+			co.async_get_one(collector);
+			if (generated.size() == old_size)
+			{
+				break;
+			}
+			BOOST_REQUIRE(generated.size() == old_size + 1);
+		}
+		std::vector<int> const expected{1, 2};
 		BOOST_CHECK(expected == generated);
 	}
 }
