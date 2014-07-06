@@ -137,6 +137,20 @@ namespace Si
 			(*consumer)(detail::result<Element>{std::move(result)});
 		}
 
+		template <class Gotten>
+		boost::optional<Gotten> get_one(rx::observable<Gotten> &from)
+		{
+			boost::optional<Gotten> result;
+			auto tf = rx::transform(rx::ref(from), [&result](Gotten element)
+			{
+				assert(!result);
+				result = std::move(element);
+				return detail::nothing{};
+			});
+			(*consumer)(detail::yield{&tf});
+			return result;
+		}
+
 	private:
 
 		consumer_type *consumer;
@@ -225,7 +239,7 @@ namespace Si
 		return coroutine_observable<Element>(std::forward<Action>(action));
 	}
 
-	BOOST_AUTO_TEST_CASE(reactive_coroutine)
+	BOOST_AUTO_TEST_CASE(reactive_coroutine_generate)
 	{
 		auto co = make_coroutine<int>([](yield_context<int> &yield) -> void
 		{
@@ -248,6 +262,27 @@ namespace Si
 			BOOST_REQUIRE(generated.size() == old_size + 1);
 		}
 		std::vector<int> const expected{1, 2};
+		BOOST_CHECK(expected == generated);
+	}
+
+	BOOST_AUTO_TEST_CASE(reactive_coroutine_get_one)
+	{
+		rx::bridge<int> asyncs;
+		auto co = make_coroutine<int>([&asyncs](yield_context<int> &yield) -> void
+		{
+			auto a = yield.get_one(asyncs);
+			BOOST_REQUIRE(a);
+			yield(*a - 1);
+		});
+		std::vector<int> generated;
+		auto collector = rx::consume<int>([&generated](int element)
+		{
+			generated.emplace_back(element);
+		});
+		co.async_get_one(collector);
+		BOOST_REQUIRE(generated.empty());
+		asyncs.got_element(4);
+		std::vector<int> const expected{3};
 		BOOST_CHECK(expected == generated);
 	}
 }
