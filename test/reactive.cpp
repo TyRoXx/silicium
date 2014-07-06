@@ -1,4 +1,5 @@
 #include <reactive/buffer.hpp>
+#include <reactive/variant.hpp>
 #include <reactive/coroutine.hpp>
 #include <reactive/generate.hpp>
 #include <reactive/consume.hpp>
@@ -12,6 +13,7 @@
 #include <reactive/connector.hpp>
 #include <reactive/receiver.hpp>
 #include <reactive/deref_optional.hpp>
+#include <boost/container/string.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
@@ -143,5 +145,36 @@ namespace Si
 		asyncs.got_element(4);
 		std::vector<int> const expected{3};
 		BOOST_CHECK(expected == generated);
+	}
+
+	BOOST_AUTO_TEST_CASE(reactive_make_variant)
+	{
+		rx::bridge<int> first;
+		rx::bridge<boost::container::string> second;
+		auto variants = make_variant(rx::ref(first), rx::ref(second));
+
+		typedef Si::fast_variant<int, boost::container::string> variant;
+		std::vector<variant> produced;
+		auto consumer = rx::consume<variant>([&produced](variant element)
+		{
+			produced.emplace_back(std::move(element));
+		});
+
+		variants.async_get_one(consumer);
+		BOOST_CHECK(produced.empty());
+		first.got_element(4);
+
+		variants.async_get_one(consumer);
+		BOOST_CHECK_EQUAL(1,produced.size());
+		second.got_element("Hi");
+
+		std::vector<variant> const expected
+		{
+			4,
+			boost::container::string("Hi")
+		};
+
+		BOOST_CHECK(expected == produced);
+		BOOST_CHECK(!rx::get_immediate(variants));
 	}
 }

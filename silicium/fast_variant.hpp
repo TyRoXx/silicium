@@ -348,7 +348,7 @@ namespace Si
 			return false;
 		}
 		comparison_visitor<equal_to, T...> v{right};
-		return apply_visitor(v, left);
+		return Si::apply_visitor(v, left);
 	}
 
 	template <class ...T>
@@ -359,7 +359,7 @@ namespace Si
 			return left.which() < right.which();
 		}
 		comparison_visitor<less, T...> v{right};
-		return apply_visitor(v, left);
+		return Si::apply_visitor(v, left);
 	}
 
 	struct ostream_visitor : boost::static_visitor<>
@@ -381,7 +381,7 @@ namespace Si
 	template <class ...T>
 	std::ostream &operator << (std::ostream &out, fast_variant<T...> const &v)
 	{
-		apply_visitor(ostream_visitor{out}, v);
+		Si::apply_visitor(ostream_visitor{out}, v);
 		return out;
 	}
 }
