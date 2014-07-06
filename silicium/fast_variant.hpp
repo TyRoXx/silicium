@@ -161,10 +161,21 @@ namespace Si
 			class CleanU = typename std::decay<U>::type,
 			size_t Index = index_of<CleanU, T...>::value,
 			class NoFastVariant = typename std::enable_if<not_same_as<CleanU, fast_variant<T...>>::value, void>::type>
-		fast_variant(U &&value) BOOST_NOEXCEPT
+		fast_variant(U &&value) BOOST_NOEXCEPT_IF(std::is_rvalue_reference<U>::value || std::is_nothrow_copy_constructible<CleanU>::value)
 			: type(&get_type<Index>())
 		{
-			type->move_construct(&storage, &value);
+			construct_impl<Index>(std::is_rvalue_reference<U>(), value);
+		}
+
+		template <
+			class U,
+			class CleanU = typename std::decay<U>::type,
+			size_t Index = index_of<CleanU, T...>::value,
+			class NoFastVariant = typename std::enable_if<not_same_as<CleanU, fast_variant<T...>>::value, void>::type>
+		fast_variant &operator = (U &&other) BOOST_NOEXCEPT_IF(std::is_rvalue_reference<U>::value || std::is_nothrow_copy_assignable<CleanU>::value)
+		{
+			assignment_impl<Index>(std::is_rvalue_reference<U>(), other);
+			return *this;
 		}
 
 		~fast_variant() BOOST_NOEXCEPT
@@ -202,11 +213,38 @@ namespace Si
 		typename std::aligned_storage<max_sizeof<T...>::value>::type storage;
 
 		template <std::size_t Index>
-		static fast_variant_vtable const &get_type()
+		static fast_variant_vtable const &get_type() BOOST_NOEXCEPT
 		{
 			typedef typename std::tuple_element<Index, std::tuple<T...>>::type element;
 			static fast_variant_vtable_impl<element, Index> const instance;
 			return instance;
+		}
+
+		template <std::size_t Index, class U>
+		void construct_impl(std::true_type, U &value) BOOST_NOEXCEPT
+		{
+			type->move_construct(&storage, &value);
+		}
+
+		template <std::size_t Index, class U>
+		void construct_impl(std::false_type, U const &value)
+		{
+			type->copy_construct(&storage, &value);
+		}
+
+		template <std::size_t Index, class U>
+		void assignment_impl(std::true_type, U &value) BOOST_NOEXCEPT
+		{
+			type->destroy(&storage);
+			type = &get_type<Index>();
+			type->move_construct(&storage, &value);
+		}
+
+		template <std::size_t Index, class U>
+		void assignment_impl(std::false_type, U const &value)
+		{
+			fast_variant copy(value);
+			*this = std::move(copy);
 		}
 	};
 
@@ -240,26 +278,26 @@ namespace Si
 	template <class Element>
 	struct try_get_ptr_visitor : boost::static_visitor<Element *>
 	{
-		Element * operator()(Element &value) const
+		Element * operator()(Element &value) const BOOST_NOEXCEPT
 		{
 			return &value;
 		}
 
 		template <class Other>
-		Element * operator()(Other const &) const
+		Element * operator()(Other const &) const BOOST_NOEXCEPT
 		{
 			return nullptr;
 		}
 	};
 
 	template <class Element, class ...T>
-	Element *try_get_ptr(fast_variant<T...> &from)
+	Element *try_get_ptr(fast_variant<T...> &from) BOOST_NOEXCEPT
 	{
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
 
 	template <class Element, class ...T>
-	Element *try_get_ptr(fast_variant<T...> const &from)
+	Element *try_get_ptr(fast_variant<T...> const &from) BOOST_NOEXCEPT
 	{
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
@@ -269,13 +307,13 @@ namespace Si
 	{
 		fast_variant<T...> const *other = nullptr;
 
-		explicit equality_visitor(fast_variant<T...> const &other)
+		explicit equality_visitor(fast_variant<T...> const &other) BOOST_NOEXCEPT
 			: other(&other)
 		{
 		}
 
 		template <class Element>
-		bool operator()(Element &value) const
+		bool operator()(Element &value) const BOOST_NOEXCEPT
 		{
 			auto other_value = try_get_ptr<Element>(*other);
 			assert(other_value);
@@ -284,7 +322,7 @@ namespace Si
 	};
 
 	template <class ...T>
-	bool operator == (fast_variant<T...> const &left, fast_variant<T...> const &right)
+	bool operator == (fast_variant<T...> const &left, fast_variant<T...> const &right) BOOST_NOEXCEPT
 	{
 		if (left.which() != right.which())
 		{
