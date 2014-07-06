@@ -123,6 +123,26 @@ namespace Si
 	}
 
 	template <class Element>
+	struct yield_context
+	{
+		typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type>::push_type consumer_type;
+
+		explicit yield_context(consumer_type &consumer)
+			: consumer(&consumer)
+		{
+		}
+
+		void operator()(Element result)
+		{
+			(*consumer)(detail::result<Element>{std::move(result)});
+		}
+
+	private:
+
+		consumer_type *consumer;
+	};
+
+	template <class Element>
 	struct coroutine_observable
 			: public rx::observable<Element>
 			, private rx::observer<detail::nothing>
@@ -131,8 +151,12 @@ namespace Si
 		typedef Element element_type;
 
 		template <class Action>
-		explicit coroutine_observable(Action &&action)
-			: coro(std::forward<Action>(action))
+		explicit coroutine_observable(Action action)
+			: coro([action](typename boost::coroutines::coroutine<command_type>::push_type &push)
+			{
+				yield_context<Element> yield(push);
+				return action(yield);
+			})
 		{
 		}
 
@@ -203,10 +227,10 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(reactive_coroutine)
 	{
-		auto co = make_coroutine<int>([](boost::coroutines::coroutine<detail::make_command<int>::type>::push_type &yield) -> void
+		auto co = make_coroutine<int>([](yield_context<int> &yield) -> void
 		{
-			yield(detail::result<int>{1});
-			yield(detail::result<int>{2});
+			yield(1);
+			yield(2);
 		});
 		std::vector<int> generated;
 		auto collector = rx::consume<int>([&generated](int element)
