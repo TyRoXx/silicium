@@ -129,11 +129,13 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_coroutine_get_one)
 	{
 		rx::bridge<int> asyncs;
-		auto co = rx::make_coroutine<int>([&asyncs](rx::yield_context<int> &yield) -> void
+		bool exited_cleanly = false;
+		auto co = rx::make_coroutine<int>([&asyncs, &exited_cleanly](rx::yield_context<int> &yield) -> void
 		{
 			auto a = yield.get_one(asyncs);
 			BOOST_REQUIRE(a);
 			yield(*a - 1);
+			exited_cleanly = true;
 		});
 		std::vector<int> generated;
 		auto collector = rx::consume<int>([&generated](int element)
@@ -143,6 +145,12 @@ namespace Si
 		co.async_get_one(collector);
 		BOOST_REQUIRE(generated.empty());
 		asyncs.got_element(4);
+
+		//TODO: reading past the end should not be the required way to avoid a force unwind of the coroutine
+		//      because the unwinding is done by throwing an exception.
+		co.async_get_one(collector);
+		BOOST_CHECK(exited_cleanly);
+
 		std::vector<int> const expected{3};
 		BOOST_CHECK(expected == generated);
 	}
