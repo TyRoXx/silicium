@@ -1,4 +1,5 @@
 #include <reactive/buffer.hpp>
+#include <reactive/process.hpp>
 #include <reactive/variant.hpp>
 #include <reactive/coroutine.hpp>
 #include <reactive/generate.hpp>
@@ -15,6 +16,24 @@
 #include <reactive/deref_optional.hpp>
 #include <boost/container/string.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/bind.hpp>
+
+namespace rx
+{
+	template <class Element>
+	struct empty : observable<Element>
+	{
+		virtual void async_get_one(observer<Element> &receiver) SILICIUM_OVERRIDE
+		{
+			return receiver.ended();
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			throw std::logic_error("empty observable cannot be cancelled");
+		}
+	};
+}
 
 namespace Si
 {
@@ -184,5 +203,64 @@ namespace Si
 
 		BOOST_CHECK(expected == produced);
 		BOOST_CHECK(!rx::get_immediate(variants));
+	}
+
+	template <class Element, class Action>
+	struct blocking_then_state : rx::observer<Element>
+	{
+		boost::asio::io_service &dispatcher;
+		boost::optional<boost::asio::io_service::work> blocker;
+		Action action;
+		rx::observable<Element> *from = nullptr;
+
+		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
+			: dispatcher(dispatcher)
+			, blocker(boost::in_place(boost::ref(dispatcher)))
+			, action(std::move(action))
+		{
+		}
+
+		~blocking_then_state()
+		{
+			if (!from)
+			{
+				return;
+			}
+			from->cancel();
+		}
+
+		virtual void got_element(Element value) SILICIUM_OVERRIDE
+		{
+			dispatcher.post(boost::bind<void>(action, boost::make_optional(std::move(value))));
+			blocker.reset();
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+			dispatcher.post(boost::bind<void>(action, boost::optional<Element>()));
+			blocker.reset();
+		}
+	};
+
+	template <class Element, class Action>
+	auto blocking_then(boost::asio::io_service &io, rx::observable<Element> &from, Action &&action)
+	{
+		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(io, std::forward<Action>(action));
+		from.async_get_one(*state);
+		state->from = &from;
+		return state;
+	}
+
+	BOOST_AUTO_TEST_CASE(reactive_process)
+	{
+		rx::empty<char> input;
+		rx::process proc = rx::launch_process("/usr/bin/which", {"which"}, input);
+
+		boost::asio::io_service io;
+		auto blocking = blocking_then(io, proc.exit_code, [](boost::optional<int> ec)
+		{
+			BOOST_CHECK_EQUAL(0, ec);
+		});
+		io.run();
 	}
 }

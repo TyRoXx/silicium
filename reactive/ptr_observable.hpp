@@ -34,6 +34,9 @@ namespace rx
 		Ptr content;
 	};
 
+	template <class Element>
+	using unique_observable = ptr_observable<Element, std::unique_ptr<observable<Element>>>;
+
 	template <class Element, class Content>
 	auto box(Content &&content)
 	{
