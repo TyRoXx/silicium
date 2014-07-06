@@ -13,6 +13,7 @@
 #include <reactive/deref_optional.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/coroutine/all.hpp>
+#include <silicium/fast_variant.hpp>
 
 namespace Si
 {
