@@ -86,4 +86,13 @@ namespace Si
 		noexcept_string const s("S");
 		f = s;
 	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_less)
+	{
+		fast_variant<int, noexcept_string> f(1), g(2), h(noexcept_string("a")), i(noexcept_string("b"));
+		BOOST_CHECK_LT(f, g);
+		BOOST_CHECK_LT(f, h);
+		BOOST_CHECK_LT(f, i);
+		BOOST_CHECK_LT(h, i);
+	}
 }

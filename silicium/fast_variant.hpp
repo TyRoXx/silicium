@@ -303,12 +303,30 @@ namespace Si
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
 
-	template <class ...T>
-	struct equality_visitor : boost::static_visitor<bool>
+	struct equal_to
+	{
+		template <class T>
+		bool operator()(T const &left, T const &right) const
+		{
+			return (left == right);
+		}
+	};
+
+	struct less
+	{
+		template <class T>
+		bool operator()(T const &left, T const &right) const
+		{
+			return (left < right);
+		}
+	};
+
+	template <class Comparison, class ...T>
+	struct comparison_visitor : boost::static_visitor<bool>
 	{
 		fast_variant<T...> const *other = nullptr;
 
-		explicit equality_visitor(fast_variant<T...> const &other) BOOST_NOEXCEPT
+		explicit comparison_visitor(fast_variant<T...> const &other) BOOST_NOEXCEPT
 			: other(&other)
 		{
 		}
@@ -318,7 +336,7 @@ namespace Si
 		{
 			auto other_value = try_get_ptr<Element>(*other);
 			assert(other_value);
-			return (value == *other_value);
+			return Comparison()(value, *other_value);
 		}
 	};
 
@@ -329,8 +347,42 @@ namespace Si
 		{
 			return false;
 		}
-		equality_visitor<T...> v{right};
+		comparison_visitor<equal_to, T...> v{right};
 		return apply_visitor(v, left);
+	}
+
+	template <class ...T>
+	bool operator < (fast_variant<T...> const &left, fast_variant<T...> const &right) BOOST_NOEXCEPT
+	{
+		if (left.which() != right.which())
+		{
+			return left.which() < right.which();
+		}
+		comparison_visitor<less, T...> v{right};
+		return apply_visitor(v, left);
+	}
+
+	struct ostream_visitor : boost::static_visitor<>
+	{
+		std::ostream *out;
+
+		explicit ostream_visitor(std::ostream &out)
+			: out(&out)
+		{
+		}
+
+		template <class T>
+		void operator()(T const &value) const
+		{
+			*out << value;
+		}
+	};
+
+	template <class ...T>
+	std::ostream &operator << (std::ostream &out, fast_variant<T...> const &v)
+	{
+		apply_visitor(ostream_visitor{out}, v);
+		return out;
 	}
 }
 
