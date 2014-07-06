@@ -41,6 +41,7 @@ namespace Si
 
 	struct fast_variant_vtable
 	{
+		//TODO: save an indirection by using function pointers instead of virtual methods
 		virtual ~fast_variant_vtable()
 		{
 		}

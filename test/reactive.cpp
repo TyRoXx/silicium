@@ -119,7 +119,7 @@ namespace Si
 		template <class Element>
 		struct make_command
 		{
-			typedef boost::variant<result<Element>, yield> type;
+			typedef Si::fast_variant<result<Element>, yield> type;
 		};
 	}
 
