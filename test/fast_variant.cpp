@@ -1,24 +1,66 @@
 #include <silicium/fast_variant.hpp>
 #include <boost/container/string.hpp>
+#include <boost/variant/static_visitor.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
 {
+	typedef boost::container::string noexcept_string;
+
 	BOOST_AUTO_TEST_CASE(fast_variant_single)
 	{
 		fast_variant<int> v;
 		BOOST_CHECK_EQUAL(0, v.which());
+		BOOST_CHECK_EQUAL(boost::make_optional(0), try_get<int>(v));
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant_assignment_same)
 	{
-		fast_variant<int, boost::container::string> v, w;
+		fast_variant<int, noexcept_string> v(1), w(2);
+		BOOST_CHECK_EQUAL(boost::make_optional(1), try_get<int>(v));
+		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(w));
 		v = w;
+		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(v));
+		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(w));
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant_assignment_different)
 	{
-		fast_variant<int, boost::container::string> v, w(boost::container::string(""));
+		fast_variant<int, noexcept_string> v, w(noexcept_string("S"));
+		BOOST_CHECK_EQUAL(boost::make_optional(0), try_get<int>(v));
+		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(w));
 		v = w;
+		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(v));
+		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(w));
+	}
+
+	struct is_int_visitor : boost::static_visitor<bool>
+	{
+		bool operator()(int) const
+		{
+			return true;
+		}
+
+		bool operator()(noexcept_string const &) const
+		{
+			return false;
+		}
+	};
+
+	BOOST_AUTO_TEST_CASE(fast_variant_apply_visitor)
+	{
+		{
+			fast_variant<int, noexcept_string> int_;
+			is_int_visitor v;
+			bool is_int = apply_visitor(v, int_);
+			BOOST_CHECK(is_int);
+		}
+
+		{
+			fast_variant<int, noexcept_string> str(noexcept_string{});
+			is_int_visitor v;
+			bool is_int = apply_visitor(v, str);
+			BOOST_CHECK(!is_int);
+		}
 	}
 }

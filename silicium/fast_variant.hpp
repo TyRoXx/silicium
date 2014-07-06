@@ -7,6 +7,8 @@
 #include <boost/mpl/min_max.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/find.hpp>
+#include <boost/optional.hpp>
+#include <boost/variant/static_visitor.hpp>
 #include <tuple>
 #include <cassert>
 #include <limits>
@@ -87,6 +89,16 @@ namespace Si
 		}
 	};
 
+	template <class Visitor, class Element>
+	struct visitor_caller
+	{
+		static typename std::decay<Visitor>::type::result_type
+		visit(Visitor &visitor, void *storage)
+		{
+			return std::forward<Visitor>(visitor)(*static_cast<Element *>(storage));
+		}
+	};
+
 	template <class ...T>
 	struct fast_variant
 	{
@@ -128,6 +140,7 @@ namespace Si
 				return *this;
 			}
 			type->destroy(&storage);
+			type = other.type;
 			type->move_construct(&storage, &other.storage);
 			return *this;
 		}
@@ -150,6 +163,15 @@ namespace Si
 			return type->which();
 		}
 
+		template <class Visitor>
+		auto apply_visitor(Visitor &&visitor)
+		{
+			using result_type = typename std::decay<Visitor>::type::result_type;
+			using visit_fn = result_type (*)(Visitor &, void *);
+			visit_fn const f[] = {&visitor_caller<Visitor, T>::visit...};
+			return f[which()](visitor, &storage);
+		}
+
 	private:
 
 		fast_variant_vtable const *type;
@@ -163,6 +185,33 @@ namespace Si
 			return instance;
 		}
 	};
+
+	template <class Visitor, class Variant>
+	auto apply_visitor(Visitor &&visitor, Variant &&variant)
+	{
+		return std::forward<Variant>(variant).apply_visitor(std::forward<Visitor>(visitor));
+	}
+
+	template <class Element>
+	struct try_get_visitor : boost::static_visitor<boost::optional<Element>>
+	{
+		boost::optional<Element> operator()(Element value) const
+		{
+			return std::move(value);
+		}
+
+		template <class Other>
+		boost::optional<Element> operator()(Other const &) const
+		{
+			return boost::none;
+		}
+	};
+
+	template <class Element, class ...T>
+	boost::optional<Element> try_get(fast_variant<T...> &from)
+	{
+		return apply_visitor(try_get_visitor<Element>{}, from);
+	}
 }
 
 #endif
