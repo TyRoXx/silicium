@@ -63,4 +63,14 @@ namespace Si
 			BOOST_CHECK(!is_int);
 		}
 	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_nesting)
+	{
+		fast_variant<fast_variant<int>, noexcept_string> f;
+		f = noexcept_string("S");
+		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(f));
+
+		f = fast_variant<int>(2);
+		BOOST_CHECK_EQUAL(boost::make_optional(fast_variant<int>(2)), try_get<fast_variant<int>>(f));
+	}
 }

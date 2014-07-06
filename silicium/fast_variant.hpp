@@ -97,12 +97,23 @@ namespace Si
 		{
 			return std::forward<Visitor>(visitor)(*static_cast<Element *>(storage));
 		}
+
+		static typename std::decay<Visitor>::type::result_type
+		visit_const(Visitor &visitor, void const *storage)
+		{
+			return std::forward<Visitor>(visitor)(*static_cast<Element *>(storage));
+		}
+	};
+
+	template <class T, class U>
+	struct not_same_as : boost::mpl::not_<std::is_same<T, U>>
+	{
 	};
 
 	template <class ...T>
 	struct fast_variant
 	{
-		fast_variant()
+		fast_variant() BOOST_NOEXCEPT
 			: type(&get_type<0>())
 		{
 			typedef typename std::tuple_element<0, std::tuple<T...>>::type first_element;
@@ -127,13 +138,13 @@ namespace Si
 			return *this;
 		}
 
-		fast_variant(fast_variant &&other)
+		fast_variant(fast_variant &&other) BOOST_NOEXCEPT
 			: type(other.type)
 		{
 			type->move_construct(&storage, &other.storage);
 		}
 
-		fast_variant &operator = (fast_variant &&other)
+		fast_variant &operator = (fast_variant &&other) BOOST_NOEXCEPT
 		{
 			if (this == &other)
 			{
@@ -145,20 +156,24 @@ namespace Si
 			return *this;
 		}
 
-		template <class U, size_t Index = index_of<typename std::decay<U>::type, T...>::value>
-		fast_variant(U &&value)
+		template <
+			class U,
+			class CleanU = typename std::decay<U>::type,
+			size_t Index = index_of<CleanU, T...>::value,
+			class NoFastVariant = typename std::enable_if<not_same_as<CleanU, fast_variant<T...>>::value, void>::type>
+		fast_variant(U &&value) BOOST_NOEXCEPT
 			: type(&get_type<Index>())
 		{
 			type->move_construct(&storage, &value);
 		}
 
-		~fast_variant()
+		~fast_variant() BOOST_NOEXCEPT
 		{
 			assert(type);
 			type->destroy(&storage);
 		}
 
-		int which() const
+		int which() const BOOST_NOEXCEPT
 		{
 			return type->which();
 		}
@@ -172,13 +187,22 @@ namespace Si
 			return f[which()](visitor, &storage);
 		}
 
+		template <class Visitor>
+		auto apply_visitor(Visitor &&visitor) const
+		{
+			using result_type = typename std::decay<Visitor>::type::result_type;
+			using visit_fn = result_type (*)(Visitor &, void const *);
+			visit_fn const f[] = {&visitor_caller<Visitor, typename std::add_const<T>::type>::visit_const...};
+			return f[which()](visitor, &storage);
+		}
+
 	private:
 
 		fast_variant_vtable const *type;
 		typename std::aligned_storage<max_sizeof<T...>::value>::type storage;
 
 		template <std::size_t Index>
-		fast_variant_vtable const &get_type()
+		static fast_variant_vtable const &get_type()
 		{
 			typedef typename std::tuple_element<Index, std::tuple<T...>>::type element;
 			static fast_variant_vtable_impl<element, Index> const instance;
@@ -211,6 +235,63 @@ namespace Si
 	boost::optional<Element> try_get(fast_variant<T...> &from)
 	{
 		return apply_visitor(try_get_visitor<Element>{}, from);
+	}
+
+	template <class Element>
+	struct try_get_ptr_visitor : boost::static_visitor<Element *>
+	{
+		Element * operator()(Element &value) const
+		{
+			return &value;
+		}
+
+		template <class Other>
+		Element * operator()(Other const &) const
+		{
+			return nullptr;
+		}
+	};
+
+	template <class Element, class ...T>
+	Element *try_get_ptr(fast_variant<T...> &from)
+	{
+		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
+	}
+
+	template <class Element, class ...T>
+	Element *try_get_ptr(fast_variant<T...> const &from)
+	{
+		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
+	}
+
+	template <class ...T>
+	struct equality_visitor : boost::static_visitor<bool>
+	{
+		fast_variant<T...> const *other = nullptr;
+
+		explicit equality_visitor(fast_variant<T...> const &other)
+			: other(&other)
+		{
+		}
+
+		template <class Element>
+		bool operator()(Element &value) const
+		{
+			auto other_value = try_get_ptr<Element>(*other);
+			assert(other_value);
+			return (value == *other_value);
+		}
+	};
+
+	template <class ...T>
+	bool operator == (fast_variant<T...> const &left, fast_variant<T...> const &right)
+	{
+		if (left.which() != right.which())
+		{
+			return false;
+		}
+		equality_visitor<T...> v{right};
+		return apply_visitor(v, left);
 	}
 }
 
