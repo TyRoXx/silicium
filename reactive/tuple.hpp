@@ -2,11 +2,15 @@
 #define SILICIUM_REACTIVE_TUPLE_HPP
 
 #include <reactive/observable.hpp>
+#include <reactive/config.hpp>
 #include "detail/integer_sequence.hpp"
 #include <bitset>
 
 namespace rx
 {
+#define SILICIUM_RX_TUPLE_AVAILABLE !SILICIUM_BROKEN_VARIADIC_TEMPLATE_EXPANSION
+
+#if SILICIUM_RX_TUPLE_AVAILABLE
 	template <class ...Parts>
 	struct and_combinator : observable<std::tuple<typename Parts::element_type...>>
 	{
@@ -118,6 +122,7 @@ namespace rx
 	{
 		return and_combinator<typename std::decay<Parts>::type...>(std::make_tuple(std::forward<Parts>(parts)...));
 	}
+#endif
 }
 
 #endif

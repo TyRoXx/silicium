@@ -37,6 +37,7 @@ namespace rx
 
 namespace Si
 {
+#if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_take)
 	{
 		auto zeros = rx::generate([]{ return 0; });
@@ -46,7 +47,9 @@ namespace Si
 		std::vector<std::tuple<int, int>> const generated = rx::take(both, expected.size());
 		BOOST_CHECK(expected == generated);
 	}
+#endif
 
+#if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_transform)
 	{
 		auto twos = rx::generate([]{ return 2; });
@@ -60,7 +63,9 @@ namespace Si
 		std::vector<int> const generated = rx::take(added, expected.size());
 		BOOST_CHECK(expected == generated);
 	}
+#endif
 
+#if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_bridge)
 	{
 		auto bridge = std::make_shared<rx::bridge<int>>();
@@ -85,6 +90,7 @@ namespace Si
 		std::vector<int> const expected(1, 3);
 		BOOST_CHECK(expected == generated);
 	}
+#endif
 
 	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
 	{
@@ -174,6 +180,7 @@ namespace Si
 		BOOST_CHECK(expected == generated);
 	}
 
+#if SILICIUM_RX_VARIANT_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_make_variant)
 	{
 		rx::bridge<int> first;
@@ -204,6 +211,7 @@ namespace Si
 		BOOST_CHECK(expected == produced);
 		BOOST_CHECK(!rx::get_immediate(variants));
 	}
+#endif
 
 	template <class Element, class Action>
 	struct blocking_then_state : rx::observer<Element>
@@ -243,7 +251,7 @@ namespace Si
 	};
 
 	template <class Element, class Action>
-	auto blocking_then(boost::asio::io_service &io, rx::observable<Element> &from, Action &&action)
+	auto blocking_then(boost::asio::io_service &io, rx::observable<Element> &from, Action &&action) -> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
 	{
 		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(io, std::forward<Action>(action));
 		from.async_get_one(*state);

@@ -3,11 +3,15 @@
 
 #include <reactive/observable.hpp>
 #include <reactive/exchange.hpp>
+#include <reactive/config.hpp>
 #include <silicium/fast_variant.hpp>
 #include "detail/integer_sequence.hpp"
 
 namespace rx
 {
+#define SILICIUM_RX_VARIANT_AVAILABLE !SILICIUM_BROKEN_VARIADIC_TEMPLATE_EXPANSION
+
+#if SILICIUM_RX_VARIANT_AVAILABLE
 	template <template <class ...T> class variant, class ...Parts>
 	struct alternative : public rx::observable<variant<typename Parts::element_type...>>
 	{
@@ -123,6 +127,7 @@ namespace rx
 	{
 		return alternative<variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}
+#endif
 }
 
 #endif
