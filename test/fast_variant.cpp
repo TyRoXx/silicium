@@ -5,7 +5,13 @@
 
 namespace Si
 {
+#ifdef _MSC_VER
+	//boost::container::string is broken in Boost 1.55 with Visual C++ 2013.
+	//std::string is not nothrow_default_constructible, but that does not matter because VC++ 2013 cannot detect that anyway.
+	typedef std::string noexcept_string;
+#else
 	typedef boost::container::string noexcept_string;
+#endif
 
 	BOOST_AUTO_TEST_CASE(fast_variant_single)
 	{

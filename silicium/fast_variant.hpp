@@ -11,6 +11,7 @@
 #include <boost/mpl/find.hpp>
 #include <boost/optional.hpp>
 #include <boost/variant/static_visitor.hpp>
+#include <boost/type_traits/is_nothrow_move_assignable.hpp>
 #include <tuple>
 #include <cassert>
 #include <limits>
@@ -56,8 +57,10 @@ namespace Si
 	template <class Element, std::size_t Index>
 	struct fast_variant_vtable_impl : fast_variant_vtable
 	{
+#ifndef _MSC_VER //these type traits do not work at all in Visual C++ 2013
 		static_assert(std::is_nothrow_move_assignable<Element>::value, "noexcept move assignment operator required");
 		static_assert(std::is_nothrow_move_constructible<Element>::value, "noexcept move constructor required");
+#endif
 
 		virtual int which() const SILICIUM_OVERRIDE
 		{
@@ -118,7 +121,9 @@ namespace Si
 			: type(&get_type<0>())
 		{
 			typedef typename std::tuple_element<0, std::tuple<T...>>::type first_element;
+#ifndef _MSC_VER //is_nothrow_default_constructible does not work at all in Visual C++ 2013
 			static_assert(std::is_nothrow_default_constructible<first_element>::value, "noexcept default constructor required");
+#endif
 			type->default_construct(&storage);
 		}
 
