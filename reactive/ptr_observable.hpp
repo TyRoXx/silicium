@@ -3,6 +3,7 @@
 
 #include <reactive/observable.hpp>
 #include <silicium/override.hpp>
+#include <boost/config.hpp>
 #include <memory>
 
 namespace rx
