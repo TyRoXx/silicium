@@ -4,8 +4,10 @@
 #include <new>
 #include <type_traits>
 #include <silicium/override.hpp>
-#include <boost/mpl/min_max.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/transform_view.hpp>
+#include <boost/mpl/max_element.hpp>
+#include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/find.hpp>
 #include <boost/optional.hpp>
 #include <boost/variant/static_visitor.hpp>
@@ -16,18 +18,16 @@
 namespace Si
 {
 	template <class ...T>
-	struct max_sizeof;
-
-	template <class Head, class ...Tail>
-	struct max_sizeof<Head, Tail...> : boost::mpl::max<boost::mpl::int_<sizeof(Head)>, typename max_sizeof<Tail...>::type>::type
+	struct max_sizeof
 	{
+		static std::size_t const value = boost::mpl::max_element<
+			boost::mpl::transform_view<
+				boost::mpl::vector<T...>,
+				boost::mpl::sizeof_<boost::mpl::_1>
+			>
+		>::type::type::value;
 	};
-
-	template <>
-	struct max_sizeof<> : boost::mpl::int_<0>
-	{
-	};
-
+	
 	template <class First, class ...T>
 	struct first
 	{
