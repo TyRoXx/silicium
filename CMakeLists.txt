@@ -37,6 +37,11 @@ if(SDL2_FOUND)
 	include_directories(${LIBSDL2_INCLUDE_DIR})
 endif()
 
+find_package(Lua51)
+if(LUA51_FOUND)
+	include_directories(${LUA_INCLUDE_DIR})
+endif()
+
 include_directories(".")
 add_subdirectory("silicium")
 add_subdirectory("test")
