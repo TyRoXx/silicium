@@ -113,13 +113,13 @@ namespace rx
 	};
 
 	template <class ...Parts>
-	auto make_variant(Parts &&...parts)
+	auto make_variant(Parts &&...parts) -> alternative<Si::fast_variant, typename std::decay<Parts>::type...>
 	{
 		return alternative<Si::fast_variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}
 
 	template <template <class ...T> class variant, class ...Parts>
-	auto make_variant(Parts &&...parts)
+	auto make_variant(Parts &&...parts) -> alternative<variant, typename std::decay<Parts>::type...>
 	{
 		return alternative<variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}

@@ -145,7 +145,7 @@ namespace rx
 	};
 
 	template <class Element, class Action>
-	auto make_coroutine(Action &&action)
+	auto make_coroutine(Action &&action) -> coroutine_observable<Element>
 	{
 		return coroutine_observable<Element>(std::forward<Action>(action));
 	}

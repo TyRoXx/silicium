@@ -28,7 +28,7 @@ namespace rx
 	};
 
 	template <class Generated>
-	auto generate(Generated &&generate)
+	auto generate(Generated &&generate) -> generator<typename std::decay<Generated>::type>
 	{
 		return generator<typename std::decay<Generated>::type>(std::forward<Generated>(generate));
 	}

@@ -19,7 +19,7 @@
 
 namespace ranges
 {
-    inline namespace v3
+    namespace v3
     {
         ////////////////////////////////////////////////////////////////////////////////////////
         // size_t
@@ -32,10 +32,7 @@ namespace ranges
         struct integer_sequence
         {
             using value_type = std::size_t;
-            static constexpr std::size_t size() noexcept
-            {
-                return sizeof...(Is);
-            }
+		//	static std::size_t const size = sizeof...(Is);
         };
 
         namespace detail

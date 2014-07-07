@@ -100,7 +100,7 @@ namespace rx
 	};
 
 	template <class Original>
-	auto make_buffer(Original &&from, std::size_t size)
+	auto make_buffer(Original &&from, std::size_t size) -> buffer<typename std::decay<Original>::type::element_type, typename std::decay<Original>::type>
 	{
 		typedef typename std::decay<Original>::type clean_original;
 		typedef typename clean_original::element_type element;

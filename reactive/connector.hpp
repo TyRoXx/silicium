@@ -95,7 +95,9 @@ namespace rx
 	};
 
 	template <class SharedSocketFactory, class EndpointObservable>
-	auto connect(SharedSocketFactory create_socket, EndpointObservable destination)
+	auto connect(SharedSocketFactory create_socket, EndpointObservable destination) -> connector<
+		typename std::decay<SharedSocketFactory>::type,
+		typename std::decay<EndpointObservable>::type>
 	{
 		return connector<
 				typename std::decay<SharedSocketFactory>::type,

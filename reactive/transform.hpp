@@ -55,7 +55,10 @@ namespace rx
 	};
 
 	template <class Transform, class Original>
-	auto transform(Original &&original, Transform &&transform)
+	auto transform(Original &&original, Transform &&transform) -> transformation<
+		typename std::decay<Transform>::type,
+		typename std::decay<Original>::type
+	>
 	{
 		return transformation<
 				typename std::decay<Transform>::type,

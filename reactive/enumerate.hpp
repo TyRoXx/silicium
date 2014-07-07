@@ -82,7 +82,7 @@ namespace rx
 	};
 
 	template <class RangeObservable>
-	auto enumerate(RangeObservable &&ranges)
+	auto enumerate(RangeObservable &&ranges) -> enumerator<typename std::decay<RangeObservable>::type>
 	{
 		return enumerator<typename std::decay<RangeObservable>::type>(std::forward<RangeObservable>(ranges));
 	}

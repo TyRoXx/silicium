@@ -12,6 +12,8 @@ namespace rx
 	{
 		typedef Element element_type;
 
+		BOOST_DEFAULTED_FUNCTION(ptr_observable(), {})
+
 		explicit ptr_observable(Ptr content)
 			: content(std::move(content))
 		{
@@ -38,25 +40,25 @@ namespace rx
 	using unique_observable = ptr_observable<Element, std::unique_ptr<observable<Element>>>;
 
 	template <class Element, class Content>
-	auto box(Content &&content)
+	auto box(Content &&content) -> ptr_observable<Element, std::unique_ptr<observable<Element>>>
 	{
 		return ptr_observable<Element, std::unique_ptr<observable<Element>>>(std::unique_ptr<observable<Element>>(new typename std::decay<Content>::type(std::forward<Content>(content))));
 	}
 
 	template <class Element, class Content>
-	auto wrap(Content &&content)
+	auto wrap(Content &&content) -> ptr_observable<Element, std::shared_ptr<observable<Element>>>
 	{
 		return ptr_observable<Element, std::shared_ptr<observable<Element>>>(std::make_shared<typename std::decay<Content>::type>(std::forward<Content>(content)));
 	}
 
 	template <class Element>
-	auto ref(rx::observable<Element> &identity)
+	auto ref(rx::observable<Element> &identity) -> rx::ptr_observable<Element, rx::observable<Element> *>
 	{
 		return rx::ptr_observable<Element, rx::observable<Element> *>(&identity);
 	}
 
 	template <class Observable, class ...Args>
-	auto make_wrapped(Args &&...args)
+	auto make_wrapped(Args &&...args) -> ptr_observable<typename Observable::element_type, std::shared_ptr<Observable>>
 	{
 		typedef typename Observable::element_type element_type;
 		typedef std::shared_ptr<Observable> ptr_type;

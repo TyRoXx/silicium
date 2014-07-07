@@ -72,13 +72,13 @@ namespace rx
 	};
 
 	template <class Input>
-	auto cache(Input &&input)
+	auto cache(Input &&input) -> cache_observable<typename std::decay<Input>::type>
 	{
 		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input), boost::none);
 	}
 
 	template <class Input, class Cached>
-	auto cache(Input &&input, Cached &&initially)
+	auto cache(Input &&input, Cached &&initially) -> cache_observable<typename std::decay<Input>::type>
 	{
 		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input), std::forward<Cached>(initially));
 	}

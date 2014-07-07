@@ -191,7 +191,7 @@ namespace Si
 		}
 
 		template <class Visitor>
-		auto apply_visitor(Visitor &&visitor)
+		auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
 		{
 			using result_type = typename std::decay<Visitor>::type::result_type;
 			using visit_fn = result_type (*)(Visitor &, void *);
@@ -200,7 +200,7 @@ namespace Si
 		}
 
 		template <class Visitor>
-		auto apply_visitor(Visitor &&visitor) const
+		auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
 		{
 			using result_type = typename std::decay<Visitor>::type::result_type;
 			using visit_fn = result_type (*)(Visitor &, void const *);
@@ -250,7 +250,7 @@ namespace Si
 	};
 
 	template <class Visitor, class Variant>
-	auto apply_visitor(Visitor &&visitor, Variant &&variant)
+	auto apply_visitor(Visitor &&visitor, Variant &&variant) -> typename std::decay<Visitor>::type::result_type
 	{
 		return std::forward<Variant>(variant).apply_visitor(std::forward<Visitor>(visitor));
 	}

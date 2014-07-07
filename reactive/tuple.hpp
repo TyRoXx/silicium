@@ -114,7 +114,7 @@ namespace rx
 	};
 
 	template <class ...Parts>
-	auto make_tuple(Parts &&...parts)
+	auto make_tuple(Parts &&...parts) -> and_combinator<typename std::decay<Parts>::type...>
 	{
 		return and_combinator<typename std::decay<Parts>::type...>(std::make_tuple(std::forward<Parts>(parts)...));
 	}
