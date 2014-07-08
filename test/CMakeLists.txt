@@ -1,3 +1,6 @@
 file(GLOB sources "*.hpp" "*.cpp" "../silicium/*.hpp" "../reactive/*.hpp")
-add_executable(test ${sources})
+if(LUA51_FOUND)
+	file(GLOB luaSources "lua/*.cpp")
+endif()
+add_executable(test ${sources} ${luaSources})
 target_link_libraries(test silicium ${Boost_LIBRARIES} ${LUA_LIBRARIES})
