@@ -95,21 +95,47 @@ namespace rx
 			s->receiver = &receiver;
 			if (s->was_resumed)
 			{
-				lua_resume(s->thread, 0);
+				int const rc = lua_resume(s->thread, 0);
+				if (LUA_YIELD == rc)
+				{
+					return;
+				}
+				if (rc != 0)
+				{
+					throw std::logic_error("error handling not implemented yet");
+				}
+				if (s->receiver)
+				{
+					exchange(s->receiver, nullptr)->ended();
+				}
 			}
 			else
 			{
+				s->was_resumed = true;
 				void *bound_state = lua_newuserdata(s->thread, sizeof(weak_state));
 				new (static_cast<weak_state *>(bound_state)) weak_state(s);
 				//TODO __gc
 				//TODO error handling
 				lua_pushcclosure(s->thread, lua_thread::yield, 1);
-				lua_resume(s->thread, 1);
+				int const rc = lua_resume(s->thread, 1);
+				if (LUA_YIELD == rc)
+				{
+					return;
+				}
+				if (rc != 0)
+				{
+					throw std::logic_error("error handling not implemented yet");
+				}
+				if (s->receiver)
+				{
+					exchange(s->receiver, nullptr)->ended();
+				}
 			}
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
 		{
+			assert(s->receiver);
 			s.reset();
 		}
 
@@ -143,7 +169,7 @@ namespace rx
 			}
 			assert(locked_state->receiver);
 			exchange(locked_state->receiver, nullptr)->got_element(locked_state->from_lua(*thread, -1));
-			return 0;
+			return lua_yield(thread, 0);
 		}
 	};
 
@@ -153,11 +179,87 @@ namespace rx
 		lua_remove(&lua, -3);
 	}
 
+	struct pinned_value
+	{
+		pinned_value() BOOST_NOEXCEPT
+		{
+		}
+
+		pinned_value(pinned_value &&other) BOOST_NOEXCEPT
+			: lua(other.lua)
+		{
+			*this = std::move(other);
+		}
+
+		explicit pinned_value(lua_State &lua, int idx)
+			: lua(&lua)
+		{
+			push_key(*this);
+			lua_pushvalue(&lua, idx);
+			lua_settable(&lua, LUA_REGISTRYINDEX);
+		}
+
+		~pinned_value() BOOST_NOEXCEPT
+		{
+			if (!lua)
+			{
+				return;
+			}
+			remove_this();
+		}
+
+		pinned_value &operator = (pinned_value &&other) BOOST_NOEXCEPT
+		{
+			if (lua)
+			{
+				remove_this();
+			}
+			else
+			{
+				lua = other.lua;
+			}
+			if (!other.lua)
+			{
+				lua = nullptr;
+				return *this;
+			}
+			assert(lua == other.lua);
+
+			push_key(other);
+			lua_gettable(lua, LUA_REGISTRYINDEX);
+
+			push_key(*this);
+			swap_top(*lua);
+			lua_settable(lua, LUA_REGISTRYINDEX);
+			return *this;
+		}
+
+	private:
+
+		lua_State *lua = nullptr;
+
+		BOOST_DELETED_FUNCTION(pinned_value(pinned_value const &))
+		BOOST_DELETED_FUNCTION(pinned_value &operator = (pinned_value const &))
+
+		void remove_this()
+		{
+			push_key(*this);
+			lua_pushnil(lua);
+			lua_settable(lua, LUA_REGISTRYINDEX);
+		}
+
+		void push_key(pinned_value &pin)
+		{
+			lua_pushlightuserdata(lua, &pin);
+		}
+	};
+
 	template <class Element, class ElementFromLua>
 	auto make_lua_thread(lua_State &parent, ElementFromLua &&from_lua)
 	{
 		lua_State * const coro = lua_newthread(&parent);
-		lua_xmove(&parent, coro, 2);
+		//pinned_value coro_pin(parent, -1);
+		lua_xmove(&parent, coro, 1);
 		swap_top(*coro);
 		return lua_thread<Element, typename std::decay<ElementFromLua>::type>(parent, std::forward<ElementFromLua>(from_lua));
 	}
@@ -175,5 +277,17 @@ namespace Si
 		}
 
 		auto thread = rx::make_lua_thread<lua_Integer>(*L, [](lua_State &lua, int idx) -> lua_Integer { return lua_tointeger(&lua, idx); });
+		std::vector<lua_Integer> generated;
+		auto consumer = rx::consume<lua_Integer>([&generated](boost::optional<lua_Integer> element)
+		{
+			BOOST_REQUIRE(element);
+			generated.emplace_back(*element);
+		});
+		thread.async_get_one(consumer);
+		BOOST_REQUIRE_EQUAL(1, generated.size());
+		thread.async_get_one(consumer);
+		BOOST_REQUIRE_EQUAL(2, generated.size());
+		std::vector<lua_Integer> const expected{4, 5};
+		BOOST_CHECK(expected == generated);
 	}
 }
