@@ -37,16 +37,13 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(lua)
 	{
 		auto L = open_lua();
-		// src
-		BOOST_REQUIRE_EQUAL(0, luaL_loadstring(L.get(), "return function (yield) yield(4) end"));
-		// fn
-		if (0 != lua_pcall(L.get(), 0, 1, 0))
+
+		lua_State * const coro = lua_newthread(L.get());
+		BOOST_REQUIRE_EQUAL(0, luaL_loadstring(coro, "return function (yield) yield(4) yield(5) end"));
+		if (0 != lua_pcall(coro, 0, 1, 0))
 		{
 			throw std::runtime_error(lua_tostring(L.get(), -1));
 		}
-
-		lua_State * const coro = lua_newthread(L.get());
-		lua_xmove(L.get(), coro, 1);
 
 		rx::bridge<int> yielded;
 		// fn &yielded
@@ -61,11 +58,24 @@ namespace Si
 			got = element;
 		});
 
-		yielded.async_get_one(consumer);
-		if (LUA_YIELD != lua_resume(L.get(), 1))
 		{
-			throw std::runtime_error(lua_tostring(coro, -1));
+			yielded.async_get_one(consumer);
+			int rc = lua_resume(coro, 1);
+			if (LUA_YIELD != rc)
+			{
+				throw std::runtime_error(lua_tostring(coro, -1));
+			}
+			BOOST_CHECK_EQUAL(boost::make_optional(4), got);
 		}
-		BOOST_CHECK_EQUAL(boost::make_optional(4), got);
+
+		{
+			yielded.async_get_one(consumer);
+			int rc = lua_resume(coro, 1);
+			if (LUA_YIELD != rc)
+			{
+				throw std::runtime_error(lua_tostring(coro, -1));
+			}
+			BOOST_CHECK_EQUAL(boost::make_optional(5), got);
+		}
 	}
 }
