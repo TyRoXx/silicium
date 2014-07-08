@@ -80,99 +80,6 @@ namespace Si
 
 namespace rx
 {
-	template <class Element, class ElementFromLua>
-	struct lua_thread : public observable<Element>
-	{
-		using element_type = Element;
-
-		explicit lua_thread(lua_State &thread, ElementFromLua from_lua)
-			: s(std::make_shared<state>(thread, std::move(from_lua)))
-		{
-		}
-
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
-		{
-			s->receiver = &receiver;
-			if (s->was_resumed)
-			{
-				int const rc = lua_resume(s->thread, 0);
-				if (LUA_YIELD == rc)
-				{
-					return;
-				}
-				if (rc != 0)
-				{
-					throw std::logic_error("error handling not implemented yet");
-				}
-				if (s->receiver)
-				{
-					exchange(s->receiver, nullptr)->ended();
-				}
-			}
-			else
-			{
-				s->was_resumed = true;
-				void *bound_state = lua_newuserdata(s->thread, sizeof(weak_state));
-				new (static_cast<weak_state *>(bound_state)) weak_state(s);
-				//TODO __gc
-				//TODO error handling
-				lua_pushcclosure(s->thread, lua_thread::yield, 1);
-				int const rc = lua_resume(s->thread, 1);
-				if (LUA_YIELD == rc)
-				{
-					return;
-				}
-				if (rc != 0)
-				{
-					throw std::logic_error("error handling not implemented yet");
-				}
-				if (s->receiver)
-				{
-					exchange(s->receiver, nullptr)->ended();
-				}
-			}
-		}
-
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-			assert(s->receiver);
-			s.reset();
-		}
-
-	private:
-
-		struct state
-		{
-			//TODO: keep the Lua thread alive
-			lua_State *thread = nullptr;
-			ElementFromLua from_lua;
-			bool was_resumed = false;
-			observer<element_type> *receiver = nullptr;
-
-			explicit state(lua_State &thread, ElementFromLua from_lua)
-				: thread(&thread)
-				, from_lua(std::move(from_lua))
-			{
-			}
-		};
-		typedef std::weak_ptr<state> weak_state;
-
-		std::shared_ptr<state> s;
-
-		static int yield(lua_State *thread)
-		{
-			weak_state * const bound_state = static_cast<weak_state *>(lua_touserdata(thread, lua_upvalueindex(1)));
-			std::shared_ptr<state> locked_state = bound_state->lock();
-			if (!locked_state)
-			{
-				return 0;
-			}
-			assert(locked_state->receiver);
-			exchange(locked_state->receiver, nullptr)->got_element(locked_state->from_lua(*thread, -1));
-			return lua_yield(thread, 0);
-		}
-	};
-
 	inline void swap_top(lua_State &lua)
 	{
 		lua_pushvalue(&lua, -2);
@@ -255,12 +162,107 @@ namespace rx
 	};
 
 	template <class Element, class ElementFromLua>
+	struct lua_thread : public observable<Element>
+	{
+		using element_type = Element;
+
+		explicit lua_thread(lua_State &thread, ElementFromLua from_lua)
+			: s(std::make_shared<state>(thread, std::move(from_lua)))
+		{
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			s->receiver = &receiver;
+			if (s->was_resumed)
+			{
+				int const rc = lua_resume(s->thread, 0);
+				if (LUA_YIELD == rc)
+				{
+					return;
+				}
+				if (rc != 0)
+				{
+					throw std::logic_error("error handling not implemented yet");
+				}
+				if (s->receiver)
+				{
+					exchange(s->receiver, nullptr)->ended();
+				}
+			}
+			else
+			{
+				s->was_resumed = true;
+				void *bound_state = lua_newuserdata(s->thread, sizeof(weak_state));
+				new (static_cast<weak_state *>(bound_state)) weak_state(s);
+				//TODO __gc
+				//TODO error handling
+				lua_pushcclosure(s->thread, lua_thread::yield, 1);
+				int const rc = lua_resume(s->thread, 1);
+				if (LUA_YIELD == rc)
+				{
+					return;
+				}
+				if (rc != 0)
+				{
+					throw std::logic_error("error handling not implemented yet");
+				}
+				if (s->receiver)
+				{
+					exchange(s->receiver, nullptr)->ended();
+				}
+			}
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			assert(s->receiver);
+			s.reset();
+		}
+
+	private:
+
+		struct state
+		{
+			//TODO: keep the Lua thread alive
+			lua_State *thread = nullptr;
+			ElementFromLua from_lua;
+			bool was_resumed = false;
+			observer<element_type> *receiver = nullptr;
+			pinned_value thread_pin;
+
+			explicit state(lua_State &thread, ElementFromLua from_lua)
+				: thread(&thread)
+				, from_lua(std::move(from_lua))
+			{
+				lua_pushthread(&thread);
+				thread_pin = pinned_value(thread, -1);
+				lua_pop(&thread, 1);
+			}
+		};
+		typedef std::weak_ptr<state> weak_state;
+
+		std::shared_ptr<state> s;
+
+		static int yield(lua_State *thread)
+		{
+			weak_state * const bound_state = static_cast<weak_state *>(lua_touserdata(thread, lua_upvalueindex(1)));
+			std::shared_ptr<state> locked_state = bound_state->lock();
+			if (!locked_state)
+			{
+				return 0;
+			}
+			assert(locked_state->receiver);
+			exchange(locked_state->receiver, nullptr)->got_element(locked_state->from_lua(*thread, -1));
+			return lua_yield(thread, 0);
+		}
+	};
+
+	template <class Element, class ElementFromLua>
 	auto make_lua_thread(lua_State &parent, ElementFromLua &&from_lua)
 	{
 		lua_State * const coro = lua_newthread(&parent);
-		//pinned_value coro_pin(parent, -1);
 		lua_xmove(&parent, coro, 1);
-		swap_top(*coro);
 		return lua_thread<Element, typename std::decay<ElementFromLua>::type>(parent, std::forward<ElementFromLua>(from_lua));
 	}
 }
