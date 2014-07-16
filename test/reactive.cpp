@@ -347,7 +347,7 @@ namespace rx
 	};
 
 	template <class Element>
-	struct signal
+	struct signal : boost::noncopyable
 	{
 		typedef connection<Element> connection_type;
 
