@@ -22,7 +22,8 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_assignment_same)
 	{
-		fast_variant<int, noexcept_string> v(1), w(2);
+		typedef fast_variant<int, noexcept_string> variant;
+		variant v(1), w(2);
 		BOOST_CHECK_EQUAL(boost::make_optional(1), try_get<int>(v));
 		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(w));
 		v = w;

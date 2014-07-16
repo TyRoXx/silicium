@@ -2,6 +2,10 @@
 #define SILICIUM_REACTIVE_TRANSFORM_HPP
 
 #include <reactive/observable.hpp>
+#include <type_traits>
+#include <utility>
+#include <cassert>
+#include <silicium/override.hpp>
 
 namespace rx
 {

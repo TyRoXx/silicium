@@ -24,3 +24,6 @@ if(SDL2_FOUND)
 	add_executable(sdl "sdl.cpp")
 	target_link_libraries(sdl ${Boost_LIBRARIES} ${SDL2_LIBRARY})
 endif()
+
+add_executable(rxhttp "rxhttp.cpp")
+target_link_libraries(rxhttp ${Boost_LIBRARIES})
