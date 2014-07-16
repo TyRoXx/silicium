@@ -174,21 +174,10 @@ namespace rx
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			s->receiver = &receiver;
+			int rc;
 			if (s->was_resumed)
 			{
-				int const rc = lua_resume(s->thread, 0);
-				if (LUA_YIELD == rc)
-				{
-					return;
-				}
-				if (rc != 0)
-				{
-					throw std::logic_error("error handling not implemented yet");
-				}
-				if (s->receiver)
-				{
-					exchange(s->receiver, nullptr)->ended();
-				}
+				rc = lua_resume(s->thread, 0);
 			}
 			else
 			{
@@ -204,19 +193,19 @@ namespace rx
 				lua_setmetatable(s->thread, -2);
 
 				lua_pushcclosure(s->thread, lua_thread::yield, 1);
-				int const rc = lua_resume(s->thread, 1);
-				if (LUA_YIELD == rc)
-				{
-					return;
-				}
-				if (rc != 0)
-				{
-					throw std::logic_error("error handling not implemented yet");
-				}
-				if (s->receiver)
-				{
-					exchange(s->receiver, nullptr)->ended();
-				}
+				rc = lua_resume(s->thread, 1);
+			}
+			if (LUA_YIELD == rc)
+			{
+				return;
+			}
+			if (rc != 0)
+			{
+				throw std::logic_error("error handling not implemented yet");
+			}
+			if (s->receiver)
+			{
+				exchange(s->receiver, nullptr)->ended();
 			}
 		}
 
