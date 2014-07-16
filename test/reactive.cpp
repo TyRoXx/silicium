@@ -17,6 +17,7 @@
 #include <boost/container/string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/bind.hpp>
+#include <boost/container/flat_map.hpp>
 
 namespace rx
 {
@@ -270,5 +271,129 @@ namespace Si
 			BOOST_CHECK_EQUAL(0, ec);
 		});
 		io.run();
+	}
+}
+
+namespace rx
+{
+	template <class Element>
+	using signal_observer_map = boost::container::flat_map<observer<Element> *, bool>;
+
+	template <class Element>
+	struct connection : observable<Element>
+	{
+		typedef Element element_type;
+
+		connection()
+		{
+		}
+
+		explicit connection(signal_observer_map<Element> &connections)
+			: connections(&connections)
+		{
+		}
+
+		connection(connection &&other)
+			: connections(other.connections)
+			, receiver_(other.receiver_)
+		{
+			other.connections = nullptr;
+			other.receiver_ = nullptr;
+		}
+
+		connection &operator = (connection &&other)
+		{
+			boost::swap(connections, other.connections);
+			boost::swap(receiver_, other.receiver_);
+			return *this;
+		}
+
+		~connection()
+		{
+			if (!connections)
+			{
+				return;
+			}
+			connections->erase(receiver_);
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			auto * const old_receiver = receiver_;
+			connections->insert(std::make_pair(&receiver, true)).first->second = true;
+			if (old_receiver && (old_receiver != &receiver))
+			{
+				auto i = connections->find(receiver_);
+				assert(i->second);
+				connections->erase(i);
+			}
+			receiver_ = &receiver;
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			size_t erased = connections->erase(exchange(receiver_, nullptr));
+			assert(erased == 1);
+		}
+
+	private:
+
+		signal_observer_map<Element> *connections = nullptr;
+		observer<Element> *receiver_ = nullptr;
+
+		BOOST_DELETED_FUNCTION(connection(connection const &))
+		BOOST_DELETED_FUNCTION(connection &operator = (connection const &))
+	};
+
+	template <class Element>
+	struct signal
+	{
+		typedef connection<Element> connection_type;
+
+		connection_type connect()
+		{
+			return connection_type(observers);
+		}
+
+		void emit_one(Element const &value)
+		{
+			for (auto &observer : observers)
+			{
+				if (observer.second)
+				{
+					observer.second = false;
+					observer.first->got_element(value);
+				}
+			}
+		}
+
+	private:
+
+		signal_observer_map<Element> observers;
+	};
+}
+
+namespace
+{
+	BOOST_AUTO_TEST_CASE(reactive_signal)
+	{
+		rx::signal<int> s;
+		auto con1 = s.connect();
+		auto con2 = s.connect();
+		std::vector<int> generated;
+		auto consumer = rx::consume<int>([&generated](boost::optional<int> value)
+		{
+			BOOST_REQUIRE(value);
+			generated.emplace_back(*value);
+		});
+		con1.async_get_one(consumer);
+		s.emit_one(2);
+		con2 = std::move(con1);
+		con2.async_get_one(consumer);
+		s.emit_one(3);
+		s.emit_one(4);
+		std::vector<int> const expected{2, 3};
+		BOOST_CHECK(expected == generated);
 	}
 }
