@@ -195,8 +195,14 @@ namespace rx
 				s->was_resumed = true;
 				void *bound_state = lua_newuserdata(s->thread, sizeof(weak_state));
 				new (static_cast<weak_state *>(bound_state)) weak_state(s);
-				//TODO __gc
+
 				//TODO error handling
+				//TODO reuse the metatable
+				lua_newtable(s->thread);
+				lua_pushcfunction(s->thread, garbage_collect_weak_state);
+				lua_setfield(s->thread, -2, "__gc");
+				lua_setmetatable(s->thread, -2);
+
 				lua_pushcclosure(s->thread, lua_thread::yield, 1);
 				int const rc = lua_resume(s->thread, 1);
 				if (LUA_YIELD == rc)
@@ -224,7 +230,6 @@ namespace rx
 
 		struct state
 		{
-			//TODO: keep the Lua thread alive
 			lua_State *thread = nullptr;
 			ElementFromLua from_lua;
 			bool was_resumed = false;
@@ -255,6 +260,13 @@ namespace rx
 			assert(locked_state->receiver);
 			exchange(locked_state->receiver, nullptr)->got_element(locked_state->from_lua(*thread, -1));
 			return lua_yield(thread, 0);
+		}
+
+		static int garbage_collect_weak_state(lua_State *thread)
+		{
+			auto &ptr = *static_cast<weak_state *>(lua_touserdata(thread, 1));
+			ptr.~weak_state();
+			return 0;
 		}
 	};
 
@@ -287,6 +299,10 @@ namespace Si
 		});
 		thread.async_get_one(consumer);
 		BOOST_REQUIRE_EQUAL(1, generated.size());
+
+		//make sure that the Lua thread is kept alive properly by trying to collect it before the next resume
+		lua_gc(L.get(), LUA_GCCOLLECT, 0);
+
 		thread.async_get_one(consumer);
 		BOOST_REQUIRE_EQUAL(2, generated.size());
 		std::vector<lua_Integer> const expected{4, 5};
