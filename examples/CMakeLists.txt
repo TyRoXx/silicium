@@ -27,3 +27,6 @@ endif()
 
 add_executable(rxhttp "rxhttp.cpp")
 target_link_libraries(rxhttp ${Boost_LIBRARIES})
+
+add_executable(watchdir "watchdir.cpp")
+target_link_libraries(watchdir ${Boost_LIBRARIES})
