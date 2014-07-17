@@ -3,6 +3,7 @@
 #include <silicium/fast_variant.hpp>
 #include <reactive/total_consumer.hpp>
 #include <reactive/consume.hpp>
+#include <reactive/enumerate.hpp>
 #include <boost/asio.hpp>
 #include <sys/inotify.h>
 #include <dirent.h>
@@ -150,12 +151,9 @@ int main()
 	boost::asio::io_service io;
 	rx::file_system_notifier notifier(io);
 	auto w = notifier.watch("/home/virtual/dev", IN_ALL_EVENTS);
-	auto printer = rx::transform(rx::ref(notifier), [](rx::file_system_notifier::element_type const &events) -> rx::detail::nothing
+	auto printer = rx::transform(rx::enumerate(rx::ref(notifier)), [](rx::file_system_change const &event) -> rx::detail::nothing
 	{
-		for (auto const &event : events)
-		{
-			std::cerr << event.mask << " " << event.name << '\n';
-		}
+		std::cerr << event.mask << " " << event.name << '\n';
 		return rx::detail::nothing{};
 	});
 	auto all = rx::make_total_consumer(printer);
