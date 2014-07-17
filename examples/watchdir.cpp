@@ -54,7 +54,7 @@ namespace rx
 	private:
 
 		int notifier = -1;
-		int watch;
+		int watch = -1;
 	};
 
 	struct file_system_notifier : observable<std::vector<file_system_change>>
