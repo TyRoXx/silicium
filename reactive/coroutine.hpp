@@ -2,7 +2,8 @@
 #define SILICIUM_REACTIVE_COROUTINE_HPP
 
 #include <reactive/transform.hpp>
-#include <reactive/ptr_observable.hpp>
+#include <reactive/config.hpp>
+#include <reactive/ref.hpp>
 #include <reactive/exchange.hpp>
 #include <boost/coroutine/all.hpp>
 #include <silicium/fast_variant.hpp>
@@ -15,10 +16,6 @@ namespace rx
 		struct result
 		{
 			Element value;
-		};
-
-		struct nothing
-		{
 		};
 
 		struct yield

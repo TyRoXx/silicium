@@ -2,9 +2,12 @@
 #define SILICIUM_REACTIVE_ENUMERATE_HPP
 
 #include <reactive/observable.hpp>
+#include <reactive/exchange.hpp>
+#include <silicium/override.hpp>
 #include <boost/range/begin.hpp>
 #include <queue>
-#include <silicium/override.hpp>
+#include <stdexcept>
+#include <cassert>
 
 namespace rx
 {

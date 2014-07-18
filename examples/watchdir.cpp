@@ -1,26 +1,9 @@
-#include <reactive/coroutine.hpp>
-#include <silicium/http/http.hpp>
-#include <silicium/fast_variant.hpp>
-#include <reactive/total_consumer.hpp>
-#include <reactive/consume.hpp>
 #include <reactive/enumerate.hpp>
+#include <reactive/for_each.hpp>
+#include <reactive/ref.hpp>
 #include <reactive/linux/inotify.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/numeric.hpp>
-
-namespace rx
-{
-	template <class Input, class Handler>
-	auto for_each(Input &&input, Handler &&handle_element)
-	{
-		typedef typename std::decay<Input>::type::element_type element;
-		return make_total_consumer(rx::transform(std::forward<Input>(input), [handle_element](element value) -> detail::nothing
-		{
-			handle_element(std::move(value));
-			return {};
-		}));
-	}
-}
 
 namespace
 {

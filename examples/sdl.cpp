@@ -1,5 +1,5 @@
 #include <reactive/bridge.hpp>
-#include <reactive/ptr_observable.hpp>
+#include <reactive/ref.hpp>
 #include <reactive/transform.hpp>
 #include <reactive/while.hpp>
 #include <reactive/finite_state_machine.hpp>
