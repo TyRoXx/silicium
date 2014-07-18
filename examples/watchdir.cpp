@@ -82,11 +82,6 @@ namespace rx
 				}
 			}
 
-			~inotify_observable() BOOST_NOEXCEPT
-			{
-				close(notifier.native_handle());
-			}
-
 			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask)
 			{
 				int wd = inotify_add_watch(notifier.native_handle(), target.string().c_str(), mask);
