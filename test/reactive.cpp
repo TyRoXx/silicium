@@ -405,7 +405,7 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 	boost::asio::io_service io;
 	rx::timer<> t(io, std::chrono::microseconds(1));
 	std::size_t elapsed_count = 0;
-	auto coro = rx::make_total_consumer(rx::make_coroutine<rx::detail::nothing>([&t, &elapsed_count](rx::yield_context<rx::detail::nothing> &yield)
+	auto coro = rx::make_total_consumer(rx::make_coroutine<rx::detail::nothing>([&t, &elapsed_count](rx::yield_context<> &yield)
 	{
 		BOOST_REQUIRE_EQUAL(0, elapsed_count);
 		boost::optional<rx::timer_elapsed> e = yield.get_one(t);

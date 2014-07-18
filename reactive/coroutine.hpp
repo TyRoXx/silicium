@@ -30,7 +30,7 @@ namespace rx
 		};
 	}
 
-	template <class Element>
+	template <class Element = detail::nothing>
 	struct yield_context
 	{
 		typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type>::push_type consumer_type;
