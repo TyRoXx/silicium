@@ -60,7 +60,7 @@ namespace rx
 			int watch = -1;
 		};
 
-		struct inotify_observable : observable<std::vector<file_notification>>
+		struct inotify_observable : observable<std::vector<file_notification>>, boost::noncopyable
 		{
 			typedef std::vector<file_notification> element_type;
 
