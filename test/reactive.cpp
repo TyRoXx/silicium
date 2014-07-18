@@ -4,7 +4,9 @@
 #include <reactive/coroutine.hpp>
 #include <reactive/generate.hpp>
 #include <reactive/consume.hpp>
+#include <reactive/timer.hpp>
 #include <reactive/tuple.hpp>
+#include <reactive/total_consumer.hpp>
 #include <reactive/ptr_observable.hpp>
 #include <reactive/transform.hpp>
 #include <reactive/bridge.hpp>
@@ -396,4 +398,21 @@ namespace
 		std::vector<int> const expected{2, 3};
 		BOOST_CHECK(expected == generated);
 	}
+}
+
+BOOST_AUTO_TEST_CASE(reactive_timer)
+{
+	boost::asio::io_service io;
+	rx::timer<> t(io, std::chrono::microseconds(1));
+	std::size_t elapsed_count = 0;
+	auto coro = rx::make_total_consumer(rx::make_coroutine<rx::detail::nothing>([&t, &elapsed_count](rx::yield_context<rx::detail::nothing> &yield)
+	{
+		BOOST_REQUIRE_EQUAL(0, elapsed_count);
+		boost::optional<rx::timer_elapsed> e = yield.get_one(t);
+		BOOST_REQUIRE(e);
+		++elapsed_count;
+	}));
+	coro.start();
+	io.run();
+	BOOST_CHECK_EQUAL(1, elapsed_count);
 }

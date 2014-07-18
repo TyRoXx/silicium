@@ -12,11 +12,12 @@ namespace rx
 	{
 	};
 
+	template <class AsioTimer = boost::asio::steady_timer>
 	struct timer : observable<timer_elapsed>
 	{
 		typedef timer_elapsed element_type;
-		typedef boost::asio::steady_timer timer_impl;
-		typedef timer_impl::duration duration;
+		typedef AsioTimer timer_impl;
+		typedef typename timer_impl::duration duration;
 
 		template <class Duration>
 		explicit timer(boost::asio::io_service &io, Duration delay)
