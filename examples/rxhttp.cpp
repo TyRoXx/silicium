@@ -71,6 +71,69 @@ namespace rx
 		std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
 		observer<element_type> *receiver_ = nullptr;
 	};
+
+	template <class Observable>
+	struct observable_source : Si::source<typename Observable::element_type>
+	{
+		typedef typename Observable::element_type element_type;
+
+		observable_source(Observable input, yield_context<element_type> &yield)
+			: input(std::move(input))
+			, yield(yield)
+		{
+		}
+
+		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		{
+			(void)size;
+			return {};
+		}
+
+		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		{
+			auto i = begin(destination);
+			for (; i != end(destination); ++i)
+			{
+				auto element = yield.get_one(input);
+				if (!element)
+				{
+					break;
+				}
+				*i = std::move(*element);
+			}
+			return i;
+		}
+
+		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
+		{
+			return 0;
+		}
+
+		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
+		{
+			return boost::none;
+		}
+
+		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
+		{
+			size_t skipped = 0;
+			while ((skipped < count) && yield.get_one(input))
+			{
+			}
+			return skipped;
+		}
+
+	private:
+
+		Observable input;
+		yield_context<element_type> &yield;
+	};
+
+	template <class Observable, class YieldContext>
+	auto make_observable_source(Observable &&input, YieldContext &yield)
+	{
+		return observable_source<typename std::decay<Observable>::type>(std::forward<Observable>(input), yield);
+	}
 }
 
 namespace
@@ -109,6 +172,7 @@ int main()
 			{
 				break;
 			}
+
 		}
 	});
 	auto handle_all = rx::make_total_consumer(rx::ref(handling_clients));
