@@ -134,20 +134,69 @@ namespace rx
 	{
 		return observable_source<typename std::decay<Observable>::type>(std::forward<Observable>(input), yield);
 	}
+
+	typedef Si::fast_variant<std::size_t, boost::system::error_code> received_from_socket;
+
+	struct socket_observable : observable<received_from_socket>
+	{
+		typedef received_from_socket element_type;
+		typedef boost::iterator_range<char *> buffer_type;
+
+		socket_observable(boost::asio::ip::tcp::socket &socket, buffer_type buffer)
+			: socket(&socket)
+			, buffer(buffer)
+		{
+			assert(!buffer.empty());
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			assert(!receiver_);
+			socket->async_receive(boost::asio::buffer(buffer.begin(), buffer.size()), [this](boost::system::error_code error, std::size_t bytes_received)
+			{
+				if (error)
+				{
+					if (error == boost::asio::error::operation_aborted)
+					{
+						return;
+					}
+					exchange(this->receiver_, nullptr)->got_element(error);
+				}
+				else
+				{
+					exchange(this->receiver_, nullptr)->got_element(bytes_received);
+				}
+			});
+			receiver_ = &receiver;
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			socket->cancel();
+			receiver_ = nullptr;
+		}
+
+	private:
+
+		boost::asio::ip::tcp::socket *socket;
+		buffer_type buffer;
+		observer<element_type> *receiver_ = nullptr;
+	};
 }
 
 namespace
 {
-	struct accept_handler : boost::static_visitor<bool>
+	struct accept_handler : boost::static_visitor<rx::detail::nothing>
 	{
-		bool operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
+		rx::detail::nothing operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
 		{
-			return true;
+			throw std::logic_error("not implemented");
 		}
 
-		bool operator()(boost::system::error_code error) const
+		rx::detail::nothing operator()(boost::system::error_code error) const
 		{
-			return false;
+			throw std::logic_error("not implemented");
 		}
 	};
 }
@@ -167,15 +216,10 @@ int main()
 				break;
 			}
 			accept_handler handler;
-			bool continue_ = Si::apply_visitor(handler, *result);
-			if (!continue_)
-			{
-				break;
-			}
-
+			yield(Si::apply_visitor(handler, *result));
 		}
 	});
-	auto handle_all = rx::make_total_consumer(rx::ref(handling_clients));
-	handle_all.start();
+	auto all = rx::make_total_consumer(rx::ref(handling_clients));
+	all.start();
 	io.run();
 }
