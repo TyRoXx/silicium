@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(silicium)
 
+if(${CMAKE_SYSTEM} MATCHES "Linux")
+	set(SILICIUM_LINUX ON)
+endif()
+
 if(UNIX)
 	add_definitions("-Wall -Wextra -pedantic -std=c++1y -Wconversion -Wvla")
 endif()

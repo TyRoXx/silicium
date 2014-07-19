@@ -5,6 +5,7 @@
 #include <silicium/override.hpp>
 #include <boost/config.hpp>
 #include <memory>
+#include <cassert>
 
 namespace rx
 {

@@ -20,6 +20,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/bind.hpp>
 #include <boost/container/flat_map.hpp>
+#include <unordered_map>
 
 namespace rx
 {
@@ -279,7 +280,13 @@ namespace Si
 namespace rx
 {
 	template <class Element>
-	using signal_observer_map = boost::container::flat_map<observer<Element> *, bool>;
+	using signal_observer_map =
+#ifdef _MSC_VER
+		std::unordered_map
+#else
+		boost::container::flat_map
+#endif
+		<observer<Element> *, bool>;
 
 	template <class Element>
 	struct connection : observable<Element>

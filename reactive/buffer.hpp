@@ -3,8 +3,9 @@
 
 #include <reactive/observable.hpp>
 #include <silicium/override.hpp>
-#include <cstddef>
 #include <boost/circular_buffer.hpp>
+#include <cassert>
+#include <cstddef>
 
 namespace rx
 {

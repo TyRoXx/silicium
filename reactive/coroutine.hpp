@@ -16,6 +16,15 @@ namespace rx
 		struct result
 		{
 			Element value;
+
+			result()
+			{
+			}
+
+			explicit result(Element value)
+				: value(std::move(value))
+			{
+			}
 		};
 
 		struct yield
@@ -74,11 +83,18 @@ namespace rx
 
 		template <class Action>
 		explicit coroutine_observable(Action action)
-			: coro([action](typename boost::coroutines::coroutine<command_type>::push_type &push)
+			: coro_(
+#ifdef _MSC_VER
+			std::make_shared<coroutine_type>(
+#endif
+			[action](typename boost::coroutines::coroutine<command_type>::push_type &push)
 			{
 				yield_context<Element> yield(push);
 				return action(yield);
 			})
+#ifdef _MSC_VER
+			)
+#endif
 		{
 		}
 
@@ -108,10 +124,27 @@ namespace rx
 	private:
 
 		typedef typename detail::make_command<element_type>::type command_type;
+		typedef typename boost::coroutines::coroutine<command_type>::pull_type coroutine_type;
+		using coroutine_holder =
+#ifdef _MSC_VER
+			std::shared_ptr<coroutine_type>
+#else
+			coroutine_type
+#endif
+			;
 
-		typename boost::coroutines::coroutine<command_type>::pull_type coro;
+		coroutine_holder coro_;
 		rx::observer<Element> *receiver_ = nullptr;
 		bool first = true;
+
+		coroutine_type &coro()
+		{
+			return
+#ifdef _MSC_VER
+				*
+#endif
+				coro_;
+		}
 
 		virtual void got_element(detail::nothing) SILICIUM_OVERRIDE
 		{
@@ -127,11 +160,11 @@ namespace rx
 		{
 			if (!rx::exchange(first, false))
 			{
-				coro();
+				coro()();
 			}
-			if (coro)
+			if (coro())
 			{
-				command_type command = coro.get();
+				command_type command = coro().get();
 				return Si::apply_visitor(*this, command);
 			}
 			else

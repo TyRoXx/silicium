@@ -36,7 +36,7 @@ namespace rx
 	};
 
 	template <class Input>
-	auto make_total_consumer(Input &&input)
+	auto make_total_consumer(Input &&input) -> total_consumer<typename std::decay<Input>::type>
 	{
 		return total_consumer<typename std::decay<Input>::type>(std::forward<Input>(input));
 	}

@@ -130,7 +130,7 @@ namespace rx
 	};
 
 	template <class Observable, class YieldContext>
-	auto make_observable_source(Observable &&input, YieldContext &yield)
+	auto make_observable_source(Observable &&input, YieldContext &yield) -> observable_source<typename std::decay<Observable>::type>
 	{
 		return observable_source<typename std::decay<Observable>::type>(std::forward<Observable>(input), yield);
 	}
