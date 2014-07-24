@@ -26,7 +26,7 @@ if(SDL2_FOUND)
 endif()
 
 add_executable(rxhttp "rxhttp.cpp")
-target_link_libraries(rxhttp ${Boost_LIBRARIES})
+target_link_libraries(rxhttp silicium ${Boost_LIBRARIES})
 
 if(SILICIUM_LINUX)
 	add_executable(watchdir "watchdir.cpp")
