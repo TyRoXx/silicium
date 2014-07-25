@@ -21,6 +21,11 @@ namespace rx
 		{
 		}
 
+		bool empty() const BOOST_NOEXCEPT
+		{
+			return !content;
+		}
+
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			assert(content);
@@ -46,6 +51,9 @@ namespace rx
 	{
 		return ptr_observable<Element, std::unique_ptr<observable<Element>>>(std::unique_ptr<observable<Element>>(new typename std::decay<Content>::type(std::forward<Content>(content))));
 	}
+
+	template <class Element>
+	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element>>>;
 
 	template <class Element, class Content>
 	auto wrap(Content &&content) -> ptr_observable<Element, std::shared_ptr<observable<Element>>>

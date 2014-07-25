@@ -269,11 +269,13 @@ namespace rx
 
 namespace
 {
-	struct accept_handler : boost::static_visitor<rx::unique_observable<rx::detail::nothing>>
+	using events = rx::shared_observable<rx::detail::nothing>;
+
+	struct accept_handler : boost::static_visitor<events>
 	{
-		rx::unique_observable<rx::detail::nothing> operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
+		events operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
 		{
-			auto client_handler = rx::box<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client](rx::yield_context<rx::detail::nothing> &yield)
+			auto client_handler = rx::wrap<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client](rx::yield_context<rx::detail::nothing> &yield)
 			{
 				std::vector<char> received(4096);
 				rx::socket_receiver_observable receiving(*client, boost::make_iterator_range(received.data(), received.data() + received.size()));
@@ -287,7 +289,7 @@ namespace
 			return client_handler;
 		}
 
-		rx::unique_observable<rx::detail::nothing> operator()(boost::system::error_code) const
+		events operator()(boost::system::error_code) const
 		{
 			throw std::logic_error("not implemented");
 		}
@@ -299,7 +301,7 @@ int main()
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
 	rx::tcp_acceptor clients(acceptor);
-	auto handling_clients = rx::make_coroutine<rx::detail::nothing>([&clients](rx::yield_context<rx::detail::nothing> &yield) -> void
+	auto handling_clients = rx::make_coroutine<events>([&clients](rx::yield_context<events> &yield) -> void
 	{
 		for (;;)
 		{
@@ -310,6 +312,10 @@ int main()
 			}
 			accept_handler handler;
 			auto context = Si::apply_visitor(handler, *result);
+			if (!context.empty())
+			{
+				yield(std::move(context));
+			}
 		}
 	});
 	auto all = rx::make_total_consumer(rx::ref(handling_clients));
