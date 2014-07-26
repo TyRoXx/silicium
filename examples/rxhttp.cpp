@@ -8,6 +8,7 @@
 #include <boost/ref.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/format.hpp>
+#include <boost/thread/future.hpp>
 
 namespace rx
 {
@@ -512,5 +513,18 @@ int main()
 	}));
 	auto all = rx::make_total_consumer(rx::ref(handling_clients));
 	all.start();
+
+	std::vector<boost::unique_future<void>> workers;
+	std::generate_n(std::back_inserter(workers), boost::thread::hardware_concurrency() - 1, [&io]
+	{
+		return boost::async(boost::launch::async, [&io]
+		{
+			io.run();
+		});
+	});
+	std::for_each(workers.begin(), workers.end(), [](boost::unique_future<void> &worker)
+	{
+		worker.get();
+	});
 	io.run();
 }

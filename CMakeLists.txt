@@ -21,7 +21,7 @@ if(MSVC)
 endif()
 
 if(UNIX)
-	find_package(Boost REQUIRED unit_test_framework filesystem iostreams system coroutine)
+        find_package(Boost REQUIRED unit_test_framework thread filesystem iostreams system coroutine)
 	add_definitions("-DBOOST_TEST_DYN_LINK")
 endif()
 
