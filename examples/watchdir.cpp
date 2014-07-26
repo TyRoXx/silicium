@@ -4,6 +4,7 @@
 #include <reactive/linux/inotify.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/numeric.hpp>
+#include <iostream>
 
 namespace
 {
