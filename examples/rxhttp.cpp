@@ -376,27 +376,88 @@ namespace rx
 	{
 		return flattener<typename std::decay<NothingObservableObservable>::type>(std::forward<NothingObservableObservable>(input));
 	}
+
+	struct sending_observable : observable<boost::system::error_code>
+	{
+		typedef boost::system::error_code element_type;
+		typedef boost::iterator_range<char const *> buffer_type;
+
+		explicit sending_observable(boost::asio::ip::tcp::socket &socket, buffer_type buffer)
+			: socket(&socket)
+			, buffer(buffer)
+		{
+		}
+
+		virtual void async_get_one(observer<boost::system::error_code> &receiver) SILICIUM_OVERRIDE
+		{
+			assert(!receiver_);
+			if (buffer.empty())
+			{
+				return receiver.ended();
+			}
+			receiver_ = &receiver;
+			boost::asio::async_write(*socket, boost::asio::buffer(buffer.begin(), buffer.size()), [this](boost::system::error_code error, std::size_t bytes_sent)
+			{
+				assert(buffer.size() == static_cast<ptrdiff_t>(bytes_sent));
+				buffer = buffer_type();
+				return exchange(receiver_, nullptr)->got_element(error);
+			});
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			throw std::logic_error("to do");
+		}
+
+	private:
+
+		boost::asio::ip::tcp::socket *socket = nullptr;
+		buffer_type buffer;
+		observer<boost::system::error_code> *receiver_ = nullptr;
+	};
 }
 
 namespace
 {
 	using events = rx::shared_observable<rx::detail::nothing>;
 
+	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield)
+	{
+		std::vector<char> received(4096);
+		rx::socket_receiver_observable receiving(client, boost::make_iterator_range(received.data(), received.data() + received.size()));
+		auto receiver = rx::make_observable_source(rx::ref(receiving), yield);
+		boost::optional<Si::http::request_header> request = Si::http::parse_header(receiver);
+		if (!request)
+		{
+			return;
+		}
+		std::vector<char> send_buffer;
+		{
+			auto response_sink = Si::make_container_sink(send_buffer);
+			Si::http::response_header response;
+			response.http_version = "HTTP/1.0";
+			response.status = 200;
+			response.status_text = "OK";
+			response.arguments["Content-Length"] = "5";
+			Si::http::write_header(response_sink, response);
+			Si::append(response_sink, "Hello");
+		}
+		rx::sending_observable sending(
+			client,
+			boost::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
+		while (yield.get_one((sending)))
+		{
+		}
+	}
+
 	struct accept_handler : boost::static_visitor<events>
 	{
 		events operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
 		{
-			auto client_handler = rx::wrap<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client](rx::yield_context<rx::detail::nothing> &yield)
+			auto client_handler = rx::wrap<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client](rx::yield_context<rx::detail::nothing> &yield) -> void
 			{
-				std::vector<char> received(4096);
-				rx::socket_receiver_observable receiving(*client, boost::make_iterator_range(received.data(), received.data() + received.size()));
-				auto receiver = rx::make_observable_source(rx::ref(receiving), yield);
-				boost::optional<Si::http::request_header> request = Si::http::parse_header(receiver);
-				if (!request)
-				{
-					return;
-				}
-				//TODO: respond
+				return serve_client(*client, yield);
 			}));
 			return client_handler;
 		}
