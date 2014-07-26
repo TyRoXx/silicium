@@ -1,20 +1,14 @@
 #include <reactive/received_from_socket_source.hpp>
 #include <reactive/sending_observable.hpp>
 #include <reactive/flatten.hpp>
-#include <reactive/socket_observable.hpp>
 #include <reactive/observable_source.hpp>
 #include <reactive/tcp_acceptor.hpp>
 #include <reactive/coroutine.hpp>
 #include <silicium/http/http.hpp>
-#include <silicium/fast_variant.hpp>
 #include <reactive/finite_state_machine.hpp>
 #include <reactive/generate.hpp>
 #include <reactive/total_consumer.hpp>
-#include <boost/asio.hpp>
-#include <boost/ref.hpp>
-#include <boost/range/algorithm/find_if.hpp>
 #include <boost/format.hpp>
-#include <boost/interprocess/sync/null_mutex.hpp>
 #include <boost/thread/future.hpp>
 
 namespace
