@@ -540,8 +540,6 @@ namespace Si
 
 namespace
 {
-	using events = rx::shared_observable<rx::detail::nothing>;
-
 	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield, boost::uintmax_t visitor_number)
 	{
 		std::vector<char> received(4096);
@@ -580,6 +578,8 @@ namespace
 		{
 		}
 	}
+
+	using events = rx::shared_observable<rx::detail::nothing>;
 
 	struct accept_handler : boost::static_visitor<events>
 	{
