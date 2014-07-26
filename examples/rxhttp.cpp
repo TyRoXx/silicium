@@ -143,7 +143,12 @@ namespace rx
 		return observable_source<typename std::decay<Observable>::type, YieldContext>(std::forward<Observable>(input), yield);
 	}
 
-	typedef Si::fast_variant<std::size_t, boost::system::error_code> received_from_socket;
+	struct incoming_bytes
+	{
+		char const *begin, *end;
+	};
+
+	typedef Si::fast_variant<incoming_bytes, boost::system::error_code> received_from_socket;
 
 	struct socket_observable : observable<received_from_socket>
 	{
@@ -175,7 +180,7 @@ namespace rx
 				else
 				{
 					auto * const receiver = exchange(this->receiver_, nullptr);
-					receiver->got_element(bytes_received);
+					receiver->got_element(incoming_bytes{buffer.begin(), buffer.begin() + bytes_received});
 				}
 			});
 		}
@@ -230,8 +235,8 @@ namespace rx
 
 		boost::asio::ip::tcp::socket *socket;
 		buffer_type buffer;
-		buffer_type::iterator next_byte;
-		buffer_type::iterator available;
+		char const *next_byte;
+		char const *available;
 		observer<element_type> *receiver_ = nullptr;
 		boost::optional<socket_observable> receiving;
 
@@ -251,12 +256,12 @@ namespace rx
 				return rx::exchange(receiver->receiver_, nullptr)->ended();
 			}
 
-			void operator()(std::size_t bytes_received) const
+			void operator()(incoming_bytes bytes_received) const
 			{
-				assert(bytes_received > 0);
-				assert(static_cast<ptrdiff_t>(bytes_received) <= receiver->buffer.size());
-				receiver->available = receiver->buffer.begin() + bytes_received;
-				receiver->next_byte = receiver->buffer.begin();
+				assert(std::distance(bytes_received.begin, bytes_received.end) > 0);
+				assert(std::distance(bytes_received.begin, bytes_received.end) <= receiver->buffer.size());
+				receiver->available = bytes_received.end;
+				receiver->next_byte = bytes_received.begin;
 				char value = *receiver->next_byte;
 				++(receiver->next_byte);
 				return rx::exchange(receiver->receiver_, nullptr)->got_element(value);
