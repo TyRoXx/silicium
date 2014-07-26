@@ -40,6 +40,7 @@ namespace rx
 		{
 			assert(!receiver_);
 			next_client = std::make_shared<boost::asio::ip::tcp::socket>(underlying.get_io_service());
+			receiver_ = &receiver;
 			underlying.async_accept(*next_client, [this](boost::system::error_code error)
 			{
 				if (!this->receiver_)
@@ -61,7 +62,6 @@ namespace rx
 					exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
 				}
 			});
-			receiver_ = &receiver;
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
