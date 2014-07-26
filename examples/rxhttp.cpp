@@ -442,7 +442,7 @@ namespace
 			response.http_version = "HTTP/1.0";
 			response.status = 200;
 			response.status_text = "OK";
-			auto body = boost::str(boost::format("Hello, visitor %1%") % visitor_number);
+			std::string const body = boost::str(boost::format("Hello, visitor %1%") % visitor_number);
 			response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
 			Si::http::write_header(response_sink, response);
 			Si::append(response_sink, body);
@@ -453,6 +453,7 @@ namespace
 		while (yield.get_one((sending)))
 		{
 		}
+		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 	}
 
 	struct accept_handler : boost::static_visitor<events>
