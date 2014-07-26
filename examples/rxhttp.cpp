@@ -8,6 +8,7 @@
 #include <boost/ref.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/format.hpp>
+#include <boost/interprocess/sync/null_mutex.hpp>
 #include <boost/thread/future.hpp>
 
 namespace rx
@@ -159,8 +160,10 @@ namespace rx
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			assert(!receiver_);
+			receiver_ = &receiver;
 			socket->async_receive(boost::asio::buffer(buffer.begin(), buffer.size()), [this](boost::system::error_code error, std::size_t bytes_received)
 			{
+				assert(receiver_);
 				if (error)
 				{
 					if (error == boost::asio::error::operation_aborted)
@@ -171,10 +174,10 @@ namespace rx
 				}
 				else
 				{
-					exchange(this->receiver_, nullptr)->got_element(bytes_received);
+					auto * const receiver = exchange(this->receiver_, nullptr);
+					receiver->got_element(bytes_received);
 				}
 			});
-			receiver_ = &receiver;
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
@@ -214,8 +217,8 @@ namespace rx
 				return receiver.got_element(value);
 			}
 			receiving = boost::in_place(boost::ref(*socket), buffer);
-			receiving->async_get_one(*this);
 			receiver_ = &receiver;
+			receiving->async_get_one(*this);
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
@@ -244,6 +247,7 @@ namespace rx
 			void operator()(boost::system::error_code) const
 			{
 				//error means end
+				assert(receiver->receiver_);
 				return rx::exchange(receiver->receiver_, nullptr)->ended();
 			}
 
@@ -279,13 +283,14 @@ namespace rx
 
 	using nothing = detail::nothing;
 
-	template <class NothingObservableObservable>
+	template <class NothingObservableObservable, class Mutex = boost::interprocess::null_mutex>
 	struct flattener
 			: public observable<nothing>
 			, private observer<typename NothingObservableObservable::element_type>
 	{
 		explicit flattener(NothingObservableObservable input)
 			: input(std::move(input))
+			, children_mutex(make_unique<Mutex>())
 		{
 		}
 
@@ -336,6 +341,7 @@ namespace rx
 		bool input_ended = false;
 		observer<nothing> *receiver_ = nullptr;
 		std::vector<std::unique_ptr<child>> children;
+		std::unique_ptr<Mutex> children_mutex;
 
 		void fetch()
 		{
@@ -344,6 +350,7 @@ namespace rx
 
 		void remove_child(child &removing)
 		{
+			boost::unique_lock<Mutex> lock(*children_mutex);
 			auto const i = boost::range::find_if(children, [&removing](std::unique_ptr<child> const &element)
 			{
 				return element.get() == &removing;
@@ -358,14 +365,18 @@ namespace rx
 
 		virtual void got_element(nothing_observable value) SILICIUM_OVERRIDE
 		{
-			children.emplace_back(make_unique<child>(*this, std::move(value)));
-			child &new_child = *children.back();
-			new_child.start();
+			{
+				boost::unique_lock<Mutex> lock(*children_mutex);
+				children.emplace_back(make_unique<child>(*this, std::move(value)));
+				child &new_child = *children.back();
+				new_child.start();
+			}
 			return fetch();
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
+			boost::unique_lock<Mutex> lock(*children_mutex);
 			assert(receiver_);
 			input_ended = true;
 			if (children.empty())
@@ -375,10 +386,10 @@ namespace rx
 		}
 	};
 
-	template <class NothingObservableObservable>
+	template <class Mutex = boost::interprocess::null_mutex, class NothingObservableObservable>
 	auto flatten(NothingObservableObservable &&input)
 	{
-		return flattener<typename std::decay<NothingObservableObservable>::type>(std::forward<NothingObservableObservable>(input));
+		return flattener<typename std::decay<NothingObservableObservable>::type, Mutex>(std::forward<NothingObservableObservable>(input));
 	}
 
 	struct sending_observable : observable<boost::system::error_code>
@@ -440,21 +451,28 @@ namespace
 		{
 			auto response_sink = Si::make_container_sink(send_buffer);
 			Si::http::response_header response;
-			response.http_version = "HTTP/1.0";
+			response.http_version = "HTTP/1.1";
 			response.status = 200;
 			response.status_text = "OK";
 			std::string const body = boost::str(boost::format("Hello, visitor %1%") % visitor_number);
 			response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
+			response.arguments["Connection"] = "close";
 			Si::http::write_header(response_sink, response);
 			Si::append(response_sink, body);
 		}
 		rx::sending_observable sending(
 			client,
 			boost::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
-		while (yield.get_one((sending)))
+
+		//ignore error
+		yield.get_one(sending);
+
+		boost::system::error_code error;
+		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+
+		while (Si::get(receiver))
 		{
 		}
-		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 	}
 
 	struct accept_handler : boost::static_visitor<events>
@@ -488,7 +506,7 @@ int main()
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
 	rx::tcp_acceptor clients(acceptor);
-	auto handling_clients = rx::flatten(rx::make_coroutine<events>([&clients](rx::yield_context<events> &yield) -> void
+	auto handling_clients = rx::flatten<boost::mutex>(rx::make_coroutine<events>([&clients](rx::yield_context<events> &yield) -> void
 	{
 		auto visitor_counter = rx::make_finite_state_machine(
 									rx::generate([]() { return rx::nothing{}; }),
@@ -514,8 +532,10 @@ int main()
 	auto all = rx::make_total_consumer(rx::ref(handling_clients));
 	all.start();
 
+	auto const thread_count = boost::thread::hardware_concurrency();
+
 	std::vector<boost::unique_future<void>> workers;
-	std::generate_n(std::back_inserter(workers), boost::thread::hardware_concurrency() - 1, [&io]
+	std::generate_n(std::back_inserter(workers), thread_count - 1, [&io]
 	{
 		return boost::async(boost::launch::async, [&io]
 		{
