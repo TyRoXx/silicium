@@ -1,10 +1,13 @@
 #include <reactive/coroutine.hpp>
 #include <silicium/http/http.hpp>
 #include <silicium/fast_variant.hpp>
+#include <reactive/finite_state_machine.hpp>
+#include <reactive/generate.hpp>
 #include <reactive/total_consumer.hpp>
 #include <boost/asio.hpp>
 #include <boost/ref.hpp>
 #include <boost/range/algorithm/find_if.hpp>
+#include <boost/format.hpp>
 
 namespace rx
 {
@@ -422,7 +425,7 @@ namespace
 {
 	using events = rx::shared_observable<rx::detail::nothing>;
 
-	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield)
+	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield, boost::uintmax_t visitor_number)
 	{
 		std::vector<char> received(4096);
 		rx::socket_receiver_observable receiving(client, boost::make_iterator_range(received.data(), received.data() + received.size()));
@@ -439,9 +442,10 @@ namespace
 			response.http_version = "HTTP/1.0";
 			response.status = 200;
 			response.status_text = "OK";
-			response.arguments["Content-Length"] = "5";
+			auto body = boost::str(boost::format("Hello, visitor %1%") % visitor_number);
+			response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
 			Si::http::write_header(response_sink, response);
-			Si::append(response_sink, "Hello");
+			Si::append(response_sink, body);
 		}
 		rx::sending_observable sending(
 			client,
@@ -453,11 +457,19 @@ namespace
 
 	struct accept_handler : boost::static_visitor<events>
 	{
+		boost::uintmax_t visitor_number;
+
+		explicit accept_handler(boost::uintmax_t visitor_number)
+			: visitor_number(visitor_number)
+		{
+		}
+
 		events operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
 		{
-			auto client_handler = rx::wrap<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client](rx::yield_context<rx::detail::nothing> &yield) -> void
+			auto visitor_number_ = visitor_number;
+			auto client_handler = rx::wrap<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client, visitor_number_](rx::yield_context<rx::detail::nothing> &yield) -> void
 			{
-				return serve_client(*client, yield);
+				return serve_client(*client, yield, visitor_number_);
 			}));
 			return client_handler;
 		}
@@ -476,6 +488,10 @@ int main()
 	rx::tcp_acceptor clients(acceptor);
 	auto handling_clients = rx::flatten(rx::make_coroutine<events>([&clients](rx::yield_context<events> &yield) -> void
 	{
+		auto visitor_counter = rx::make_finite_state_machine(
+									rx::generate([]() { return rx::nothing{}; }),
+									static_cast<boost::uintmax_t>(0),
+									[](boost::uintmax_t previous, rx::nothing) { return previous + 1; });
 		for (;;)
 		{
 			auto result = yield.get_one(clients);
@@ -483,7 +499,9 @@ int main()
 			{
 				break;
 			}
-			accept_handler handler;
+			auto const visitor_number = yield.get_one(visitor_counter);
+			assert(visitor_number);
+			accept_handler handler{*visitor_number};
 			auto context = Si::apply_visitor(handler, *result);
 			if (!context.empty())
 			{
