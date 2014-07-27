@@ -45,7 +45,7 @@ int main()
 {
 	boost::asio::io_service io;
 	rx::linux::inotify_observable notifier(io);
-	auto w = notifier.watch("/home/virtual/dev", IN_ALL_EVENTS);
+	auto w = notifier.watch(".", IN_ALL_EVENTS);
 
 	auto all = rx::for_each(rx::enumerate(rx::ref(notifier)), [](rx::linux::file_notification const &event)
 	{
