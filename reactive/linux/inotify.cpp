@@ -56,7 +56,7 @@ namespace rx
 					for (std::size_t i = 0; i < bytes_read; )
 					{
 						inotify_event const &event = *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-						changes.emplace_back(file_notification{event.mask, event.name});
+						changes.emplace_back(file_notification{event.mask, boost::filesystem::path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0'))});
 						i += sizeof(inotify_event);
 						i += event.len;
 					}
