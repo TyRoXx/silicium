@@ -26,11 +26,24 @@ namespace rx
 
 		watch_descriptor inotify_observable::watch(boost::filesystem::path const &target, boost::uint32_t mask)
 		{
-			int wd = inotify_add_watch(notifier.native_handle(), target.string().c_str(), mask);
+			boost::system::error_code error;
+			auto result = watch(target, mask, error);
+			if (error)
+			{
+				boost::throw_exception(boost::system::system_error(error));
+			}
+			return result;
+		}
+
+		watch_descriptor inotify_observable::watch(boost::filesystem::path const &target, boost::uint32_t mask, boost::system::error_code &ec)
+		{
+			int const wd = inotify_add_watch(notifier.native_handle(), target.string().c_str(), mask);
 			if (wd < 0)
 			{
-				throw boost::system::system_error(errno, boost::system::posix_category);
+				ec = boost::system::error_code(errno, boost::system::posix_category);
+				return watch_descriptor();
 			}
+			ec = boost::system::error_code();
 			return watch_descriptor(notifier.native_handle(), wd);
 		}
 

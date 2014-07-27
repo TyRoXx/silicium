@@ -66,6 +66,7 @@ namespace rx
 
 			explicit inotify_observable(boost::asio::io_service &io);
 			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask);
+			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask, boost::system::error_code &ec);
 			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE;
 			virtual void cancel() SILICIUM_OVERRIDE;
 
