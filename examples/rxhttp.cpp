@@ -5,8 +5,6 @@
 #include <reactive/tcp_acceptor.hpp>
 #include <reactive/coroutine.hpp>
 #include <silicium/http/http.hpp>
-#include <reactive/finite_state_machine.hpp>
-#include <reactive/generate.hpp>
 #include <reactive/total_consumer.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
@@ -87,10 +85,7 @@ int main()
 	rx::tcp_acceptor clients(acceptor);
 	auto handling_clients = rx::flatten<boost::mutex>(rx::make_coroutine<events>([&clients](rx::yield_context<events> &yield) -> void
 	{
-		auto visitor_counter = rx::make_finite_state_machine(
-									rx::generate([]() { return rx::nothing{}; }),
-									static_cast<boost::uintmax_t>(0),
-									[](boost::uintmax_t previous, rx::nothing) { return previous + 1; });
+		boost::uintmax_t visitor_count = 0;
 		for (;;)
 		{
 			auto result = yield.get_one(clients);
@@ -98,9 +93,8 @@ int main()
 			{
 				break;
 			}
-			auto const visitor_number = yield.get_one(visitor_counter);
-			assert(visitor_number);
-			accept_handler handler{*visitor_number};
+			++visitor_count;
+			accept_handler handler{visitor_count};
 			auto context = Si::apply_visitor(handler, *result);
 			if (!context.empty())
 			{
