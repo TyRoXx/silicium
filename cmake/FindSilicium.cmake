@@ -4,7 +4,7 @@
 #  LIBSILICIUM_INCLUDE_DIRS
 #  LIBSILICIUM_LIBRARIES
 
-find_path(LIBSILICIUM_INCLUDE_DIR "override.hpp" HINTS "/usr/local/include/silicium" "/usr/include/silicium")
+find_path(LIBSILICIUM_INCLUDE_DIR "version.hpp" HINTS "/usr/local/include/silicium" "/usr/include/silicium")
 find_library(LIBSILICIUM_LIBRARY "libsilicium.a" HINTS "/usr/local/lib" "/usr/lib")
 
 set(LIBSILICIUM_LIBRARIES ${LIBSILICIUM_LIBRARY})
