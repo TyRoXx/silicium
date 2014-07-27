@@ -6,3 +6,9 @@ endif()
 
 add_library(reactive ${sources} ${linuxSources})
 target_link_libraries(reactive ${Boost_LIBRARIES})
+
+install(DIRECTORY . DESTINATION "include/reactive")
+install(TARGETS reactive
+	RUNTIME DESTINATION "bin"
+	LIBRARY DESTINATION "lib"
+	ARCHIVE DESTINATION "lib")
