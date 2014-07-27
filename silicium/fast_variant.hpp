@@ -55,7 +55,7 @@ namespace Si
 	};
 
 	template <class Element, std::size_t Index>
-	struct fast_variant_vtable_impl : fast_variant_vtable
+	struct fast_variant_vtable_impl SILICIUM_FINAL : fast_variant_vtable
 	{
 #ifndef _MSC_VER //these type traits do not work at all in Visual C++ 2013
 		static_assert(std::is_nothrow_move_assignable<Element>::value, "noexcept move assignment operator required");

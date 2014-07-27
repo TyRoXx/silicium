@@ -3,8 +3,10 @@
 
 #if defined(__GNUC__) && (__GNUC__ <= 4) && (__GNUC__ < 4 || __GNUC_MINOR__ <= 6)
 #	define SILICIUM_OVERRIDE
+#	define SILICIUM_FINAL
 #else
 #	define SILICIUM_OVERRIDE override
+#	define SILICIUM_FINAL final
 #endif
 
 #endif

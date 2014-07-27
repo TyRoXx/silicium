@@ -37,7 +37,7 @@ namespace Si
 	}
 
 	template <class Element, class Buffer = std::array<Element, ((1U << 13U) / sizeof(Element))>>
-	struct buffering_sink : flushable_sink<Element>
+	struct buffering_sink SILICIUM_FINAL : flushable_sink<Element>
 	{
 		explicit buffering_sink(sink<Element> &destination, Buffer buffer = Buffer())
 			: m_destination(destination)
@@ -99,7 +99,7 @@ namespace Si
 	};
 
 	template <class Element, class OutputIterator>
-	struct iterator_sink : sink<Element>
+	struct iterator_sink SILICIUM_FINAL : sink<Element>
 	{
 		explicit iterator_sink(OutputIterator out)
 			: m_out(std::move(out))
@@ -139,7 +139,7 @@ namespace Si
 		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
 	}
 
-	struct ostream_ref_sink : flushable_sink<char>
+	struct ostream_ref_sink SILICIUM_FINAL : flushable_sink<char>
 	{
 		explicit ostream_ref_sink(std::ostream &file)
 		   : m_file(file)
@@ -170,7 +170,7 @@ namespace Si
 		std::ostream &m_file;
 	};
 
-	struct ostream_sink : flushable_sink<char>
+	struct ostream_sink SILICIUM_FINAL : flushable_sink<char>
 	{
 		//unique_ptr to make ostreams movable
 		explicit ostream_sink(std::unique_ptr<std::ostream> file)
@@ -206,7 +206,7 @@ namespace Si
 	std::unique_ptr<flushable_sink<char>> make_file_sink(boost::filesystem::path const &name);
 
 	template <class Element>
-	struct auto_flush_sink : sink<Element>
+	struct auto_flush_sink SILICIUM_FINAL : sink<Element>
 	{
 		auto_flush_sink()
 			: m_next(nullptr)

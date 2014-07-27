@@ -32,7 +32,7 @@ namespace Si
 	};
 
 	template <class Element>
-	struct memory_source : source<Element>
+	struct memory_source SILICIUM_FINAL : source<Element>
 	{
 		memory_source()
 		{
@@ -99,7 +99,7 @@ namespace Si
 		return std::move(result);
 	}
 
-	struct line_source : Si::source<std::vector<char>>
+	struct line_source SILICIUM_FINAL : Si::source<std::vector<char>>
 	{
 		explicit line_source(Si::source<char> &next)
 			: m_next(next)
@@ -177,7 +177,7 @@ namespace Si
 	};
 
 	template <class Element>
-	struct buffering_source : mutable_source<Element>
+	struct buffering_source SILICIUM_FINAL : mutable_source<Element>
 	{
 		explicit buffering_source(source<Element> &next, std::size_t capacity)
 			: m_next(next)
@@ -295,7 +295,7 @@ namespace Si
 	}
 
 	template <class Element>
-	struct mutable_source_iterator : boost::iterator_facade<mutable_source_iterator<Element>, Element, std::input_iterator_tag>
+	struct mutable_source_iterator SILICIUM_FINAL : boost::iterator_facade<mutable_source_iterator<Element>, Element, std::input_iterator_tag>
 	{
 		mutable_source_iterator() BOOST_NOEXCEPT
 			: m_source(nullptr)
@@ -360,7 +360,7 @@ namespace Si
 	}
 
 	template <class Element, class Generator>
-	struct generator_source : source<Element>
+	struct generator_source SILICIUM_FINAL : source<Element>
 	{
 		explicit generator_source(Generator generate_next)
 			: m_generate_next(std::move(generate_next))
@@ -423,7 +423,7 @@ namespace Si
 	}
 
 	template <class To, class From, class Transformation>
-	struct transforming_source : source<To>
+	struct transforming_source SILICIUM_FINAL : source<To>
 	{
 		template <class Transformation2>
 		explicit transforming_source(source<From> &original, Transformation2 &&transform)
