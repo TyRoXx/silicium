@@ -377,7 +377,7 @@ namespace Si
 			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
 		}
 		unique_handle thread_closer(process.hThread);
-		unique_handle process_closer(process.hThread);
+		unique_handle process_closer(process.hProcess);
 		output.write.reset();
 		if (parameters.out)
 		{
