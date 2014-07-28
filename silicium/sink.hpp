@@ -81,7 +81,7 @@ namespace Si
 		void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
 			assert(m_destination);
-			if (data.size() <= (m_fallback_buffer.size() - m_buffer_used))
+			if (static_cast<size_t>(data.size()) <= (m_fallback_buffer.size() - m_buffer_used))
 			{
 				boost::range::copy(data, m_fallback_buffer.begin() + m_buffer_used);
 				m_buffer_used += data.size();
