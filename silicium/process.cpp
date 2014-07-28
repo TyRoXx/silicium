@@ -1,5 +1,6 @@
 #include <silicium/process.hpp>
 #include <silicium/to_unique.hpp>
+#include <silicium/win32.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/system/system_error.hpp>
 #include <algorithm>
@@ -259,7 +260,7 @@ namespace Si
 #endif //__linux__
 
 #ifdef _WIN32
-	namespace
+	namespace win32
 	{
 		typedef std::basic_string<WCHAR> winapi_string;
 
@@ -303,16 +304,6 @@ namespace Si
 			}
 			return command_line;
 		}
-
-		struct handle_closer
-		{
-			void operator()(HANDLE h) const
-			{
-				CloseHandle(h);
-			}
-		};
-
-		typedef std::unique_ptr<std::remove_pointer<HANDLE>::type, handle_closer> unique_handle;
 
 		struct pipe
 		{
@@ -359,12 +350,12 @@ namespace Si
 
 	int run_process(process_parameters const &parameters)
 	{
-		winapi_string const executable = utf8_to_winapi_string(parameters.executable.string());
-		winapi_string command_line = build_command_line(parameters.arguments);
+		win32::winapi_string const executable = win32::utf8_to_winapi_string(parameters.executable.string());
+		win32::winapi_string command_line = win32::build_command_line(parameters.arguments);
 		SECURITY_ATTRIBUTES security{};
 		security.nLength = sizeof(security);
 		security.bInheritHandle = TRUE;
-		auto output = create_anonymous_pipe();
+		auto output = win32::create_anonymous_pipe();
 		STARTUPINFOW startup{};
 		startup.cb = sizeof(startup);
 		startup.dwFlags |= STARTF_USESTDHANDLES;
@@ -376,8 +367,8 @@ namespace Si
 		{
 			throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
 		}
-		unique_handle thread_closer(process.hThread);
-		unique_handle process_closer(process.hProcess);
+		win32::unique_handle thread_closer(process.hThread);
+		win32::unique_handle process_closer(process.hProcess);
 		output.write.reset();
 		if (parameters.out)
 		{
