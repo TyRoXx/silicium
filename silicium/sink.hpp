@@ -39,8 +39,12 @@ namespace Si
 	template <class Element, class Buffer = std::array<Element, ((1U << 13U) / sizeof(Element))>>
 	struct buffering_sink SILICIUM_FINAL : flushable_sink<Element>
 	{
+		buffering_sink()
+		{
+		}
+
 		explicit buffering_sink(sink<Element> &destination, Buffer buffer = Buffer())
-			: m_destination(destination)
+			: m_destination(&destination)
 			, m_fallback_buffer(std::move(buffer))
 			, m_buffer_used(0)
 		{
@@ -48,7 +52,8 @@ namespace Si
 
 		boost::iterator_range<Element *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
 		{
-			auto first_try = m_destination.make_append_space(size);
+			assert(m_destination);
+			auto first_try = m_destination->make_append_space(size);
 			if (!first_try.empty())
 			{
 				auto const copied = (std::min)(static_cast<std::ptrdiff_t>(m_buffer_used), first_try.size());
@@ -62,18 +67,20 @@ namespace Si
 
 		void flush_append_space() SILICIUM_OVERRIDE
 		{
+			assert(m_destination);
 			if (m_buffer_used)
 			{
 				flush();
 			}
 			else
 			{
-				m_destination.flush_append_space();
+				m_destination->flush_append_space();
 			}
 		}
 
 		void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
+			assert(m_destination);
 			if (data.size() <= (m_fallback_buffer.size() - m_buffer_used))
 			{
 				boost::range::copy(data, m_fallback_buffer.begin() + m_buffer_used);
@@ -82,18 +89,19 @@ namespace Si
 			}
 
 			flush();
-			m_destination.append(data);
+			m_destination->append(data);
 		}
 
 		void flush() SILICIUM_OVERRIDE
 		{
-			m_destination.append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used));
+			assert(m_destination);
+			m_destination->append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used));
 			m_buffer_used = 0;
 		}
 
 	private:
 
-		sink<Element> &m_destination;
+		sink<Element> *m_destination = nullptr;
 		Buffer m_fallback_buffer;
 		std::size_t m_buffer_used;
 	};
