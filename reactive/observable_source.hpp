@@ -13,7 +13,7 @@ namespace rx
 
 		observable_source(Observable input, YieldContext &yield)
 			: input(std::move(input))
-			, yield(yield)
+			, yield(&yield)
 		{
 		}
 
@@ -30,7 +30,8 @@ namespace rx
 			auto i = begin(destination);
 			for (; i != end(destination); ++i)
 			{
-				auto element = yield.get_one(input);
+				assert(yield);
+				auto element = yield->get_one(input);
 				if (!element)
 				{
 					break;
@@ -53,7 +54,8 @@ namespace rx
 		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
 		{
 			size_t skipped = 0;
-			while ((skipped < count) && yield.get_one(input))
+			assert(yield);
+			while ((skipped < count) && yield->get_one(input))
 			{
 			}
 			return skipped;
@@ -62,7 +64,7 @@ namespace rx
 	private:
 
 		Observable input;
-		YieldContext &yield;
+		YieldContext *yield = nullptr;
 	};
 
 	template <class Observable, class YieldContext>
