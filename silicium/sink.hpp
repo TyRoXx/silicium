@@ -141,8 +141,12 @@ namespace Si
 
 	struct ostream_ref_sink SILICIUM_FINAL : flushable_sink<char>
 	{
+		ostream_ref_sink()
+		{
+		}
+
 		explicit ostream_ref_sink(std::ostream &file)
-		   : m_file(file)
+		   : m_file(&file)
 		{
 		}
 
@@ -157,17 +161,19 @@ namespace Si
 
 		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
 		{
-		   m_file.write(data.begin(), data.size());
+			assert(m_file);
+			m_file->write(data.begin(), data.size());
 		}
 
 		virtual void flush() SILICIUM_OVERRIDE
 		{
-		   m_file.flush();
+			assert(m_file);
+			m_file->flush();
 		}
 
 	private:
 
-		std::ostream &m_file;
+		std::ostream *m_file = nullptr;
 	};
 
 	struct ostream_sink SILICIUM_FINAL : flushable_sink<char>
