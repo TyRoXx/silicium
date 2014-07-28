@@ -21,8 +21,8 @@ namespace Si
 
 	private:
 
-		boost::asio::ip::tcp::acceptor &m_acceptor;
-		boost::asio::yield_context &m_yield;
+		boost::asio::ip::tcp::acceptor *m_acceptor = nullptr;
+		boost::asio::yield_context *m_yield = nullptr;
 	};
 }
 
