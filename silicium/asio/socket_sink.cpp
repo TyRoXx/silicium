@@ -4,8 +4,8 @@
 namespace Si
 {
 	socket_sink::socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
-		: m_socket(socket)
-		, m_yield(yield)
+		: m_socket(&socket)
+		, m_yield(&yield)
 	{
 	}
 
@@ -20,6 +20,8 @@ namespace Si
 
 	void socket_sink::append(boost::iterator_range<char const *> data)
 	{
-		boost::asio::async_write(m_socket, boost::asio::buffer(data.begin(), data.size()), m_yield);
+		assert(m_socket);
+		assert(m_yield);
+		boost::asio::async_write(*m_socket, boost::asio::buffer(data.begin(), data.size()), *m_yield);
 	}
 }
