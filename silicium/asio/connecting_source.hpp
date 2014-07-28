@@ -25,8 +25,8 @@ namespace Si
 
 	private:
 
-		boost::asio::io_service &io;
-		boost::asio::yield_context &yield;
+		boost::asio::io_service *io = nullptr;
+		boost::asio::yield_context *yield = nullptr;
 		boost::asio::ip::tcp::endpoint remote_endpoint;
 	};
 }

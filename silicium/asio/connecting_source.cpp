@@ -3,25 +3,31 @@
 namespace Si
 {
 	connecting_source::connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield, boost::asio::ip::tcp::endpoint remote_endpoint)
-		: io(io)
-		, yield(yield)
+		: io(&io)
+		, yield(&yield)
 		, remote_endpoint(remote_endpoint)
 	{
 	}
 
 	boost::iterator_range<connecting_source::element_type const *> connecting_source::map_next(std::size_t)
 	{
+		assert(io);
+		assert(yield);
 		return {};
 	}
 
 	connecting_source::element_type *connecting_source::copy_next(boost::iterator_range<element_type *> destination)
 	{
+		assert(io);
+		assert(yield);
 		auto copied = begin(destination);
 		for (; copied != end(destination); ++copied)
 		{
-			auto socket = std::make_shared<boost::asio::ip::tcp::socket>(io);
+			assert(io);
+			auto socket = std::make_shared<boost::asio::ip::tcp::socket>(*io);
 			boost::system::error_code error;
-			socket->async_connect(remote_endpoint, yield[error]);
+			assert(yield);
+			socket->async_connect(remote_endpoint, (*yield)[error]);
 			if (error)
 			{
 				*copied = error;
@@ -36,16 +42,22 @@ namespace Si
 
 	boost::uintmax_t connecting_source::minimum_size()
 	{
+		assert(io);
+		assert(yield);
 		return 0;
 	}
 
 	boost::optional<boost::uintmax_t> connecting_source::maximum_size()
 	{
+		assert(io);
+		assert(yield);
 		return boost::none;
 	}
 
 	std::size_t connecting_source::skip(std::size_t count)
 	{
+		assert(io);
+		assert(yield);
 		std::size_t skipped = 0;
 		for (; (skipped < count) && Si::get(*this); ++skipped)
 		{
