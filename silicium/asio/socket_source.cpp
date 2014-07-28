@@ -3,8 +3,8 @@
 namespace Si
 {
 	socket_source::socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
-		: m_socket(socket)
-		, m_yield(yield)
+		: m_socket(&socket)
+		, m_yield(&yield)
 	{
 	}
 
@@ -15,7 +15,9 @@ namespace Si
 
 	char *socket_source::copy_next(boost::iterator_range<char *> destination)
 	{
-		size_t const read = m_socket.async_read_some(boost::asio::buffer(destination.begin(), destination.size()), m_yield);
+		assert(m_socket);
+		assert(m_yield);
+		size_t const read = m_socket->async_read_some(boost::asio::buffer(destination.begin(), destination.size()), *m_yield);
 		return destination.begin() + read;
 	}
 
@@ -31,12 +33,16 @@ namespace Si
 
 	std::size_t socket_source::skip(std::size_t count)
 	{
+		assert(m_socket);
+		assert(m_yield);
 		std::size_t skipped = 0;
 		while (skipped < count)
 		{
 			std::array<char, 1U << 12U> thrown_away;
 			auto const rest = (count - skipped);
-			auto const read = m_socket.async_read_some(boost::asio::buffer(thrown_away.data(), std::min(rest, thrown_away.size())), m_yield);
+			assert(m_socket);
+			assert(m_yield);
+			auto const read = m_socket->async_read_some(boost::asio::buffer(thrown_away.data(), std::min(rest, thrown_away.size())), *m_yield);
 			skipped += read;
 			if (read == 0)
 			{
