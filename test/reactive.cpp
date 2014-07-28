@@ -14,7 +14,6 @@
 #include <reactive/enumerate.hpp>
 #include <reactive/cache.hpp>
 #include <reactive/connector.hpp>
-#include <reactive/receiver.hpp>
 #include <reactive/deref_optional.hpp>
 #include <boost/container/string.hpp>
 #include <boost/test/unit_test.hpp>
