@@ -101,6 +101,7 @@ namespace Si
 		auto bridge = std::make_shared<rx::bridge<int>>();
 		rx::ptr_observable<int, std::shared_ptr<rx::observable<int>>> first{bridge};
 		auto buf = rx::make_buffer(first, 2);
+		buf.prefetch();
 
 		std::vector<int> generated;
 		auto consumer = rx::consume<int>([&generated](int element)

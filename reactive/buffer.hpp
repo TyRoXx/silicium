@@ -20,7 +20,6 @@ namespace rx
 			: from(std::move(from))
 			, elements(size)
 		{
-			check_fetch();
 		}
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
@@ -42,6 +41,11 @@ namespace rx
 			assert(receiver);
 			assert(fetching);
 			return from.cancel();
+		}
+
+		void prefetch()
+		{
+			check_fetch();
 		}
 
 	private:
