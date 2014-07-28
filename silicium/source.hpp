@@ -101,8 +101,12 @@ namespace Si
 
 	struct line_source SILICIUM_FINAL : Si::source<std::vector<char>>
 	{
+		line_source()
+		{
+		}
+
 		explicit line_source(Si::source<char> &next)
-			: m_next(next)
+			: m_next(&next)
 		{
 		}
 
@@ -113,20 +117,21 @@ namespace Si
 
 		virtual std::vector<char> *copy_next(boost::iterator_range<std::vector<char> *> destination) SILICIUM_OVERRIDE
 		{
+			assert(m_next);
 			auto i = begin(destination);
 			for (; i != end(destination); ++i)
 			{
 				auto &line = *i;
 				for (;;)
 				{
-					auto c = get(m_next);
+					auto c = get(*m_next);
 					if (!c)
 					{
 						return &line;
 					}
 					if (*c == '\r')
 					{
-						auto lf = get(m_next);
+						auto lf = get(*m_next);
 						if (!lf)
 						{
 							return &line;
@@ -153,7 +158,8 @@ namespace Si
 
 		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
 		{
-			auto max_chars = m_next.maximum_size();
+			assert(m_next);
+			auto max_chars = m_next->maximum_size();
 			//a line can be a single character ('\n')
 			return max_chars;
 		}
@@ -173,7 +179,7 @@ namespace Si
 
 	private:
 
-		Si::source<char> &m_next;
+		Si::source<char> *m_next = nullptr;
 	};
 
 	template <class Element>
