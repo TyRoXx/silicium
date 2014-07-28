@@ -203,7 +203,7 @@ namespace Si
 
 		virtual Element *copy_next(boost::iterator_range<Element *> destination) SILICIUM_OVERRIDE
 		{
-			if (m_buffer.empty() && (destination.size() < m_buffer.capacity()))
+			if (m_buffer.empty() && (static_cast<size_t>(destination.size()) < m_buffer.capacity()))
 			{
 				pull();
 			}

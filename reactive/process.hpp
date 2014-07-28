@@ -16,6 +16,7 @@ namespace rx
 
 	inline process launch_process(boost::filesystem::path executable, std::vector<std::string> arguments, observable<char> &input)
 	{
+		(void)input;
 		throw std::logic_error("not implemented");
 	}
 }
