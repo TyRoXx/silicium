@@ -21,7 +21,7 @@ namespace rx
 	using nothing = detail::nothing;
 
 	template <class T, class ...Args>
-	auto make_unique(Args &&...args)
+	auto make_unique(Args &&...args) -> std::unique_ptr<T>
 	{
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}

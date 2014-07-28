@@ -18,6 +18,29 @@ namespace rx
 			: public observable<nothing>
 			, private observer<typename NothingObservableObservable::element_type>
 	{
+		typedef nothing element_type;
+
+		flattener()
+		{
+		}
+
+#ifdef _MSC_VER
+		flattener(flattener &&other)
+		{
+			*this = std::move(other);
+		}
+		
+		flattener &operator = (flattener &&other)
+		{
+			input = std::move(other.input);
+			input_ended = std::move(other.input_ended);
+			receiver_ = std::move(other.receiver_);
+			children = std::move(other.children);
+			children_mutex = std::move(other.children_mutex);
+			return *this;
+		}
+#endif
+
 		explicit flattener(NothingObservableObservable input)
 			: input(std::move(input))
 			, children_mutex(make_unique<Mutex>())
@@ -40,7 +63,9 @@ namespace rx
 
 		typedef typename NothingObservableObservable::element_type nothing_observable;
 
-		struct child : observer<nothing>
+		struct child
+			: private observer<nothing>
+			, private boost::noncopyable
 		{
 			flattener &parent;
 			nothing_observable observed;
@@ -97,7 +122,7 @@ namespace rx
 		{
 			{
 				boost::unique_lock<Mutex> lock(*children_mutex);
-				children.emplace_back(make_unique<child>(*this, std::move(value)));
+				children.emplace_back(rx::make_unique<child>(*this, std::move(value)));
 				child &new_child = *children.back();
 				new_child.start();
 			}
@@ -117,7 +142,7 @@ namespace rx
 	};
 
 	template <class Mutex, class NothingObservableObservable>
-	auto flatten(NothingObservableObservable &&input)
+	auto flatten(NothingObservableObservable &&input) -> flattener<typename std::decay<NothingObservableObservable>::type, Mutex>
 	{
 		return flattener<typename std::decay<NothingObservableObservable>::type, Mutex>(std::forward<NothingObservableObservable>(input));
 	}

@@ -81,6 +81,23 @@ namespace rx
 	{
 		typedef Element element_type;
 
+		coroutine_observable()
+		{
+		}
+
+		coroutine_observable(coroutine_observable &&other)
+		{
+			*this = std::move(other);
+		}
+
+		coroutine_observable &operator = (coroutine_observable &&other)
+		{
+			coro_ = std::move(other.coro_);
+			receiver_ = std::move(other.receiver_);
+			first = std::move(other.first);
+			return *this;
+		}
+
 		template <class Action>
 		explicit coroutine_observable(Action action)
 			: coro_(

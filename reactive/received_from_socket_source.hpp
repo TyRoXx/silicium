@@ -93,7 +93,7 @@ namespace rx
 	private:
 
 		Si::source<rx::received_from_socket> *original = nullptr;
-		rx::incoming_bytes rest{};
+		rx::incoming_bytes rest;
 	};
 }
 
