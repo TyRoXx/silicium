@@ -47,13 +47,13 @@ namespace rx
 			virtual void got_element(Element value) SILICIUM_OVERRIDE
 			{
 				cancel_others();
-				exchange(combinator->receiver_, nullptr)->got_element(element_type{std::move(value)});
+				rx::exchange(combinator->receiver_, nullptr)->got_element(element_type{std::move(value)});
 			}
 
 			virtual void ended() SILICIUM_OVERRIDE
 			{
 				cancel_others();
-				exchange(combinator->receiver_, nullptr)->ended();
+				rx::exchange(combinator->receiver_, nullptr)->ended();
 			}
 
 		private:

@@ -50,11 +50,11 @@ namespace rx
 					{
 						return;
 					}
-					exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{error});
+					rx::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{error});
 				}
 				else
 				{
-					exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
+					rx::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
 				}
 			});
 		}

@@ -170,7 +170,7 @@ namespace rx
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			exchange(receiver_, nullptr)->ended();
+			rx::exchange(receiver_, nullptr)->ended();
 		}
 
 		void next()

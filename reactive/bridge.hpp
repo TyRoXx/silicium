@@ -22,13 +22,13 @@ namespace rx
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver);
-			exchange(receiver, nullptr)->got_element(std::move(value));
+			rx::exchange(receiver, nullptr)->got_element(std::move(value));
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
 			assert(receiver);
-			exchange(receiver, nullptr)->ended();
+			rx::exchange(receiver, nullptr)->ended();
 		}
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
