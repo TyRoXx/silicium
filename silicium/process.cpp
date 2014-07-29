@@ -1,6 +1,10 @@
 #include <silicium/process.hpp>
 #include <silicium/to_unique.hpp>
+
+#ifdef _WIN32
 #include <silicium/win32.hpp>
+#endif
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/system/system_error.hpp>
 #include <algorithm>
@@ -10,10 +14,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-#endif
-
-#ifdef _WIN32
-#include <Windows.h>
 #endif
 
 namespace Si
