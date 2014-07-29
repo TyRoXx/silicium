@@ -5,8 +5,8 @@
 #include <reactive/config.hpp>
 #include <reactive/exchange.hpp>
 #include <silicium/override.hpp>
-#include <vector>
 #include <memory>
+#include <unordered_map>
 #include <cassert>
 #include <boost/thread/locks.hpp>
 #include <boost/range/algorithm/find_if.hpp>
@@ -95,7 +95,7 @@ namespace rx
 		NothingObservableObservable input;
 		bool input_ended = false;
 		observer<nothing> *receiver_ = nullptr;
-		std::vector<std::unique_ptr<child>> children;
+		std::unordered_map<child *, std::unique_ptr<child>> children;
 		std::unique_ptr<Mutex> children_mutex;
 
 		void fetch()
@@ -106,10 +106,7 @@ namespace rx
 		void remove_child(child &removing)
 		{
 			boost::unique_lock<Mutex> lock(*children_mutex);
-			auto const i = boost::range::find_if(children, [&removing](std::unique_ptr<child> const &element)
-			{
-				return element.get() == &removing;
-			});
+			auto const i = children.find(&removing);
 			children.erase(i);
 			if (input_ended &&
 			    children.empty())
@@ -122,9 +119,10 @@ namespace rx
 		{
 			{
 				boost::unique_lock<Mutex> lock(*children_mutex);
-				children.emplace_back(rx::make_unique<child>(*this, std::move(value)));
-				child &new_child = *children.back();
-				new_child.start();
+				auto child_ = rx::make_unique<child>(*this, std::move(value));
+				child &child_ref = *child_;
+				children.insert(std::make_pair(&child_ref, std::move(child_)));
+				child_ref.start();
 			}
 			return fetch();
 		}
