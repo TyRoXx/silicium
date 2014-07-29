@@ -26,7 +26,7 @@ namespace
 		{
 			auto response_sink = Si::make_container_sink(send_buffer);
 			Si::http::response_header response;
-			response.http_version = "HTTP/1.1";
+			response.http_version = "HTTP/1.0";
 			response.status = 200;
 			response.status_text = "OK";
 			std::string const body = boost::str(boost::format("Hello, visitor %1%") % visitor_number);
