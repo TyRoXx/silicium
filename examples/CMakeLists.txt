@@ -28,6 +28,9 @@ endif()
 add_executable(rxhttp "rxhttp.cpp")
 target_link_libraries(rxhttp silicium ${Boost_LIBRARIES})
 
+add_executable(trivialhttp "trivialhttp.cpp")
+target_link_libraries(trivialhttp ${Boost_LIBRARIES})
+
 if(SILICIUM_LINUX)
 	add_executable(watchdir "watchdir.cpp")
 	target_link_libraries(watchdir reactive ${Boost_LIBRARIES})
