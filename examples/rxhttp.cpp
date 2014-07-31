@@ -11,11 +11,13 @@
 
 namespace
 {
-	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield, boost::uintmax_t visitor_number)
+	template <class Send, class Shutdown>
+	void serve_client(
+		Si::source<rx::received_from_socket> &receiver,
+		Send const &send,
+		Shutdown const &shutdown,
+		boost::uintmax_t visitor_number)
 	{
-		std::vector<char> received(4096);
-		rx::socket_observable receiving(client, boost::make_iterator_range(received.data(), received.data() + received.size()));
-		auto receiver = rx::make_observable_source(rx::ref(receiving), yield);
 		rx::received_from_socket_source bytes_receiver(receiver);
 		boost::optional<Si::http::request_header> request = Si::http::parse_header(bytes_receiver);
 		if (!request)
@@ -35,19 +37,33 @@ namespace
 			Si::http::write_header(response_sink, response);
 			Si::append(response_sink, body);
 		}
-		rx::sending_observable sending(
-			client,
-			boost::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
+		send(boost::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
 
-		//ignore error
-		yield.get_one(sending);
-
-		boost::system::error_code error;
-		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+		shutdown();
 
 		while (Si::get(bytes_receiver))
 		{
 		}
+	}
+
+	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield, boost::uintmax_t visitor_number)
+	{
+		std::vector<char> received(4096);
+		rx::socket_observable receiving(client, boost::make_iterator_range(received.data(), received.data() + received.size()));
+		auto receiver = rx::make_observable_source(rx::ref(receiving), yield);
+		auto const send = [&client, &yield](boost::iterator_range<char const *> data)
+		{
+			rx::sending_observable sending(client, data);
+
+			//ignore error
+			yield.get_one(sending);
+		};
+		auto const shutdown = [&client]
+		{
+			boost::system::error_code error;
+			client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+		};
+		return serve_client(receiver, send, shutdown, visitor_number);
 	}
 
 	using events = rx::shared_observable<rx::detail::nothing>;
