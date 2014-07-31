@@ -11,14 +11,12 @@
 
 namespace
 {
-	template <class Send, class Shutdown>
+	template <class Socket>
 	void serve_client(
-		Si::source<rx::received_from_socket> &receiver,
-		Send const &send,
-		Shutdown const &shutdown,
+		Socket &client,
 		boost::uintmax_t visitor_number)
 	{
-		rx::received_from_socket_source bytes_receiver(receiver);
+		rx::received_from_socket_source bytes_receiver(client.receiving());
 		boost::optional<Si::http::request_header> request = Si::http::parse_header(bytes_receiver);
 		if (!request)
 		{
@@ -37,33 +35,60 @@ namespace
 			Si::http::write_header(response_sink, response);
 			Si::append(response_sink, body);
 		}
-		send(boost::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
-
-		shutdown();
+		client.send(boost::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
+		client.shutdown();
 
 		while (Si::get(bytes_receiver))
 		{
 		}
 	}
 
-	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield, boost::uintmax_t visitor_number)
+	struct coroutine_socket
 	{
-		std::vector<char> received(4096);
-		rx::socket_observable receiving(client, boost::make_iterator_range(received.data(), received.data() + received.size()));
-		auto receiver = rx::make_observable_source(rx::ref(receiving), yield);
-		auto const send = [&client, &yield](boost::iterator_range<char const *> data)
+		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, rx::yield_context<rx::detail::nothing> &yield)
+			: socket(&socket)
+			, yield(&yield)
+			, received(4096)
+			, receiver(socket, boost::make_iterator_range(received.data(), received.data() + received.size()))
+			, receiving_(receiver, yield)
 		{
-			rx::sending_observable sending(client, data);
+		}
+
+		Si::source<rx::received_from_socket> &receiving()
+		{
+			return receiving_;
+		}
+
+		void send(boost::iterator_range<char const *> data)
+		{
+			assert(socket);
+			assert(yield);
+
+			rx::sending_observable sending(*socket, data);
 
 			//ignore error
-			yield.get_one(sending);
-		};
-		auto const shutdown = [&client]
+			yield->get_one(sending);
+		}
+
+		void shutdown()
 		{
 			boost::system::error_code error;
-			client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
-		};
-		return serve_client(receiver, send, shutdown, visitor_number);
+			socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+		}
+
+	private:
+
+		boost::asio::ip::tcp::socket *socket = nullptr;
+		rx::yield_context<rx::detail::nothing> *yield = nullptr;
+		std::vector<char> received;
+		rx::socket_observable receiver;
+		rx::observable_source<rx::socket_observable, rx::yield_context<rx::detail::nothing>> receiving_;
+	};
+
+	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield, boost::uintmax_t visitor_number)
+	{
+		coroutine_socket coro_socket(client, yield);
+		return serve_client(coro_socket, visitor_number);
 	}
 
 	using events = rx::shared_observable<rx::detail::nothing>;
