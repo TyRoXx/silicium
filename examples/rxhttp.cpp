@@ -85,12 +85,6 @@ namespace
 		rx::observable_source<rx::socket_observable, rx::yield_context<rx::detail::nothing>> receiving_;
 	};
 
-	void serve_client(boost::asio::ip::tcp::socket &client, rx::yield_context<rx::detail::nothing> &yield, boost::uintmax_t visitor_number)
-	{
-		coroutine_socket coro_socket(client, yield);
-		return serve_client(coro_socket, visitor_number);
-	}
-
 	using events = rx::shared_observable<rx::detail::nothing>;
 
 	struct accept_handler : boost::static_visitor<events>
@@ -107,7 +101,8 @@ namespace
 			auto visitor_number_ = visitor_number;
 			auto client_handler = rx::wrap<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client, visitor_number_](rx::yield_context<rx::detail::nothing> &yield) -> void
 			{
-				return serve_client(*client, yield, visitor_number_);
+				coroutine_socket coro_socket(*client, yield);
+				return serve_client(coro_socket, visitor_number_);
 			}));
 			return client_handler;
 		}
