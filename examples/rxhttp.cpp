@@ -8,6 +8,7 @@
 #include <reactive/total_consumer.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
+#include <thread>
 
 namespace
 {
@@ -91,6 +92,7 @@ namespace
 
 		explicit thread_socket_source(boost::asio::ip::tcp::socket &socket)
 			: socket(&socket)
+			, received(4096)
 		{
 		}
 
@@ -121,6 +123,7 @@ namespace
 				{
 					*i = rx::incoming_bytes(received.data(), received.data() + bytes_received);
 				}
+				++i;
 			}
 			return i;
 		}
@@ -178,11 +181,11 @@ namespace
 
 	using events = rx::shared_observable<rx::detail::nothing>;
 
-	struct accept_handler : boost::static_visitor<events>
+	struct coroutine_accept_handler : boost::static_visitor<events>
 	{
 		boost::uintmax_t visitor_number;
 
-		explicit accept_handler(boost::uintmax_t visitor_number)
+		explicit coroutine_accept_handler(boost::uintmax_t visitor_number)
 			: visitor_number(visitor_number)
 		{
 		}
@@ -220,12 +223,72 @@ namespace
 						break;
 					}
 					++visitor_count;
-					accept_handler handler{visitor_count};
+					coroutine_accept_handler handler{visitor_count};
 					auto context = Si::apply_visitor(handler, *result);
 					if (!context.empty())
 					{
 						yield(std::move(context));
 					}
+				}
+			})))))
+		{
+		}
+
+		void start()
+		{
+			all_work.start();
+		}
+
+	private:
+
+		boost::asio::ip::tcp::acceptor acceptor;
+		rx::tcp_acceptor clients;
+		rx::total_consumer<rx::unique_observable<rx::nothing>> all_work;
+	};
+
+	struct thread_accept_handler : boost::static_visitor<>
+	{
+		boost::uintmax_t visitor_number;
+
+		explicit thread_accept_handler(boost::uintmax_t visitor_number)
+			: visitor_number(visitor_number)
+		{
+		}
+
+		void operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
+		{
+			auto visitor_number_ = visitor_number;
+			std::thread([client, visitor_number_]
+			{
+				thread_socket threaded_socket(*client);
+				serve_client(threaded_socket, visitor_number_);
+			}).detach();
+		}
+
+		void operator()(boost::system::error_code) const
+		{
+			throw std::logic_error("not implemented");
+		}
+	};
+
+	struct thread_web_server
+	{
+		explicit thread_web_server(boost::asio::io_service &io, boost::uint16_t port)
+			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
+			, clients(acceptor)
+			, all_work(rx::make_total_consumer(rx::box<rx::nothing>(rx::flatten<boost::mutex>(rx::make_coroutine<events>([this](rx::yield_context<events> &yield) -> void
+			{
+				boost::uintmax_t visitor_count = 0;
+				for (;;)
+				{
+					auto result = yield.get_one(clients);
+					if (!result)
+					{
+						break;
+					}
+					++visitor_count;
+					thread_accept_handler handler{visitor_count};
+					Si::apply_visitor(handler, *result);
 				}
 			})))))
 		{
@@ -248,8 +311,11 @@ int main()
 {
 	boost::asio::io_service io;
 
-	coroutine_web_server server(io, 8080);
-	server.start();
+	coroutine_web_server coroutined(io, 8080);
+	coroutined.start();
+
+	thread_web_server threaded(io, 8081);
+	threaded.start();
 
 	auto const thread_count = boost::thread::hardware_concurrency();
 
