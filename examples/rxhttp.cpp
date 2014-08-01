@@ -85,6 +85,97 @@ namespace
 		rx::observable_source<rx::socket_observable, rx::yield_context<rx::detail::nothing>> receiving_;
 	};
 
+	struct thread_socket_source : Si::source<rx::received_from_socket>
+	{
+		typedef rx::received_from_socket element_type;
+
+		explicit thread_socket_source(boost::asio::ip::tcp::socket &socket)
+			: socket(&socket)
+		{
+		}
+
+		boost::asio::ip::tcp::socket *get_socket() const
+		{
+			return socket;
+		}
+
+		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		{
+			(void)size;
+			return {};
+		}
+
+		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		{
+			assert(socket);
+			auto *i = destination.begin();
+			if (i != destination.end())
+			{
+				boost::system::error_code ec;
+				auto const bytes_received = socket->receive(boost::asio::buffer(received), 0, ec);
+				if (ec)
+				{
+					*i = ec;
+				}
+				else
+				{
+					*i = rx::incoming_bytes(received.data(), received.data() + bytes_received);
+				}
+			}
+			return i;
+		}
+
+		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
+		{
+			return 0;
+		}
+
+		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
+		{
+			return boost::none;
+		}
+
+		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
+		{
+			(void)count;
+			throw std::logic_error("to do");
+		}
+
+	private:
+
+		boost::asio::ip::tcp::socket *socket = nullptr;
+		std::vector<char> received;
+	};
+
+	struct thread_socket
+	{
+		explicit thread_socket(boost::asio::ip::tcp::socket &socket)
+			: receiving_(socket)
+		{
+		}
+
+		Si::source<rx::received_from_socket> &receiving()
+		{
+			return receiving_;
+		}
+
+		void send(boost::iterator_range<char const *> data)
+		{
+			assert(socket);
+			boost::asio::write(*receiving_.get_socket(), boost::asio::buffer(data.begin(), data.size()));
+		}
+
+		void shutdown()
+		{
+			boost::system::error_code error;
+			receiving_.get_socket()->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+		}
+
+	private:
+
+		thread_socket_source receiving_;
+	};
+
 	using events = rx::shared_observable<rx::detail::nothing>;
 
 	struct accept_handler : boost::static_visitor<events>
@@ -112,34 +203,53 @@ namespace
 			throw std::logic_error("not implemented");
 		}
 	};
+
+	struct coroutine_web_server
+	{
+		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
+			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
+			, clients(acceptor)
+			, all_work(rx::make_total_consumer(rx::box<rx::nothing>(rx::flatten<boost::mutex>(rx::make_coroutine<events>([this](rx::yield_context<events> &yield) -> void
+			{
+				boost::uintmax_t visitor_count = 0;
+				for (;;)
+				{
+					auto result = yield.get_one(clients);
+					if (!result)
+					{
+						break;
+					}
+					++visitor_count;
+					accept_handler handler{visitor_count};
+					auto context = Si::apply_visitor(handler, *result);
+					if (!context.empty())
+					{
+						yield(std::move(context));
+					}
+				}
+			})))))
+		{
+		}
+
+		void start()
+		{
+			all_work.start();
+		}
+
+	private:
+
+		boost::asio::ip::tcp::acceptor acceptor;
+		rx::tcp_acceptor clients;
+		rx::total_consumer<rx::unique_observable<rx::nothing>> all_work;
+	};
 }
 
 int main()
 {
 	boost::asio::io_service io;
-	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
-	rx::tcp_acceptor clients(acceptor);
-	auto handling_clients = rx::flatten<boost::mutex>(rx::make_coroutine<events>([&clients](rx::yield_context<events> &yield) -> void
-	{
-		boost::uintmax_t visitor_count = 0;
-		for (;;)
-		{
-			auto result = yield.get_one(clients);
-			if (!result)
-			{
-				break;
-			}
-			++visitor_count;
-			accept_handler handler{visitor_count};
-			auto context = Si::apply_visitor(handler, *result);
-			if (!context.empty())
-			{
-				yield(std::move(context));
-			}
-		}
-	}));
-	auto all = rx::make_total_consumer(rx::ref(handling_clients));
-	all.start();
+
+	coroutine_web_server server(io, 8080);
+	server.start();
 
 	auto const thread_count = boost::thread::hardware_concurrency();
 
