@@ -86,7 +86,11 @@ namespace rx
 	private:
 
 		//TODO: save the memory for the function pointer
-		conditional_transformer<file_notification, enumerator<win32::directory_changes>, boost::optional<file_notification>(*)(win32::file_notification &&)> impl;
+		conditional_transformer<
+			file_notification,
+			enumerator<win32::directory_changes>,
+			boost::optional<file_notification>(*)(win32::file_notification &&)
+		> impl;
 	};
 #endif
 }
