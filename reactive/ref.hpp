@@ -6,9 +6,12 @@
 namespace rx
 {
 	template <class Element>
-	auto ref(rx::observable<Element> &identity) -> rx::ptr_observable<Element, rx::observable<Element> *>
+	using reference = ptr_observable<Element, observable<Element> *>;
+
+	template <class Element>
+	auto ref(observable<Element> &identity) -> reference<Element>
 	{
-		return rx::ptr_observable<Element, rx::observable<Element> *>(&identity);
+		return reference<Element>(&identity);
 	}
 }
 

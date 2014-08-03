@@ -8,8 +8,119 @@
 #endif
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/numeric.hpp>
+#include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/optional.hpp>
 #include <iostream>
+
+namespace rx
+{
+	BOOST_SCOPED_ENUM_DECLARE_BEGIN(file_notification_type)
+	{
+		add,
+		remove,
+		change
+	}
+	BOOST_SCOPED_ENUM_DECLARE_END(file_notification_type)
+
+	struct file_notification
+	{
+		file_notification_type type = file_notification_type::change;
+		boost::filesystem::path name;
+
+		file_notification()
+		{
+		}
+
+		file_notification(file_notification_type type, boost::filesystem::path name)
+			: type(type)
+			, name(std::move(name))
+		{
+		}
+	};
+
+#ifdef _WIN32
+	namespace win32
+	{
+		boost::optional<file_notification_type> to_portable_file_notification_type(DWORD action)
+		{
+			switch (action)
+			{
+			case FILE_ACTION_ADDED: return file_notification_type::add;
+			case FILE_ACTION_REMOVED: return file_notification_type::remove;
+			case FILE_ACTION_MODIFIED: return file_notification_type::change;
+			default:
+				return boost::none; //TODO
+			}
+		}
+
+		boost::optional<rx::file_notification> to_portable_file_notification(win32::file_notification &&original)
+		{
+			auto const type = to_portable_file_notification_type(original.action);
+			if (!type)
+			{
+				return boost::none;
+			}
+			return rx::file_notification(*type, std::move(original.name));
+		}
+	}
+
+	struct file_system_watcher
+		: public observable<file_notification>
+		, private observer<win32::file_notification>
+	{
+		typedef file_notification element_type;
+
+		explicit file_system_watcher(boost::filesystem::path const &watched_dir)
+			: original(watched_dir, true)
+			, individual_events(ref(original))
+		{
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			assert(!receiver_);
+			receiver_ = &receiver;
+			fetch();
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			throw std::logic_error("to do");
+		}
+
+	private:
+
+		win32::directory_changes original;
+		enumerator<reference<std::vector<win32::file_notification>>> individual_events;
+		observer<element_type> *receiver_ = nullptr;
+
+		void fetch()
+		{
+			individual_events.async_get_one(*this);
+		}
+
+		virtual void got_element(win32::file_notification value) SILICIUM_OVERRIDE
+		{
+			assert(receiver_);
+			auto converted = to_portable_file_notification(std::move(value));
+			if (converted)
+			{
+				rx::exchange(receiver_, nullptr)->got_element(std::move(*converted));
+			}
+			else
+			{
+				fetch();
+			}
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+			SILICIUM_UNREACHABLE();
+		}
+	};
+#endif
+}
 
 namespace
 {
@@ -56,10 +167,10 @@ int main()
 	std::cerr << "Watching " << watched_dir << '\n';
 
 #ifdef _WIN32
-	rx::win32::directory_changes notifier(watched_dir, false);
-	auto all = rx::for_each(rx::enumerate(rx::ref(notifier)), [](rx::win32::file_notification const &event)
+	rx::file_system_watcher notifier(watched_dir);
+	auto all = rx::for_each(rx::ref(notifier), [](rx::file_notification const &event)
 	{
-		std::cerr << event.name << '\n';
+		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
 	});
 	boost::asio::io_service::work keep_running(io);
 #else
