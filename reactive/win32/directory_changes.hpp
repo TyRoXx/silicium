@@ -32,12 +32,13 @@ namespace rx
 		{
 			using element_type = std::vector<file_notification>;
 
-			explicit directory_changes(boost::filesystem::path const &watched);
+			explicit directory_changes(boost::filesystem::path const &watched, bool is_recursive);
 			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE;
 			virtual void cancel() SILICIUM_OVERRIDE;
 
 		private:
 
+			bool is_recursive;
 			observer<element_type> *receiver_ = nullptr;
 			Si::win32::unique_handle watch_file;
 			boost::asio::io_service read_dispatcher;

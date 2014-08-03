@@ -7,8 +7,9 @@ namespace rx
 {
 	namespace win32
 	{
-		directory_changes::directory_changes(boost::filesystem::path const &watched)
-			: watch_file(CreateFileW(
+		directory_changes::directory_changes(boost::filesystem::path const &watched, bool is_recursive)
+			: is_recursive(is_recursive)
+			, watch_file(CreateFileW(
 				watched.c_str(),
 				FILE_LIST_DIRECTORY,
 				FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
@@ -37,7 +38,7 @@ namespace rx
 				DWORD received = 0;
 				std::array<char, 0x10000> buffer;
 				DWORD const actions = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_DIR_NAME;
-				if (!ReadDirectoryChangesW(watch_file.get(), buffer.data(), buffer.size(), TRUE, actions, &received, nullptr, nullptr))
+				if (!ReadDirectoryChangesW(watch_file.get(), buffer.data(), buffer.size(), is_recursive, actions, &received, nullptr, nullptr))
 				{
 					//TODO: handle ERROR_NOTIFY_ENUM_DIR (overflow of event queue)
 					throw std::logic_error("to do: error handling");

@@ -56,7 +56,7 @@ int main()
 	std::cerr << "Watching " << watched_dir << '\n';
 
 #ifdef _WIN32
-	rx::win32::directory_changes notifier(watched_dir);
+	rx::win32::directory_changes notifier(watched_dir, false);
 	auto all = rx::for_each(rx::enumerate(rx::ref(notifier)), [](rx::win32::file_notification const &event)
 	{
 		std::cerr << event.name << '\n';
