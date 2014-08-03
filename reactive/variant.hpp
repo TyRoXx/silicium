@@ -4,8 +4,8 @@
 #include <reactive/observable.hpp>
 #include <reactive/exchange.hpp>
 #include <reactive/config.hpp>
+#include <reactive/detail/integer_sequence.hpp>
 #include <silicium/fast_variant.hpp>
-#include "detail/integer_sequence.hpp"
 
 namespace rx
 {
