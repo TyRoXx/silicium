@@ -114,7 +114,7 @@ namespace rx
 	private:
 
 		Input original;
-		Transformation transform;
+		Transformation transform; //TODO: optimize for emptiness
 		observer<element_type> *receiver_ = nullptr;
 
 		BOOST_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &));
@@ -178,6 +178,7 @@ namespace rx
 
 	private:
 
+		//TODO: save the memory for the function pointer
 		conditional_transformer<file_notification, enumerator<win32::directory_changes>, boost::optional<file_notification>(*)(win32::file_notification &&)> impl;
 	};
 #endif
