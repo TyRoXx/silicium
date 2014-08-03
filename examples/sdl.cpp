@@ -204,7 +204,7 @@ namespace
 	}
 }
 
-int main()
+int main(int argc, char* argv[]) //SDL2 requires the parameters on Windows
 {
 	check_sdl(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS));
 	BOOST_SCOPE_EXIT(void)
@@ -223,7 +223,7 @@ int main()
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
 	rx::bridge<SDL_Event> frame_events;
-	auto frames = rx::cache(make_frames(rx::ref(frame_events)), frame{{}});
+	auto frames = rx::cache(make_frames(rx::ref(frame_events)), frame());
 
 	for (;;)
 	{
@@ -243,4 +243,5 @@ int main()
 
 		SDL_Delay(16);
 	}
+	return 0;
 }
