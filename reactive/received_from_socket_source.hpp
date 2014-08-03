@@ -60,7 +60,16 @@ namespace rx
 		virtual char *copy_next(boost::iterator_range<char *> destination) SILICIUM_OVERRIDE
 		{
 			auto mapped = map_next(destination.size());
-			char * const copied = std::copy_n(mapped.begin(), std::min(destination.size(), mapped.size()), destination.begin());
+			auto const copy_size = std::min(destination.size(), mapped.size());
+#ifdef _MSC_VER
+			if (copy_size == 0)
+			{
+				//The VC++ 2013 copy_n requires non-nullptr iterators although nullptr is
+				//a perfectly valid iterator in an empty range. We do not call copy_n in that special case.
+				return destination.begin();
+			}
+#endif
+			char * const copied = std::copy_n(mapped.begin(), copy_size, destination.begin());
 			skip(std::distance(destination.begin(), copied));
 			return copied;
 		}
