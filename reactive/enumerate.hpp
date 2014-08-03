@@ -25,10 +25,31 @@ namespace rx
 		typedef typename enumerated_element<RangeObservable>::type element_type;
 		typedef typename RangeObservable::element_type range_type;
 
+		enumerator()
+		{
+		}
+
 		explicit enumerator(RangeObservable input)
 			: input(std::move(input))
 		{
 		}
+
+#ifdef _MSC_VER
+		enumerator(enumerator &&other)
+			: input(std::move(other.input))
+			, buffered(std::move(other.buffered))
+			, receiver_(std::move(other.receiver_))
+		{
+		}
+
+		enumerator &operator = (enumerator &&other)
+		{
+			input = std::move(other.input);
+			buffered = std::move(other.buffered);
+			receiver_ = std::move(other.receiver_);
+			return *this;
+		}
+#endif
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
@@ -82,6 +103,9 @@ namespace rx
 			buffered.pop();
 			return exchange(receiver_, nullptr)->got_element(std::move(element));
 		}
+
+		BOOST_DELETED_FUNCTION(enumerator(enumerator const &));
+		BOOST_DELETED_FUNCTION(enumerator &operator = (enumerator const &));
 	};
 
 	template <class RangeObservable>
