@@ -260,7 +260,7 @@ namespace rx
 	};
 
 	template <class Element, class ElementFromLua>
-	auto make_lua_thread(lua_State &parent, ElementFromLua &&from_lua)
+	auto make_lua_thread(lua_State &parent, ElementFromLua &&from_lua) -> lua_thread<Element, typename std::decay<ElementFromLua>::type>
 	{
 		lua_State * const coro = lua_newthread(&parent);
 		lua_xmove(&parent, coro, 1);
