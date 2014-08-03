@@ -65,17 +65,39 @@ namespace rx
 		}
 	}
 
-	struct file_system_watcher
-		: public observable<file_notification>
-		, private observer<win32::file_notification>
+	template <class Element, class Input, class Transformation>
+	struct conditional_transformer
+		: public observable<Element>
+		, private observer<typename Input::element_type>
 	{
-		typedef file_notification element_type;
+		typedef Element element_type;
 
-		explicit file_system_watcher(boost::filesystem::path const &watched_dir)
-			: original(watched_dir, true)
-			, individual_events(ref(original))
+		conditional_transformer()
 		{
 		}
+
+		explicit conditional_transformer(Input original, Transformation transform)
+			: original(std::move(original))
+			, transform(std::move(transform))
+		{
+		}
+
+#ifdef _MSC_VER
+		conditional_transformer(conditional_transformer &&other)
+			: original(std::move(other.original))
+			, transform(std::move(other.transform))
+			, receiver_(std::move(other.receiver_))
+		{
+		}
+
+		conditional_transformer &operator = (conditional_transformer &&other)
+		{
+			original = std:move(other.original);
+			transform = std:move(other.transform);
+			receiver_ = std:move(other.receiver_);
+			return *this;
+		}
+#endif
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
@@ -91,19 +113,22 @@ namespace rx
 
 	private:
 
-		win32::directory_changes original;
-		enumerator<reference<std::vector<win32::file_notification>>> individual_events;
+		Input original;
+		Transformation transform;
 		observer<element_type> *receiver_ = nullptr;
+
+		BOOST_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &));
+		BOOST_DELETED_FUNCTION(conditional_transformer &operator = (conditional_transformer const &));
 
 		void fetch()
 		{
-			individual_events.async_get_one(*this);
+			original.async_get_one(*this);
 		}
 
-		virtual void got_element(win32::file_notification value) SILICIUM_OVERRIDE
+		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
-			auto converted = to_portable_file_notification(std::move(value));
+			auto converted = transform(std::move(value));
 			if (converted)
 			{
 				rx::exchange(receiver_, nullptr)->got_element(std::move(*converted));
@@ -119,6 +144,14 @@ namespace rx
 			SILICIUM_UNREACHABLE();
 		}
 	};
+
+	template <class Element, class Input, class Transformation>
+	auto transform_if_initialized(Input &&input, Transformation &&transform) -> conditional_transformer<Element, typename std::decay<Input>::type, typename std::decay<Transformation>::type>
+	{
+		return conditional_transformer<Element, typename std::decay<Input>::type, typename std::decay<Transformation>::type>(
+			std::forward<Input>(input),
+			std::forward<Transformation>(transform));
+	}
 #endif
 }
 
@@ -167,7 +200,7 @@ int main()
 	std::cerr << "Watching " << watched_dir << '\n';
 
 #ifdef _WIN32
-	rx::file_system_watcher notifier(watched_dir);
+	auto notifier = rx::transform_if_initialized<rx::file_notification>(rx::enumerate(rx::win32::directory_changes(watched_dir, true)), rx::win32::to_portable_file_notification);
 	auto all = rx::for_each(rx::ref(notifier), [](rx::file_notification const &event)
 	{
 		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
