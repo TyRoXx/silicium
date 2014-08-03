@@ -152,6 +152,34 @@ namespace rx
 			std::forward<Input>(input),
 			std::forward<Transformation>(transform));
 	}
+
+	struct file_system_watcher : observable<file_notification>
+	{
+		typedef file_notification element_type;
+
+		file_system_watcher()
+		{
+		}
+
+		explicit file_system_watcher(boost::filesystem::path const &watched)
+			: impl(enumerate(win32::directory_changes(watched, true)), win32::to_portable_file_notification)
+		{
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			return impl.async_get_one(receiver);
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			return impl.cancel();
+		}
+
+	private:
+
+		conditional_transformer<file_notification, enumerator<win32::directory_changes>, boost::optional<file_notification>(*)(win32::file_notification &&)> impl;
+	};
 #endif
 }
 
@@ -200,7 +228,7 @@ int main()
 	std::cerr << "Watching " << watched_dir << '\n';
 
 #ifdef _WIN32
-	auto notifier = rx::transform_if_initialized<rx::file_notification>(rx::enumerate(rx::win32::directory_changes(watched_dir, true)), rx::win32::to_portable_file_notification);
+	rx::file_system_watcher notifier(watched_dir);
 	auto all = rx::for_each(rx::ref(notifier), [](rx::file_notification const &event)
 	{
 		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
