@@ -165,12 +165,13 @@ namespace
 
 		void send(boost::iterator_range<char const *> data)
 		{
-			assert(socket);
+			assert(receiving_.get_socket());
 			boost::asio::write(*receiving_.get_socket(), boost::asio::buffer(data.begin(), data.size()));
 		}
 
 		void shutdown()
 		{
+			assert(receiving_.get_socket());
 			boost::system::error_code error;
 			receiving_.get_socket()->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 		}
