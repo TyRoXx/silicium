@@ -1,5 +1,6 @@
 #include <reactive/win32/directory_changes.hpp>
 #include <reactive/exchange.hpp>
+#include <reactive/config.hpp>
 #include <Windows.h>
 #include <array>
 
@@ -7,6 +8,18 @@ namespace rx
 {
 	namespace win32
 	{
+		directory_changes::directory_changes()
+		{
+		}
+
+		directory_changes::directory_changes(directory_changes &&other)
+			: is_recursive(std::move(other.is_recursive))
+			, receiver_(other.receiver_)
+			, watch_file(std::move(other.watch_file))
+			, immovable(std::move(other.immovable))
+		{
+		}
+
 		directory_changes::directory_changes(boost::filesystem::path const &watched, bool is_recursive)
 			: is_recursive(is_recursive)
 			, watch_file(CreateFileW(
@@ -18,7 +31,7 @@ namespace rx
 				FILE_FLAG_BACKUP_SEMANTICS,
 				NULL
 			))
-			, read_active(read_dispatcher)
+			, immovable(make_unique<immovable_state>())
 		{
 			if (watch_file.get() == INVALID_HANDLE_VALUE)
 			{
@@ -26,14 +39,25 @@ namespace rx
 			}
 
 			//start running after the creation of work
-			read_runner = std::async(std::launch::async, [this]{ this->read_dispatcher.run(); });
+			auto &dispatcher = immovable->read_dispatcher;
+			immovable->read_runner = std::async(std::launch::async, [&dispatcher]{ dispatcher.run(); });
+		}
+
+		directory_changes &directory_changes::operator = (directory_changes &&other)
+		{
+			is_recursive = other.is_recursive;
+			receiver_ = other.receiver_;
+			watch_file = std::move(other.watch_file);
+			immovable = std::move(other.immovable);
+			return *this;
 		}
 
 		void directory_changes::async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
-			read_dispatcher.post([this]
+			assert(immovable);
+			immovable->read_dispatcher.post([this]
 			{
 				DWORD received = 0;
 				std::array<char, 0x10000> buffer;

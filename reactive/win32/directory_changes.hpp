@@ -32,7 +32,10 @@ namespace rx
 		{
 			using element_type = std::vector<file_notification>;
 
+			directory_changes();
+			directory_changes(directory_changes &&other);
 			explicit directory_changes(boost::filesystem::path const &watched, bool is_recursive);
+			directory_changes &operator = (directory_changes &&other);
 			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE;
 			virtual void cancel() SILICIUM_OVERRIDE;
 
@@ -41,9 +44,24 @@ namespace rx
 			bool is_recursive;
 			observer<element_type> *receiver_ = nullptr;
 			Si::win32::unique_handle watch_file;
-			boost::asio::io_service read_dispatcher;
-			std::future<void> read_runner;
-			boost::asio::io_service::work read_active;
+
+			struct immovable_state
+			{
+				boost::asio::io_service read_dispatcher;
+				std::future<void> read_runner;
+				boost::asio::io_service::work read_active;
+
+				immovable_state()
+					: read_active(read_dispatcher)
+				{
+				}
+			};
+
+			//this indirection is needed for movability
+			std::unique_ptr<immovable_state> immovable;
+
+			BOOST_DELETED_FUNCTION(directory_changes(directory_changes const &));
+			BOOST_DELETED_FUNCTION(directory_changes &operator = (directory_changes const &));
 		};
 	}
 }
