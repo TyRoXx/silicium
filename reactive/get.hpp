@@ -22,7 +22,7 @@ namespace rx
 	};
 
 	template <class Input>
-	auto get(Input &from)
+	auto get(Input &from) -> boost::optional<typename Input::element_type>
 	{
 		visitor<typename Input::element_type> v;
 		from.async_get_one(v);

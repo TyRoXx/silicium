@@ -25,6 +25,30 @@ namespace rx
 				: value(std::move(value))
 			{
 			}
+
+#ifdef _MSC_VER
+			result(result &&other)
+				: value(std::move(other.value))
+			{
+			}
+
+			result &operator = (result &&other)
+			{
+				value = std::move(other.value);
+				return *this;
+			}
+
+			result(result const &other)
+				: value(other.value)
+			{
+			}
+
+			result &operator = (result const &other)
+			{
+				value = other.value;
+				return *this;
+			}
+#endif
 		};
 
 		struct yield

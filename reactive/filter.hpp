@@ -55,7 +55,9 @@ namespace rx
 	};
 
 	template <class Input, class Predicate>
-	auto filter(Input &&input, Predicate &&is_propagated)
+	auto filter(Input &&input, Predicate &&is_propagated) -> filter_observable<
+		typename std::decay<Input>::type,
+		typename std::decay<Predicate>::type>
 	{
 		return filter_observable<
 				typename std::decay<Input>::type,

@@ -17,11 +17,36 @@ namespace rx
 		typedef typename std::result_of<Transform (typename Original::element_type)>::type element_type;
 		typedef typename Original::element_type from_type;
 
+		transformation()
+		{
+		}
+
 		explicit transformation(Transform transform, Original original)
 			: transform(std::move(transform))
 			, original(std::move(original))
 		{
 		}
+
+#ifdef _MSC_VER
+		transformation(transformation &&other)
+			: transform(std::move(other.transform))
+			, original(std::move(other.original))
+			, receiver(std::move(other.receiver))
+		{
+		}
+
+		transformation &operator = (transformation &&other)
+		{
+			//TODO: exception safety
+			transform = std::move(other.transform);
+			original = std::move(other.original);
+			receiver = std::move(other.receiver);
+			return *this;
+		}
+#else
+		transformation(transformation &&other) = default;
+		transformation &operator = (transformation &&other) = default;
+#endif
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
@@ -56,6 +81,9 @@ namespace rx
 			receiver = nullptr;
 			receiver_copy->ended();
 		}
+
+		BOOST_DELETED_FUNCTION(transformation(transformation const &));
+		BOOST_DELETED_FUNCTION(transformation &operator = (transformation const &));
 	};
 
 	template <class Transform, class Original>

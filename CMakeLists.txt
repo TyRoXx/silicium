@@ -16,12 +16,15 @@ if(MSVC)
 	#we want more warnings
 	add_definitions("/W4")
 
+	#disable "'std::_Copy_n': Function call with parameters that may be unsafe"
+	add_definitions("/wd4996")
+
 	#workaround for Boost 1.55 Context error LNK2026
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 endif()
 
 if(UNIX)
-        find_package(Boost REQUIRED unit_test_framework thread filesystem iostreams system coroutine)
+	find_package(Boost REQUIRED unit_test_framework thread filesystem iostreams system coroutine)
 	add_definitions("-DBOOST_TEST_DYN_LINK")
 endif()
 
@@ -38,7 +41,7 @@ endif()
 
 find_package(SDL2)
 if(SDL2_FOUND)
-	include_directories(${LIBSDL2_INCLUDE_DIR})
+	include_directories(${SDL2_INCLUDE_DIR})
 endif()
 
 find_package(Lua51)

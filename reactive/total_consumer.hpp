@@ -10,10 +10,27 @@ namespace rx
 	{
 		typedef typename Input::element_type element_type;
 
+		total_consumer()
+		{
+		}
+
 		explicit total_consumer(Input input)
 			: input(std::move(input))
 		{
 		}
+
+#ifdef _MSC_VER
+		total_consumer(total_consumer &&other)
+			: input(std::move(other.input))
+		{
+		}
+
+		total_consumer &operator = (total_consumer &&other)
+		{
+			input = std::move(other.input);
+			return *this;
+		}
+#endif
 
 		void start()
 		{

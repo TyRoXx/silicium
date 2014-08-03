@@ -20,6 +20,26 @@ namespace rx
 		{
 		}
 
+#ifdef _MSC_VER
+		cache_observable(cache_observable &&other)
+			: input(std::move(other.input))
+			, receiver_(std::move(other.receiver_))
+			, cached(std::move(other.cached))
+			, is_fetching(std::move(other.is_fetching))
+		{
+		}
+
+		cache_observable &operator = (cache_observable &&other)
+		{
+			//TODO: exception safety
+			input = std::move(other.input);
+			receiver_ = std::move(other.receiver_);
+			cached = std::move(other.cached);
+			is_fetching = std::move(other.is_fetching);
+			return *this;
+		}
+#endif
+
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			assert(!receiver_);

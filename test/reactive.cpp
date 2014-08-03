@@ -220,13 +220,13 @@ namespace Si
 	template <class Element, class Action>
 	struct blocking_then_state : rx::observer<Element>
 	{
-		boost::asio::io_service &dispatcher;
+		boost::asio::io_service *dispatcher;
 		boost::optional<boost::asio::io_service::work> blocker;
 		Action action;
 		rx::observable<Element> *from = nullptr;
 
 		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
-			: dispatcher(dispatcher)
+			: dispatcher(&dispatcher)
 			, blocker(boost::in_place(boost::ref(dispatcher)))
 			, action(std::move(action))
 		{
@@ -243,13 +243,15 @@ namespace Si
 
 		virtual void got_element(Element value) SILICIUM_OVERRIDE
 		{
-			dispatcher.post(boost::bind<void>(action, boost::make_optional(std::move(value))));
+			assert(dispatcher);
+			dispatcher->post(boost::bind<void>(action, boost::make_optional(std::move(value))));
 			blocker.reset();
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			dispatcher.post(boost::bind<void>(action, boost::optional<Element>()));
+			assert(dispatcher);
+			dispatcher->post(boost::bind<void>(action, boost::optional<Element>()));
 			blocker.reset();
 		}
 	};

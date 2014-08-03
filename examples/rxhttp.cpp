@@ -9,6 +9,7 @@
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
 #include <thread>
+#include <cassert>
 
 namespace
 {

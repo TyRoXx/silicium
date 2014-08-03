@@ -16,11 +16,32 @@ namespace rx
 	{
 		typedef Element element_type;
 
+		buffer()
+		{
+		}
+
 		explicit buffer(Original from, std::size_t size)
 			: from(std::move(from))
 			, elements(size)
 		{
 		}
+
+#ifdef _MSC_VER
+		buffer(buffer &&other)
+		{
+			*this = std::move(other);
+		}
+
+		buffer &operator = (buffer &&other)
+		{
+			//TODO: exception safety
+			from = std::move(other.from);
+			elements = std::move(other.elements);
+			receiver = std::move(other.receiver);
+			fetching = std::move(other.fetching);
+			return *this;
+		}
+#endif
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
@@ -102,6 +123,9 @@ namespace rx
 			fetching = true;
 			from.async_get_one(*this);
 		}
+
+		BOOST_DELETED_FUNCTION(buffer(buffer const &));
+		BOOST_DELETED_FUNCTION(buffer &operator = (buffer const &));
 	};
 
 	template <class Original>

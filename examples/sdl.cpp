@@ -5,11 +5,18 @@
 #include <reactive/finite_state_machine.hpp>
 #include <reactive/filter.hpp>
 #include <reactive/generate.hpp>
+#include <reactive/ptr_observable.hpp>
 #include <reactive/cache.hpp>
 #include <reactive/get.hpp>
-#include <SDL2/SDL.h>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
+#include <vector>
+
+#ifdef _MSC_VER
+#	include <SDL.h>
+#else
+#	include <SDL2/SDL.h>
+#endif
 
 namespace
 {
@@ -183,10 +190,17 @@ namespace
 
 	template <class Events>
 	auto make_frames(Events &&input)
+#ifdef _MSC_VER
+		-> rx::unique_observable<frame>
+#endif
 	{
 		game_state initial_state;
 		auto model = rx::make_finite_state_machine(std::forward<Events>(input), initial_state, step_game_state);
-		return rx::transform(std::move(model), draw_game_state);
+		return
+#ifdef _MSC_VER
+			rx::box<frame>
+#endif
+			(rx::transform(std::move(model), draw_game_state));
 	}
 }
 

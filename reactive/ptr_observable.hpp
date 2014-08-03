@@ -21,6 +21,30 @@ namespace rx
 		{
 		}
 
+#ifdef _MSC_VER
+		ptr_observable(ptr_observable &&other)
+			: content(std::move(other.content))
+		{
+		}
+
+		ptr_observable &operator = (ptr_observable &&other)
+		{
+			content = std::move(other.content);
+			return *this;
+		}
+
+		ptr_observable(ptr_observable const &other)
+			: content(other.content)
+		{
+		}
+
+		ptr_observable &operator = (ptr_observable const &other)
+		{
+			content = other.content;
+			return *this;
+		}
+#endif
+
 		bool empty() const BOOST_NOEXCEPT
 		{
 			return !content;

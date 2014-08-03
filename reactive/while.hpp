@@ -59,7 +59,9 @@ namespace rx
 	};
 
 	template <class Input, class ElementPredicate>
-	auto while_(Input &&input, ElementPredicate &&is_not_end)
+	auto while_(Input &&input, ElementPredicate &&is_not_end) -> while_observable<
+		typename std::decay<Input>::type,
+		typename std::decay<ElementPredicate>::type>
 	{
 		return while_observable<
 				typename std::decay<Input>::type,

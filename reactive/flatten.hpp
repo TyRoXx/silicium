@@ -72,7 +72,7 @@ namespace rx
 
 			explicit child(flattener &parent, nothing_observable observed)
 				: parent(parent)
-				, observed(observed)
+				, observed(std::move(observed))
 			{
 			}
 
