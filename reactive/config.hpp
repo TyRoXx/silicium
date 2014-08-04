@@ -21,6 +21,12 @@ namespace rx
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 
+	template <class T>
+	auto to_unique(T &&t)
+	{
+		typedef typename std::decay<T>::type decayed_T;
+		return std::unique_ptr<decayed_T>(new decayed_T(std::forward<T>(t)));
+	}
 }
 
 #endif
