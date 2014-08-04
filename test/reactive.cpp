@@ -439,7 +439,7 @@ namespace rx
 		virtual void push_result(Element result) = 0;
 	};
 
-	template <class Element>
+	template <class Element, class ThreadingAPI>
 	struct async_observable : public observable<Element>
 	{
 		typedef Element element_type;
@@ -463,7 +463,7 @@ namespace rx
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			assert(state);
-			std::unique_lock<std::mutex> lock(state->result_mutex);
+			typename ThreadingAPI::unique_lock lock(state->result_mutex);
 			assert(!state->receiver_);
 			state->receiver_ = &receiver;
 			if (!state->cached_result)
@@ -490,15 +490,15 @@ namespace rx
 
 		struct movable_state : private yield_context_2<Element>
 		{
-			std::future<void> thread;
-			std::mutex result_mutex;
+			typename ThreadingAPI::template future<void> thread;
+			typename ThreadingAPI::mutex result_mutex;
+			typename ThreadingAPI::condition_variable result_retrieved;
 			observer<element_type> *receiver_ = nullptr;
-			std::condition_variable result_retrieved;
 			boost::optional<Element> cached_result;
 
 			template <class Action>
 			explicit movable_state(Action &&action)
-				: thread(std::async(std::launch::async, [this, action]() -> void
+				: thread(ThreadingAPI::template launch_async([this, action]() -> void
 				{
 					action(static_cast<yield_context_2<Element> &>(*this));
 				}))
@@ -507,7 +507,7 @@ namespace rx
 
 			virtual void push_result(Element result) SILICIUM_OVERRIDE
 			{
-				std::unique_lock<std::mutex> lock(result_mutex);
+				typename ThreadingAPI::unique_lock lock(result_mutex);
 				while (cached_result.is_initialized())
 				{
 					result_retrieved.wait(lock);
@@ -528,10 +528,25 @@ namespace rx
 		std::unique_ptr<movable_state> state;
 	};
 
+	struct std_thread
+	{
+		template <class T>
+		using future = std::future<T>;
+		using mutex = std::mutex;
+		using condition_variable = std::condition_variable;
+		using unique_lock = std::unique_lock<std::mutex>;
+
+		template <class Action, class ...Args>
+		static auto launch_async(Action &&action, Args &&...args)
+		{
+			return std::async(std::launch::async, std::forward<Action>(action), std::forward<Args>(args)...);
+		}
+	};
+
 	template <class Element, class Action>
 	auto async(Action &&action)
 	{
-		return async_observable<Element>(std::forward<Action>(action));
+		return async_observable<Element, std_thread>(std::forward<Action>(action));
 	}
 }
 
