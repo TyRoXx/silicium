@@ -49,6 +49,9 @@ namespace rx
 			receiver_ = std::move(other.receiver_);
 			return *this;
 		}
+#else
+		enumerator(enumerator &&) = default;
+		enumerator &operator = (enumerator &&) = default;
 #endif
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
@@ -104,8 +107,8 @@ namespace rx
 			return exchange(receiver_, nullptr)->got_element(std::move(element));
 		}
 
-		BOOST_DELETED_FUNCTION(enumerator(enumerator const &));
-		BOOST_DELETED_FUNCTION(enumerator &operator = (enumerator const &));
+		BOOST_DELETED_FUNCTION(enumerator(enumerator const &))
+		BOOST_DELETED_FUNCTION(enumerator &operator = (enumerator const &))
 	};
 
 	template <class RangeObservable>

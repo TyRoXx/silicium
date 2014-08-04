@@ -42,6 +42,9 @@ namespace rx
 			receiver_ = std::move(other.receiver_);
 			return *this;
 		}
+#else
+		finite_state_machine(finite_state_machine &&) = default;
+		finite_state_machine &operator = (finite_state_machine &&) = default;
 #endif
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
@@ -95,8 +98,8 @@ namespace rx
 			}
 		}
 
-		BOOST_DELETED_FUNCTION(finite_state_machine(finite_state_machine const &));
-		BOOST_DELETED_FUNCTION(finite_state_machine &operator = (finite_state_machine const &));
+		BOOST_DELETED_FUNCTION(finite_state_machine(finite_state_machine const &))
+		BOOST_DELETED_FUNCTION(finite_state_machine &operator = (finite_state_machine const &))
 	};
 
 	template <class In, class State, class Step>

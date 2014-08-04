@@ -59,8 +59,8 @@ namespace rx
 		Transformation transform; //TODO: optimize for emptiness
 		observer<element_type> *receiver_ = nullptr;
 
-		BOOST_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &));
-		BOOST_DELETED_FUNCTION(conditional_transformer &operator = (conditional_transformer const &));
+		BOOST_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &))
+		BOOST_DELETED_FUNCTION(conditional_transformer &operator = (conditional_transformer const &))
 
 		void fetch()
 		{

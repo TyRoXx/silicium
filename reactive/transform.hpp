@@ -82,8 +82,8 @@ namespace rx
 			receiver_copy->ended();
 		}
 
-		BOOST_DELETED_FUNCTION(transformation(transformation const &));
-		BOOST_DELETED_FUNCTION(transformation &operator = (transformation const &));
+		BOOST_DELETED_FUNCTION(transformation(transformation const &))
+		BOOST_DELETED_FUNCTION(transformation &operator = (transformation const &))
 	};
 
 	template <class Transform, class Original>

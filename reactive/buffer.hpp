@@ -41,6 +41,9 @@ namespace rx
 			fetching = std::move(other.fetching);
 			return *this;
 		}
+#else
+		buffer(buffer &&) = default;
+		buffer &operator = (buffer &&) = default;
 #endif
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
@@ -124,8 +127,8 @@ namespace rx
 			from.async_get_one(*this);
 		}
 
-		BOOST_DELETED_FUNCTION(buffer(buffer const &));
-		BOOST_DELETED_FUNCTION(buffer &operator = (buffer const &));
+		BOOST_DELETED_FUNCTION(buffer(buffer const &))
+		BOOST_DELETED_FUNCTION(buffer &operator = (buffer const &))
 	};
 
 	template <class Original>
