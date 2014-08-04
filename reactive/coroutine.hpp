@@ -63,7 +63,7 @@ namespace rx
 		};
 	}
 
-	template <class Element = detail::nothing>
+	template <class Element = nothing>
 	struct yield_context
 	{
 		typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type>::push_type consumer_type;
@@ -86,7 +86,7 @@ namespace rx
 			{
 				assert(!result);
 				result = std::move(element);
-				return detail::nothing{};
+				return nothing{};
 			});
 			(*consumer)(detail::yield{&tf});
 			return result;
@@ -100,7 +100,7 @@ namespace rx
 	template <class Element>
 	struct coroutine_observable
 			: public rx::observable<Element>
-			, private rx::observer<detail::nothing>
+			, private rx::observer<nothing>
 			, public boost::static_visitor<> //TODO make private
 	{
 		typedef Element element_type;
@@ -187,7 +187,7 @@ namespace rx
 				coro_;
 		}
 
-		virtual void got_element(detail::nothing) SILICIUM_OVERRIDE
+		virtual void got_element(nothing) SILICIUM_OVERRIDE
 		{
 			next();
 		}

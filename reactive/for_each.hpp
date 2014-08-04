@@ -19,7 +19,7 @@ namespace rx
 #ifdef _MSC_VER
 			box<nothing>
 #endif
-			(transform(std::forward<Input>(input), [handle_element](element value) -> detail::nothing
+			(transform(std::forward<Input>(input), [handle_element](element value) -> nothing
 		{
 			handle_element(std::move(value));
 			return {};

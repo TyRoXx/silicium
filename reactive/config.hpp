@@ -11,14 +11,9 @@
 
 namespace rx
 {
-	namespace detail
+	struct nothing
 	{
-		struct nothing
-		{
-		};
-	}
-
-	using nothing = detail::nothing;
+	};
 
 	template <class T, class ...Args>
 	auto make_unique(Args &&...args) -> std::unique_ptr<T>

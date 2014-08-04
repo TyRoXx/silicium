@@ -47,7 +47,7 @@ namespace
 
 	struct coroutine_socket
 	{
-		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, rx::yield_context<rx::detail::nothing> &yield)
+		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, rx::yield_context<rx::nothing> &yield)
 			: socket(&socket)
 			, yield(&yield)
 			, received(4096)
@@ -81,10 +81,10 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::socket *socket = nullptr;
-		rx::yield_context<rx::detail::nothing> *yield = nullptr;
+		rx::yield_context<rx::nothing> *yield = nullptr;
 		std::vector<char> received;
 		rx::socket_observable receiver;
-		rx::observable_source<rx::socket_observable, rx::yield_context<rx::detail::nothing>> receiving_;
+		rx::observable_source<rx::socket_observable, rx::yield_context<rx::nothing>> receiving_;
 	};
 
 	struct thread_socket_source : Si::source<rx::received_from_socket>
@@ -181,7 +181,7 @@ namespace
 		thread_socket_source receiving_;
 	};
 
-	using events = rx::shared_observable<rx::detail::nothing>;
+	using events = rx::shared_observable<rx::nothing>;
 
 	struct coroutine_accept_handler : boost::static_visitor<events>
 	{
@@ -195,7 +195,7 @@ namespace
 		events operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
 		{
 			auto visitor_number_ = visitor_number;
-			auto client_handler = rx::wrap<rx::detail::nothing>(rx::make_coroutine<rx::detail::nothing>([client, visitor_number_](rx::yield_context<rx::detail::nothing> &yield) -> void
+			auto client_handler = rx::wrap<rx::nothing>(rx::make_coroutine<rx::nothing>([client, visitor_number_](rx::yield_context<rx::nothing> &yield) -> void
 			{
 				coroutine_socket coro_socket(*client, yield);
 				return serve_client(coro_socket, visitor_number_);
