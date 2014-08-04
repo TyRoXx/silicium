@@ -20,6 +20,7 @@
 #include <boost/bind.hpp>
 #include <boost/container/flat_map.hpp>
 #include <unordered_map>
+#include <future>
 
 namespace rx
 {
@@ -424,4 +425,137 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 	coro.start();
 	io.run();
 	BOOST_CHECK_EQUAL(1, elapsed_count);
+}
+
+namespace rx
+{
+	template <class Element>
+	struct yield_context_2
+	{
+		virtual ~yield_context_2()
+		{
+		}
+
+		virtual void push_result(Element result) = 0;
+	};
+
+	template <class Element>
+	struct async_observable : public observable<Element>
+	{
+		typedef Element element_type;
+
+		async_observable()
+		{
+		}
+
+		template <class Action>
+		explicit async_observable(Action &&action)
+			: state(make_unique<movable_state>(std::forward<Action>(action)))
+		{
+		}
+
+		void wait()
+		{
+			assert(state);
+			state->thread.get();
+		}
+
+		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		{
+			assert(state);
+			std::unique_lock<std::mutex> lock(state->result_mutex);
+			assert(!state->receiver_);
+			state->receiver_ = &receiver;
+			if (!state->cached_result)
+			{
+				if (!state->thread.valid())
+				{
+					lock.unlock();
+					return rx::exchange(state->receiver_, nullptr)->ended();
+				}
+				return;
+			}
+			auto ready_result = std::move(*state->cached_result);
+			state->result_retrieved.notify_one();
+			lock.unlock();
+			rx::exchange(state->receiver_, nullptr)->got_element(std::move(ready_result));
+		}
+
+		virtual void cancel() SILICIUM_OVERRIDE
+		{
+			throw std::logic_error("to do");
+		}
+
+	private:
+
+		struct movable_state : private yield_context_2<Element>
+		{
+			std::future<void> thread;
+			std::mutex result_mutex;
+			observer<element_type> *receiver_ = nullptr;
+			std::condition_variable result_retrieved;
+			boost::optional<Element> cached_result;
+
+			template <class Action>
+			explicit movable_state(Action &&action)
+				: thread(std::async(std::launch::async, [this, action]() -> void
+				{
+					action(static_cast<yield_context_2<Element> &>(*this));
+				}))
+			{
+			}
+
+			virtual void push_result(Element result) SILICIUM_OVERRIDE
+			{
+				std::unique_lock<std::mutex> lock(result_mutex);
+				while (cached_result.is_initialized())
+				{
+					result_retrieved.wait(lock);
+				}
+				if (receiver_)
+				{
+					auto receiver = rx::exchange(receiver_, nullptr);
+					lock.unlock();
+					receiver->got_element(std::move(result));
+				}
+				else
+				{
+					cached_result = std::move(result);
+				}
+			}
+		};
+
+		std::unique_ptr<movable_state> state;
+	};
+
+	template <class Element, class Action>
+	auto async(Action &&action)
+	{
+		return async_observable<Element>(std::forward<Action>(action));
+	}
+}
+
+BOOST_AUTO_TEST_CASE(reactive_async)
+{
+	auto a = rx::async<int>([](rx::yield_context_2<int> &yield)
+	{
+		yield.push_result(1);
+		yield.push_result(2);
+		yield.push_result(3);
+	});
+	std::vector<int> const expected{1, 2, 3};
+	std::vector<int> produced;
+	std::unique_ptr<rx::observer<int>> pusher;
+	pusher = rx::to_unique(rx::consume<int>([&](int element)
+	{
+		produced.emplace_back(element);
+		if (produced.size() == expected.size())
+		{
+			return;
+		}
+		a.async_get_one(*pusher);
+	}));
+	a.async_get_one(*pusher);
+	a.wait();
+	BOOST_CHECK(expected == produced);
 }
