@@ -498,11 +498,12 @@ namespace rx
 
 			template <class Action>
 			explicit movable_state(Action &&action)
-				: thread(ThreadingAPI::template launch_async([this, action]() -> void
+			{
+				//start the background thread after the initialization of all the members
+				thread = ThreadingAPI::template launch_async([this, action]() -> void
 				{
 					action(static_cast<yield_context_2<Element> &>(*this));
-				}))
-			{
+				});
 			}
 
 			virtual void push_result(Element result) SILICIUM_OVERRIDE
