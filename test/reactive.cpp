@@ -529,7 +529,7 @@ namespace rx
 		std::unique_ptr<movable_state> state;
 	};
 
-	struct std_thread
+	struct std_threading
 	{
 		template <class T>
 		using future = std::future<T>;
@@ -544,16 +544,16 @@ namespace rx
 		}
 	};
 
-	template <class Element, class Action>
+	template <class Element, class ThreadingAPI, class Action>
 	auto async(Action &&action)
 	{
-		return async_observable<Element, std_thread>(std::forward<Action>(action));
+		return async_observable<Element, ThreadingAPI>(std::forward<Action>(action));
 	}
 }
 
 BOOST_AUTO_TEST_CASE(reactive_async)
 {
-	auto a = rx::async<int>([](rx::yield_context_2<int> &yield)
+	auto a = rx::async<int, rx::std_threading>([](rx::yield_context_2<int> &yield)
 	{
 		yield.push_result(1);
 		yield.push_result(2);
