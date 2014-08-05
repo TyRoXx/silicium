@@ -19,6 +19,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/bind.hpp>
 #include <boost/container/flat_map.hpp>
+#include <boost/thread.hpp>
 #include <unordered_map>
 #include <future>
 
@@ -536,11 +537,24 @@ namespace rx
 		using mutex = std::mutex;
 		using condition_variable = std::condition_variable;
 		using unique_lock = std::unique_lock<std::mutex>;
-
 		template <class Action, class ...Args>
 		static auto launch_async(Action &&action, Args &&...args)
 		{
 			return std::async(std::launch::async, std::forward<Action>(action), std::forward<Args>(args)...);
+		}
+	};
+
+	struct boost_threading
+	{
+		template <class T>
+		using future = boost::unique_future<T>;
+		using mutex = boost::mutex;
+		using condition_variable = boost::condition_variable;
+		using unique_lock = boost::unique_lock<boost::mutex>;
+		template <class Action, class ...Args>
+		static auto launch_async(Action &&action, Args &&...args)
+		{
+			return boost::async(boost::launch::async, std::forward<Action>(action), std::forward<Args>(args)...);
 		}
 	};
 
@@ -551,7 +565,9 @@ namespace rx
 	}
 }
 
-BOOST_AUTO_TEST_CASE(reactive_async)
+typedef boost::mpl::list<rx::std_threading, rx::boost_threading> threading_apis;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(reactive_async, ThreadingAPI, threading_apis)
 {
 	auto a = rx::async<int, rx::std_threading>([](rx::yield_context_2<int> &yield)
 	{
