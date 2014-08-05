@@ -23,8 +23,11 @@ if(MSVC)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 endif()
 
+if(MSVC)
+	set(Boost_USE_STATIC_LIBS ON) 
+endif()
+find_package(Boost REQUIRED unit_test_framework thread filesystem iostreams system coroutine)
 if(UNIX)
-	find_package(Boost REQUIRED unit_test_framework thread filesystem iostreams system coroutine)
 	add_definitions("-DBOOST_TEST_DYN_LINK")
 endif()
 
