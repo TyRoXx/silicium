@@ -9,7 +9,7 @@
 
 namespace rx
 {
-#define SILICIUM_RX_VARIANT_AVAILABLE !SILICIUM_BROKEN_VARIADIC_TEMPLATE_EXPANSION
+#define SILICIUM_RX_VARIANT_AVAILABLE 1
 
 #if SILICIUM_RX_VARIANT_AVAILABLE
 	template <template <class ...T> class variant, class ...Parts>

@@ -190,10 +190,17 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_make_variant)
 	{
 		rx::bridge<int> first;
-		rx::bridge<boost::container::string> second;
+		using string =
+#ifdef _MSC_VER //does not compile with boost::container::string in VC++ 2013
+			std::string
+#else
+			boost::container::string
+#endif
+			;
+		rx::bridge<string> second;
 		auto variants = make_variant(rx::ref(first), rx::ref(second));
 
-		typedef Si::fast_variant<int, boost::container::string> variant;
+		typedef Si::fast_variant<int, string> variant;
 		std::vector<variant> produced;
 		auto consumer = rx::consume<variant>([&produced](variant element)
 		{
@@ -205,13 +212,13 @@ namespace Si
 		first.got_element(4);
 
 		variants.async_get_one(consumer);
-		BOOST_CHECK_EQUAL(1,produced.size());
+		BOOST_CHECK_EQUAL(1, produced.size());
 		second.got_element("Hi");
 
 		std::vector<variant> const expected
 		{
 			4,
-			boost::container::string("Hi")
+			string("Hi")
 		};
 
 		BOOST_CHECK(expected == produced);
