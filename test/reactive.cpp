@@ -354,6 +354,7 @@ namespace rx
 		{
 			assert(receiver_);
 			size_t erased = connections->erase(exchange(receiver_, nullptr));
+			boost::ignore_unused_variable_warning(erased);
 			assert(erased == 1);
 		}
 

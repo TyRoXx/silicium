@@ -97,23 +97,23 @@ namespace
 	struct result_printer : boost::static_visitor<>
 	{
 		explicit result_printer(std::ostream &out)
-			: m_out(out)
+			: m_out(&out)
 		{
 		}
 
 		void operator()(Si::build_success) const
 		{
-			m_out << "success";
+			*m_out << "success";
 		}
 
 		void operator()(Si::build_failure const &failure) const
 		{
-			m_out << "failure: " << failure.short_description;
+			*m_out << "failure: " << failure.short_description;
 		}
 
 	private:
 
-		std::ostream &m_out;
+		std::ostream *m_out = nullptr;
 	};
 
 	std::pair<Si::report, Si::report_finalizer> create_simple_file_report(boost::filesystem::path const &parent, std::string name)
