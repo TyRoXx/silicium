@@ -21,8 +21,10 @@ namespace rx
 	{
 		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
 		boost::filesystem::path const test_file = watched_dir / "test.txt";
-		boost::system::error_code ec;
-		boost::filesystem::remove(test_file, ec);
+		{
+			boost::system::error_code ec;
+			boost::filesystem::remove(test_file, ec);
+		}
 
 		boost::asio::io_service io;
 		file_system_watcher watcher(io, watched_dir);
