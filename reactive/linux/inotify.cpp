@@ -1,12 +1,17 @@
 #include "inotify.hpp"
 #include <reactive/exchange.hpp>
+#include <boost/ref.hpp>
 
 namespace rx
 {
 	namespace linux
 	{
+		inotify_observable::inotify_observable()
+		{
+		}
+
 		inotify_observable::inotify_observable(boost::asio::io_service &io)
-			: notifier(io)
+			: notifier(boost::in_place(boost::ref(io)))
 		{
 			int fd = inotify_init();
 			if (fd < 0)
@@ -15,7 +20,7 @@ namespace rx
 			}
 			try
 			{
-				notifier.assign(fd);
+				notifier->assign(fd);
 			}
 			catch (...)
 			{
@@ -37,14 +42,15 @@ namespace rx
 
 		watch_descriptor inotify_observable::watch(boost::filesystem::path const &target, boost::uint32_t mask, boost::system::error_code &ec)
 		{
-			int const wd = inotify_add_watch(notifier.native_handle(), target.string().c_str(), mask);
+			assert(notifier);
+			int const wd = inotify_add_watch(notifier->native_handle(), target.string().c_str(), mask);
 			if (wd < 0)
 			{
 				ec = boost::system::error_code(errno, boost::system::posix_category);
 				return watch_descriptor();
 			}
 			ec = boost::system::error_code();
-			return watch_descriptor(notifier.native_handle(), wd);
+			return watch_descriptor(notifier->native_handle(), wd);
 		}
 
 		void inotify_observable::async_get_one(observer<element_type> &receiver)
@@ -53,7 +59,8 @@ namespace rx
 			std::size_t const min_buffer_size = sizeof(inotify_event) + NAME_MAX + 1;
 			std::size_t const additional_buffer = 8192;
 			read_buffer.resize(min_buffer_size + additional_buffer);
-			notifier.async_read_some(boost::asio::buffer(read_buffer), [this](boost::system::error_code error, std::size_t bytes_read)
+			assert(notifier);
+			notifier->async_read_some(boost::asio::buffer(read_buffer), [this](boost::system::error_code error, std::size_t bytes_read)
 			{
 				if (error)
 				{
@@ -82,7 +89,8 @@ namespace rx
 		void inotify_observable::cancel()
 		{
 			assert(receiver_);
-			notifier.cancel();
+			assert(notifier);
+			notifier->cancel();
 			receiver_ = nullptr;
 		}
 	}

@@ -41,8 +41,9 @@ namespace rx
 		{
 		}
 
-		explicit file_system_watcher(boost::filesystem::path const &watched)
+		explicit file_system_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
 			: impl(enumerate(win32::directory_changes(watched, true)), win32::to_portable_file_notification)
+			, work(io)
 		{
 		}
 
@@ -64,6 +65,7 @@ namespace rx
 			enumerator<win32::directory_changes>,
 			boost::optional<file_notification>(*)(win32::file_notification &&)
 		> impl;
+		boost::asio::io_service::work work;
 	};
 #endif
 }

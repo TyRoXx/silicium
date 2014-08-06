@@ -5,4 +5,8 @@
 #	include <reactive/win32/file_system_watcher.hpp>
 #endif
 
+#ifdef __linux__
+#	include <reactive/linux/file_system_watcher.hpp>
+#endif
+
 #endif

@@ -6,6 +6,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/swap.hpp>
+#include <boost/optional.hpp>
 #include <sys/inotify.h>
 #include <dirent.h>
 
@@ -64,6 +65,7 @@ namespace rx
 		{
 			typedef std::vector<file_notification> element_type;
 
+			inotify_observable();
 			explicit inotify_observable(boost::asio::io_service &io);
 			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask);
 			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask, boost::system::error_code &ec);
@@ -72,7 +74,7 @@ namespace rx
 
 		private:
 
-			boost::asio::posix::stream_descriptor notifier;
+			boost::optional<boost::asio::posix::stream_descriptor> notifier;
 			std::vector<char> read_buffer;
 			observer<element_type> *receiver_ = nullptr;
 		};

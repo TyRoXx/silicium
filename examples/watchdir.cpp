@@ -56,21 +56,11 @@ int main()
 	auto const watched_dir = boost::filesystem::current_path();
 	std::cerr << "Watching " << watched_dir << '\n';
 
-#ifdef _WIN32
-	rx::file_system_watcher notifier(watched_dir);
+	rx::file_system_watcher notifier(io, watched_dir);
 	auto all = rx::for_each(rx::ref(notifier), [](rx::file_notification const &event)
 	{
 		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
 	});
-	boost::asio::io_service::work keep_running(io);
-#else
-	rx::linux::inotify_observable notifier(io);
-	auto w = notifier.watch(watched_dir, IN_ALL_EVENTS);
-	auto all = rx::for_each(rx::enumerate(rx::ref(notifier)), [](rx::linux::file_notification const &event)
-	{
-		std::cerr << inotify_mask_to_string(event.mask) << " " << event.name << '\n';
-	});
-#endif
 	all.start();
 
 	io.run();

@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_TRANSFORM_IF_INITIALIZED_HPP
 
 #include <reactive/observable.hpp>
+#include <reactive/exchange.hpp>
 #include <silicium/override.hpp>
 #include <cassert>
 
