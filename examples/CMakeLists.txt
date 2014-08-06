@@ -1,5 +1,5 @@
-add_executable(helloworld "helloworld.cpp")
-target_link_libraries(helloworld silicium ${Boost_LIBRARIES})
+add_executable(run_process "run_process.cpp")
+target_link_libraries(run_process silicium ${Boost_LIBRARIES})
 
 add_executable(hellohttp "hellohttp.cpp")
 target_link_libraries(hellohttp silicium ${Boost_LIBRARIES})
