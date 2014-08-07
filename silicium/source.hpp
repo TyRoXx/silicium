@@ -89,6 +89,12 @@ namespace Si
 	}
 
 	template <class Element>
+	memory_source<Element> make_container_source(std::basic_string<Element> const &container)
+	{
+		return memory_source<Element>({container.data(), container.data() + container.size()});
+	}
+
+	template <class Element>
 	boost::optional<Element> get(Si::source<Element> &from)
 	{
 		Element result;

@@ -28,7 +28,24 @@ namespace Si
 				return boost::none;
 			}
 			request_header header;
-			//TODO split first_line
+			{
+				auto const method_end = std::find(first_line->begin(), first_line->end(), ' ');
+				if (method_end == first_line->end())
+				{
+					return boost::none;
+				}
+				header.method.assign(first_line->begin(), method_end);
+
+				auto const path_begin = method_end + 1;
+				auto const path_end = std::find(path_begin, first_line->end(), ' ');
+				if (path_end == first_line->end())
+				{
+					return boost::none;
+				}
+				header.path.assign(path_begin, path_end);
+
+				header.http_version.assign(path_end + 1, first_line->end());
+			}
 
 			for (;;)
 			{
