@@ -273,19 +273,6 @@ namespace Si
 		state->from = &from;
 		return state;
 	}
-
-	BOOST_AUTO_TEST_CASE(reactive_process)
-	{
-		rx::empty<char> input;
-		rx::process proc = rx::launch_process("/usr/bin/which", {"which"}, input);
-
-		boost::asio::io_service io;
-		auto blocking = blocking_then(io, proc.exit_code, [](boost::optional<int> ec)
-		{
-			BOOST_CHECK_EQUAL(0, ec);
-		});
-		io.run();
-	}
 }
 
 namespace rx
