@@ -1,16 +1,9 @@
-#include <reactive/enumerate.hpp>
-#include <reactive/for_each.hpp>
-#include <reactive/ref.hpp>
-#include <reactive/transform_if_initialized.hpp>
 #include <reactive/directory_watcher.hpp>
+#include <reactive/for_each.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/optional.hpp>
 #include <iostream>
-#ifndef _WIN32
-#	include <reactive/linux/inotify.hpp>
-#endif
 
 namespace
 {
