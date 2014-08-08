@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_LINUX_FILE_SYSTEM_WATCHER_HPP
-#define SILICIUM_REACTIVE_LINUX_FILE_SYSTEM_WATCHER_HPP
+#ifndef SILICIUM_REACTIVE_LINUX_DIRECTORY_WATCHER_HPP
+#define SILICIUM_REACTIVE_LINUX_DIRECTORY_WATCHER_HPP
 
 #include <reactive/linux/inotify.hpp>
 #include <reactive/file_notification.hpp>
@@ -36,15 +36,15 @@ namespace rx
 		}
 	}
 
-	struct file_system_watcher : observable<file_notification>
+	struct directory_watcher : observable<file_notification>
 	{
 		typedef file_notification element_type;
 
-		file_system_watcher()
+		directory_watcher()
 		{
 		}
 
-		explicit file_system_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
+		explicit directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
 			: inotify(io)
 			, impl(enumerate(ref(inotify)), linux::to_portable_file_notification)
 			, root(inotify.watch(watched, IN_ALL_EVENTS))

@@ -1,4 +1,4 @@
-#include <reactive/file_system_watcher.hpp>
+#include <reactive/directory_watcher.hpp>
 #include <reactive/consume.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -22,7 +22,7 @@ namespace rx
 			std::function<void (file_notification const &)> const &on_event)
 		{
 			boost::asio::io_service io;
-			file_system_watcher watcher(io, watched_dir);
+			directory_watcher watcher(io, watched_dir);
 
 			bool got_event = false;
 			auto consumer = consume<file_notification>([&io, &got_event, &on_event](file_notification const &event)
