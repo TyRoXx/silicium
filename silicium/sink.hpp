@@ -56,7 +56,7 @@ namespace Si
 			auto first_try = m_destination->make_append_space(size);
 			if (!first_try.empty())
 			{
-				auto const copied = (std::min)(static_cast<std::ptrdiff_t>(m_buffer_used), first_try.size());
+				auto const copied = (std::min<std::ptrdiff_t>)(static_cast<std::ptrdiff_t>(m_buffer_used), first_try.size());
 				std::copy(m_fallback_buffer.begin(), m_fallback_buffer.begin() + copied, first_try.begin());
 				m_buffer_used = 0;
 				return first_try;

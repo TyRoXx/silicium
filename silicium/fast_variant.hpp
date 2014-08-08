@@ -10,6 +10,7 @@
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/find.hpp>
 #include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/type_traits/is_nothrow_move_assignable.hpp>
 #include <tuple>
