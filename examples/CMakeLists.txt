@@ -31,5 +31,5 @@ target_link_libraries(rxhttp silicium ${Boost_LIBRARIES})
 add_executable(trivialhttp "trivialhttp.cpp")
 target_link_libraries(trivialhttp ${Boost_LIBRARIES})
 
-add_executable(watchdir "watchdir.cpp")
-target_link_libraries(watchdir reactive ${Boost_LIBRARIES})
+add_executable(directory_watcher "directory_watcher.cpp")
+target_link_libraries(directory_watcher reactive ${Boost_LIBRARIES})
