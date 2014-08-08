@@ -6,6 +6,8 @@
 #include <silicium/win32.hpp>
 #include <silicium/override.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/optional.hpp>
+#include <boost/ref.hpp>
 #include <future>
 
 namespace rx
@@ -45,15 +47,22 @@ namespace rx
 			observer<element_type> *receiver_ = nullptr;
 			Si::win32::unique_handle watch_file;
 
-			struct immovable_state
+			struct immovable_state : private boost::noncopyable
 			{
 				boost::asio::io_service read_dispatcher;
 				std::future<void> read_runner;
-				boost::asio::io_service::work read_active;
+				boost::optional<boost::asio::io_service::work> read_active;
 
 				immovable_state()
-					: read_active(read_dispatcher)
+					: read_active(boost::in_place(boost::ref(read_dispatcher)))
 				{
+				}
+
+				~immovable_state()
+				{
+					read_active.reset();
+					read_dispatcher.stop();
+					read_runner.get();
 				}
 			};
 

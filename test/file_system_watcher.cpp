@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <fstream>
 
@@ -32,6 +33,11 @@ namespace rx
 				got_event = true;
 			});
 			watcher.async_get_one(consumer);
+
+#ifdef _WIN32
+			//currently the implementation for Windows needs some time for the background thread to set everything up
+			boost::this_thread::sleep(boost::posix_time::seconds(1));
+#endif
 
 			provoke_event();
 

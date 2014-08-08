@@ -3,7 +3,11 @@
 
 #include <reactive/win32/directory_changes.hpp>
 #include <reactive/file_notification.hpp>
+#include <reactive/enumerate.hpp>
+#include <reactive/ref.hpp>
+#include <reactive/transform_if_initialized.hpp>
 #include <boost/optional.hpp>
+#include <boost/ref.hpp>
 
 namespace rx
 {
@@ -41,9 +45,9 @@ namespace rx
 		{
 		}
 
-		explicit file_system_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
+		explicit directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
 			: impl(enumerate(win32::directory_changes(watched, false)), win32::to_portable_file_notification)
-			, work(io)
+			, work(boost::in_place(boost::ref(io)))
 		{
 		}
 
@@ -65,7 +69,7 @@ namespace rx
 			enumerator<win32::directory_changes>,
 			boost::optional<file_notification>(*)(win32::file_notification &&)
 		> impl;
-		boost::asio::io_service::work work;
+		boost::optional<boost::asio::io_service::work> work;
 	};
 #endif
 }
