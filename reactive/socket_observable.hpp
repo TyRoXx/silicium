@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_SOCKET_OBSERVABLE_HPP
 
 #include <silicium/fast_variant.hpp>
+#include <silicium/override.hpp>
 #include <reactive/observable.hpp>
 #include <reactive/exchange.hpp>
 #include <boost/config.hpp>

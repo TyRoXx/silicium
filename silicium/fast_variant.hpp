@@ -2,260 +2,427 @@
 #define SILICIUM_FAST_VARIANT_HPP
 
 #include <new>
-#include <type_traits>
-#include <silicium/override.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/transform_view.hpp>
-#include <boost/mpl/max_element.hpp>
-#include <boost/mpl/sizeof.hpp>
-#include <boost/mpl/find.hpp>
-#include <boost/optional.hpp>
-#include <boost/optional/optional_io.hpp>
+#include <array>
+#include <memory>
+#include <boost/type_traits/aligned_storage.hpp>
 #include <boost/variant/static_visitor.hpp>
-#include <boost/type_traits/is_nothrow_move_assignable.hpp>
-#include <tuple>
-#include <cassert>
-#include <limits>
+#include <boost/mpl/find.hpp>
+#include <boost/mpl/vector.hpp>
+#include <boost/optional.hpp>
 
 namespace Si
 {
-	template <class ...T>
-	struct max_sizeof
+	namespace detail
 	{
-		static std::size_t const value = boost::mpl::max_element<
-			boost::mpl::transform_view<
-				boost::mpl::vector<T...>,
-				boost::mpl::sizeof_<boost::mpl::_1>
-			>
-		>::type::type::value;
-	};
-	
-	template <class First, class ...T>
-	struct first
-	{
-		typedef First type;
-	};
+		template <class ...T>
+		struct union_;
 
-	template <class Element, class ...All>
-	struct index_of : boost::mpl::find<boost::mpl::vector<All...>, Element>::type::pos
-	{
-	};
-
-	struct fast_variant_vtable
-	{
-		//TODO: save an indirection by using function pointers instead of virtual methods
-		virtual ~fast_variant_vtable()
+		template <class First, class ...T>
+		struct union_<First, T...>
 		{
-		}
-		virtual int which() const = 0;
-		virtual void default_construct(void *storage) const = 0;
-		virtual void destroy(void *storage) const = 0;
-		virtual void copy(void *to, void const *from) const = 0;
-		virtual void copy_construct(void *to, void const *from) const = 0;
-		virtual void move_construct(void *to, void *from) const = 0;
-	};
-
-	template <class Element, std::size_t Index>
-	struct fast_variant_vtable_impl SILICIUM_FINAL : fast_variant_vtable
-	{
-#ifndef _MSC_VER //these type traits do not work at all in Visual C++ 2013
-		static_assert(std::is_nothrow_move_assignable<Element>::value, "noexcept move assignment operator required");
-		static_assert(std::is_nothrow_move_constructible<Element>::value, "noexcept move constructor required");
-#endif
-
-		fast_variant_vtable_impl()
-		{
-		}
-
-		virtual int which() const SILICIUM_OVERRIDE
-		{
-			return Index;
-		}
-
-		virtual void default_construct(void *storage) const SILICIUM_OVERRIDE
-		{
-			new (static_cast<Element *>(storage)) Element();
-		}
-
-		virtual void destroy(void *storage) const SILICIUM_OVERRIDE
-		{
-			static_cast<Element *>(storage)->~Element();
-		}
-
-		virtual void copy(void *to, void const *from) const SILICIUM_OVERRIDE
-		{
-			*static_cast<Element *>(to) = *static_cast<Element const *>(from);
-		}
-
-		virtual void copy_construct(void *to, void const *from) const SILICIUM_OVERRIDE
-		{
-			new (static_cast<Element *>(to)) Element(*static_cast<Element const *>(from));
-		}
-
-		virtual void move_construct(void *to, void *from) const SILICIUM_OVERRIDE
-		{
-			new (static_cast<Element *>(to)) Element(std::move(*static_cast<Element *>(from)));
-		}
-	};
-
-	template <class Visitor, class Element>
-	struct visitor_caller
-	{
-		static typename std::decay<Visitor>::type::result_type
-		visit(Visitor &visitor, void *storage)
-		{
-			return std::forward<Visitor>(visitor)(*static_cast<Element *>(storage));
-		}
-
-		static typename std::decay<Visitor>::type::result_type
-		visit_const(Visitor &visitor, void const *storage)
-		{
-			return std::forward<Visitor>(visitor)(*static_cast<Element *>(storage));
-		}
-	};
-
-	template <class T, class U>
-	struct not_same_as : boost::mpl::not_<std::is_same<T, U>>
-	{
-	};
-
-	template <class ...T>
-	struct fast_variant
-	{
-		fast_variant() BOOST_NOEXCEPT
-			: type(&get_type<0>())
-		{
-			typedef typename std::tuple_element<0, std::tuple<T...>>::type first_element;
-#ifndef _MSC_VER //is_nothrow_default_constructible does not work at all in Visual C++ 2013
-			static_assert(std::is_nothrow_default_constructible<first_element>::value, "noexcept default constructor required");
-#endif
-			type->default_construct(&storage);
-		}
-
-		fast_variant(fast_variant const &other)
-			: type(other.type)
-		{
-			type->copy_construct(&storage, &other.storage);
-		}
-
-		fast_variant &operator = (fast_variant const &other)
-		{
-			if (this == &other)
+			union
 			{
+				First head;
+				union_<T...> tail;
+			}
+			content;
+		};
+
+		template <>
+		struct union_<>
+		{
+		};
+
+		template <class T>
+		void destroy_storage(void *storage) BOOST_NOEXCEPT
+		{
+			static_cast<T *>(storage)->~T();
+		}
+
+		template <class T>
+		void move_construct_storage(void *destination, void *source) BOOST_NOEXCEPT
+		{
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T *>(source);
+			new (&dest) T(std::move(src));
+		}
+
+		template <class T>
+		void copy_construct_storage(void *destination, void const *source)
+		{
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T const *>(source);
+			new (&dest) T(src);
+		}
+
+		template <class T>
+		void move_storage(void *destination, void *source) BOOST_NOEXCEPT
+		{
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T *>(source);
+			dest = std::move(src);
+		}
+
+		template <class T>
+		void copy_storage(void *destination, void const *source)
+		{
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T const *>(source);
+			dest = src;
+		}
+
+		template <class T>
+		bool equals(void const *left, void const *right)
+		{
+			auto &left_ = *static_cast<T const *>(left);
+			auto &right_ = *static_cast<T const *>(right);
+			return left_ == right_;
+		}
+
+		template <class T>
+		bool less(void const *left, void const *right)
+		{
+			auto &left_ = *static_cast<T const *>(left);
+			auto &right_ = *static_cast<T const *>(right);
+			return left_ < right_;
+		}
+
+		template <class Visitor, class T, class Result>
+		Result apply_visitor_impl(Visitor &&visitor, void *element)
+		{
+			return std::forward<Visitor>(visitor)(*static_cast<T *>(element));
+		}
+
+		template <class Visitor, class T, class Result>
+		Result apply_visitor_const_impl(Visitor &&visitor, void const *element)
+		{
+			return std::forward<Visitor>(visitor)(*static_cast<T const *>(element));
+		}
+
+		template <class First, class ...Rest>
+		struct first
+		{
+			using type = First;
+		};
+
+		template <class Element, class ...All>
+		struct index_of : boost::mpl::find<boost::mpl::vector<All...>, Element>::type::pos
+		{
+		};
+
+		template <bool IsCopyable, class ...T>
+		struct fast_variant_base;
+
+		template <class ...T>
+		struct fast_variant_base<false, T...>
+		{
+			using which_type = unsigned;
+
+			fast_variant_base() BOOST_NOEXCEPT
+			{
+				using constructed = typename first<T...>::type;
+				new (reinterpret_cast<constructed *>(&storage)) constructed();
+			}
+
+			~fast_variant_base() BOOST_NOEXCEPT
+			{
+				destroy_storage(which_, storage);
+			}
+
+			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
+				: which_(other.which_)
+			{
+				move_construct_storage(which_, storage, other.storage);
+			}
+
+			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
+			{
+				if (which_ == other.which_)
+				{
+					move_storage(which_, storage, other.storage);
+				}
+				else
+				{
+					destroy_storage(which_, storage);
+					move_construct_storage(other.which_, storage, other.storage);
+					which_ = other.which_;
+				}
 				return *this;
 			}
-			fast_variant copy(other);
-			*this = std::move(copy);
-			return *this;
-		}
 
-		fast_variant(fast_variant &&other) BOOST_NOEXCEPT
-			: type(other.type)
-		{
-			type->move_construct(&storage, &other.storage);
-		}
-
-		fast_variant &operator = (fast_variant &&other) BOOST_NOEXCEPT
-		{
-			if (this == &other)
+			template <
+				class U,
+				class CleanU = typename std::decay<U>::type,
+				std::size_t Index = index_of<CleanU, T...>::value,
+				class NoFastVariant = typename std::enable_if<
+					boost::mpl::and_<
+						boost::mpl::not_<
+							std::is_base_of<
+								fast_variant_base,
+								CleanU
+							>
+						>,
+						boost::mpl::bool_<Index < sizeof...(T)>
+					>::value,
+					void
+				>::type>
+			fast_variant_base(U &&value)
+				: which_(Index)
 			{
+				new (&storage) CleanU(std::forward<U>(value));
+			}
+
+			which_type which() const BOOST_NOEXCEPT
+			{
+				return which_;
+			}
+
+			template <class Visitor>
+			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
+			{
+				using result = typename std::decay<Visitor>::type::result_type;
+				std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f
+				{{
+					&apply_visitor_impl<Visitor, T, result>...
+				}};
+				return f[which_](std::forward<Visitor>(visitor), &storage);
+			}
+
+			template <class Visitor>
+			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
+			{
+				using result = typename std::decay<Visitor>::type::result_type;
+				std::array<result (*)(Visitor &&, void const *), sizeof...(T)> const f
+				{{
+					&apply_visitor_const_impl<Visitor, T, result>...
+				}};
+				return f[which_](std::forward<Visitor>(visitor), &storage);
+			}
+
+			bool operator == (fast_variant_base const &other) const
+			{
+				if (which_ != other.which_)
+				{
+					return false;
+				}
+				std::array<bool (*)(void const *, void const *), sizeof...(T)> const f =
+				{{
+					&equals<T>...
+				}};
+				return f[which_](&storage, &other.storage);
+			}
+
+			bool operator < (fast_variant_base const &other) const
+			{
+				if (which_ > other.which_)
+				{
+					return false;
+				}
+				if (which_ < other.which_)
+				{
+					return true;
+				}
+				std::array<bool (*)(void const *, void const *), sizeof...(T)> const f =
+				{{
+					&less<T>...
+				}};
+				return f[which_](&storage, &other.storage);
+			}
+
+		protected: //TODO: make private somehow
+
+			using storage_type = std::array<char, sizeof(union_<T...>)>;
+
+			which_type which_ = 0;
+			storage_type storage;
+
+			static void copy_construct_storage(which_type which, storage_type &destination, storage_type const &source)
+			{
+				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
+				{{
+					&detail::copy_construct_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
+
+			static void move_construct_storage(which_type which, storage_type &destination, storage_type &source) BOOST_NOEXCEPT
+			{
+				std::array<void (*)(void *, void *), sizeof...(T)> const f =
+				{{
+					&detail::move_construct_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
+
+			static void destroy_storage(which_type which, storage_type &destroyed) BOOST_NOEXCEPT
+			{
+				std::array<void (*)(void *), sizeof...(T)> const f =
+				{{
+					&detail::destroy_storage<T>...
+				}};
+				f[which](&destroyed);
+			}
+
+			static void copy_storage(which_type which, storage_type &destination, storage_type const &source)
+			{
+				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
+				{{
+					&detail::copy_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
+
+			static void move_storage(which_type which, storage_type &destination, storage_type &source) BOOST_NOEXCEPT
+			{
+				std::array<void (*)(void *, void *), sizeof...(T)> const f =
+				{{
+					&detail::move_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
+		};
+
+		template <class ...T>
+		struct fast_variant_base<true, T...> : fast_variant_base<false, T...>
+		{
+			using base = fast_variant_base<false, T...>;
+
+			fast_variant_base() BOOST_NOEXCEPT
+			{
+			}
+
+			template <
+				class U,
+				class CleanU = typename std::decay<U>::type,
+				std::size_t Index = index_of<CleanU, T...>::value,
+				class NoFastVariant = typename std::enable_if<
+					boost::mpl::and_<
+						boost::mpl::not_<
+							std::is_base_of<
+								fast_variant_base,
+								CleanU
+							>
+						>,
+						boost::mpl::bool_<Index < sizeof...(T)>
+					>::value,
+					void
+				>::type>
+			fast_variant_base(U &&value)
+				: base(std::forward<U>(value))
+			{
+			}
+
+			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
+				: base(std::move(other))
+			{
+			}
+
+			fast_variant_base(fast_variant_base const &other)
+				: base()
+			{
+				this->which_ = other.which();
+				base::copy_construct_storage(this->which_, this->storage, other.storage);
+			}
+
+			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
+			{
+				base::operator = (std::move(other));
 				return *this;
 			}
-			type->destroy(&storage);
-			type = other.type;
-			type->move_construct(&storage, &other.storage);
-			return *this;
-		}
 
-		template <
-			class U,
-			class CleanU = typename std::decay<U>::type,
-			size_t Index = index_of<CleanU, T...>::value,
-			class NoFastVariant = typename std::enable_if<not_same_as<CleanU, fast_variant<T...>>::value, void>::type>
-		fast_variant(U &&value) BOOST_NOEXCEPT_IF(std::is_rvalue_reference<U>::value || std::is_nothrow_copy_constructible<CleanU>::value)
-			: type(&get_type<Index>())
+			fast_variant_base &operator = (fast_variant_base const &other)
+			{
+				if (this->which_ == other.which_)
+				{
+					base::copy_storage(this->which_, this->storage, other.storage);
+				}
+				else
+				{
+					typename base::storage_type temporary;
+					base::copy_construct_storage(other.which_, temporary, other.storage);
+					base::destroy_storage(this->which_, this->storage);
+					base::move_construct_storage(other.which_, this->storage, temporary);
+					this->which_ = other.which_;
+				}
+				return *this;
+			}
+		};
+
+		template <class ...T>
+		struct are_noexcept_movable;
+
+		template <class First, class ...T>
+		struct are_noexcept_movable<First, T...>
+			: boost::mpl::and_<
+				boost::mpl::and_<
+					std::is_nothrow_move_constructible<First>,
+					std::is_nothrow_move_assignable<First>
+				>,
+				are_noexcept_movable<T...>
+			>::type
 		{
-			construct_impl<Index>(std::is_rvalue_reference<U>(), value);
-		}
+		};
 
-		template <
-			class U,
-			class CleanU = typename std::decay<U>::type,
-			size_t Index = index_of<CleanU, T...>::value,
-			class NoFastVariant = typename std::enable_if<not_same_as<CleanU, fast_variant<T...>>::value, void>::type>
-		fast_variant &operator = (U &&other) BOOST_NOEXCEPT_IF(std::is_rvalue_reference<U>::value || std::is_nothrow_copy_assignable<CleanU>::value)
+		template <>
+		struct are_noexcept_movable<> : std::true_type
 		{
-			assignment_impl<Index>(std::is_rvalue_reference<U>(), other);
-			return *this;
-		}
+		};
 
-		~fast_variant() BOOST_NOEXCEPT
+		template <class ...T>
+		struct are_copyable;
+
+		template <class First, class ...T>
+		struct are_copyable<First, T...>
+			: boost::mpl::and_<
+				boost::mpl::and_<
+					std::is_copy_constructible<First>,
+					std::is_copy_assignable<First>
+				>,
+				are_copyable<T...>
+			>::type
 		{
-			assert(type);
-			type->destroy(&storage);
-		}
+		};
 
-		int which() const BOOST_NOEXCEPT
+		template <>
+		struct are_copyable<> : std::true_type
 		{
-			return type->which();
-		}
+		};
 
-		template <class Visitor>
-		auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
+		BOOST_STATIC_ASSERT(are_copyable<>::value);
+		BOOST_STATIC_ASSERT(are_copyable<int>::value);
+		BOOST_STATIC_ASSERT(are_copyable<int, float>::value);
+		BOOST_STATIC_ASSERT(!are_copyable<int, std::unique_ptr<int>>::value);
+
+		template <class ...T>
+		using select_fast_variant_base = fast_variant_base<are_copyable<T...>::value, T...>;
+	}
+
+	template <class ...T>
+	struct fast_variant : detail::select_fast_variant_base<T...>
+	{
+		BOOST_STATIC_ASSERT_MSG(detail::are_noexcept_movable<T...>::value, "All contained types must be nothrow/noexcept-movable");
+
+		using base = detail::select_fast_variant_base<T...>;
+
+		using base::base;
+
+		fast_variant()
 		{
-			using result_type = typename std::decay<Visitor>::type::result_type;
-			using visit_fn = result_type (*)(Visitor &, void *);
-			visit_fn const f[] = {&visitor_caller<Visitor, T>::visit...};
-			return f[which()](visitor, &storage);
 		}
+	};
 
-		template <class Visitor>
-		auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
+	template <class ...T>
+	bool operator != (fast_variant<T...> const &left, fast_variant<T...> const &right)
+	{
+		return !(left == right);
+	}
+
+	struct hash_visitor : boost::static_visitor<std::size_t>
+	{
+		template <class T>
+		std::size_t operator()(T const &element) const
 		{
-			using result_type = typename std::decay<Visitor>::type::result_type;
-			using visit_fn = result_type (*)(Visitor &, void const *);
-			visit_fn const f[] = {&visitor_caller<Visitor, typename std::add_const<T>::type>::visit_const...};
-			return f[which()](visitor, &storage);
-		}
-
-	private:
-
-		fast_variant_vtable const *type;
-		typename std::aligned_storage<max_sizeof<T...>::value>::type storage;
-
-		template <std::size_t Index>
-		static fast_variant_vtable const &get_type() BOOST_NOEXCEPT
-		{
-			typedef typename std::tuple_element<Index, std::tuple<T...>>::type element;
-			static fast_variant_vtable_impl<element, Index> const instance;
-			return instance;
-		}
-
-		template <std::size_t Index, class U>
-		void construct_impl(std::true_type, U &value) BOOST_NOEXCEPT
-		{
-			type->move_construct(&storage, &value);
-		}
-
-		template <std::size_t Index, class U>
-		void construct_impl(std::false_type, U const &value)
-		{
-			type->copy_construct(&storage, &value);
-		}
-
-		template <std::size_t Index, class U>
-		void assignment_impl(std::true_type, U &value) BOOST_NOEXCEPT
-		{
-			type->destroy(&storage);
-			type = &get_type<Index>();
-			type->move_construct(&storage, &value);
-		}
-
-		template <std::size_t Index, class U>
-		void assignment_impl(std::false_type, U const &value)
-		{
-			fast_variant copy(value);
-			*this = std::move(copy);
+			return std::hash<T>()(element);
 		}
 	};
 
@@ -313,65 +480,6 @@ namespace Si
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
 
-	struct equal_to
-	{
-		template <class T>
-		bool operator()(T const &left, T const &right) const
-		{
-			return (left == right);
-		}
-	};
-
-	struct less
-	{
-		template <class T>
-		bool operator()(T const &left, T const &right) const
-		{
-			return (left < right);
-		}
-	};
-
-	template <class Comparison, class ...T>
-	struct comparison_visitor : boost::static_visitor<bool>
-	{
-		fast_variant<T...> const *other = nullptr;
-
-		explicit comparison_visitor(fast_variant<T...> const &other) BOOST_NOEXCEPT
-			: other(&other)
-		{
-		}
-
-		template <class Element>
-		bool operator()(Element &value) const BOOST_NOEXCEPT
-		{
-			auto other_value = try_get_ptr<Element>(*other);
-			assert(other_value);
-			return Comparison()(value, *other_value);
-		}
-	};
-
-	template <class ...T>
-	bool operator == (fast_variant<T...> const &left, fast_variant<T...> const &right) BOOST_NOEXCEPT
-	{
-		if (left.which() != right.which())
-		{
-			return false;
-		}
-		comparison_visitor<equal_to, T...> v{right};
-		return Si::apply_visitor(v, left);
-	}
-
-	template <class ...T>
-	bool operator < (fast_variant<T...> const &left, fast_variant<T...> const &right) BOOST_NOEXCEPT
-	{
-		if (left.which() != right.which())
-		{
-			return left.which() < right.which();
-		}
-		comparison_visitor<less, T...> v{right};
-		return Si::apply_visitor(v, left);
-	}
-
 	struct ostream_visitor : boost::static_visitor<>
 	{
 		std::ostream *out;
@@ -395,5 +503,20 @@ namespace Si
 		return out;
 	}
 }
+
+namespace std
+{
+	template <class ...T>
+	struct hash<Si::fast_variant<T...>>
+	{
+		std::size_t operator()(Si::fast_variant<T...> const &v) const
+		{
+			return Si::apply_visitor(Si::hash_visitor(), v);
+		}
+	};
+}
+
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int>) == 8);
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int *>) == (4 + sizeof(int *)));
 
 #endif
