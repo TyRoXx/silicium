@@ -11,6 +11,12 @@
 
 namespace Si
 {
+	template <class Visitor, class Variant>
+	auto apply_visitor(Visitor &&visitor, Variant &&variant) -> typename std::decay<Visitor>::type::result_type
+	{
+		return std::forward<Variant>(variant).apply_visitor(std::forward<Visitor>(visitor));
+	}
+
 	namespace detail
 	{
 		template <class ...T>
@@ -449,12 +455,6 @@ namespace Si
 			return std::hash<T>()(element);
 		}
 	};
-
-	template <class Visitor, class Variant>
-	auto apply_visitor(Visitor &&visitor, Variant &&variant) -> typename std::decay<Visitor>::type::result_type
-	{
-		return std::forward<Variant>(variant).apply_visitor(std::forward<Visitor>(visitor));
-	}
 
 	template <class Element>
 	struct try_get_visitor : boost::static_visitor<boost::optional<Element>>
