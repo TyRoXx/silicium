@@ -1,7 +1,9 @@
 #include <silicium/fast_variant.hpp>
+#include <reactive/config.hpp>
 #include <boost/container/string.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/type_traits/aligned_storage.hpp>
 
 namespace Si
 {
@@ -101,5 +103,252 @@ namespace Si
 		BOOST_CHECK_LT(f, h);
 		BOOST_CHECK_LT(f, i);
 		BOOST_CHECK_LT(h, i);
+	}
+
+	namespace detail
+	{
+		template <class ...T>
+		struct union_;
+
+		template <class First, class ...T>
+		struct union_<First, T...>
+		{
+			union
+			{
+				First head;
+				union_<T...> tail;
+			}
+			content;
+		};
+
+		template <>
+		struct union_<>
+		{
+		};
+
+		template <bool IsCopyable, class ...T>
+		struct fast_variant_base;
+
+		template <class ...T>
+		struct fast_variant_base<false, T...>
+		{
+			using which_type = std::size_t;
+
+			fast_variant_base() BOOST_NOEXCEPT
+			{
+				//TODO
+			}
+
+			~fast_variant_base() BOOST_NOEXCEPT
+			{
+				//TODO
+			}
+
+			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
+			{
+				throw std::logic_error("to do");
+			}
+
+			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
+			{
+				throw std::logic_error("to do");
+			}
+
+			template <
+				class U,
+				class CleanU = typename std::decay<U>::type,
+				class NoFastVariant = typename std::enable_if<
+					boost::mpl::not_<
+						std::is_same<
+							CleanU,
+							fast_variant<T...>
+						>
+					>::value,
+					void
+				>::type>
+			fast_variant_base(U &&value)
+			{
+				throw std::logic_error("to do");
+			}
+
+			which_type which() const BOOST_NOEXCEPT
+			{
+				return which_;
+			}
+
+			template <class Visitor>
+			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type;
+
+			template <class Visitor>
+			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type;
+
+		protected:
+
+			which_type which_;
+			typename boost::aligned_storage<sizeof(union_<T...>)>::type storage;
+		};
+
+		template <class ...T>
+		struct fast_variant_base<true, T...> : fast_variant_base<false, T...>
+		{
+			using base = fast_variant_base<false, T...>;
+
+			fast_variant_base() BOOST_NOEXCEPT
+			{
+			}
+
+			template <
+				class U,
+				class CleanU = typename std::decay<U>::type,
+				class NoFastVariant = typename std::enable_if<
+					boost::mpl::not_<
+						std::is_same<
+							CleanU,
+							fast_variant<T...>
+						>
+					>::value,
+					void
+				>::type>
+			fast_variant_base(U &&value)
+				: base(std::forward<U>(value))
+			{
+			}
+
+			fast_variant_base(fast_variant_base const &other)
+			{
+				throw std::logic_error("to do");
+			}
+
+			fast_variant_base &operator = (fast_variant_base const &other)
+			{
+				throw std::logic_error("to do");
+			}
+		};
+
+		template <class ...T>
+		struct are_noexcept_movable;
+
+		template <class First, class ...T>
+		struct are_noexcept_movable<First, T...>
+			: boost::mpl::and_<
+				boost::mpl::and_<
+					std::is_nothrow_move_constructible<First>,
+					std::is_nothrow_move_assignable<First>
+				>,
+				are_noexcept_movable<T...>
+			>::type
+		{
+		};
+
+		template <>
+		struct are_noexcept_movable<> : std::true_type
+		{
+		};
+
+		template <class ...T>
+		struct are_copyable;
+
+		template <class First, class ...T>
+		struct are_copyable<First, T...>
+			: boost::mpl::and_<
+				boost::mpl::and_<
+					std::is_copy_constructible<First>,
+					std::is_copy_assignable<First>
+				>,
+				are_copyable<T...>
+			>::type
+		{
+		};
+
+		template <>
+		struct are_copyable<> : std::true_type
+		{
+		};
+
+		BOOST_STATIC_ASSERT(are_copyable<>::value);
+		BOOST_STATIC_ASSERT(are_copyable<int>::value);
+		BOOST_STATIC_ASSERT(are_copyable<int, float>::value);
+		BOOST_STATIC_ASSERT(!are_copyable<int, std::unique_ptr<int>>::value);
+
+		template <class ...T>
+		using select_fast_variant_base = fast_variant_base<are_copyable<T...>::value, T...>;
+	}
+
+	template <class ...T>
+	struct fast_variant2 : detail::select_fast_variant_base<T...>
+	{
+		BOOST_STATIC_ASSERT_MSG(detail::are_noexcept_movable<T...>::value, "All contained types must be nothrow/noexcept-movable");
+
+		using base = detail::select_fast_variant_base<T...>;
+
+		using base::base;
+
+		fast_variant2()
+		{
+		}
+	};
+
+	template <class ...T>
+	bool operator == (fast_variant2<T...> const &left, fast_variant2<T...> const &right)
+	{
+		if (left.which() != right.which())
+		{
+			return false;
+		}
+		throw std::logic_error("to do");
+	}
+
+	template <class ...T>
+	bool operator != (fast_variant2<T...> const &left, fast_variant2<T...> const &right)
+	{
+		return !(left == right);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_default)
+	{
+		using variant = fast_variant2<int>;
+		variant v;
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant2_non_copyable_default)
+	{
+		using variant = fast_variant2<std::unique_ptr<int>>;
+		variant v;
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_operator_copy)
+	{
+		using variant = fast_variant2<int>;
+		variant v;
+		variant w(2);
+		BOOST_CHECK(v != w);
+		v = w;
+		BOOST_CHECK(v == w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_construct_copy)
+	{
+		using variant = fast_variant2<int>;
+		variant v;
+		variant w(v);
+		BOOST_CHECK(v == w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_operator_move)
+	{
+		using variant = fast_variant2<std::unique_ptr<int>>;
+		variant v;
+		variant w(rx::make_unique<int>(2));
+		BOOST_CHECK(v != w);
+		v = std::move(w);
+		BOOST_CHECK(v != w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_construct_move)
+	{
+		using variant = fast_variant2<std::unique_ptr<int>>;
+		variant v(rx::make_unique<int>(2));
+		variant w(std::move(v));
+		BOOST_CHECK(v != w);
 	}
 }
