@@ -127,15 +127,42 @@ namespace Si
 		};
 
 		template <class T>
-		void destroy_storage(void *storage)
+		void destroy_storage(void *storage) BOOST_NOEXCEPT
 		{
 			static_cast<T *>(storage)->~T();
+		}
+
+		template <class T>
+		void move_storage(void *destination, void *source) BOOST_NOEXCEPT
+		{
+			*static_cast<T *>(destination) = std::move(*static_cast<T *>(source));
+		}
+
+		template <class T>
+		void copy_storage(void *destination, void const *source)
+		{
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T const *>(source);
+			dest = src;
+		}
+
+		template <class T>
+		bool equals(void const *left, void const *right)
+		{
+			auto &left_ = *static_cast<T const *>(left);
+			auto &right_ = *static_cast<T const *>(right);
+			return left_ == right_;
 		}
 
 		template <class First, class ...Rest>
 		struct first
 		{
 			using type = First;
+		};
+
+		template <class Element, class ...All>
+		struct index_of : boost::mpl::find<boost::mpl::vector<All...>, Element>::type::pos
+		{
 		};
 
 		template <bool IsCopyable, class ...T>
@@ -163,30 +190,38 @@ namespace Si
 			}
 
 			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
+				: which_(other.which_)
 			{
-				throw std::logic_error("to do");
+				std::array<void (*)(void *, void *), sizeof...(T)> const f
+				{{
+					&move_storage<T>...
+				}};
+				f[which_](&storage, &other.storage);
 			}
 
 			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
 			{
-				throw std::logic_error("to do");
+				//TODO
+				return *this;
 			}
 
 			template <
 				class U,
 				class CleanU = typename std::decay<U>::type,
+				std::size_t Index = index_of<CleanU, T...>::value,
 				class NoFastVariant = typename std::enable_if<
 					boost::mpl::not_<
-						std::is_same<
-							CleanU,
-							fast_variant<T...>
+						std::is_base_of<
+							fast_variant_base,
+							CleanU
 						>
 					>::value,
 					void
 				>::type>
 			fast_variant_base(U &&value)
+				: which_(Index)
 			{
-				throw std::logic_error("to do");
+				new (&storage) CleanU(std::forward<U>(value));
 			}
 
 			which_type which() const BOOST_NOEXCEPT
@@ -200,7 +235,20 @@ namespace Si
 			template <class Visitor>
 			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type;
 
-		protected:
+			bool operator == (fast_variant_base const &other) const
+			{
+				if (which_ != other.which_)
+				{
+					return false;
+				}
+				std::array<bool (*)(void const *, void const *), sizeof...(T)> const f =
+				{{
+					&equals<T>...
+				}};
+				return f[which_](&storage, &other.storage);
+			}
+
+		protected: //TODO: make private somehow
 
 			which_type which_ = 0;
 			typename boost::aligned_storage<sizeof(union_<T...>)>::type storage;
@@ -220,9 +268,9 @@ namespace Si
 				class CleanU = typename std::decay<U>::type,
 				class NoFastVariant = typename std::enable_if<
 					boost::mpl::not_<
-						std::is_same<
-							CleanU,
-							fast_variant<T...>
+						std::is_base_of<
+							fast_variant_base,
+							CleanU
 						>
 					>::value,
 					void
@@ -234,12 +282,17 @@ namespace Si
 
 			fast_variant_base(fast_variant_base const &other)
 			{
-				throw std::logic_error("to do");
+				this->which_ = other.which();
+				std::array<void (*)(void *, void const *), sizeof...(T)> const f
+				{{
+					&copy_storage<T>...
+				}};
+				f[this->which_](&this->storage, &other.storage);
 			}
 
 			fast_variant_base &operator = (fast_variant_base const &other)
 			{
-				throw std::logic_error("to do");
+				throw std::logic_error("operator = const &");
 			}
 		};
 
@@ -305,16 +358,6 @@ namespace Si
 		{
 		}
 	};
-
-	template <class ...T>
-	bool operator == (fast_variant2<T...> const &left, fast_variant2<T...> const &right)
-	{
-		if (left.which() != right.which())
-		{
-			return false;
-		}
-		throw std::logic_error("to do");
-	}
 
 	template <class ...T>
 	bool operator != (fast_variant2<T...> const &left, fast_variant2<T...> const &right)
