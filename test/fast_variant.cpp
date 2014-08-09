@@ -126,6 +126,18 @@ namespace Si
 		{
 		};
 
+		template <class T>
+		void destroy_storage(void *storage)
+		{
+			static_cast<T *>(storage)->~T();
+		}
+
+		template <class First, class ...Rest>
+		struct first
+		{
+			using type = First;
+		};
+
 		template <bool IsCopyable, class ...T>
 		struct fast_variant_base;
 
@@ -136,12 +148,18 @@ namespace Si
 
 			fast_variant_base() BOOST_NOEXCEPT
 			{
-				//TODO
+				using constructed = typename first<T...>::type;
+				new (reinterpret_cast<constructed *>(&storage)) constructed();
 			}
 
 			~fast_variant_base() BOOST_NOEXCEPT
 			{
-				//TODO
+				//hopefully compilers are clever enough to optimize this..
+				std::array<void (*)(void *), sizeof...(T)> const f
+				{{
+					&destroy_storage<T>...
+				}};
+				f[which_](&storage);
 			}
 
 			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
@@ -184,7 +202,7 @@ namespace Si
 
 		protected:
 
-			which_type which_;
+			which_type which_ = 0;
 			typename boost::aligned_storage<sizeof(union_<T...>)>::type storage;
 		};
 
@@ -304,16 +322,40 @@ namespace Si
 		return !(left == right);
 	}
 
+	// default constructor
+
 	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_default)
 	{
 		using variant = fast_variant2<int>;
 		variant v;
+		BOOST_CHECK_EQUAL(0, v.which());
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant2_non_copyable_default)
 	{
 		using variant = fast_variant2<std::unique_ptr<int>>;
 		variant v;
+		BOOST_CHECK_EQUAL(0, v.which());
+	}
+
+	// move constructor
+
+	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_construct_move)
+	{
+		using variant = fast_variant2<std::unique_ptr<int>>;
+		variant v(rx::make_unique<int>(2));
+		variant w(std::move(v));
+		BOOST_CHECK(v != w);
+	}
+
+	// copy constructor
+
+	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_construct_copy)
+	{
+		using variant = fast_variant2<int>;
+		variant v;
+		variant w(v);
+		BOOST_CHECK(v == w);
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_operator_copy)
@@ -326,12 +368,18 @@ namespace Si
 		BOOST_CHECK(v == w);
 	}
 
-	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_construct_copy)
+	// move operator
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_move)
 	{
-		using variant = fast_variant2<int>;
+		using variant = fast_variant2<noexcept_string>;
+		BOOST_STATIC_ASSERT(std::is_copy_assignable<variant>::value);
+		BOOST_STATIC_ASSERT(std::is_copy_constructible<variant>::value);
 		variant v;
-		variant w(v);
-		BOOST_CHECK(v == w);
+		variant w(noexcept_string(1000, 'a'));
+		BOOST_CHECK(v != w);
+		v = std::move(w);
+		BOOST_CHECK(v != w);
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_operator_move)
@@ -344,11 +392,39 @@ namespace Si
 		BOOST_CHECK(v != w);
 	}
 
-	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_construct_move)
+	// copy operator
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_copy_to_same)
 	{
-		using variant = fast_variant2<std::unique_ptr<int>>;
-		variant v(rx::make_unique<int>(2));
-		variant w(std::move(v));
+		using variant = fast_variant2<int, double>;
+		variant v;
+		variant w(3);
 		BOOST_CHECK(v != w);
+		v = w;
+		BOOST_CHECK(v == w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_copy_to_different)
+	{
+		using variant = fast_variant2<int, double>;
+		variant v(1.0);
+		variant w(3);
+		BOOST_CHECK(v != w);
+		v = w;
+		BOOST_CHECK(v == w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_copy_raw)
+	{
+		using variant = fast_variant2<int, double>;
+		variant v;
+		variant w(3);
+		BOOST_CHECK(v != w);
+		v = 3;
+		BOOST_CHECK(v == w);
+		w = 2.0;
+		BOOST_CHECK(v != w);
+		v = 2.0;
+		BOOST_CHECK(v == w);
 	}
 }
