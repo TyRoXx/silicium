@@ -249,11 +249,14 @@ namespace Si
 				class CleanU = typename std::decay<U>::type,
 				std::size_t Index = index_of<CleanU, T...>::value,
 				class NoFastVariant = typename std::enable_if<
-					boost::mpl::not_<
-						std::is_base_of<
-							fast_variant_base,
-							CleanU
-						>
+					boost::mpl::and_<
+						boost::mpl::not_<
+							std::is_base_of<
+								fast_variant_base,
+								CleanU
+							>
+						>,
+						boost::mpl::bool_<Index < sizeof...(T)>
 					>::value,
 					void
 				>::type>
@@ -385,12 +388,16 @@ namespace Si
 			template <
 				class U,
 				class CleanU = typename std::decay<U>::type,
+				std::size_t Index = index_of<CleanU, T...>::value,
 				class NoFastVariant = typename std::enable_if<
-					boost::mpl::not_<
-						std::is_base_of<
-							fast_variant_base,
-							CleanU
-						>
+					boost::mpl::and_<
+						boost::mpl::not_<
+							std::is_base_of<
+								fast_variant_base,
+								CleanU
+							>
+						>,
+						boost::mpl::bool_<Index < sizeof...(T)>
 					>::value,
 					void
 				>::type>
@@ -698,5 +705,8 @@ namespace Si
 		s.erase(2);
 		BOOST_CHECK_EQUAL(0, s.count(2));
 		BOOST_CHECK_EQUAL(1, s.count(3));
+		s.insert(2.0f);
+		BOOST_CHECK_EQUAL(0, s.count(2));
+		BOOST_CHECK_EQUAL(1, s.count(2.0f));
 	}
 }
