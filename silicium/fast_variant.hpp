@@ -162,7 +162,7 @@ namespace Si
 								CleanU
 							>
 						>,
-						boost::mpl::bool_<Index < sizeof...(T)>
+						boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>
 					>::value,
 					void
 				>::type>
@@ -303,7 +303,7 @@ namespace Si
 								CleanU
 							>
 						>,
-						boost::mpl::bool_<Index < sizeof...(T)>
+						boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>
 					>::value,
 					void
 				>::type>
