@@ -4,7 +4,6 @@
 #include <new>
 #include <array>
 #include <memory>
-#include <boost/type_traits/aligned_storage.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/mpl/find.hpp>
 #include <boost/mpl/vector.hpp>
@@ -22,7 +21,7 @@ namespace Si
 		{
 			union
 			{
-				First head;
+				std::array<char, sizeof(First)> head;
 				union_<T...> tail;
 			}
 			content;
@@ -36,6 +35,10 @@ namespace Si
 		template <class T>
 		void destroy_storage(void *storage) BOOST_NOEXCEPT
 		{
+#ifdef _MSC_VER
+			//VC++ 2013: Silence (wrong) warning about unreferenced parameter
+			(void)storage;
+#endif
 			static_cast<T *>(storage)->~T();
 		}
 
@@ -110,12 +113,36 @@ namespace Si
 		{
 		};
 
+		template <class ...T>
+		struct are_noexcept_movable;
+
+		template <class First, class ...T>
+		struct are_noexcept_movable<First, T...>
+			: boost::mpl::and_<
+				boost::mpl::and_<
+					std::is_nothrow_move_constructible<First>,
+					std::is_nothrow_move_assignable<First>
+				>,
+				are_noexcept_movable<T...>
+			>::type
+		{
+		};
+
+		template <>
+		struct are_noexcept_movable<> : std::true_type
+		{
+		};
+
 		template <bool IsCopyable, class ...T>
 		struct fast_variant_base;
 
 		template <class ...T>
 		struct fast_variant_base<false, T...>
 		{
+#ifndef _MSC_VER //VC++ 2013 does not have noexcept
+			BOOST_STATIC_ASSERT_MSG(detail::are_noexcept_movable<T...>::value, "All contained types must be nothrow/noexcept-movable");
+#endif
+
 			using which_type = unsigned;
 
 			fast_variant_base() BOOST_NOEXCEPT
@@ -349,26 +376,6 @@ namespace Si
 		};
 
 		template <class ...T>
-		struct are_noexcept_movable;
-
-		template <class First, class ...T>
-		struct are_noexcept_movable<First, T...>
-			: boost::mpl::and_<
-				boost::mpl::and_<
-					std::is_nothrow_move_constructible<First>,
-					std::is_nothrow_move_assignable<First>
-				>,
-				are_noexcept_movable<T...>
-			>::type
-		{
-		};
-
-		template <>
-		struct are_noexcept_movable<> : std::true_type
-		{
-		};
-
-		template <class ...T>
 		struct are_copyable;
 
 		template <class First, class ...T>
@@ -391,25 +398,42 @@ namespace Si
 		BOOST_STATIC_ASSERT(are_copyable<>::value);
 		BOOST_STATIC_ASSERT(are_copyable<int>::value);
 		BOOST_STATIC_ASSERT(are_copyable<int, float>::value);
+
+#ifndef _MSC_VER
+		//In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
+		//so this assert would fail.
 		BOOST_STATIC_ASSERT(!are_copyable<int, std::unique_ptr<int>>::value);
+#endif
 
 		template <class ...T>
 		using select_fast_variant_base = fast_variant_base<are_copyable<T...>::value, T...>;
+
+		struct ostream_visitor : boost::static_visitor<>
+		{
+			std::ostream *out;
+
+			explicit ostream_visitor(std::ostream &out)
+				: out(&out)
+			{
+			}
+
+			template <class T>
+			void operator()(T const &value) const
+			{
+				*out << value;
+			}
+		};
+
+		template <class ...T>
+		std::ostream &operator << (std::ostream &out, select_fast_variant_base<T...> const &v)
+		{
+			Si::apply_visitor(ostream_visitor{ out }, v);
+			return out;
+		}
 	}
 
 	template <class ...T>
-	struct fast_variant : detail::select_fast_variant_base<T...>
-	{
-		BOOST_STATIC_ASSERT_MSG(detail::are_noexcept_movable<T...>::value, "All contained types must be nothrow/noexcept-movable");
-
-		using base = detail::select_fast_variant_base<T...>;
-
-		using base::base;
-
-		fast_variant()
-		{
-		}
-	};
+	using fast_variant = detail::select_fast_variant_base<T...>;
 
 	template <class ...T>
 	bool operator != (fast_variant<T...> const &left, fast_variant<T...> const &right)
@@ -478,29 +502,6 @@ namespace Si
 	Element *try_get_ptr(fast_variant<T...> const &from) BOOST_NOEXCEPT
 	{
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
-	}
-
-	struct ostream_visitor : boost::static_visitor<>
-	{
-		std::ostream *out;
-
-		explicit ostream_visitor(std::ostream &out)
-			: out(&out)
-		{
-		}
-
-		template <class T>
-		void operator()(T const &value) const
-		{
-			*out << value;
-		}
-	};
-
-	template <class ...T>
-	std::ostream &operator << (std::ostream &out, fast_variant<T...> const &v)
-	{
-		Si::apply_visitor(ostream_visitor{out}, v);
-		return out;
 	}
 }
 
