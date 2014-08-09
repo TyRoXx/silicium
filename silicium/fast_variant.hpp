@@ -27,7 +27,10 @@ namespace Si
 		{
 			union
 			{
-				std::array<char, sizeof(First)> head;
+#ifndef _MSC_VER
+				alignas(First)
+#endif
+					std::array<char, sizeof(First)> head;
 				union_<T...> tail;
 			}
 			content;
