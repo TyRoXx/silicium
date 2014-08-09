@@ -4,6 +4,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/type_traits/aligned_storage.hpp>
+#include <unordered_set>
 
 namespace Si
 {
@@ -503,6 +504,30 @@ namespace Si
 		return !(left == right);
 	}
 
+	struct hash_visitor : boost::static_visitor<std::size_t>
+	{
+		template <class T>
+		std::size_t operator()(T const &element) const
+		{
+			return std::hash<T>()(element);
+		}
+	};
+}
+
+namespace std
+{
+	template <class ...T>
+	struct hash<Si::fast_variant2<T...>>
+	{
+		std::size_t operator()(Si::fast_variant2<T...> const &v) const
+		{
+			return Si::apply_visitor(Si::hash_visitor(), v);
+		}
+	};
+}
+
+namespace Si
+{
 	// default constructor
 
 	BOOST_AUTO_TEST_CASE(fast_variant2_copyable_default)
@@ -658,5 +683,20 @@ namespace Si
 	{
 		fast_variant2<int, float> v(1), w(2);
 		BOOST_CHECK(v < w);
+	}
+
+	// std::hash
+
+	BOOST_AUTO_TEST_CASE(fast_variant_hash)
+	{
+		using variant = fast_variant2<int, float>;
+		std::unordered_set<variant> s;
+		s.insert(2);
+		BOOST_CHECK_EQUAL(1, s.count(2));
+		s.insert(3);
+		BOOST_CHECK_EQUAL(1, s.count(3));
+		s.erase(2);
+		BOOST_CHECK_EQUAL(0, s.count(2));
+		BOOST_CHECK_EQUAL(1, s.count(3));
 	}
 }
