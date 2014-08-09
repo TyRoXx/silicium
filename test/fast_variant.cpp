@@ -152,7 +152,7 @@ namespace Si
 		void move_storage(void *destination, void *source) BOOST_NOEXCEPT
 		{
 			auto &dest = *static_cast<T *>(destination);
-			auto &src = *static_cast<T const *>(source);
+			auto &src = *static_cast<T *>(source);
 			dest = std::move(src);
 		}
 
@@ -210,7 +210,16 @@ namespace Si
 
 			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
 			{
-				//TODO
+				if (which_ == other.which_)
+				{
+					move_storage(which_, storage, other.storage);
+				}
+				else
+				{
+					destroy_storage(which_, storage);
+					move_construct_storage(other.which_, storage, other.storage);
+					which_ = other.which_;
+				}
 				return *this;
 			}
 
@@ -299,6 +308,15 @@ namespace Si
 				}};
 				f[which](&destination, &source);
 			}
+
+			static void move_storage(which_type which, storage_type &destination, storage_type &source) BOOST_NOEXCEPT
+			{
+				std::array<void (*)(void *, void *), sizeof...(T)> const f =
+				{{
+					&detail::move_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
 		};
 
 		template <class ...T>
@@ -327,11 +345,22 @@ namespace Si
 			{
 			}
 
+			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
+				: base(std::move(other))
+			{
+			}
+
 			fast_variant_base(fast_variant_base const &other)
 				: base()
 			{
 				this->which_ = other.which();
 				base::copy_construct_storage(this->which_, this->storage, other.storage);
+			}
+
+			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
+			{
+				base::operator = (std::move(other));
+				return *this;
 			}
 
 			fast_variant_base &operator = (fast_variant_base const &other)
