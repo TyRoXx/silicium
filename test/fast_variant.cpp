@@ -133,9 +133,27 @@ namespace Si
 		}
 
 		template <class T>
+		void move_construct_storage(void *destination, void *source) BOOST_NOEXCEPT
+		{
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T *>(source);
+			new (&dest) T(std::move(src));
+		}
+
+		template <class T>
+		void copy_construct_storage(void *destination, void const *source)
+		{
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T const *>(source);
+			new (&dest) T(src);
+		}
+
+		template <class T>
 		void move_storage(void *destination, void *source) BOOST_NOEXCEPT
 		{
-			*static_cast<T *>(destination) = std::move(*static_cast<T *>(source));
+			auto &dest = *static_cast<T *>(destination);
+			auto &src = *static_cast<T const *>(source);
+			dest = std::move(src);
 		}
 
 		template <class T>
@@ -181,22 +199,13 @@ namespace Si
 
 			~fast_variant_base() BOOST_NOEXCEPT
 			{
-				//hopefully compilers are clever enough to optimize this..
-				std::array<void (*)(void *), sizeof...(T)> const f
-				{{
-					&destroy_storage<T>...
-				}};
-				f[which_](&storage);
+				destroy_storage(which_, storage);
 			}
 
 			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
 				: which_(other.which_)
 			{
-				std::array<void (*)(void *, void *), sizeof...(T)> const f
-				{{
-					&move_storage<T>...
-				}};
-				f[which_](&storage, &other.storage);
+				move_construct_storage(which_, storage, other.storage);
 			}
 
 			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
@@ -250,8 +259,46 @@ namespace Si
 
 		protected: //TODO: make private somehow
 
+			using storage_type = typename boost::aligned_storage<sizeof(union_<T...>)>::type;
+
 			which_type which_ = 0;
-			typename boost::aligned_storage<sizeof(union_<T...>)>::type storage;
+			storage_type storage;
+
+			static void copy_construct_storage(which_type which, storage_type &destination, storage_type const &source)
+			{
+				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
+				{{
+					&detail::copy_construct_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
+
+			static void move_construct_storage(which_type which, storage_type &destination, storage_type &source) BOOST_NOEXCEPT
+			{
+				std::array<void (*)(void *, void *), sizeof...(T)> const f =
+				{{
+					&detail::move_construct_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
+
+			static void destroy_storage(which_type which, storage_type &destroyed) BOOST_NOEXCEPT
+			{
+				std::array<void (*)(void *), sizeof...(T)> const f =
+				{{
+					&detail::destroy_storage<T>...
+				}};
+				f[which](&destroyed);
+			}
+
+			static void copy_storage(which_type which, storage_type &destination, storage_type const &source)
+			{
+				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
+				{{
+					&detail::copy_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
 		};
 
 		template <class ...T>
@@ -281,18 +328,27 @@ namespace Si
 			}
 
 			fast_variant_base(fast_variant_base const &other)
+				: base()
 			{
 				this->which_ = other.which();
-				std::array<void (*)(void *, void const *), sizeof...(T)> const f
-				{{
-					&copy_storage<T>...
-				}};
-				f[this->which_](&this->storage, &other.storage);
+				base::copy_construct_storage(this->which_, this->storage, other.storage);
 			}
 
 			fast_variant_base &operator = (fast_variant_base const &other)
 			{
-				throw std::logic_error("operator = const &");
+				if (this->which_ == other.which_)
+				{
+					base::copy_storage(this->which_, this->storage, other.storage);
+				}
+				else
+				{
+					typename base::storage_type temporary;
+					base::copy_construct_storage(other.which_, temporary, other.storage);
+					base::destroy_storage(this->which_, this->storage);
+					base::move_construct_storage(other.which_, this->storage, temporary);
+					this->which_ = other.which_;
+				}
+				return *this;
 			}
 		};
 
