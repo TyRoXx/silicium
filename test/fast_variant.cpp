@@ -172,6 +172,14 @@ namespace Si
 			return left_ == right_;
 		}
 
+		template <class T>
+		bool less(void const *left, void const *right)
+		{
+			auto &left_ = *static_cast<T const *>(left);
+			auto &right_ = *static_cast<T const *>(right);
+			return left_ < right_;
+		}
+
 		template <class Visitor, class T, class Result>
 		Result apply_visitor_impl(Visitor &&visitor, void *element)
 		{
@@ -290,6 +298,23 @@ namespace Si
 				std::array<bool (*)(void const *, void const *), sizeof...(T)> const f =
 				{{
 					&equals<T>...
+				}};
+				return f[which_](&storage, &other.storage);
+			}
+
+			bool operator < (fast_variant_base const &other) const
+			{
+				if (which_ > other.which_)
+				{
+					return false;
+				}
+				if (which_ < other.which_)
+				{
+					return true;
+				}
+				std::array<bool (*)(void const *, void const *), sizeof...(T)> const f =
+				{{
+					&less<T>...
 				}};
 				return f[which_](&storage, &other.storage);
 			}
@@ -613,5 +638,25 @@ namespace Si
 		variant const v(2);
 		bool success = Si::apply_visitor(test_visitor_1(), v);
 		BOOST_CHECK(success);
+	}
+
+	// comparison operators
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_equal)
+	{
+		fast_variant2<int, float> v, w;
+		BOOST_CHECK(v == w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_less_which)
+	{
+		fast_variant2<int, float> v(1), w(1.0f);
+		BOOST_CHECK(v < w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_less_content)
+	{
+		fast_variant2<int, float> v(1), w(2);
+		BOOST_CHECK(v < w);
 	}
 }
