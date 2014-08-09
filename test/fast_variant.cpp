@@ -172,6 +172,18 @@ namespace Si
 			return left_ == right_;
 		}
 
+		template <class Visitor, class T, class Result>
+		Result apply_visitor_impl(Visitor &&visitor, void *element)
+		{
+			return std::forward<Visitor>(visitor)(*static_cast<T *>(element));
+		}
+
+		template <class Visitor, class T, class Result>
+		Result apply_visitor_const_impl(Visitor &&visitor, void const *element)
+		{
+			return std::forward<Visitor>(visitor)(*static_cast<T const *>(element));
+		}
+
 		template <class First, class ...Rest>
 		struct first
 		{
@@ -248,10 +260,26 @@ namespace Si
 			}
 
 			template <class Visitor>
-			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type;
+			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
+			{
+				using result = typename std::decay<Visitor>::type::result_type;
+				std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f
+				{{
+					&apply_visitor_impl<Visitor, T, result>...
+				}};
+				return f[which_](std::forward<Visitor>(visitor), &storage);
+			}
 
 			template <class Visitor>
-			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type;
+			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
+			{
+				using result = typename std::decay<Visitor>::type::result_type;
+				std::array<result (*)(Visitor &&, void const *), sizeof...(T)> const f
+				{{
+					&apply_visitor_const_impl<Visitor, T, result>...
+				}};
+				return f[which_](std::forward<Visitor>(visitor), &storage);
+			}
 
 			bool operator == (fast_variant_base const &other) const
 			{
@@ -554,5 +582,36 @@ namespace Si
 		BOOST_CHECK(v != w);
 		v = 2.0;
 		BOOST_CHECK(v == w);
+	}
+
+	// apply_visitor
+
+	struct test_visitor_1 : boost::static_visitor<bool>
+	{
+		bool operator()(int i) const
+		{
+			return (i == 2);
+		}
+
+		bool operator()(double) const
+		{
+			return false;
+		}
+	};
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_apply_visitor_mutable)
+	{
+		using variant = fast_variant2<int, double>;
+		variant v(2);
+		bool success = Si::apply_visitor(test_visitor_1(), v);
+		BOOST_CHECK(success);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_apply_visitor_const)
+	{
+		using variant = fast_variant2<int, double>;
+		variant const v(2);
+		bool success = Si::apply_visitor(test_visitor_1(), v);
+		BOOST_CHECK(success);
 	}
 }
