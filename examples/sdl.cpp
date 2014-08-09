@@ -204,7 +204,7 @@ namespace
 	}
 }
 
-int main(int argc, char* argv[]) //SDL2 requires the parameters on Windows
+int main(int, char* []) //SDL2 requires the parameters on Windows
 {
 	check_sdl(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS));
 	BOOST_SCOPE_EXIT(void)

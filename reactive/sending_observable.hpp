@@ -32,7 +32,7 @@ namespace rx
 			boost::asio::async_write(*socket, boost::asio::buffer(buffer.begin(), buffer.size()), [this](boost::system::error_code error, std::size_t bytes_sent)
 			{
 				boost::ignore_unused_variable_warning(bytes_sent);
-				assert(buffer.size() == static_cast<ptrdiff_t>(bytes_sent));
+				assert(buffer.size() == static_cast<buffer_type::size_type>(bytes_sent));
 				buffer = buffer_type();
 				return exchange(receiver_, nullptr)->got_element(error);
 			});

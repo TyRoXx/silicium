@@ -63,6 +63,10 @@ namespace Si
 		static_assert(std::is_nothrow_move_constructible<Element>::value, "noexcept move constructor required");
 #endif
 
+		fast_variant_vtable_impl()
+		{
+		}
+
 		virtual int which() const SILICIUM_OVERRIDE
 		{
 			return Index;
