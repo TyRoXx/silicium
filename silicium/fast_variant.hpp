@@ -231,7 +231,7 @@ namespace Si
 
 		protected: //TODO: make private somehow
 
-			using storage_type = std::array<char, sizeof(union_<T...>)>;
+			using storage_type = std::array<char, sizeof(union_<T...>)>; //TODO: ensure proper alignment
 
 			which_type which_ = 0;
 			storage_type storage;
