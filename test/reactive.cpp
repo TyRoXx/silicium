@@ -212,7 +212,7 @@ namespace Si
 		first.got_element(4);
 
 		variants.async_get_one(consumer);
-		BOOST_CHECK_EQUAL(1, produced.size());
+		BOOST_CHECK_EQUAL(1U, produced.size());
 		second.got_element("Hi");
 
 		std::vector<variant> const expected
@@ -413,14 +413,14 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 	std::size_t elapsed_count = 0;
 	auto coro = rx::make_total_consumer(rx::make_coroutine<rx::nothing>([&t, &elapsed_count](rx::yield_context<> &yield)
 	{
-		BOOST_REQUIRE_EQUAL(0, elapsed_count);
+		BOOST_REQUIRE_EQUAL(0U, elapsed_count);
 		boost::optional<rx::timer_elapsed> e = yield.get_one(t);
 		BOOST_REQUIRE(e);
 		++elapsed_count;
 	}));
 	coro.start();
 	io.run();
-	BOOST_CHECK_EQUAL(1, elapsed_count);
+	BOOST_CHECK_EQUAL(1U, elapsed_count);
 }
 
 namespace rx

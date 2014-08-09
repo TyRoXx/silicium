@@ -19,7 +19,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(fast_variant_single)
 	{
 		fast_variant<int> v;
-		BOOST_CHECK_EQUAL(0, v.which());
+		BOOST_CHECK_EQUAL(0U, v.which());
 		BOOST_CHECK_EQUAL(boost::make_optional(0), try_get<int>(v));
 	}
 
@@ -112,14 +112,14 @@ namespace Si
 	{
 		using variant = fast_variant<int>;
 		variant v;
-		BOOST_CHECK_EQUAL(0, v.which());
+		BOOST_CHECK_EQUAL(0U, v.which());
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_default)
 	{
 		using variant = fast_variant<std::unique_ptr<int>>;
 		variant v;
-		BOOST_CHECK_EQUAL(0, v.which());
+		BOOST_CHECK_EQUAL(0U, v.which());
 	}
 
 	// move constructor
@@ -270,14 +270,14 @@ namespace Si
 		using variant = fast_variant<int, float>;
 		std::unordered_set<variant> s;
 		s.insert(2);
-		BOOST_CHECK_EQUAL(1, s.count(2));
+		BOOST_CHECK_EQUAL(1U, s.count(2));
 		s.insert(3);
-		BOOST_CHECK_EQUAL(1, s.count(3));
+		BOOST_CHECK_EQUAL(1U, s.count(3));
 		s.erase(2);
-		BOOST_CHECK_EQUAL(0, s.count(2));
-		BOOST_CHECK_EQUAL(1, s.count(3));
+		BOOST_CHECK_EQUAL(0U, s.count(2));
+		BOOST_CHECK_EQUAL(1U, s.count(3));
 		s.insert(2.0f);
-		BOOST_CHECK_EQUAL(0, s.count(2));
-		BOOST_CHECK_EQUAL(1, s.count(2.0f));
+		BOOST_CHECK_EQUAL(0U, s.count(2));
+		BOOST_CHECK_EQUAL(1U, s.count(2.0f));
 	}
 }
