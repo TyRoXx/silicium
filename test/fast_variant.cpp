@@ -105,10 +105,7 @@ namespace Si
 		BOOST_CHECK_LT(f, i);
 		BOOST_CHECK_LT(h, i);
 	}
-}
 
-namespace Si
-{
 	// default constructor
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_default)
