@@ -1,6 +1,6 @@
 #include <reactive/buffer.hpp>
 #include <reactive/process.hpp>
-#include <reactive/variant.hpp>
+#include <reactive/variant_observable.hpp>
 #include <reactive/coroutine.hpp>
 #include <reactive/generate.hpp>
 #include <reactive/consume.hpp>

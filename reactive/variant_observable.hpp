@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_VARIANT_HPP
-#define SILICIUM_REACTIVE_VARIANT_HPP
+#ifndef SILICIUM_REACTIVE_VARIANT_OBSERVABLE_HPP
+#define SILICIUM_REACTIVE_VARIANT_OBSERVABLE_HPP
 
 #include <reactive/observable.hpp>
 #include <reactive/exchange.hpp>
@@ -13,12 +13,12 @@ namespace rx
 
 #if SILICIUM_RX_VARIANT_AVAILABLE
 	template <template <class ...T> class variant, class ...Parts>
-	struct alternative : public rx::observable<variant<typename Parts::element_type...>>
+	struct variant_observable : public rx::observable<variant<typename Parts::element_type...>>
 	{
 		typedef variant<typename Parts::element_type...> element_type;
 
 		template <class ...P>
-		explicit alternative(P &&...parts)
+		explicit variant_observable(P &&...parts)
 			: parts(std::forward<P>(parts)...)
 		{
 		}
@@ -42,7 +42,7 @@ namespace rx
 		template <class Element, std::size_t Index>
 		struct tuple_observer : observer<Element>
 		{
-			alternative *combinator = nullptr;
+			variant_observable *combinator = nullptr;
 
 			virtual void got_element(Element value) SILICIUM_OVERRIDE
 			{
@@ -117,15 +117,15 @@ namespace rx
 	};
 
 	template <class ...Parts>
-	auto make_variant(Parts &&...parts) -> alternative<Si::fast_variant, typename std::decay<Parts>::type...>
+	auto make_variant(Parts &&...parts) -> variant_observable<Si::fast_variant, typename std::decay<Parts>::type...>
 	{
-		return alternative<Si::fast_variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
+		return variant_observable<Si::fast_variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}
 
 	template <template <class ...T> class variant, class ...Parts>
-	auto make_variant(Parts &&...parts) -> alternative<variant, typename std::decay<Parts>::type...>
+	auto make_variant(Parts &&...parts) -> variant_observable<variant, typename std::decay<Parts>::type...>
 	{
-		return alternative<variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
+		return variant_observable<variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}
 #endif
 }
