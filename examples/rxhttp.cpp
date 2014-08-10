@@ -248,31 +248,6 @@ namespace
 		rx::total_consumer<rx::unique_observable<rx::nothing>> all_work;
 	};
 
-	struct thread_accept_handler : boost::static_visitor<>
-	{
-		boost::uintmax_t visitor_number;
-
-		explicit thread_accept_handler(boost::uintmax_t visitor_number)
-			: visitor_number(visitor_number)
-		{
-		}
-
-		void operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
-		{
-			auto visitor_number_ = visitor_number;
-			std::thread([client, visitor_number_]
-			{
-				thread_socket threaded_socket(*client);
-				serve_client(threaded_socket, visitor_number_);
-			}).detach();
-		}
-
-		void operator()(boost::system::error_code) const
-		{
-			throw std::logic_error("not implemented");
-		}
-	};
-
 	struct thread_web_server
 	{
 		explicit thread_web_server(boost::asio::io_service &io, boost::uint16_t port)
@@ -289,8 +264,20 @@ namespace
 						break;
 					}
 					++visitor_count;
-					thread_accept_handler handler{visitor_count};
-					Si::apply_visitor(handler, *result);
+					Si::visit<void>(*result,
+						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client)
+					{
+						auto visitor_number_ = visitor_count;
+						std::thread([client, visitor_number_]
+						{
+							thread_socket threaded_socket(*client);
+							serve_client(threaded_socket, visitor_number_);
+						}).detach();
+					},
+						[](boost::system::error_code)
+					{
+						throw std::logic_error("not implemented");
+					});
 				}
 			})))))
 		{
