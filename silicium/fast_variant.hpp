@@ -450,6 +450,24 @@ namespace Si
 		return !(left == right);
 	}
 
+	template <class ...T>
+	bool operator > (fast_variant<T...> const &left, fast_variant<T...> const &right)
+	{
+		return (right < left);
+	}
+
+	template <class ...T>
+	bool operator <= (fast_variant<T...> const &left, fast_variant<T...> const &right)
+	{
+		return !(left > right);
+	}
+
+	template <class ...T>
+	bool operator >= (fast_variant<T...> const &left, fast_variant<T...> const &right)
+	{
+		return !(left < right);
+	}
+
 	struct hash_visitor : boost::static_visitor<std::size_t>
 	{
 		template <class T>

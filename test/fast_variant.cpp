@@ -251,6 +251,14 @@ namespace Si
 		BOOST_CHECK(v == w);
 	}
 
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_not_equal)
+	{
+		fast_variant<int, float> v, w, x(2), y(2.0f);
+		BOOST_CHECK(!(v != w));
+		BOOST_CHECK(v != x);
+		BOOST_CHECK(x != y);
+	}
+
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_less_which)
 	{
 		fast_variant<int, float> v(1), w(1.0f);
@@ -261,6 +269,55 @@ namespace Si
 	{
 		fast_variant<int, float> v(1), w(2);
 		BOOST_CHECK(v < w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_less_equal_which)
+	{
+		fast_variant<int, float> v(1), w(1.0f);
+		BOOST_CHECK(v <= w);
+		BOOST_CHECK(v <= v);
+		BOOST_CHECK(w <= w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_less_equal_content)
+	{
+		fast_variant<int, float> v(1), w(2);
+		BOOST_CHECK(v <= w);
+		BOOST_CHECK(v <= v);
+		BOOST_CHECK(w <= w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_greater_which)
+	{
+		fast_variant<int, float> v(1), w(1.0f);
+		BOOST_CHECK(w > v);
+		BOOST_CHECK(!(v > v));
+		BOOST_CHECK(!(w > w));
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_greater_content)
+	{
+		fast_variant<int, float> v(1), w(2);
+		BOOST_CHECK(w > v);
+		BOOST_CHECK(!(w > w));
+		BOOST_CHECK(!(v > v));
+		BOOST_CHECK(!(w > w));
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_greater_equal_which)
+	{
+		fast_variant<int, float> v(1), w(1.0f);
+		BOOST_CHECK(w >= v);
+		BOOST_CHECK(v >= v);
+		BOOST_CHECK(w >= w);
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_greater_equal_content)
+	{
+		fast_variant<int, float> v(1), w(2);
+		BOOST_CHECK(w >= v);
+		BOOST_CHECK(v >= v);
+		BOOST_CHECK(w >= w);
 	}
 
 	// std::hash
