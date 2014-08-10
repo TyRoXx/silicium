@@ -6,10 +6,16 @@
 namespace Si
 {
 	template <class T>
-	std::unique_ptr<T> to_unique(T value)
+	auto to_unique(T &&t) -> std::unique_ptr<typename std::decay<T>::type>
 	{
-		return std::unique_ptr<T>(new T(std::move(value)));
+		typedef typename std::decay<T>::type decayed_T;
+		return std::unique_ptr<decayed_T>(new decayed_T(std::forward<T>(t)));
 	}
+}
+
+namespace rx
+{
+	using Si::to_unique;
 }
 
 #endif
