@@ -374,7 +374,7 @@ namespace Si
 		}));
 	}
 
-	BOOST_AUTO_TEST_CASE(fast_variant_copyable_mutable_construct_superset)
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_mutable_assign_subset)
 	{
 		fast_variant<int> v(2);
 		fast_variant<float, int> w;
@@ -382,7 +382,7 @@ namespace Si
 		BOOST_CHECK_EQUAL(boost::make_optional<int>(2), try_get<int>(w));
 	}
 
-	BOOST_AUTO_TEST_CASE(fast_variant_copyable_const_construct_superset)
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_const_assign_subset)
 	{
 		fast_variant<int> const v(2);
 		fast_variant<float, int> w;
