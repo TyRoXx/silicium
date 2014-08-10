@@ -3,7 +3,7 @@
 
 #include <silicium/observable.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Element, class Consume>
 	struct consumer : observer<Element>

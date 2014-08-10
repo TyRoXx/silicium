@@ -4,7 +4,7 @@
 #include <silicium/observable.hpp>
 #include <boost/optional.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Element>
 	struct optional_observer : observer<Element>

@@ -6,7 +6,7 @@
 #include <silicium/ptr_observable.hpp>
 #endif
 
-namespace rx
+namespace Si
 {
 	template <class Input>
 	auto deref_optional(Input &&input) -> ptr_observable<typename Input::element_type, std::unique_ptr<typename Input::element_type>>

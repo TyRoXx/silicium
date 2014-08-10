@@ -5,7 +5,7 @@
 #include <boost/optional.hpp>
 #include <silicium/override.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Input>
 	struct cache_observable

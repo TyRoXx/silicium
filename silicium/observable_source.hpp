@@ -4,7 +4,7 @@
 #include <silicium/observable.hpp>
 #include <silicium/source.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Observable, class YieldContext>
 	struct observable_source : Si::source<typename Observable::element_type>

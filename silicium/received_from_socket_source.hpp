@@ -7,24 +7,24 @@
 #include <boost/variant/static_visitor.hpp>
 #include <cassert>
 
-namespace rx
+namespace Si
 {
 	namespace detail
 	{
-		struct error_stripper : boost::static_visitor<boost::optional<rx::incoming_bytes>>
+		struct error_stripper : boost::static_visitor<boost::optional<Si::incoming_bytes>>
 		{
-			boost::optional<rx::incoming_bytes> operator()(rx::incoming_bytes bytes) const
+			boost::optional<Si::incoming_bytes> operator()(Si::incoming_bytes bytes) const
 			{
 				return bytes;
 			}
 
-			boost::optional<rx::incoming_bytes> operator()(boost::system::error_code) const
+			boost::optional<Si::incoming_bytes> operator()(boost::system::error_code) const
 			{
 				return boost::none;
 			}
 		};
 
-		boost::optional<rx::incoming_bytes> strip_error(rx::received_from_socket received)
+		boost::optional<Si::incoming_bytes> strip_error(Si::received_from_socket received)
 		{
 			return Si::apply_visitor(error_stripper{}, received);
 		}
@@ -32,7 +32,7 @@ namespace rx
 
 	struct received_from_socket_source : Si::source<char>
 	{
-		explicit received_from_socket_source(Si::source<rx::received_from_socket> &original)
+		explicit received_from_socket_source(Si::source<Si::received_from_socket> &original)
 			: original(&original)
 		{
 		}
@@ -101,8 +101,8 @@ namespace rx
 
 	private:
 
-		Si::source<rx::received_from_socket> *original = nullptr;
-		rx::incoming_bytes rest;
+		Si::source<Si::received_from_socket> *original = nullptr;
+		Si::incoming_bytes rest;
 	};
 }
 

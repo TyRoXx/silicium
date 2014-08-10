@@ -6,7 +6,7 @@
 #include <silicium/fast_variant.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
-namespace rx
+namespace Si
 {
 	using tcp_acceptor_result = Si::fast_variant<
 		std::shared_ptr<boost::asio::ip::tcp::socket>, //until socket itself is noexcept-movable
@@ -50,11 +50,11 @@ namespace rx
 					{
 						return;
 					}
-					rx::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{error});
+					Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{error});
 				}
 				else
 				{
-					rx::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
+					Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
 				}
 			});
 		}

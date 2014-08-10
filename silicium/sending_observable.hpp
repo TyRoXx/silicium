@@ -8,7 +8,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/range/iterator_range.hpp>
 
-namespace rx
+namespace Si
 {
 	struct sending_observable : observable<boost::system::error_code>
 	{

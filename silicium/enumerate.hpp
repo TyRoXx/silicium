@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <cassert>
 
-namespace rx
+namespace Si
 {
 	template <class RangeObservable>
 	struct enumerated_element

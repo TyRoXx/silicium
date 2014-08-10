@@ -7,7 +7,7 @@
 #include <cassert>
 #include <cstddef>
 
-namespace rx
+namespace Si
 {
 	template <class Element, class Original>
 	struct buffer

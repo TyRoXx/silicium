@@ -8,7 +8,7 @@
 #include <silicium/ref.hpp>
 #include <boost/optional.hpp>
 
-namespace rx
+namespace Si
 {
 #ifdef __linux__
 	namespace linux
@@ -25,14 +25,14 @@ namespace rx
 			}
 		}
 
-		boost::optional<rx::file_notification> to_portable_file_notification(linux::file_notification &&original)
+		boost::optional<Si::file_notification> to_portable_file_notification(linux::file_notification &&original)
 		{
 			auto const type = to_portable_file_notification_type(original.mask);
 			if (!type)
 			{
 				return boost::none;
 			}
-			return rx::file_notification(*type, std::move(original.name));
+			return Si::file_notification(*type, std::move(original.name));
 		}
 	}
 

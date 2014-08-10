@@ -5,7 +5,7 @@
 #include <cassert>
 #include <boost/optional.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class In, class State, class Step>
 	struct finite_state_machine

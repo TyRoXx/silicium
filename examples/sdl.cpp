@@ -190,20 +190,20 @@ namespace
 	template <class Events>
 	auto make_frames(Events &&input)
 #ifdef _MSC_VER
-		-> rx::unique_observable<frame>
+		-> Si::unique_observable<frame>
 #endif
 	{
 		game_state initial_state;
-		auto model = rx::make_finite_state_machine(std::forward<Events>(input), initial_state, step_game_state);
+		auto model = Si::make_finite_state_machine(std::forward<Events>(input), initial_state, step_game_state);
 		return
 #ifdef _MSC_VER
-			rx::box<frame>
+			Si::box<frame>
 #endif
-			(rx::transform(std::move(model), draw_game_state));
+			(Si::transform(std::move(model), draw_game_state));
 	}
 
 	template <class Element>
-	struct visitor : rx::observer<Element>
+	struct visitor : Si::observer<Element>
 	{
 		boost::optional<Element> result;
 
@@ -244,8 +244,8 @@ int main(int, char* []) //SDL2 requires the parameters on Windows
 
 	std::unique_ptr<SDL_Renderer, renderer_destructor> renderer(SDL_CreateRenderer(window.get(), -1, 0));
 
-	rx::bridge<SDL_Event> frame_events;
-	auto frames = rx::cache(make_frames(rx::ref(frame_events)), frame());
+	Si::bridge<SDL_Event> frame_events;
+	auto frames = Si::cache(make_frames(Si::ref(frame_events)), frame());
 
 	for (;;)
 	{

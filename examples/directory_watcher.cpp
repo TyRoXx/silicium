@@ -10,8 +10,8 @@ int main()
 	auto const watched_dir = boost::filesystem::current_path();
 	std::cerr << "Watching " << watched_dir << '\n';
 
-	rx::directory_watcher notifier(io, watched_dir);
-	auto all = rx::for_each(rx::ref(notifier), [](rx::file_notification const &event)
+	Si::directory_watcher notifier(io, watched_dir);
+	auto all = Si::for_each(Si::ref(notifier), [](Si::file_notification const &event)
 	{
 		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
 	});

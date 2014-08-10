@@ -10,7 +10,7 @@
 #include <sys/inotify.h>
 #include <dirent.h>
 
-namespace rx
+namespace Si
 {
 	namespace linux
 	{

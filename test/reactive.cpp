@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include <future>
 
-namespace rx
+namespace Si
 {
 	template <class Element>
 	struct empty : observable<Element>
@@ -44,11 +44,11 @@ namespace Si
 #if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_take)
 	{
-		auto zeros = rx::generate([]{ return 0; });
-		auto ones  = rx::generate([]{ return 1; });
-		auto both = rx::make_tuple(zeros, ones);
+		auto zeros = Si::generate([]{ return 0; });
+		auto ones  = Si::generate([]{ return 1; });
+		auto both = Si::make_tuple(zeros, ones);
 		std::vector<std::tuple<int, int>> const expected(4, std::make_tuple(0, 1));
-		std::vector<std::tuple<int, int>> const generated = rx::take(both, expected.size());
+		std::vector<std::tuple<int, int>> const generated = Si::take(both, expected.size());
 		BOOST_CHECK(expected == generated);
 	}
 #endif
@@ -56,15 +56,15 @@ namespace Si
 #if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_transform)
 	{
-		auto twos = rx::generate([]{ return 2; });
-		auto ones  = rx::generate([]{ return 1; });
-		auto both = rx::make_tuple(twos, ones);
-		auto added = rx::transform(both, [](std::tuple<int, int> const &element)
+		auto twos = Si::generate([]{ return 2; });
+		auto ones  = Si::generate([]{ return 1; });
+		auto both = Si::make_tuple(twos, ones);
+		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
 		{
 			return std::get<0>(element) + std::get<1>(element);
 		});
 		std::vector<int> const expected(4, 3);
-		std::vector<int> const generated = rx::take(added, expected.size());
+		std::vector<int> const generated = Si::take(added, expected.size());
 		BOOST_CHECK(expected == generated);
 	}
 #endif
@@ -72,16 +72,16 @@ namespace Si
 #if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_bridge)
 	{
-		auto bridge = std::make_shared<rx::bridge<int>>();
-		rx::ptr_observable<int, std::shared_ptr<rx::observable<int>>> first(bridge);
-		auto ones  = rx::generate([]{ return 1; });
-		auto both = rx::make_tuple(first, ones);
-		auto added = rx::transform(both, [](std::tuple<int, int> const &element)
+		auto bridge = std::make_shared<Si::bridge<int>>();
+		Si::ptr_observable<int, std::shared_ptr<Si::observable<int>>> first(bridge);
+		auto ones  = Si::generate([]{ return 1; });
+		auto both = Si::make_tuple(first, ones);
+		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
 		{
 			return std::get<0>(element) + std::get<1>(element);
 		});
 		std::vector<int> generated;
-		auto consumer = rx::consume<int>([&generated](int element)
+		auto consumer = Si::consume<int>([&generated](int element)
 		{
 			generated.emplace_back(element);
 		});
@@ -98,13 +98,13 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
 	{
-		auto bridge = std::make_shared<rx::bridge<int>>();
-		rx::ptr_observable<int, std::shared_ptr<rx::observable<int>>> first{bridge};
-		auto buf = rx::make_buffer(first, 2);
+		auto bridge = std::make_shared<Si::bridge<int>>();
+		Si::ptr_observable<int, std::shared_ptr<Si::observable<int>>> first{bridge};
+		auto buf = Si::make_buffer(first, 2);
 		buf.prefetch();
 
 		std::vector<int> generated;
-		auto consumer = rx::consume<int>([&generated](int element)
+		auto consumer = Si::consume<int>([&generated](int element)
 		{
 			generated.emplace_back(element);
 		});
@@ -132,13 +132,13 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(reactive_coroutine_generate)
 	{
-		auto co = rx::make_coroutine<int>([](rx::yield_context<int> &yield) -> void
+		auto co = Si::make_coroutine<int>([](Si::yield_context<int> &yield) -> void
 		{
 			yield(1);
 			yield(2);
 		});
 		std::vector<int> generated;
-		auto collector = rx::consume<int>([&generated](int element)
+		auto collector = Si::consume<int>([&generated](int element)
 		{
 			generated.emplace_back(element);
 		});
@@ -158,9 +158,9 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(reactive_coroutine_get_one)
 	{
-		rx::bridge<int> asyncs;
+		Si::bridge<int> asyncs;
 		bool exited_cleanly = false;
-		auto co = rx::make_coroutine<int>([&asyncs, &exited_cleanly](rx::yield_context<int> &yield) -> void
+		auto co = Si::make_coroutine<int>([&asyncs, &exited_cleanly](Si::yield_context<int> &yield) -> void
 		{
 			auto a = yield.get_one(asyncs);
 			BOOST_REQUIRE(a);
@@ -168,7 +168,7 @@ namespace Si
 			exited_cleanly = true;
 		});
 		std::vector<int> generated;
-		auto collector = rx::consume<int>([&generated](int element)
+		auto collector = Si::consume<int>([&generated](int element)
 		{
 			generated.emplace_back(element);
 		});
@@ -188,7 +188,7 @@ namespace Si
 #if SILICIUM_RX_VARIANT_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_make_variant)
 	{
-		rx::bridge<int> first;
+		Si::bridge<int> first;
 		using string =
 #ifdef _MSC_VER //does not compile with boost::container::string in VC++ 2013
 			std::string
@@ -196,12 +196,12 @@ namespace Si
 			boost::container::string
 #endif
 			;
-		rx::bridge<string> second;
-		auto variants = make_variant(rx::ref(first), rx::ref(second));
+		Si::bridge<string> second;
+		auto variants = make_variant(Si::ref(first), Si::ref(second));
 
 		typedef Si::fast_variant<int, string> variant;
 		std::vector<variant> produced;
-		auto consumer = rx::consume<variant>([&produced](variant element)
+		auto consumer = Si::consume<variant>([&produced](variant element)
 		{
 			produced.emplace_back(std::move(element));
 		});
@@ -221,17 +221,17 @@ namespace Si
 		};
 
 		BOOST_CHECK(expected == produced);
-		BOOST_CHECK(!rx::get_immediate(variants));
+		BOOST_CHECK(!Si::get_immediate(variants));
 	}
 #endif
 
 	template <class Element, class Action>
-	struct blocking_then_state : rx::observer<Element>
+	struct blocking_then_state : Si::observer<Element>
 	{
 		boost::asio::io_service *dispatcher;
 		boost::optional<boost::asio::io_service::work> blocker;
 		Action action;
-		rx::observable<Element> *from = nullptr;
+		Si::observable<Element> *from = nullptr;
 
 		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
 			: dispatcher(&dispatcher)
@@ -265,7 +265,7 @@ namespace Si
 	};
 
 	template <class Element, class Action>
-	auto blocking_then(boost::asio::io_service &io, rx::observable<Element> &from, Action &&action) -> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
+	auto blocking_then(boost::asio::io_service &io, Si::observable<Element> &from, Action &&action) -> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
 	{
 		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(io, std::forward<Action>(action));
 		from.async_get_one(*state);
@@ -274,7 +274,7 @@ namespace Si
 	}
 }
 
-namespace rx
+namespace Si
 {
 	template <class Element>
 	using signal_observer_map =
@@ -385,11 +385,11 @@ namespace
 {
 	BOOST_AUTO_TEST_CASE(reactive_signal)
 	{
-		rx::signal<int> s;
+		Si::signal<int> s;
 		auto con1 = s.connect();
 		auto con2 = s.connect();
 		std::vector<int> generated;
-		auto consumer = rx::consume<int>([&generated](boost::optional<int> value)
+		auto consumer = Si::consume<int>([&generated](boost::optional<int> value)
 		{
 			BOOST_REQUIRE(value);
 			generated.emplace_back(*value);
@@ -408,12 +408,12 @@ namespace
 BOOST_AUTO_TEST_CASE(reactive_timer)
 {
 	boost::asio::io_service io;
-	rx::timer<> t(io, std::chrono::microseconds(1));
+	Si::timer<> t(io, std::chrono::microseconds(1));
 	std::size_t elapsed_count = 0;
-	auto coro = rx::make_total_consumer(rx::make_coroutine<rx::nothing>([&t, &elapsed_count](rx::yield_context<> &yield)
+	auto coro = Si::make_total_consumer(Si::make_coroutine<Si::nothing>([&t, &elapsed_count](Si::yield_context<> &yield)
 	{
 		BOOST_REQUIRE_EQUAL(0U, elapsed_count);
-		boost::optional<rx::timer_elapsed> e = yield.get_one(t);
+		boost::optional<Si::timer_elapsed> e = yield.get_one(t);
 		BOOST_REQUIRE(e);
 		++elapsed_count;
 	}));
@@ -422,7 +422,7 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 	BOOST_CHECK_EQUAL(1U, elapsed_count);
 }
 
-namespace rx
+namespace Si
 {
 	template <class Element>
 	struct yield_context_2
@@ -466,14 +466,14 @@ namespace rx
 				if (!state->thread.valid())
 				{
 					lock.unlock();
-					return rx::exchange(state->receiver_, nullptr)->ended();
+					return Si::exchange(state->receiver_, nullptr)->ended();
 				}
 				return;
 			}
 			auto ready_result = std::move(*state->cached_result);
 			state->result_retrieved.notify_one();
 			lock.unlock();
-			rx::exchange(state->receiver_, nullptr)->got_element(std::move(ready_result));
+			Si::exchange(state->receiver_, nullptr)->got_element(std::move(ready_result));
 		}
 
 		virtual void cancel() SILICIUM_OVERRIDE
@@ -510,7 +510,7 @@ namespace rx
 				}
 				if (receiver_)
 				{
-					auto receiver = rx::exchange(receiver_, nullptr);
+					auto receiver = Si::exchange(receiver_, nullptr);
 					lock.unlock();
 					receiver->got_element(std::move(result));
 				}
@@ -561,11 +561,11 @@ namespace rx
 
 #if 0 //TODO: make the following test finish (currently it sometimes will block forever in wait())
 
-typedef boost::mpl::list<rx::std_threading, rx::boost_threading> threading_apis;
+typedef boost::mpl::list<Si::std_threading, Si::boost_threading> threading_apis;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(reactive_async, ThreadingAPI, threading_apis)
 {
-	auto a = rx::async<int, rx::std_threading>([](rx::yield_context_2<int> &yield)
+	auto a = Si::async<int, Si::std_threading>([](Si::yield_context_2<int> &yield)
 	{
 		yield.push_result(1);
 		yield.push_result(2);
@@ -573,8 +573,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(reactive_async, ThreadingAPI, threading_apis)
 	});
 	std::vector<int> const expected{1, 2, 3};
 	std::vector<int> produced;
-	std::unique_ptr<rx::observer<int>> pusher;
-	pusher = rx::to_unique(rx::consume<int>([&](int element)
+	std::unique_ptr<Si::observer<int>> pusher;
+	pusher = Si::to_unique(Si::consume<int>([&](int element)
 	{
 		produced.emplace_back(element);
 		if (produced.size() == expected.size())

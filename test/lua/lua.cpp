@@ -25,7 +25,7 @@ namespace Si
 		return L;
 	}
 
-	typedef rx::observer<lua_Integer> yield_destination;
+	typedef Si::observer<lua_Integer> yield_destination;
 
 	static int yield(lua_State *L)
 	{
@@ -46,12 +46,12 @@ namespace Si
 			throw std::runtime_error(lua_tostring(L.get(), -1));
 		}
 
-		rx::bridge<lua_Integer> yielded;
+		Si::bridge<lua_Integer> yielded;
 		lua_pushlightuserdata(coro, &static_cast<yield_destination &>(yielded));
 		lua_pushcclosure(coro, yield, 1);
 
 		boost::optional<lua_Integer> got;
-		auto consumer = rx::consume<lua_Integer>([&got](boost::optional<lua_Integer> element)
+		auto consumer = Si::consume<lua_Integer>([&got](boost::optional<lua_Integer> element)
 		{
 			BOOST_REQUIRE(element);
 			got = element;
@@ -79,7 +79,7 @@ namespace Si
 	}
 }
 
-namespace rx
+namespace Si
 {
 	inline void swap_top(lua_State &lua)
 	{
@@ -280,9 +280,9 @@ namespace Si
 			throw std::runtime_error(lua_tostring(L.get(), -1));
 		}
 
-		auto thread = rx::make_lua_thread<lua_Integer>(*L, [](lua_State &lua, int idx) -> lua_Integer { return lua_tointeger(&lua, idx); });
+		auto thread = Si::make_lua_thread<lua_Integer>(*L, [](lua_State &lua, int idx) -> lua_Integer { return lua_tointeger(&lua, idx); });
 		std::vector<lua_Integer> generated;
-		auto consumer = rx::consume<lua_Integer>([&generated](boost::optional<lua_Integer> element)
+		auto consumer = Si::consume<lua_Integer>([&generated](boost::optional<lua_Integer> element)
 		{
 			BOOST_REQUIRE(element);
 			generated.emplace_back(*element);

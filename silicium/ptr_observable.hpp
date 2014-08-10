@@ -7,7 +7,7 @@
 #include <memory>
 #include <cassert>
 
-namespace rx
+namespace Si
 {
 	template <class Element, class Ptr>
 	struct ptr_observable : observable<Element>

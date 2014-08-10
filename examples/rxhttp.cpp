@@ -18,7 +18,7 @@ namespace
 		Socket &client,
 		boost::uintmax_t visitor_number)
 	{
-		rx::received_from_socket_source bytes_receiver(client.receiving());
+		Si::received_from_socket_source bytes_receiver(client.receiving());
 		boost::optional<Si::http::request_header> request = Si::http::parse_header(bytes_receiver);
 		if (!request)
 		{
@@ -47,7 +47,7 @@ namespace
 
 	struct coroutine_socket
 	{
-		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, rx::yield_context<rx::nothing> &yield)
+		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, Si::yield_context<Si::nothing> &yield)
 			: socket(&socket)
 			, yield(&yield)
 			, received(4096)
@@ -56,7 +56,7 @@ namespace
 		{
 		}
 
-		Si::source<rx::received_from_socket> &receiving()
+		Si::source<Si::received_from_socket> &receiving()
 		{
 			return receiving_;
 		}
@@ -66,7 +66,7 @@ namespace
 			assert(socket);
 			assert(yield);
 
-			rx::sending_observable sending(*socket, data);
+			Si::sending_observable sending(*socket, data);
 
 			//ignore error
 			yield->get_one(sending);
@@ -81,15 +81,15 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::socket *socket = nullptr;
-		rx::yield_context<rx::nothing> *yield = nullptr;
+		Si::yield_context<Si::nothing> *yield = nullptr;
 		std::vector<char> received;
-		rx::socket_observable receiver;
-		rx::observable_source<rx::socket_observable, rx::yield_context<rx::nothing>> receiving_;
+		Si::socket_observable receiver;
+		Si::observable_source<Si::socket_observable, Si::yield_context<Si::nothing>> receiving_;
 	};
 
-	struct thread_socket_source : Si::source<rx::received_from_socket>
+	struct thread_socket_source : Si::source<Si::received_from_socket>
 	{
-		typedef rx::received_from_socket element_type;
+		typedef Si::received_from_socket element_type;
 
 		explicit thread_socket_source(boost::asio::ip::tcp::socket &socket)
 			: socket(&socket)
@@ -122,7 +122,7 @@ namespace
 				}
 				else
 				{
-					*i = rx::incoming_bytes(received.data(), received.data() + bytes_received);
+					*i = Si::incoming_bytes(received.data(), received.data() + bytes_received);
 				}
 				++i;
 			}
@@ -158,7 +158,7 @@ namespace
 		{
 		}
 
-		Si::source<rx::received_from_socket> &receiving()
+		Si::source<Si::received_from_socket> &receiving()
 		{
 			return receiving_;
 		}
@@ -181,14 +181,14 @@ namespace
 		thread_socket_source receiving_;
 	};
 
-	using events = rx::shared_observable<rx::nothing>;
+	using events = Si::shared_observable<Si::nothing>;
 
 	struct coroutine_web_server
 	{
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
 			, clients(acceptor)
-			, all_work(rx::make_total_consumer(rx::box<rx::nothing>(rx::flatten<boost::mutex>(rx::make_coroutine<events>([this](rx::yield_context<events> &yield) -> void
+			, all_work(Si::make_total_consumer(Si::box<Si::nothing>(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
 				for (;;)
@@ -203,7 +203,7 @@ namespace
 						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client)
 					{
 						auto visitor_number_ = visitor_count;
-						auto client_handler = rx::wrap<rx::nothing>(rx::make_coroutine<rx::nothing>([client, visitor_number_](rx::yield_context<rx::nothing> &yield) -> void
+						auto client_handler = Si::wrap<Si::nothing>(Si::make_coroutine<Si::nothing>([client, visitor_number_](Si::yield_context<Si::nothing> &yield) -> void
 						{
 							coroutine_socket coro_socket(*client, yield);
 							return serve_client(coro_socket, visitor_number_);
@@ -231,8 +231,8 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::acceptor acceptor;
-		rx::tcp_acceptor clients;
-		rx::total_consumer<rx::unique_observable<rx::nothing>> all_work;
+		Si::tcp_acceptor clients;
+		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
 	};
 
 	struct thread_web_server
@@ -240,7 +240,7 @@ namespace
 		explicit thread_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
 			, clients(acceptor)
-			, all_work(rx::make_total_consumer(rx::box<rx::nothing>(rx::flatten<boost::mutex>(rx::make_coroutine<events>([this](rx::yield_context<events> &yield) -> void
+			, all_work(Si::make_total_consumer(Si::box<Si::nothing>(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
 				for (;;)
@@ -278,8 +278,8 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::acceptor acceptor;
-		rx::tcp_acceptor clients;
-		rx::total_consumer<rx::unique_observable<rx::nothing>> all_work;
+		Si::tcp_acceptor clients;
+		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
 	};
 }
 

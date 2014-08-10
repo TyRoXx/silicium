@@ -7,7 +7,7 @@
 #include <silicium/override.hpp>
 #include <cassert>
 
-namespace rx
+namespace Si
 {
 	template <class Element>
 	struct bridge : observable<Element>, observer<Element>
@@ -22,13 +22,13 @@ namespace rx
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver);
-			rx::exchange(receiver, nullptr)->got_element(std::move(value));
+			Si::exchange(receiver, nullptr)->got_element(std::move(value));
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
 			assert(receiver);
-			rx::exchange(receiver, nullptr)->ended();
+			Si::exchange(receiver, nullptr)->ended();
 		}
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE

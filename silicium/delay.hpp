@@ -5,7 +5,7 @@
 #include <silicium/tuple.hpp>
 #include <silicium/ptr_observable.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Input, class Duration>
 	auto delay(Input &&input, boost::asio::io_service &io, Duration duration)
@@ -17,7 +17,7 @@ namespace rx
 		{
 			return std::move(std::get<1>(value));
 		};
-		return transform(rx::make_tuple(delaying_timer, std::forward<Input>(input)), unpack);
+		return transform(Si::make_tuple(delaying_timer, std::forward<Input>(input)), unpack);
 	}
 }
 

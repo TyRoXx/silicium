@@ -4,7 +4,7 @@
 #include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/filesystem/path.hpp>
 
-namespace rx
+namespace Si
 {
 	BOOST_SCOPED_ENUM_DECLARE_BEGIN(file_notification_type)
 	{

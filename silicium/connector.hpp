@@ -6,7 +6,7 @@
 #include <boost/variant.hpp>
 #include <silicium/override.hpp>
 
-namespace rx
+namespace Si
 {
 	typedef std::shared_ptr<boost::asio::ip::tcp::socket> shared_socket;
 	typedef boost::variant<shared_socket, boost::system::error_code> connector_element;

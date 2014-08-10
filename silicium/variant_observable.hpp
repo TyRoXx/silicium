@@ -7,13 +7,13 @@
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/fast_variant.hpp>
 
-namespace rx
+namespace Si
 {
 #define SILICIUM_RX_VARIANT_AVAILABLE 1
 
 #if SILICIUM_RX_VARIANT_AVAILABLE
 	template <template <class ...T> class variant, class ...Parts>
-	struct variant_observable : public rx::observable<variant<typename Parts::element_type...>>
+	struct variant_observable : public Si::observable<variant<typename Parts::element_type...>>
 	{
 		typedef variant<typename Parts::element_type...> element_type;
 
@@ -23,7 +23,7 @@ namespace rx
 		{
 		}
 
-		virtual void async_get_one(rx::observer<element_type> &receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(Si::observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
@@ -47,13 +47,13 @@ namespace rx
 			virtual void got_element(Element value) SILICIUM_OVERRIDE
 			{
 				cancel_others();
-				rx::exchange(combinator->receiver_, nullptr)->got_element(element_type{std::move(value)});
+				Si::exchange(combinator->receiver_, nullptr)->got_element(element_type{std::move(value)});
 			}
 
 			virtual void ended() SILICIUM_OVERRIDE
 			{
 				cancel_others();
-				rx::exchange(combinator->receiver_, nullptr)->ended();
+				Si::exchange(combinator->receiver_, nullptr)->ended();
 			}
 
 		private:
@@ -78,7 +78,7 @@ namespace rx
 
 		std::tuple<Parts...> parts;
 		observers_type observers;
-		rx::observer<element_type> *receiver_ = nullptr;
+		Si::observer<element_type> *receiver_ = nullptr;
 
 		template <std::size_t Index, class Head, class ...Tail>
 		void async_get_one_impl()

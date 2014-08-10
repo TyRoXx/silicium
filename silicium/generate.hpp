@@ -3,7 +3,7 @@
 
 #include <silicium/observable.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Generated, class Element = typename std::result_of<Generated ()>::type>
 	struct generator : observable<Element>

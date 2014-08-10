@@ -8,7 +8,7 @@
 #include <boost/coroutine/all.hpp>
 #include <silicium/fast_variant.hpp>
 
-namespace rx
+namespace Si
 {
 	namespace detail
 	{
@@ -53,7 +53,7 @@ namespace rx
 
 		struct yield
 		{
-			rx::observable<nothing> *target;
+			Si::observable<nothing> *target;
 		};
 
 		template <class Element>
@@ -79,10 +79,10 @@ namespace rx
 		}
 
 		template <class Gotten>
-		boost::optional<Gotten> get_one(rx::observable<Gotten> &from)
+		boost::optional<Gotten> get_one(Si::observable<Gotten> &from)
 		{
 			boost::optional<Gotten> result;
-			auto tf = rx::transform(rx::ref(from), [&result](Gotten element)
+			auto tf = Si::transform(Si::ref(from), [&result](Gotten element)
 			{
 				assert(!result);
 				result = std::move(element);
@@ -99,8 +99,8 @@ namespace rx
 
 	template <class Element>
 	struct coroutine_observable
-			: public rx::observable<Element>
-			, private rx::observer<nothing>
+			: public Si::observable<Element>
+			, private Si::observer<nothing>
 			, public boost::static_visitor<> //TODO make private
 	{
 		typedef Element element_type;
@@ -139,7 +139,7 @@ namespace rx
 		{
 		}
 
-		virtual void async_get_one(rx::observer<element_type> &receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(Si::observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			receiver_ = &receiver;
 			next();
@@ -153,7 +153,7 @@ namespace rx
 		//TODO make private
 		void operator()(detail::result<element_type> command)
 		{
-			return rx::exchange(receiver_, nullptr)->got_element(std::move(command.value));
+			return Si::exchange(receiver_, nullptr)->got_element(std::move(command.value));
 		}
 
 		//TODO make private
@@ -175,7 +175,7 @@ namespace rx
 			;
 
 		coroutine_holder coro_;
-		rx::observer<Element> *receiver_ = nullptr;
+		Si::observer<Element> *receiver_ = nullptr;
 		bool first = true;
 
 		coroutine_type &coro()
@@ -194,12 +194,12 @@ namespace rx
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			rx::exchange(receiver_, nullptr)->ended();
+			Si::exchange(receiver_, nullptr)->ended();
 		}
 
 		void next()
 		{
-			if (!rx::exchange(first, false))
+			if (!Si::exchange(first, false))
 			{
 				coro()();
 			}
@@ -210,7 +210,7 @@ namespace rx
 			}
 			else
 			{
-				rx::exchange(receiver_, nullptr)->ended();
+				Si::exchange(receiver_, nullptr)->ended();
 			}
 		}
 	};

@@ -3,7 +3,7 @@
 
 #include <silicium/ptr_observable.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Element>
 	using reference = ptr_observable<Element, observable<Element> *>;

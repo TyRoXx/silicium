@@ -9,7 +9,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/range/iterator_range.hpp>
 
-namespace rx
+namespace Si
 {
 	struct incoming_bytes
 	{

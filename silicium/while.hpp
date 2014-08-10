@@ -3,7 +3,7 @@
 
 #include <silicium/observable.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Input, class ElementPredicate>
 	struct while_observable

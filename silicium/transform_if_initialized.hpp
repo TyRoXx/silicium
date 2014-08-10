@@ -7,7 +7,7 @@
 #include <silicium/config.hpp>
 #include <cassert>
 
-namespace rx
+namespace Si
 {
 	template <class Element, class Input, class Transformation>
 	struct conditional_transformer
@@ -75,7 +75,7 @@ namespace rx
 			auto converted = transform(std::move(value));
 			if (converted)
 			{
-				rx::exchange(receiver_, nullptr)->got_element(std::move(*converted));
+				Si::exchange(receiver_, nullptr)->got_element(std::move(*converted));
 			}
 			else
 			{

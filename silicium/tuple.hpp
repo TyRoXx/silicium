@@ -6,7 +6,7 @@
 #include <silicium/detail/integer_sequence.hpp>
 #include <bitset>
 
-namespace rx
+namespace Si
 {
 #ifdef _MSC_VER
 #	define SILICIUM_RX_TUPLE_AVAILABLE 0

@@ -7,7 +7,7 @@
 #include <boost/asio/steady_timer.hpp>
 #include <boost/chrono/duration.hpp>
 
-namespace rx
+namespace Si
 {
 	struct timer_elapsed
 	{

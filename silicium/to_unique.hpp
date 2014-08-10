@@ -13,7 +13,7 @@ namespace Si
 	}
 }
 
-namespace rx
+namespace Si
 {
 	using Si::to_unique;
 }

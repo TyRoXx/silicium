@@ -3,10 +3,10 @@
 
 #include <silicium/observable.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Input>
-	struct total_consumer : private rx::observer<typename Input::element_type>
+	struct total_consumer : private Si::observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 

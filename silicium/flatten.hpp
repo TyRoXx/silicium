@@ -11,7 +11,7 @@
 #include <boost/thread/locks.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class NothingObservableObservable, class Mutex>
 	struct flattener
@@ -119,7 +119,7 @@ namespace rx
 		{
 			{
 				boost::unique_lock<Mutex> lock(*children_mutex);
-				auto child_ = rx::make_unique<child>(*this, std::move(value));
+				auto child_ = Si::make_unique<child>(*this, std::move(value));
 				child &child_ref = *child_;
 				children.insert(std::make_pair(&child_ref, std::move(child_)));
 				child_ref.start();

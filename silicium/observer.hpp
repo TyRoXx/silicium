@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_OBSERVER_HPP
 #define SILICIUM_REACTIVE_OBSERVER_HPP
 
-namespace rx
+namespace Si
 {
 	template <class E>
 	struct observer

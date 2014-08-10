@@ -127,7 +127,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_construct_move)
 	{
 		using variant = fast_variant<std::unique_ptr<int>>;
-		variant v(rx::make_unique<int>(2));
+		variant v(Si::make_unique<int>(2));
 		variant w(std::move(v));
 		BOOST_CHECK(v != w);
 	}
@@ -170,7 +170,7 @@ namespace Si
 	{
 		using variant = fast_variant<std::unique_ptr<int>>;
 		variant v;
-		variant w(rx::make_unique<int>(2));
+		variant w(Si::make_unique<int>(2));
 		BOOST_CHECK(v != w);
 		v = std::move(w);
 		BOOST_CHECK(v != w);

@@ -2,7 +2,7 @@
 #include <silicium/exchange.hpp>
 #include <boost/ref.hpp>
 
-namespace rx
+namespace Si
 {
 	namespace linux
 	{
@@ -80,7 +80,7 @@ namespace rx
 						i += sizeof(inotify_event);
 						i += event.len;
 					}
-					rx::exchange(this->receiver_, nullptr)->got_element(std::move(changes));
+					Si::exchange(this->receiver_, nullptr)->got_element(std::move(changes));
 				}
 			});
 			receiver_ = &receiver;

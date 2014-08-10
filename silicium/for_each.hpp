@@ -6,7 +6,7 @@
 #include <silicium/config.hpp>
 #include <silicium/ptr_observable.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Input, class Handler>
 	auto for_each(Input &&input, Handler &&handle_element)

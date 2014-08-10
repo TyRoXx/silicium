@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace rx
+namespace Si
 {
 	template <class T, class U>
 	T exchange(T &dest, U &&source)

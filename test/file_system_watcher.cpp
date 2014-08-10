@@ -7,7 +7,7 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <fstream>
 
-namespace rx
+namespace Si
 {
 	namespace
 	{

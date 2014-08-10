@@ -7,7 +7,7 @@
 #include <cassert>
 #include <silicium/override.hpp>
 
-namespace rx
+namespace Si
 {
 	template <class Transform, class Original>
 	struct transformation
