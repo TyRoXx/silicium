@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_FLATTEN_HPP
 
 #include <reactive/observable.hpp>
-#include <reactive/config.hpp>
+#include <silicium/config.hpp>
 #include <reactive/exchange.hpp>
 #include <silicium/override.hpp>
 #include <memory>

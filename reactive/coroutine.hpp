@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_COROUTINE_HPP
 
 #include <reactive/transform.hpp>
-#include <reactive/config.hpp>
+#include <silicium/config.hpp>
 #include <reactive/ref.hpp>
 #include <reactive/exchange.hpp>
 #include <boost/coroutine/all.hpp>

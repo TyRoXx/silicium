@@ -1,5 +1,5 @@
 #include <silicium/fast_variant.hpp>
-#include <reactive/config.hpp>
+#include <silicium/config.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <boost/container/string.hpp>
 #include <boost/variant/static_visitor.hpp>

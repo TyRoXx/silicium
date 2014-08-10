@@ -3,6 +3,7 @@
 
 #include <reactive/timer.hpp>
 #include <reactive/tuple.hpp>
+#include <reactive/ptr_observable.hpp>
 
 namespace rx
 {

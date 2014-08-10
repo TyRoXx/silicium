@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_TUPLE_HPP
 
 #include <reactive/observable.hpp>
-#include <reactive/config.hpp>
+#include <silicium/config.hpp>
 #include "detail/integer_sequence.hpp"
 #include <bitset>
 

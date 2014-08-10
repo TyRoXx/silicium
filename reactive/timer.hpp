@@ -3,6 +3,7 @@
 
 #include <reactive/observable.hpp>
 #include <reactive/exchange.hpp>
+#include <silicium/override.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/chrono/duration.hpp>
 

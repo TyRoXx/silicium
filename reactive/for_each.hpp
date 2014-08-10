@@ -3,7 +3,7 @@
 
 #include <reactive/total_consumer.hpp>
 #include <reactive/transform.hpp>
-#include <reactive/config.hpp>
+#include <silicium/config.hpp>
 #include <reactive/ptr_observable.hpp>
 
 namespace rx
