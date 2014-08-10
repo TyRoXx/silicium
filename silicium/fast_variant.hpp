@@ -674,11 +674,11 @@ namespace std
 }
 
 //TODO: which is always 0, so this can be made as small as sizeof(int)
-BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int>) == (2 * sizeof(int)));
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
 
 //TODO: which is always 0, so this can be made as small as sizeof(int *)
-BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int *>) == (sizeof(int) + sizeof(int *)));
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int *>) == (sizeof(boost::uint32_t) + sizeof(int *)));
 
-BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<std::hash<Si::fast_variant<int>>>) == sizeof(int));
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<std::hash<Si::fast_variant<int>>>) == sizeof(boost::uint32_t));
 
 #endif

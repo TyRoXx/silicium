@@ -142,10 +142,10 @@ namespace Si
 		return out;
 	}
 
-	BOOST_STATIC_ASSERT(sizeof(optional<char>) == sizeof(unsigned));
-	BOOST_STATIC_ASSERT(sizeof(optional<short>) == sizeof(unsigned));
-	BOOST_STATIC_ASSERT(sizeof(optional<unsigned>) == (2 * sizeof(unsigned)));
-	BOOST_STATIC_ASSERT(sizeof(optional<char *>) == (sizeof(unsigned) + sizeof(char *)));
+	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t>) == sizeof(boost::uint32_t));
+	BOOST_STATIC_ASSERT(sizeof(optional<boost::int16_t>) == sizeof(boost::uint32_t));
+	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
+	BOOST_STATIC_ASSERT(sizeof(optional<char *>) == (sizeof(boost::uint32_t) + sizeof(char *)));
 }
 
 namespace std
