@@ -373,4 +373,33 @@ namespace Si
 			return 0;
 		}));
 	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_mutable_construct_superset)
+	{
+		fast_variant<int> v(2);
+		fast_variant<float, int> w;
+		w.assign(v);
+		BOOST_CHECK_EQUAL(boost::make_optional<int>(2), try_get<int>(w));
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_copyable_const_construct_superset)
+	{
+		fast_variant<int> const v(2);
+		fast_variant<float, int> w;
+		w.assign(v);
+		BOOST_CHECK_EQUAL(boost::make_optional<int>(2), try_get<int>(w));
+	}
+
+#if 0 //TODO: make this work
+	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_construct_superset)
+	{
+		fast_variant<std::unique_ptr<int>> v(Si::make_unique<int>(2));
+		fast_variant<float, std::unique_ptr<int>> w;
+		w.assign(std::move(v)); //would not compile because assign uses apply_visitor which does not forward rvalue-ness yet
+		auto * const element = try_get_ptr<std::unique_ptr<int>>(w);
+		BOOST_REQUIRE(element);
+		BOOST_REQUIRE(*element);
+		BOOST_CHECK_EQUAL(2, **element);
+	}
+#endif
 }

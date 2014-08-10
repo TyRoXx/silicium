@@ -188,6 +188,16 @@ namespace Si
 		struct are_noexcept_movable<> : std::true_type
 		{
 		};
+		
+		template <class Constructed>
+		struct construction_visitor : boost::static_visitor<Constructed>
+		{
+			template <class T>
+			Constructed operator()(T &&argument) const
+			{
+				return Constructed(std::forward<T>(argument));
+			}
+		};
 
 		template <bool IsCopyable, class ...T>
 		struct fast_variant_base;
@@ -312,6 +322,12 @@ namespace Si
 				return f[storage.which()](&storage.storage(), &other.storage.storage());
 			}
 
+			template <bool IsOtherCopyable, class ...U>
+			void assign(fast_variant_base<IsOtherCopyable, U...> &&other)
+			{
+				*this = Si::apply_visitor(construction_visitor<fast_variant_base>(), std::move(other));
+			}
+
 		protected: //TODO: make private somehow
 
 			using internal_which_type = typename boost::uint_value_t<sizeof...(T)>::least;
@@ -428,6 +444,14 @@ namespace Si
 					this->storage.which(other.storage.which());
 				}
 				return *this;
+			}
+
+			using base::assign;
+
+			template <bool IsOtherCopyable, class ...U>
+			void assign(fast_variant_base<IsOtherCopyable, U...> const &other)
+			{
+				*this = Si::apply_visitor(construction_visitor<fast_variant_base>(), other);
 			}
 		};
 
