@@ -288,13 +288,13 @@ namespace Si
 			generated.emplace_back(*element);
 		});
 		thread.async_get_one(consumer);
-		BOOST_REQUIRE_EQUAL(1, generated.size());
+		BOOST_REQUIRE_EQUAL(1U, generated.size());
 
 		//make sure that the Lua thread is kept alive properly by trying to collect it before the next resume
 		lua_gc(L.get(), LUA_GCCOLLECT, 0);
 
 		thread.async_get_one(consumer);
-		BOOST_REQUIRE_EQUAL(2, generated.size());
+		BOOST_REQUIRE_EQUAL(2U, generated.size());
 		std::vector<lua_Integer> const expected{4, 5};
 		BOOST_CHECK(expected == generated);
 	}

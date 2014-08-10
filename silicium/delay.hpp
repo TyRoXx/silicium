@@ -7,6 +7,7 @@
 
 namespace Si
 {
+#ifndef _MSC_VER
 	template <class Input, class Duration>
 	auto delay(Input &&input, boost::asio::io_service &io, Duration duration)
 	{
@@ -19,6 +20,7 @@ namespace Si
 		};
 		return transform(Si::make_tuple(delaying_timer, std::forward<Input>(input)), unpack);
 	}
+#endif
 }
 
 #endif

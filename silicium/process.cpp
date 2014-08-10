@@ -2,7 +2,7 @@
 #include <silicium/to_unique.hpp>
 
 #ifdef _WIN32
-#include <silicium/win32.hpp>
+#	include <silicium/win32/win32.hpp>
 #endif
 
 #include <boost/filesystem/operations.hpp>
@@ -11,9 +11,9 @@
 #include <memory>
 
 #ifdef __linux__
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/wait.h>
+#	include <unistd.h>
+#	include <fcntl.h>
+#	include <sys/wait.h>
 #endif
 
 namespace Si
