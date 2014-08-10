@@ -27,6 +27,27 @@ namespace Si
 		{
 		}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		and_combinator(and_combinator &&other)
+			: parts(std::move(other.parts))
+			, receiver(std::move(other.receiver))
+			, buffer(std::move(other.buffer))
+			, elements_received(std::move(other.elements_received))
+			, observers(std::move(other.observers))
+		{
+		}
+
+		and_combinator &operator = (and_combinator &&other)
+		{
+			parts = std::move(other.parts);
+			receiver = std::move(other.receiver);
+			buffer = std::move(other.buffer);
+			elements_received = std::move(other.elements_received);
+			observers = std::move(other.observers);
+			return *this;
+		}
+#endif
+
 		virtual void async_get_one(observer<buffer_tuple> &receiver) SILICIUM_OVERRIDE
 		{
 			assert(!this->receiver);
