@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_TAKE_HPP
 
 #include <silicium/observable.hpp>
+#include <silicium/override.hpp>
 #include <boost/optional.hpp>
 
 namespace Si

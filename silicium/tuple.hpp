@@ -4,6 +4,7 @@
 #include <silicium/observable.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/integer_sequence.hpp>
+#include <silicium/override.hpp>
 #include <bitset>
 
 namespace Si

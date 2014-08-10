@@ -1,4 +1,4 @@
-file(GLOB sources "*.hpp" "*.cpp" "../silicium/*.hpp" "../silicium/*.hpp")
+file(GLOB sources "*.hpp" "*.cpp" "../silicium/*.hpp" "../silicium/*.hpp" "solo_include/*.cpp")
 if(LUA51_FOUND)
 	file(GLOB luaSources "lua/*.cpp")
 endif()

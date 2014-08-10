@@ -2,6 +2,8 @@
 #define SILICIUM_REACTIVE_FILTER_HPP
 
 #include <silicium/observable.hpp>
+#include <silicium/override.hpp>
+#include <utility>
 
 namespace Si
 {

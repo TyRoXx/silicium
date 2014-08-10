@@ -9,7 +9,10 @@
 namespace Si
 {
 	template <class Input>
-	auto deref_optional(Input &&input) -> ptr_observable<typename Input::element_type, std::unique_ptr<typename Input::element_type>>
+	auto deref_optional(Input &&input)
+#ifdef _MSC_VER
+		-> ptr_observable<typename Input::element_type, std::unique_ptr<typename Input::element_type>>
+#endif
 	{
 		typedef boost::optional<typename Input::element_type> optional_type;
 		auto is_set = [](optional_type const &element) { return element.is_initialized(); };

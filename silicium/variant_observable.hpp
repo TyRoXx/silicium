@@ -6,6 +6,7 @@
 #include <silicium/config.hpp>
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/fast_variant.hpp>
+#include <silicium/override.hpp>
 
 namespace Si
 {

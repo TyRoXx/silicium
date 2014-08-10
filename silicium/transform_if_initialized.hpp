@@ -6,6 +6,7 @@
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <cassert>
+#include <boost/config.hpp>
 
 namespace Si
 {

@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_FINITE_STATE_MACHINE_HPP
 
 #include <silicium/observable.hpp>
+#include <silicium/override.hpp>
 #include <cassert>
 #include <boost/optional.hpp>
 
