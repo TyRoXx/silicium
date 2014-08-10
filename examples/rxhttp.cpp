@@ -183,32 +183,6 @@ namespace
 
 	using events = rx::shared_observable<rx::nothing>;
 
-	struct coroutine_accept_handler : boost::static_visitor<events>
-	{
-		boost::uintmax_t visitor_number;
-
-		explicit coroutine_accept_handler(boost::uintmax_t visitor_number)
-			: visitor_number(visitor_number)
-		{
-		}
-
-		events operator()(std::shared_ptr<boost::asio::ip::tcp::socket> client) const
-		{
-			auto visitor_number_ = visitor_number;
-			auto client_handler = rx::wrap<rx::nothing>(rx::make_coroutine<rx::nothing>([client, visitor_number_](rx::yield_context<rx::nothing> &yield) -> void
-			{
-				coroutine_socket coro_socket(*client, yield);
-				return serve_client(coro_socket, visitor_number_);
-			}));
-			return client_handler;
-		}
-
-		events operator()(boost::system::error_code) const
-		{
-			throw std::logic_error("not implemented");
-		}
-	};
-
 	struct coroutine_web_server
 	{
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
@@ -225,8 +199,21 @@ namespace
 						break;
 					}
 					++visitor_count;
-					coroutine_accept_handler handler{visitor_count};
-					auto context = Si::apply_visitor(handler, *result);
+					auto context = Si::visit<events>(*result,
+						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client)
+					{
+						auto visitor_number_ = visitor_count;
+						auto client_handler = rx::wrap<rx::nothing>(rx::make_coroutine<rx::nothing>([client, visitor_number_](rx::yield_context<rx::nothing> &yield) -> void
+						{
+							coroutine_socket coro_socket(*client, yield);
+							return serve_client(coro_socket, visitor_number_);
+						}));
+						return client_handler;
+					},
+						[](boost::system::error_code) -> events
+					{
+						throw std::logic_error("not implemented");
+					});
 					if (!context.empty())
 					{
 						yield(std::move(context));
