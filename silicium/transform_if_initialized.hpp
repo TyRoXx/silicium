@@ -26,7 +26,7 @@ namespace Si
 		{
 		}
 
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_GENERATES_MOVES
 		conditional_transformer(conditional_transformer &&other)
 			: original(std::move(other.original))
 			, transform(std::move(other.transform))

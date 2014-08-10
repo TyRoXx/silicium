@@ -9,6 +9,19 @@
 #	define SILICIUM_UNREACHABLE() __builtin_unreachable()
 #endif
 
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)
+#	define SILICIUM_COMPILER_GENERATES_MOVES 1
+#else
+#	define SILICIUM_COMPILER_GENERATES_MOVES 0
+#endif
+
+
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)
+#	define SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT 1
+#else
+#	define SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT 0
+#endif
+
 namespace Si
 {
 	struct nothing

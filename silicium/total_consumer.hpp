@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_TOTAL_CONSUMER_HPP
 
 #include <silicium/observable.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -19,7 +20,7 @@ namespace Si
 		{
 		}
 
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_GENERATES_MOVES
 		total_consumer(total_consumer &&other)
 			: input(std::move(other.input))
 		{

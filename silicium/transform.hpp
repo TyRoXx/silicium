@@ -2,10 +2,11 @@
 #define SILICIUM_REACTIVE_TRANSFORM_HPP
 
 #include <silicium/observable.hpp>
+#include <silicium/config.hpp>
+#include <silicium/override.hpp>
 #include <type_traits>
 #include <utility>
 #include <cassert>
-#include <silicium/override.hpp>
 
 namespace Si
 {
@@ -27,7 +28,7 @@ namespace Si
 		{
 		}
 
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_GENERATES_MOVES
 		transformation(transformation &&other)
 			: transform(std::move(other.transform))
 			, original(std::move(other.original))

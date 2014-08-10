@@ -30,7 +30,9 @@ namespace Si
 			union
 			{
 #ifndef _MSC_VER
+#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 408
 				alignas(First)
+#endif
 #endif
 					std::array<char, sizeof(First)> head;
 				union_<T...> tail;
@@ -193,7 +195,7 @@ namespace Si
 		template <class ...T>
 		struct fast_variant_base<false, T...>
 		{
-#ifndef _MSC_VER //VC++ 2013 does not have noexcept
+#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
 			BOOST_STATIC_ASSERT_MSG(detail::are_noexcept_movable<T...>::value, "All contained types must be nothrow/noexcept-movable");
 #endif
 

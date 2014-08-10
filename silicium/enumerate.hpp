@@ -3,6 +3,7 @@
 
 #include <silicium/observable.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/config.hpp>
 #include <silicium/override.hpp>
 #include <boost/range/begin.hpp>
 #include <queue>
@@ -34,7 +35,7 @@ namespace Si
 		{
 		}
 
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_GENERATES_MOVES
 		enumerator(enumerator &&other)
 			: input(std::move(other.input))
 			, buffered(std::move(other.buffered))
