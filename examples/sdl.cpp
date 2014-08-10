@@ -7,7 +7,6 @@
 #include <reactive/generate.hpp>
 #include <reactive/ptr_observable.hpp>
 #include <reactive/cache.hpp>
-#include <reactive/get.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>
 #include <vector>
@@ -202,6 +201,29 @@ namespace
 #endif
 			(rx::transform(std::move(model), draw_game_state));
 	}
+
+	template <class Element>
+	struct visitor : rx::observer<Element>
+	{
+		boost::optional<Element> result;
+
+		virtual void got_element(Element value) SILICIUM_OVERRIDE
+		{
+			result = std::move(value);
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+		}
+	};
+
+	template <class Input>
+	auto get(Input &from) -> boost::optional<typename Input::element_type>
+	{
+		visitor<typename Input::element_type> v;
+		from.async_get_one(v);
+		return std::move(v.result);
+	}
 }
 
 int main(int, char* []) //SDL2 requires the parameters on Windows
@@ -233,7 +255,7 @@ int main(int, char* []) //SDL2 requires the parameters on Windows
 			frame_events.got_element(event);
 		}
 
-		auto f = rx::get(frames);
+		auto f = get(frames);
 		if (!f)
 		{
 			break;
