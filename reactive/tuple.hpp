@@ -3,7 +3,7 @@
 
 #include <reactive/observable.hpp>
 #include <silicium/config.hpp>
-#include "detail/integer_sequence.hpp"
+#include <silicium/detail/integer_sequence.hpp>
 #include <bitset>
 
 namespace rx
