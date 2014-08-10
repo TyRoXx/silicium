@@ -1,15 +1,15 @@
 #ifndef SILICIUM_REACTIVE_WIN32_DIRECTORY_WATCHER_HPP
 #define SILICIUM_REACTIVE_WIN32_DIRECTORY_WATCHER_HPP
 
-#include <reactive/win32/directory_changes.hpp>
-#include <reactive/file_notification.hpp>
-#include <reactive/enumerate.hpp>
-#include <reactive/ref.hpp>
-#include <reactive/transform_if_initialized.hpp>
+#include <silicium/win32/directory_changes.hpp>
+#include <silicium/file_notification.hpp>
+#include <silicium/enumerate.hpp>
+#include <silicium/ref.hpp>
+#include <silicium/transform_if_initialized.hpp>
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
 
-namespace rx
+namespace Si
 {
 #ifdef _WIN32
 	namespace win32
@@ -26,14 +26,14 @@ namespace rx
 			}
 		}
 
-		boost::optional<rx::file_notification> to_portable_file_notification(win32::file_notification &&original)
+		boost::optional<Si::file_notification> to_portable_file_notification(win32::file_notification &&original)
 		{
 			auto const type = to_portable_file_notification_type(original.action);
 			if (!type)
 			{
 				return boost::none;
 			}
-			return rx::file_notification(*type, std::move(original.name));
+			return Si::file_notification(*type, std::move(original.name));
 		}
 	}
 

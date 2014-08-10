@@ -1,10 +1,10 @@
-#include <reactive/win32/directory_changes.hpp>
-#include <reactive/exchange.hpp>
-#include <reactive/config.hpp>
+#include <silicium/win32/directory_changes.hpp>
+#include <silicium/exchange.hpp>
+#include <silicium/config.hpp>
 #include <Windows.h>
 #include <array>
 
-namespace rx
+namespace Si
 {
 	namespace win32
 	{
@@ -79,7 +79,7 @@ namespace rx
 					}
 					next_event += notification.NextEntryOffset;
 				}
-				rx::exchange(this->receiver_, nullptr)->got_element(std::move(notifications));
+				Si::exchange(this->receiver_, nullptr)->got_element(std::move(notifications));
 			});
 		}
 

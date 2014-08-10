@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_DIRECTORY_CHANGES_HPP
 
 #include <boost/asio/io_service.hpp>
-#include <reactive/observable.hpp>
+#include <silicium/observable.hpp>
 #include <silicium/win32.hpp>
 #include <silicium/override.hpp>
 #include <boost/filesystem/path.hpp>
@@ -10,7 +10,7 @@
 #include <boost/ref.hpp>
 #include <future>
 
-namespace rx
+namespace Si
 {
 	namespace win32
 	{
