@@ -4,6 +4,7 @@
 #include <reactive/observable.hpp>
 #include <reactive/exchange.hpp>
 #include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <cassert>
 
 namespace rx
@@ -49,7 +50,7 @@ namespace rx
 			fetch();
 		}
 
-			virtual void cancel() SILICIUM_OVERRIDE
+		virtual void cancel() SILICIUM_OVERRIDE
 		{
 			throw std::logic_error("to do");
 		}
@@ -82,7 +83,7 @@ namespace rx
 			}
 		}
 
-			virtual void ended() SILICIUM_OVERRIDE
+		virtual void ended() SILICIUM_OVERRIDE
 		{
 			SILICIUM_UNREACHABLE();
 		}

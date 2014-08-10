@@ -337,4 +337,40 @@ namespace Si
 		BOOST_CHECK_EQUAL(0U, s.count(2));
 		BOOST_CHECK_EQUAL(1U, s.count(2.0f));
 	}
+
+	// visit
+
+	BOOST_AUTO_TEST_CASE(fast_variant_const_visit)
+	{
+		using variant = fast_variant<int, float>;
+		variant const v(2);
+		BOOST_CHECK_EQUAL(2 + 1, visit<int>(
+			v,
+			[](int i) -> int
+		{
+			return i + 1;
+		},
+			[](float) -> int
+		{
+			BOOST_REQUIRE(false);
+			return 0;
+		}));
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_mutable_visit)
+	{
+		using variant = fast_variant<int, float>;
+		variant v(2);
+		BOOST_CHECK_EQUAL(2 + 1, visit<int>(
+			v,
+			[](int i) -> int
+		{
+			return i + 1;
+		},
+			[](float) -> int
+		{
+			BOOST_REQUIRE(false);
+			return 0;
+		}));
+	}
 }

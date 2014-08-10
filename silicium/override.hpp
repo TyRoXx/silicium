@@ -9,6 +9,4 @@
 #	define SILICIUM_FINAL final
 #endif
 
-#define SILICIUM_UNREACHABLE() throw std::logic_error("Marked unreachable, " __FILE__ ":" BOOST_STRINGIZE(__LINE__))
-
 #endif

@@ -1,6 +1,7 @@
 #ifndef SILICIUM_FAST_VARIANT_HPP
 #define SILICIUM_FAST_VARIANT_HPP
 
+#include <silicium/config.hpp>
 #include <new>
 #include <array>
 #include <memory>
@@ -523,6 +524,70 @@ namespace Si
 	typename std::add_const<Element>::type *try_get_ptr(fast_variant<T...> const &from) BOOST_NOEXCEPT
 	{
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
+	}
+
+	namespace detail
+	{
+		template <std::size_t Index, class First, class ...T>
+		struct at : at<Index - 1, T...>
+		{
+		};
+
+		template <class First, class ...T>
+		struct at<0, First, T...>
+		{
+			using type = First;
+		};
+
+		template <class Result, std::size_t Index, class ...T>
+		Result visit_impl(fast_variant<T...> &)
+		{
+			SILICIUM_UNREACHABLE();
+		}
+
+		template <class Result, std::size_t Index, class ...T>
+		Result visit_impl(fast_variant<T...> const &)
+		{
+			SILICIUM_UNREACHABLE();
+		}
+
+		template <class Result, std::size_t Index, class ...T, class FirstVisitor, class ...Visitors>
+		Result visit_impl(fast_variant<T...> &var, FirstVisitor const &first_visitor, Visitors const & ...visitors)
+		{
+			using element_type = typename at<Index, T...>::type;
+			if (var.which() == Index)
+			{
+				auto * const element = try_get_ptr<element_type>(var);
+				assert(element);
+				return first_visitor(*element);
+			}
+			return visit_impl<Result, Index + 1>(var, visitors...);
+		}
+
+		template <class Result, std::size_t Index, class ...T, class FirstVisitor, class ...Visitors>
+		Result visit_impl(fast_variant<T...> const &var, FirstVisitor const &first_visitor, Visitors const & ...visitors)
+		{
+			using element_type = typename at<Index, T...>::type;
+			if (var.which() == Index)
+			{
+				auto * const element = try_get_ptr<element_type>(var);
+				assert(element);
+				return first_visitor(*element);
+			}
+			return visit_impl<Result, Index + 1>(var, visitors...);
+		}
+	}
+
+	template <class Result, class ...T, class ...Visitors>
+	Result visit(fast_variant<T...> &var, Visitors const & ...visitors)
+	{
+		return detail::visit_impl<Result, 0>(var, visitors...);
+	}
+
+	template <class Result, class ...T, class ...Visitors>
+	Result visit(fast_variant<T...> const &var, Visitors const & ...visitors)
+	{
+		return detail::visit_impl<Result, 0>(var, visitors...);
 	}
 }
 
