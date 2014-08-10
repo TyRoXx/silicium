@@ -8,6 +8,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/mpl/find.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/integer.hpp>
 #include <boost/optional.hpp>
 
 namespace Si
@@ -40,6 +41,49 @@ namespace Si
 		template <>
 		struct union_<>
 		{
+		};
+
+		template <class Which, std::size_t Size>
+		struct combined_storage
+		{
+			using which_type = Which;
+
+			combined_storage() BOOST_NOEXCEPT
+			{
+				which(0);
+			}
+
+			which_type which() const BOOST_NOEXCEPT
+			{
+				return *reinterpret_cast<which_type const *>(bytes.data() + which_offset);
+			}
+
+			void which(which_type value) BOOST_NOEXCEPT
+			{
+				*reinterpret_cast<which_type *>(bytes.data() + which_offset) = value;
+			}
+
+			char &storage() BOOST_NOEXCEPT
+			{
+				return *bytes.data();
+			}
+
+			char const &storage() const BOOST_NOEXCEPT
+			{
+				return *bytes.data();
+			}
+
+		private:
+
+			using alignment_unit = unsigned;
+			enum
+			{
+				which_offset = (Size + sizeof(which_type) - 1) / sizeof(which_type) * sizeof(which_type),
+				used_size = which_offset + sizeof(which_type),
+				padding = sizeof(alignment_unit),
+				padded_size = (used_size + padding - 1) / padding * padding
+			};
+			std::array<char, padded_size> bytes;
 		};
 
 		template <class T>
@@ -158,31 +202,31 @@ namespace Si
 			fast_variant_base() BOOST_NOEXCEPT
 			{
 				using constructed = typename first<T...>::type;
-				new (reinterpret_cast<constructed *>(&storage)) constructed();
+				new (reinterpret_cast<constructed *>(&storage.storage())) constructed();
 			}
 
 			~fast_variant_base() BOOST_NOEXCEPT
 			{
-				destroy_storage(which_, storage);
+				destroy_storage(storage.which(), storage.storage());
 			}
 
 			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
-				: which_(other.which_)
 			{
-				move_construct_storage(which_, storage, other.storage);
+				storage.which(other.storage.which());
+				move_construct_storage(storage.which(), storage.storage(), other.storage.storage());
 			}
 
 			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
 			{
-				if (which_ == other.which_)
+				if (storage.which() == other.which())
 				{
-					move_storage(which_, storage, other.storage);
+					move_storage(storage.which(), storage.storage(), other.storage.storage());
 				}
 				else
 				{
-					destroy_storage(which_, storage);
-					move_construct_storage(other.which_, storage, other.storage);
-					which_ = other.which_;
+					destroy_storage(storage.which(), storage.storage());
+					move_construct_storage(other.storage.which(), storage.storage(), other.storage.storage());
+					storage.which(other.storage.which());
 				}
 				return *this;
 			}
@@ -204,14 +248,14 @@ namespace Si
 					void
 				>::type>
 			fast_variant_base(U &&value)
-				: which_(Index)
 			{
-				new (&storage) CleanU(std::forward<U>(value));
+				storage.which(Index);
+				new (&storage.storage()) CleanU(std::forward<U>(value));
 			}
 
 			which_type which() const BOOST_NOEXCEPT
 			{
-				return which_;
+				return storage.which();
 			}
 
 			template <class Visitor>
@@ -222,7 +266,7 @@ namespace Si
 				{{
 					&apply_visitor_impl<Visitor, T, result>...
 				}};
-				return f[which_](std::forward<Visitor>(visitor), &storage);
+				return f[storage.which()](std::forward<Visitor>(visitor), &storage.storage());
 			}
 
 			template <class Visitor>
@@ -233,12 +277,12 @@ namespace Si
 				{{
 					&apply_visitor_const_impl<Visitor, T, result>...
 				}};
-				return f[which_](std::forward<Visitor>(visitor), &storage);
+				return f[storage.which()](std::forward<Visitor>(visitor), &storage.storage());
 			}
 
 			bool operator == (fast_variant_base const &other) const
 			{
-				if (which_ != other.which_)
+				if (storage.which() != other.storage.which())
 				{
 					return false;
 				}
@@ -246,16 +290,16 @@ namespace Si
 				{{
 					&equals<T>...
 				}};
-				return f[which_](&storage, &other.storage);
+				return f[storage.which()](&storage.storage(), &other.storage.storage());
 			}
 
 			bool operator < (fast_variant_base const &other) const
 			{
-				if (which_ > other.which_)
+				if (storage.which() > other.storage.which())
 				{
 					return false;
 				}
-				if (which_ < other.which_)
+				if (storage.which() < other.storage.which())
 				{
 					return true;
 				}
@@ -263,17 +307,17 @@ namespace Si
 				{{
 					&less<T>...
 				}};
-				return f[which_](&storage, &other.storage);
+				return f[storage.which()](&storage.storage(), &other.storage.storage());
 			}
 
 		protected: //TODO: make private somehow
 
-			using storage_type = std::array<char, sizeof(union_<T...>)>; //TODO: ensure proper alignment
+			using internal_which_type = typename boost::uint_value_t<sizeof...(T)>::least;
+			using storage_type = combined_storage<internal_which_type, sizeof(union_<T...>)>; //TODO: ensure proper alignment
 
-			which_type which_ = 0;
 			storage_type storage;
 
-			static void copy_construct_storage(which_type which, storage_type &destination, storage_type const &source)
+			static void copy_construct_storage(which_type which, char &destination, char const &source)
 			{
 				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
 				{{
@@ -282,7 +326,7 @@ namespace Si
 				f[which](&destination, &source);
 			}
 
-			static void move_construct_storage(which_type which, storage_type &destination, storage_type &source) BOOST_NOEXCEPT
+			static void move_construct_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
 				std::array<void (*)(void *, void *), sizeof...(T)> const f =
 				{{
@@ -291,7 +335,7 @@ namespace Si
 				f[which](&destination, &source);
 			}
 
-			static void destroy_storage(which_type which, storage_type &destroyed) BOOST_NOEXCEPT
+			static void destroy_storage(which_type which, char &destroyed) BOOST_NOEXCEPT
 			{
 				std::array<void (*)(void *), sizeof...(T)> const f =
 				{{
@@ -300,7 +344,7 @@ namespace Si
 				f[which](&destroyed);
 			}
 
-			static void copy_storage(which_type which, storage_type &destination, storage_type const &source)
+			static void copy_storage(which_type which, char &destination, char const &source)
 			{
 				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
 				{{
@@ -309,7 +353,7 @@ namespace Si
 				f[which](&destination, &source);
 			}
 
-			static void move_storage(which_type which, storage_type &destination, storage_type &source) BOOST_NOEXCEPT
+			static void move_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
 				std::array<void (*)(void *, void *), sizeof...(T)> const f =
 				{{
@@ -357,8 +401,8 @@ namespace Si
 			fast_variant_base(fast_variant_base const &other)
 				: base()
 			{
-				this->which_ = other.which();
-				base::copy_construct_storage(this->which_, this->storage, other.storage);
+				this->storage.which(other.storage.which());
+				base::copy_construct_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
 			}
 
 			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
@@ -369,17 +413,17 @@ namespace Si
 
 			fast_variant_base &operator = (fast_variant_base const &other)
 			{
-				if (this->which_ == other.which_)
+				if (this->storage.which() == other.storage.which())
 				{
-					base::copy_storage(this->which_, this->storage, other.storage);
+					base::copy_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
 				}
 				else
 				{
 					typename base::storage_type temporary;
-					base::copy_construct_storage(other.which_, temporary, other.storage);
-					base::destroy_storage(this->which_, this->storage);
-					base::move_construct_storage(other.which_, this->storage, temporary);
-					this->which_ = other.which_;
+					base::copy_construct_storage(other.storage.which(), temporary.storage(), other.storage.storage());
+					base::destroy_storage(this->storage.which(), this->storage.storage());
+					base::move_construct_storage(other.storage.which(), this->storage.storage(), temporary.storage());
+					this->storage.which(other.storage.which());
 				}
 				return *this;
 			}
@@ -603,7 +647,12 @@ namespace std
 	};
 }
 
-BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int>) == 8);
-BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int *>) == (4 + sizeof(int *)));
+//TODO: which is always 0, so this can be made as small as sizeof(int)
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int>) == (2 * sizeof(int)));
+
+//TODO: which is always 0, so this can be made as small as sizeof(int *)
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<int *>) == (sizeof(int) + sizeof(int *)));
+
+BOOST_STATIC_ASSERT(sizeof(Si::fast_variant<std::hash<Si::fast_variant<int>>>) == sizeof(int));
 
 #endif
