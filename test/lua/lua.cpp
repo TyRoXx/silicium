@@ -1,5 +1,5 @@
-#include <reactive/bridge.hpp>
-#include <reactive/consume.hpp>
+#include <silicium/bridge.hpp>
+#include <silicium/consume.hpp>
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <boost/test/unit_test.hpp>

@@ -59,6 +59,5 @@ endif()
 
 include_directories(".")
 add_subdirectory("silicium")
-add_subdirectory("reactive")
 add_subdirectory("test")
 add_subdirectory("examples")
