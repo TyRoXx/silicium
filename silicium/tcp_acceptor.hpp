@@ -3,6 +3,7 @@
 
 #include <silicium/observable.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/override.hpp>
 #include <silicium/fast_variant.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
