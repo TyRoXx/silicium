@@ -520,7 +520,7 @@ namespace Si
 	}
 
 	template <class Element, class ...T>
-	Element *try_get_ptr(fast_variant<T...> const &from) BOOST_NOEXCEPT
+	typename std::add_const<Element>::type *try_get_ptr(fast_variant<T...> const &from) BOOST_NOEXCEPT
 	{
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
