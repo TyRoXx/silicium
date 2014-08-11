@@ -31,7 +31,7 @@ namespace Si
 		{
 		}
 
-		optional(T &&value)
+		optional(T &&value) BOOST_NOEXCEPT
 			: content(std::move(value))
 		{
 		}
@@ -59,7 +59,7 @@ namespace Si
 			return *this;
 		}
 
-		optional &operator = (T &&value)
+		optional &operator = (T &&value) BOOST_NOEXCEPT
 		{
 			content = std::move(value);
 			return *this;
