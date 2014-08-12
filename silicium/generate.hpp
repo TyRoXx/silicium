@@ -1,15 +1,17 @@
 #ifndef SILICIUM_REACTIVE_GENERATE_HPP
 #define SILICIUM_REACTIVE_GENERATE_HPP
 
-#include <silicium/observable.hpp>
 #include <silicium/config.hpp>
 #include <silicium/override.hpp>
+#include <silicium/observer.hpp>
 
 namespace Si
 {
 	template <class Generated, class Element = typename std::result_of<Generated ()>::type>
-	struct generator : observable<Element>
+	struct generator
 	{
+		using element_type = Element;
+
 		generator()
 		{
 		}
@@ -32,12 +34,12 @@ namespace Si
 		}
 #endif
 
-		virtual void async_get_one(observer<Element> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<Element> &receiver)
 		{
 			return receiver.got_element(generate());
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 		}
 
