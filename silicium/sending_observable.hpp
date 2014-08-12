@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_SENDING_OBSERVABLE_HPP
 #define SILICIUM_REACTIVE_SENDING_OBSERVABLE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -10,7 +10,7 @@
 
 namespace Si
 {
-	struct sending_observable : observable<boost::system::error_code>
+	struct sending_observable
 	{
 		typedef boost::system::error_code element_type;
 		typedef boost::iterator_range<char const *> buffer_type;
@@ -21,7 +21,7 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(observer<boost::system::error_code> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<boost::system::error_code> &receiver)
 		{
 			assert(!receiver_);
 			if (buffer.empty())
@@ -38,7 +38,7 @@ namespace Si
 			});
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(receiver_);
 			throw std::logic_error("to do");

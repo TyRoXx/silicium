@@ -67,7 +67,7 @@ namespace
 			assert(socket);
 			assert(yield);
 
-			Si::sending_observable sending(*socket, data);
+			auto sending = Si::virtualize(Si::sending_observable(*socket, data));
 
 			//ignore error
 			yield->get_one(sending);
