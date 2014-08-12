@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_TCP_ACCEPTOR_HPP
 #define SILICIUM_REACTIVE_TCP_ACCEPTOR_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
 #include <silicium/fast_variant.hpp>
@@ -14,7 +14,7 @@ namespace Si
 		boost::system::error_code
 	>;
 
-	struct tcp_acceptor : observable<tcp_acceptor_result>, boost::noncopyable
+	struct tcp_acceptor : private boost::noncopyable
 	{
 		typedef tcp_acceptor_result element_type;
 
@@ -36,7 +36,7 @@ namespace Si
 			underlying->cancel();
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			assert(underlying);
@@ -65,7 +65,7 @@ namespace Si
 			});
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(receiver_);
 			assert(underlying);
