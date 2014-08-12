@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_TUPLE_HPP
 #define SILICIUM_REACTIVE_TUPLE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/override.hpp>
@@ -17,10 +17,11 @@ namespace Si
 
 #if SILICIUM_RX_TUPLE_AVAILABLE
 	template <class ...Parts>
-	struct and_combinator : observable<std::tuple<typename Parts::element_type...>>
+	struct and_combinator
 	{
+		using element_type = std::tuple<typename Parts::element_type...>;
 		typedef std::tuple<Parts...> parts_tuple;
-		typedef std::tuple<typename Parts::element_type...> buffer_tuple;
+		typedef element_type buffer_tuple;
 
 		template <class PartsTuple>
 		explicit and_combinator(PartsTuple &&parts)
@@ -49,7 +50,7 @@ namespace Si
 		}
 #endif
 
-		virtual void async_get_one(observer<buffer_tuple> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<buffer_tuple> &receiver)
 		{
 			assert(!this->receiver);
 			this->receiver = &receiver;
@@ -57,7 +58,7 @@ namespace Si
 			return async_get_one_impl<0, Parts...>();
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			return cancel_impl<0, Parts...>();
 		}
