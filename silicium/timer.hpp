@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_TIMER_HPP
 #define SILICIUM_REACTIVE_TIMER_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -14,7 +14,7 @@ namespace Si
 	};
 
 	template <class AsioTimer = boost::asio::steady_timer>
-	struct timer : observable<timer_elapsed>
+	struct timer
 	{
 		typedef timer_elapsed element_type;
 		typedef AsioTimer timer_impl;
@@ -27,7 +27,7 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
@@ -44,7 +44,7 @@ namespace Si
 			});
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(receiver_);
 			impl.cancel();
