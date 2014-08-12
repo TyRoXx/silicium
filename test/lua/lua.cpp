@@ -163,7 +163,7 @@ namespace Si
 	};
 
 	template <class Element, class ElementFromLua>
-	struct lua_thread : public observable<Element>
+	struct lua_thread
 	{
 		using element_type = Element;
 
@@ -172,7 +172,7 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			s->receiver = &receiver;
 			int rc;
@@ -210,7 +210,7 @@ namespace Si
 			}
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(s->receiver);
 			s.reset();
