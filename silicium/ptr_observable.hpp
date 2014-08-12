@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_PTR_OBSERVABLE_HPP
 #define SILICIUM_REACTIVE_PTR_OBSERVABLE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <silicium/virtualize.hpp>
@@ -12,7 +12,7 @@
 namespace Si
 {
 	template <class Element, class Ptr>
-	struct ptr_observable : observable<Element>
+	struct ptr_observable
 	{
 		typedef Element element_type;
 
@@ -52,13 +52,13 @@ namespace Si
 			return !content;
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(content);
 			return content->async_get_one(receiver);
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(content);
 			return content->cancel();
