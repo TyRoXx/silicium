@@ -1,8 +1,8 @@
 #ifndef SILICIUM_REACTIVE_BUFFER_HPP
 #define SILICIUM_REACTIVE_BUFFER_HPP
 
-#include <silicium/observable.hpp>
 #include <silicium/override.hpp>
+#include <silicium/observer.hpp>
 #include <boost/circular_buffer.hpp>
 #include <cassert>
 #include <cstddef>
@@ -11,8 +11,7 @@ namespace Si
 {
 	template <class Element, class Original>
 	struct buffer
-			: public observable<Element>
-			, private observer<Element>
+		: private observer<Element>
 	{
 		typedef Element element_type;
 
@@ -46,7 +45,7 @@ namespace Si
 		buffer &operator = (buffer &&) = default;
 #endif
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!this->receiver);
 			this->receiver = &receiver;
@@ -60,7 +59,7 @@ namespace Si
 			}
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(receiver);
 			assert(fetching);
