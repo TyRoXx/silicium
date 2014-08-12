@@ -3,6 +3,7 @@
 
 #include <silicium/observable.hpp>
 #include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <silicium/virtualize.hpp>
 #include <boost/config.hpp>
 #include <memory>
@@ -92,6 +93,18 @@ namespace Si
 		typedef typename Observable::element_type element_type;
 		typedef std::shared_ptr<Observable> ptr_type;
 		return ptr_observable<element_type, ptr_type>(std::make_shared<Observable>(std::forward<Args>(args)...));
+	}
+
+	template <class Input>
+	auto erase_unique(Input &&input)
+	{
+		using clean_input = typename std::decay<Input>::type;
+		using element_type = typename clean_input::element_type;
+		return Si::unique_observable<element_type>(
+					Si::make_unique<Si::virtualized_observable<clean_input>>(
+						std::forward<Input>(input)
+					)
+				);
 	}
 
 	template <class Input>
