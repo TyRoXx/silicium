@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_FINITE_STATE_MACHINE_HPP
 #define SILICIUM_REACTIVE_FINITE_STATE_MACHINE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/override.hpp>
 #include <cassert>
 #include <boost/optional.hpp>
@@ -10,8 +10,7 @@ namespace Si
 {
 	template <class In, class State, class Step>
 	struct finite_state_machine
-			: public observable<State>
-			, private observer<typename In::element_type>
+		: private observer<typename In::element_type>
 	{
 		typedef State element_type;
 
@@ -48,14 +47,14 @@ namespace Si
 		finite_state_machine &operator = (finite_state_machine &&) = default;
 #endif
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
 			in.async_get_one(*this);
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			//TODO
 		}
