@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_TRANSFORM_HPP
 #define SILICIUM_REACTIVE_TRANSFORM_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/override.hpp>
 #include <type_traits>
@@ -13,8 +13,7 @@ namespace Si
 {
 	template <class Transform, class Original>
 	struct transformation
-			: public observable<typename std::result_of<Transform (typename Original::element_type)>::type>
-			, private observer<typename Original::element_type>
+		: private observer<typename Original::element_type>
 	{
 		typedef typename std::result_of<Transform (typename Original::element_type)>::type element_type;
 		typedef typename Original::element_type from_type;
@@ -50,14 +49,14 @@ namespace Si
 		transformation &operator = (transformation &&other) = default;
 #endif
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!this->receiver);
 			this->receiver = &receiver;
 			original.async_get_one(*this);
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			return original.cancel();
 		}

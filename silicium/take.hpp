@@ -24,16 +24,16 @@ namespace Si
 		}
 	};
 
-	template <class Element>
-	boost::optional<Element> get_immediate(observable<Element> &from)
+	template <class Observable, class Element = typename Observable::element_type>
+	boost::optional<Element> get_immediate(Observable &from)
 	{
 		optional_observer<Element> current;
 		from.async_get_one(current);
 		return std::move(current.element);
 	}
 
-	template <class Element>
-	std::vector<Element> take(observable<Element> &from, std::size_t count)
+	template <class Observable, class Element = typename Observable::element_type>
+	std::vector<Element> take(Observable &from, std::size_t count)
 	{
 		std::vector<Element> taken;
 		for (std::size_t i = 0; i < count; ++i)
