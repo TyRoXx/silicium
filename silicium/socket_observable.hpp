@@ -3,7 +3,7 @@
 
 #include <silicium/fast_variant.hpp>
 #include <silicium/override.hpp>
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <boost/config.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -28,7 +28,7 @@ namespace Si
 
 	typedef Si::fast_variant<incoming_bytes, boost::system::error_code> received_from_socket;
 
-	struct socket_observable : observable<received_from_socket>
+	struct socket_observable
 	{
 		typedef received_from_socket element_type;
 		typedef boost::iterator_range<char *> buffer_type;
@@ -40,7 +40,7 @@ namespace Si
 			assert(!buffer.empty());
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
@@ -63,7 +63,7 @@ namespace Si
 			});
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(receiver_);
 			socket->cancel();
