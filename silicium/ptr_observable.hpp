@@ -3,6 +3,7 @@
 
 #include <silicium/observable.hpp>
 #include <silicium/override.hpp>
+#include <silicium/virtualize.hpp>
 #include <boost/config.hpp>
 #include <memory>
 #include <cassert>
@@ -80,9 +81,9 @@ namespace Si
 	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element>>>;
 
 	template <class Element, class Content>
-	auto wrap(Content &&content) -> ptr_observable<Element, std::shared_ptr<observable<Element>>>
+	auto wrap(Content &&content) -> ptr_observable<Element, std::shared_ptr<typename std::decay<Content>::type>>
 	{
-		return ptr_observable<Element, std::shared_ptr<observable<Element>>>(std::make_shared<typename std::decay<Content>::type>(std::forward<Content>(content)));
+		return ptr_observable<Element, std::shared_ptr<typename std::decay<Content>::type>>(std::make_shared<typename std::decay<Content>::type>(std::forward<Content>(content)));
 	}
 
 	template <class Observable, class ...Args>
@@ -91,6 +92,18 @@ namespace Si
 		typedef typename Observable::element_type element_type;
 		typedef std::shared_ptr<Observable> ptr_type;
 		return ptr_observable<element_type, ptr_type>(std::make_shared<Observable>(std::forward<Args>(args)...));
+	}
+
+	template <class Input>
+	auto erase_shared(Input &&input)
+	{
+		using clean_input = typename std::decay<Input>::type;
+		using element_type = typename clean_input::element_type;
+		return Si::shared_observable<element_type>(
+					std::make_shared<Si::virtualized_observable<clean_input>>(
+						std::forward<Input>(input)
+					)
+				);
 	}
 }
 

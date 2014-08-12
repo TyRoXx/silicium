@@ -99,9 +99,8 @@ namespace Si
 
 	template <class Element>
 	struct coroutine_observable
-			: public Si::observable<Element>
-			, private Si::observer<nothing>
-			, public boost::static_visitor<> //TODO make private
+		: private Si::observer<nothing>
+		, public boost::static_visitor<> //TODO make private
 	{
 		typedef Element element_type;
 
@@ -139,13 +138,13 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(Si::observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(Si::observer<element_type> &receiver)
 		{
 			receiver_ = &receiver;
 			next();
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			throw std::logic_error("not implemented");
 		}

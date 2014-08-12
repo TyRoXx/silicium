@@ -5,6 +5,7 @@
 #include <silicium/tcp_acceptor.hpp>
 #include <silicium/coroutine.hpp>
 #include <silicium/http/http.hpp>
+#include <silicium/virtualize.hpp>
 #include <silicium/total_consumer.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
@@ -200,10 +201,10 @@ namespace
 					}
 					++visitor_count;
 					auto context = Si::visit<events>(*result,
-						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client)
+						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client) -> events
 					{
 						auto visitor_number_ = visitor_count;
-						auto client_handler = Si::wrap<Si::nothing>(Si::make_coroutine<Si::nothing>([client, visitor_number_](Si::yield_context<Si::nothing> &yield) -> void
+						auto client_handler = Si::erase_shared(Si::make_coroutine<Si::nothing>([client, visitor_number_](Si::yield_context<Si::nothing> &yield) -> void
 						{
 							coroutine_socket coro_socket(*client, yield);
 							return serve_client(coro_socket, visitor_number_);
