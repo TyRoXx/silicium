@@ -67,7 +67,7 @@ namespace Si
 		//TODO: save the memory for the function pointer
 		conditional_transformer<
 			file_notification,
-			enumerator<reference<std::vector<linux::file_notification>>>,
+			enumerator<ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
 			boost::optional<file_notification>(*)(linux::file_notification &&)
 		> impl;
 		linux::watch_descriptor root;

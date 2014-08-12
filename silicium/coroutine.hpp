@@ -78,8 +78,8 @@ namespace Si
 			(*consumer)(detail::result<Element>{std::move(result)});
 		}
 
-		template <class Gotten>
-		boost::optional<Gotten> get_one(Si::observable<Gotten> &from)
+		template <class Observable, class Gotten = typename Observable::element_type>
+		boost::optional<Gotten> get_one(Observable &from)
 		{
 			boost::optional<Gotten> result;
 			auto tf = Si::transform(Si::ref(from), [&result](Gotten element)

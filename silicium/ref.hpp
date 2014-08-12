@@ -5,13 +5,10 @@
 
 namespace Si
 {
-	template <class Element>
-	using reference = ptr_observable<Element, observable<Element> *>;
-
-	template <class Element>
-	auto ref(observable<Element> &identity) -> reference<Element>
+	template <class Observable, class Element = typename Observable::element_type>
+	auto ref(Observable &identity) -> ptr_observable<Element, Observable *>
 	{
-		return reference<Element>(&identity);
+		return ptr_observable<Element, Observable *>(&identity);
 	}
 }
 
