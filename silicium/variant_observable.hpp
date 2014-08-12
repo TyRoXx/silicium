@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_VARIANT_OBSERVABLE_HPP
 #define SILICIUM_REACTIVE_VARIANT_OBSERVABLE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/integer_sequence.hpp>
@@ -14,7 +14,7 @@ namespace Si
 
 #if SILICIUM_RX_VARIANT_AVAILABLE
 	template <template <class ...T> class variant, class ...Parts>
-	struct variant_observable : public Si::observable<variant<typename Parts::element_type...>>
+	struct variant_observable
 	{
 		typedef variant<typename Parts::element_type...> element_type;
 
@@ -24,14 +24,14 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(Si::observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(Si::observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
 			return async_get_one_impl<0, Parts...>();
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(receiver_);
 			cancel_impl<0, sizeof...(Parts)>();
