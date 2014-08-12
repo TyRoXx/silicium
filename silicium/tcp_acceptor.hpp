@@ -18,26 +18,31 @@ namespace Si
 	{
 		typedef tcp_acceptor_result element_type;
 
+		tcp_acceptor()
+		{
+		}
+
 		explicit tcp_acceptor(boost::asio::ip::tcp::acceptor &underlying)
-			: underlying(underlying)
+			: underlying(&underlying)
 		{
 		}
 
 		~tcp_acceptor()
 		{
-			if (!receiver_)
+			if (!receiver_ || !underlying)
 			{
 				return;
 			}
-			underlying.cancel();
+			underlying->cancel();
 		}
 
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			assert(!receiver_);
-			next_client = std::make_shared<boost::asio::ip::tcp::socket>(underlying.get_io_service());
+			assert(underlying);
+			next_client = std::make_shared<boost::asio::ip::tcp::socket>(underlying->get_io_service());
 			receiver_ = &receiver;
-			underlying.async_accept(*next_client, [this](boost::system::error_code error)
+			underlying->async_accept(*next_client, [this](boost::system::error_code error)
 			{
 				if (!this->receiver_)
 				{
@@ -63,13 +68,14 @@ namespace Si
 		virtual void cancel() SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
-			underlying.cancel();
+			assert(underlying);
+			underlying->cancel();
 			receiver_ = nullptr;
 		}
 
 	private:
 
-		boost::asio::ip::tcp::acceptor &underlying;
+		boost::asio::ip::tcp::acceptor *underlying = nullptr;
 		std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
 		observer<element_type> *receiver_ = nullptr;
 	};
