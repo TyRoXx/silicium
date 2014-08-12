@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_FLATTEN_HPP
 #define SILICIUM_REACTIVE_FLATTEN_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
@@ -15,8 +15,7 @@ namespace Si
 {
 	template <class NothingObservableObservable, class Mutex>
 	struct flattener
-			: public observable<nothing>
-			, private observer<typename NothingObservableObservable::element_type>
+		: private observer<typename NothingObservableObservable::element_type>
 	{
 		typedef nothing element_type;
 
@@ -47,14 +46,14 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
 			fetch();
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			throw std::logic_error("to do");
 		}

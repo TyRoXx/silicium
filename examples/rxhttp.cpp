@@ -189,7 +189,7 @@ namespace
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
 			, clients(acceptor)
-			, all_work(Si::make_total_consumer(Si::box<Si::nothing>(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
+			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
 				for (;;)
@@ -241,7 +241,7 @@ namespace
 		explicit thread_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
 			, clients(acceptor)
-			, all_work(Si::make_total_consumer(Si::box<Si::nothing>(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
+			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
 				for (;;)
