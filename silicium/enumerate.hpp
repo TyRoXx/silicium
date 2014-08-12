@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_ENUMERATE_HPP
 #define SILICIUM_REACTIVE_ENUMERATE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/config.hpp>
 #include <silicium/override.hpp>
@@ -20,8 +20,7 @@ namespace Si
 
 	template <class RangeObservable>
 	struct enumerator
-			: public observable<typename enumerated_element<RangeObservable>::type>
-			, private observer<typename RangeObservable::element_type>
+		: private observer<typename RangeObservable::element_type>
 	{
 		typedef typename enumerated_element<RangeObservable>::type element_type;
 		typedef typename RangeObservable::element_type range_type;
@@ -55,7 +54,7 @@ namespace Si
 		enumerator &operator = (enumerator &&) = default;
 #endif
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
@@ -69,7 +68,7 @@ namespace Si
 			}
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			assert(receiver_);
 			throw std::logic_error("not implemented");
