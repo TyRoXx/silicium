@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_LINUX_INOTIFY_HPP
 #define SILICIUM_REACTIVE_LINUX_INOTIFY_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/override.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
@@ -61,7 +61,7 @@ namespace Si
 			int watch = -1;
 		};
 
-		struct inotify_observable : observable<std::vector<file_notification>>, boost::noncopyable
+		struct inotify_observable : private boost::noncopyable
 		{
 			typedef std::vector<file_notification> element_type;
 
@@ -69,8 +69,8 @@ namespace Si
 			explicit inotify_observable(boost::asio::io_service &io);
 			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask);
 			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask, boost::system::error_code &ec);
-			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE;
-			virtual void cancel() SILICIUM_OVERRIDE;
+			void async_get_one(observer<element_type> &receiver);
+			void cancel();
 
 		private:
 
