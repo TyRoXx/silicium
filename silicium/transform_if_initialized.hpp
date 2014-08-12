@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_TRANSFORM_IF_INITIALIZED_HPP
 #define SILICIUM_REACTIVE_TRANSFORM_IF_INITIALIZED_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>
@@ -12,8 +12,7 @@ namespace Si
 {
 	template <class Element, class Input, class Transformation>
 	struct conditional_transformer
-		: public observable<Element>
-		, private observer<typename Input::element_type>
+		: private observer<typename Input::element_type>
 	{
 		typedef Element element_type;
 
@@ -44,14 +43,14 @@ namespace Si
 		}
 #endif
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
 			fetch();
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			throw std::logic_error("to do");
 		}
