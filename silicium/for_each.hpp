@@ -17,7 +17,7 @@ namespace Si
 		typedef typename std::decay<Input>::type::element_type element;
 		return make_total_consumer(
 #ifdef _MSC_VER
-			box<nothing>
+			erase_unique
 #endif
 			(transform(std::forward<Input>(input), [handle_element](element value) -> nothing
 		{

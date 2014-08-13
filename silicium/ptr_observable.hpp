@@ -96,7 +96,7 @@ namespace Si
 	}
 
 	template <class Input>
-	auto erase_unique(Input &&input)
+	auto erase_unique(Input &&input) -> Si::unique_observable<typename std::decay<Input>::type::element_type>
 	{
 		using clean_input = typename std::decay<Input>::type;
 		using element_type = typename clean_input::element_type;
@@ -108,7 +108,7 @@ namespace Si
 	}
 
 	template <class Input>
-	auto erase_shared(Input &&input)
+	auto erase_shared(Input &&input) -> Si::shared_observable<typename std::decay<Input>::type::element_type>
 	{
 		using clean_input = typename std::decay<Input>::type;
 		using element_type = typename clean_input::element_type;

@@ -21,6 +21,19 @@ namespace Si
 		{
 		}
 
+#ifdef _MSC_VER
+		virtualized_observable(virtualized_observable &&other)
+			: next(std::move(other.next))
+		{
+		}
+
+		virtualized_observable &operator = (virtualized_observable &&other)
+		{
+			next = std::move(other.next);
+			return *this;
+		}
+#endif
+
 		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
 		{
 			return next.async_get_one(receiver);
