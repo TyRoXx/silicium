@@ -12,7 +12,6 @@
 #include <silicium/take.hpp>
 #include <silicium/enumerate.hpp>
 #include <silicium/cache.hpp>
-#include <silicium/connector.hpp>
 #include <silicium/deref_optional.hpp>
 #include <boost/container/string.hpp>
 #include <boost/test/unit_test.hpp>
