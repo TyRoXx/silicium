@@ -55,6 +55,12 @@ namespace Si
 				return *this;
 			}
 
+			void release() BOOST_NOEXCEPT
+			{
+				notifier = -1;
+				watch = -1;
+			}
+
 		private:
 
 			int notifier = -1;
