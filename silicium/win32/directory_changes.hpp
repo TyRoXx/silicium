@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_DIRECTORY_CHANGES_HPP
 
 #include <boost/asio/io_service.hpp>
-#include <silicium/observable.hpp>
+#include <silicium/observer.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/override.hpp>
 #include <boost/filesystem/path.hpp>
@@ -30,7 +30,7 @@ namespace Si
 			}
 		};
 
-		struct directory_changes : observable<std::vector<file_notification>>
+		struct directory_changes
 		{
 			using element_type = std::vector<file_notification>;
 
@@ -38,8 +38,8 @@ namespace Si
 			directory_changes(directory_changes &&other);
 			explicit directory_changes(boost::filesystem::path const &watched, bool is_recursive);
 			directory_changes &operator = (directory_changes &&other);
-			virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE;
-			virtual void cancel() SILICIUM_OVERRIDE;
+			void async_get_one(observer<element_type> &receiver);
+			void cancel();
 
 		private:
 
