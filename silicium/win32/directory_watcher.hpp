@@ -37,7 +37,7 @@ namespace Si
 		}
 	}
 
-	struct directory_watcher : observable<file_notification>
+	struct directory_watcher
 	{
 		typedef file_notification element_type;
 
@@ -51,12 +51,12 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			return impl.async_get_one(receiver);
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			return impl.cancel();
 		}
