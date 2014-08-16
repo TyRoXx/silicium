@@ -17,11 +17,7 @@ namespace Si
 
 			explicit basic_dynamic_library(boost::filesystem::path const &file)
 			{
-				boost::system::error_code const ec = open(file);
-				if (ec)
-				{
-					boost::throw_exception(boost::system::system_error(ec));
-				}
+				open(file);
 			}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
@@ -43,15 +39,23 @@ namespace Si
 			{
 			}
 
-			boost::system::error_code open(boost::filesystem::path const &file)
+			void open(boost::filesystem::path const &file, boost::system::error_code &ec)
 			{
-				boost::system::error_code ec;
 				std::unique_ptr<void, deleter> new_handle(DynamicLibraryImpl::open(file, ec));
 				if (!ec)
 				{
 					handle = std::move(new_handle);
 				}
-				return ec;
+			}
+
+			void open(boost::filesystem::path const &file)
+			{
+				boost::system::error_code ec;
+				open(file, ec);
+				if (ec)
+				{
+					boost::throw_exception(boost::system::system_error(ec));
+				}
 			}
 
 			void *find_symbol(std::string const &name) const
