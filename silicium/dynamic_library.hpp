@@ -16,6 +16,8 @@ namespace Si
 		win32::dynamic_library_impl
 #endif
 	>;
+
+	BOOST_STATIC_ASSERT(sizeof(dynamic_library) == sizeof(void *));
 }
 
 #endif
