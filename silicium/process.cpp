@@ -11,7 +11,7 @@
 #include <memory>
 
 #ifdef __linux__
-#	include <unistd.h>
+#	include <silicium/linux/file_descriptor.hpp>
 #	include <fcntl.h>
 #	include <sys/wait.h>
 #endif
@@ -30,24 +30,6 @@ namespace Si
 	{
 		namespace
 		{
-			void terminating_close(int file) BOOST_NOEXCEPT
-			{
-				if (close(file) < 0)
-				{
-					//it is intended that this will terminate the process because of noexcept
-					throw boost::system::system_error(errno, boost::system::system_category());
-				}
-			}
-
-			struct file_closer
-			{
-				void operator()(int *file) const noexcept
-				{
-					assert(file);
-					terminating_close(*file);
-				}
-			};
-
 			void copy_all(int source, sink<char> &destination)
 			{
 				for (;;)
@@ -73,55 +55,9 @@ namespace Si
 				fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
 			}
 
-			struct file_descriptor : private boost::noncopyable
-			{
-				int handle;
-
-				file_descriptor() BOOST_NOEXCEPT
-					: handle(-1)
-				{
-				}
-
-				file_descriptor(file_descriptor &&other) BOOST_NOEXCEPT
-					: handle(-1)
-				{
-					swap(other);
-				}
-
-				explicit file_descriptor(int handle) BOOST_NOEXCEPT
-					: handle(handle)
-				{
-				}
-
-				file_descriptor &operator = (file_descriptor &&other) BOOST_NOEXCEPT
-				{
-					swap(other);
-					return *this;
-				}
-
-				void swap(file_descriptor &other) BOOST_NOEXCEPT
-				{
-					using std::swap;
-					swap(handle, other.handle);
-				}
-
-				void close() BOOST_NOEXCEPT
-				{
-					file_descriptor().swap(*this);
-				}
-
-				~file_descriptor() BOOST_NOEXCEPT
-				{
-					if (handle >= 0)
-					{
-						terminating_close(handle);
-					}
-				}
-			};
-
 			struct pipe
 			{
-				file_descriptor write, read;
+				linux::file_descriptor write, read;
 
 				void close() BOOST_NOEXCEPT
 				{
@@ -143,8 +79,8 @@ namespace Si
 					throw boost::system::system_error(errno, boost::system::system_category());
 				}
 				pipe result;
-				result.read  = file_descriptor(fds[0]);
-				result.write = file_descriptor(fds[1]);
+				result.read  = linux::file_descriptor(fds[0]);
+				result.write = linux::file_descriptor(fds[1]);
 				return result;
 			}
 		}

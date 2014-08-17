@@ -452,6 +452,7 @@ namespace Si
 
 		virtual boost::iterator_range<To const *> map_next(std::size_t size) override
 		{
+			(void)size;
 			return {};
 		}
 
