@@ -26,6 +26,10 @@ BOOST_AUTO_TEST_CASE(dynamic_library_find_symbol)
 	BOOST_REQUIRE(!lib.empty());
 	void *sin_ = lib.find_symbol("sin");
 	BOOST_REQUIRE(sin_);
+#ifdef __GNUC__
+	//silence Warnung: ISO C++ forbids casting between pointer-to-function and pointer-to-object [enabled by default]
+	__extension__
+#endif
 	auto const sin_callable = reinterpret_cast<double (*)(double)>(sin_);
 	BOOST_CHECK_EQUAL(0, sin_callable(0));
 }
