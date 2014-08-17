@@ -12,6 +12,7 @@
 #include <silicium/take.hpp>
 #include <silicium/enumerate.hpp>
 #include <silicium/cache.hpp>
+#include <silicium/empty.hpp>
 #include <silicium/deref_optional.hpp>
 #include <boost/container/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -20,23 +21,6 @@
 #include <boost/thread.hpp>
 #include <unordered_map>
 #include <future>
-
-namespace Si
-{
-	template <class Element>
-	struct empty : observable<Element>
-	{
-		virtual void async_get_one(observer<Element> &receiver) SILICIUM_OVERRIDE
-		{
-			return receiver.ended();
-		}
-
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-			throw std::logic_error("empty observable cannot be cancelled");
-		}
-	};
-}
 
 namespace Si
 {
