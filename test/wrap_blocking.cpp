@@ -21,6 +21,21 @@ namespace Si
 		{
 		}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		blocking_observable(blocking_observable &&other)
+			: act(std::move(other.act))
+			, done(std::move(other.done))
+		{
+		}
+
+		blocking_observable &operator = (blocking_observable &&other)
+		{
+			act = std::move(other.act);
+			done = std::move(other.done);
+			return *this;
+		}
+#endif
+
 		void async_get_one(observer<element_type> &receiver)
 		{
 			done = boost::async(boost::launch::async, [this, &receiver]()
@@ -52,7 +67,7 @@ namespace Si
 	};
 
 	template <class Action>
-	auto wrap_blocking(Action &&act)
+	auto wrap_blocking(Action &&act) -> blocking_observable<typename std::decay<Action>::type>
 	{
 		return blocking_observable<typename std::decay<Action>::type>(act);
 	}

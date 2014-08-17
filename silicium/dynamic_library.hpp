@@ -7,6 +7,10 @@
 #	include <silicium/linux/dynamic_library_impl.hpp>
 #endif
 
+#ifdef _WIN32
+#	include <silicium/win32/dynamic_library_impl.hpp>
+#endif
+
 namespace Si
 {
 	using dynamic_library = detail::basic_dynamic_library<
