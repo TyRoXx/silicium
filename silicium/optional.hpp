@@ -107,6 +107,18 @@ namespace Si
 		}
 #endif
 
+		T *operator -> () BOOST_NOEXCEPT
+		{
+			assert(*this);
+			return try_get_ptr<T>(content);
+		}
+
+		T const *operator -> () const BOOST_NOEXCEPT
+		{
+			assert(*this);
+			return try_get_ptr<T>(content);
+		}
+
 	private:
 
 		fast_variant<none_t, T> content;
