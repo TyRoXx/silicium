@@ -408,13 +408,13 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 	BOOST_CHECK_EQUAL(1U, elapsed_count);
 }
 
-#if 0 //TODO: make the following test finish (currently it sometimes will block forever in wait())
+#if 1 //TODO: make the following test finish (currently it sometimes will block forever in wait())
 
 typedef boost::mpl::list<Si::std_threading, Si::boost_threading> threading_apis;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(reactive_async, ThreadingAPI, threading_apis)
 {
-	auto a = Si::async<int, Si::std_threading>([](Si::yield_context_2<int> &yield)
+	auto a = Si::async<int, ThreadingAPI>([](Si::yield_context_2<int> &yield)
 	{
 		yield.push_result(1);
 		yield.push_result(2);
