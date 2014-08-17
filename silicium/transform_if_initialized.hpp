@@ -26,7 +26,10 @@ namespace Si
 		{
 		}
 
-#if !SILICIUM_COMPILER_GENERATES_MOVES
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		conditional_transformer(conditional_transformer &&) = default;
+		conditional_transformer &operator = (conditional_transformer &&) = default;
+#else
 		conditional_transformer(conditional_transformer &&other)
 			: original(std::move(other.original))
 			, transform(std::move(other.transform))
