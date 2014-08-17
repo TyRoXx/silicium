@@ -414,7 +414,7 @@ typedef boost::mpl::list<Si::std_threading, Si::boost_threading> threading_apis;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(reactive_async, ThreadingAPI, threading_apis)
 {
-	auto a = Si::async<int, ThreadingAPI>([](Si::yield_context_2<int> &yield)
+	auto a = Si::make_thread<int, ThreadingAPI>([](Si::yield_context_2<int> &yield)
 	{
 		yield.push_result(1);
 		yield.push_result(2);

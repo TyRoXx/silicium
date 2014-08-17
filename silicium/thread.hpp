@@ -19,16 +19,16 @@ namespace Si
 	};
 
 	template <class Element, class ThreadingAPI>
-	struct async_observable : public observable<Element>
+	struct thread_observable : public observable<Element>
 	{
 		typedef Element element_type;
 
-		async_observable()
+		thread_observable()
 		{
 		}
 
 		template <class Action>
-		explicit async_observable(Action &&action)
+		explicit thread_observable(Action &&action)
 			: state(make_unique<movable_state>(std::forward<Action>(action)))
 		{
 		}
@@ -137,9 +137,9 @@ namespace Si
 	};
 
 	template <class Element, class ThreadingAPI, class Action>
-	auto async(Action &&action) -> async_observable<Element, ThreadingAPI>
+	auto make_thread(Action &&action) -> thread_observable<Element, ThreadingAPI>
 	{
-		return async_observable<Element, ThreadingAPI>(std::forward<Action>(action));
+		return thread_observable<Element, ThreadingAPI>(std::forward<Action>(action));
 	}
 }
 
