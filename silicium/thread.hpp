@@ -19,7 +19,7 @@ namespace Si
 	};
 
 	template <class Element, class ThreadingAPI>
-	struct thread_observable : public observable<Element>
+	struct thread_observable
 	{
 		typedef Element element_type;
 
@@ -39,7 +39,7 @@ namespace Si
 			state->thread.get();
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(state);
 			typename ThreadingAPI::unique_lock lock(state->result_mutex);
@@ -60,7 +60,7 @@ namespace Si
 			Si::exchange(state->receiver_, nullptr)->got_element(std::move(ready_result));
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
+		void cancel()
 		{
 			throw std::logic_error("to do");
 		}
