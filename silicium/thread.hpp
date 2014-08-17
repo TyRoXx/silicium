@@ -3,8 +3,11 @@
 
 #include <silicium/observer.hpp>
 #include <silicium/override.hpp>
+#include <silicium/config.hpp>
+#include <silicium/exchange.hpp>
 #include <future>
 #include <boost/thread/future.hpp>
+#include <boost/optional.hpp>
 
 namespace Si
 {
