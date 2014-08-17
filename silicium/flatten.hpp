@@ -13,11 +13,12 @@
 
 namespace Si
 {
-	template <class NothingObservableObservable, class Mutex>
+	template <class ObservableObservable, class Mutex>
 	struct flattener
-		: private observer<typename NothingObservableObservable::element_type>
+		: private observer<typename ObservableObservable::element_type>
 	{
-		typedef nothing element_type;
+		typedef typename ObservableObservable::element_type sub_observable;
+		typedef typename sub_observable::element_type element_type;
 
 		flattener()
 		{
@@ -40,7 +41,7 @@ namespace Si
 		}
 #endif
 
-		explicit flattener(NothingObservableObservable input)
+		explicit flattener(ObservableObservable input)
 			: input(std::move(input))
 			, children_mutex(make_unique<Mutex>())
 		{
@@ -50,7 +51,11 @@ namespace Si
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
-			fetch();
+			if (!is_fetching)
+			{
+				is_fetching = true;
+				fetch();
+			}
 		}
 
 		void cancel()
@@ -60,16 +65,14 @@ namespace Si
 
 	private:
 
-		typedef typename NothingObservableObservable::element_type nothing_observable;
-
 		struct child
-			: private observer<nothing>
+			: private observer<element_type>
 			, private boost::noncopyable
 		{
 			flattener &parent;
-			nothing_observable observed;
+			sub_observable observed;
 
-			explicit child(flattener &parent, nothing_observable observed)
+			explicit child(flattener &parent, sub_observable observed)
 				: parent(parent)
 				, observed(std::move(observed))
 			{
@@ -80,8 +83,10 @@ namespace Si
 				observed.async_get_one(*this);
 			}
 
-			virtual void got_element(nothing) SILICIUM_OVERRIDE
+			virtual void got_element(element_type value) SILICIUM_OVERRIDE
 			{
+				Si::exchange(parent.receiver_, nullptr)->got_element(std::move(value));
+				//TODO: fix the race condition between got_element and async_get_one
 				return start();
 			}
 
@@ -91,14 +96,16 @@ namespace Si
 			}
 		};
 
-		NothingObservableObservable input;
+		ObservableObservable input;
 		bool input_ended = false;
-		observer<nothing> *receiver_ = nullptr;
+		observer<element_type> *receiver_ = nullptr;
 		std::unordered_map<child *, std::unique_ptr<child>> children;
 		std::unique_ptr<Mutex> children_mutex;
+		bool is_fetching = false;
 
 		void fetch()
 		{
+			assert(is_fetching);
 			return input.async_get_one(*this);
 		}
 
@@ -114,7 +121,7 @@ namespace Si
 			}
 		}
 
-		virtual void got_element(nothing_observable value) SILICIUM_OVERRIDE
+		virtual void got_element(sub_observable value) SILICIUM_OVERRIDE
 		{
 			{
 				boost::unique_lock<Mutex> lock(*children_mutex);
@@ -138,10 +145,10 @@ namespace Si
 		}
 	};
 
-	template <class Mutex, class NothingObservableObservable>
-	auto flatten(NothingObservableObservable &&input) -> flattener<typename std::decay<NothingObservableObservable>::type, Mutex>
+	template <class Mutex, class ObservableObservable>
+	auto flatten(ObservableObservable &&input) -> flattener<typename std::decay<ObservableObservable>::type, Mutex>
 	{
-		return flattener<typename std::decay<NothingObservableObservable>::type, Mutex>(std::forward<NothingObservableObservable>(input));
+		return flattener<typename std::decay<ObservableObservable>::type, Mutex>(std::forward<ObservableObservable>(input));
 	}
 }
 
