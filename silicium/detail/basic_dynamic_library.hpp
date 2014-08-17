@@ -63,17 +63,26 @@ namespace Si
 				return DynamicLibraryImpl::find_symbol(handle.get(), name);
 			}
 
+			bool empty() const BOOST_NOEXCEPT
+			{
+				return !handle;
+			}
+
 		private:
 
 			struct deleter
 			{
 				void operator()(void *handle) const BOOST_NOEXCEPT
 				{
+					assert(handle);
 					DynamicLibraryImpl::close(handle);
 				}
 			};
 
 			std::unique_ptr<void, deleter> handle;
+
+			BOOST_DELETED_FUNCTION(basic_dynamic_library(basic_dynamic_library const &))
+			BOOST_DELETED_FUNCTION(basic_dynamic_library &operator = (basic_dynamic_library const &))
 		};
 	}
 }

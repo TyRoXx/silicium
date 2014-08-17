@@ -1,16 +1,37 @@
 #include <silicium/dynamic_library.hpp>
 #include <boost/test/unit_test.hpp>
 
+namespace
+{
+	Si::dynamic_library load_libm()
+	{
+		return Si::dynamic_library("libm.so");
+	}
+
+	Si::dynamic_library load_some_library()
+	{
+		return load_libm();
+	}
+}
+
 BOOST_AUTO_TEST_CASE(dynamic_library_find_symbol)
 {
-	Si::dynamic_library lib("libc.so");
-	void *malloc_ = lib.find_symbol("malloc");
-	BOOST_REQUIRE(malloc_);
-	void *free_ = lib.find_symbol("free");
-	BOOST_REQUIRE(free_);
-	std::size_t const size = 10000;
-	char * const allocated = static_cast<char *>(((void *(*)(std::size_t))malloc_)(size));
-	BOOST_REQUIRE(allocated);
-	std::fill(allocated, allocated + size, '-');
-	((void (*)(void *))free_)(allocated);
+	Si::dynamic_library lib = load_libm();
+	BOOST_REQUIRE(!lib.empty());
+	void *sin_ = lib.find_symbol("sin");
+	BOOST_REQUIRE(sin_);
+	auto const sin_callable = reinterpret_cast<double (*)(double)>(sin_);
+	BOOST_CHECK_EQUAL(0, sin_callable(0));
+}
+
+BOOST_AUTO_TEST_CASE(dynamic_library_move)
+{
+	Si::dynamic_library lib = load_some_library();
+	BOOST_CHECK(!lib.empty());
+	Si::dynamic_library moved = std::move(lib);
+	BOOST_CHECK(lib.empty());
+	BOOST_CHECK(!moved.empty());
+	lib = std::move(moved);
+	BOOST_CHECK(!lib.empty());
+	BOOST_CHECK(moved.empty());
 }
