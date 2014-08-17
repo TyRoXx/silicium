@@ -35,10 +35,4 @@ namespace Si
 	}
 }
 
-namespace Si
-{
-	using Si::nothing;
-	using Si::make_unique;
-}
-
 #endif
