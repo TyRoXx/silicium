@@ -29,27 +29,14 @@ namespace Si
 			}
 		}
 
-		watch_descriptor inotify_observable::watch(boost::filesystem::path const &target, boost::uint32_t mask)
-		{
-			boost::system::error_code error;
-			auto result = watch(target, mask, error);
-			if (error)
-			{
-				boost::throw_exception(boost::system::system_error(error));
-			}
-			return result;
-		}
-
-		watch_descriptor inotify_observable::watch(boost::filesystem::path const &target, boost::uint32_t mask, boost::system::error_code &ec)
+		error_or<watch_descriptor> inotify_observable::watch(boost::filesystem::path const &target, boost::uint32_t mask)
 		{
 			assert(notifier);
 			int const wd = inotify_add_watch(notifier->native_handle(), target.string().c_str(), mask);
 			if (wd < 0)
 			{
-				ec = boost::system::error_code(errno, boost::system::posix_category);
-				return watch_descriptor();
+				return boost::system::error_code(errno, boost::system::posix_category);
 			}
-			ec = boost::system::error_code();
 			return watch_descriptor(notifier->native_handle(), wd);
 		}
 

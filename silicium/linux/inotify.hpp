@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_LINUX_INOTIFY_HPP
 
 #include <silicium/observer.hpp>
+#include <silicium/error_or.hpp>
 #include <silicium/override.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
@@ -73,8 +74,7 @@ namespace Si
 
 			inotify_observable();
 			explicit inotify_observable(boost::asio::io_service &io);
-			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask);
-			watch_descriptor watch(boost::filesystem::path const &target, boost::uint32_t mask, boost::system::error_code &ec);
+			error_or<watch_descriptor> watch(boost::filesystem::path const &target, boost::uint32_t mask);
 			void async_get_one(observer<element_type> &receiver);
 			void cancel();
 
