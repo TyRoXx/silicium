@@ -2,7 +2,7 @@
 #define SILICIUM_ERROR_OR_HPP
 
 #include <silicium/optional.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/system/system_error.hpp>
 
 namespace Si
 {
@@ -39,7 +39,7 @@ namespace Si
 						[](Error const &e) { return e; });
 		}
 
-		Value &value()
+		Value &value() &
 		{
 			return Si::visit<Value &>(
 						storage,
@@ -47,7 +47,15 @@ namespace Si
 						[](Error const &e) -> Value & { boost::throw_exception(boost::system::system_error(e)); });
 		}
 
-		Value const &value() const
+		Value &&value() &&
+		{
+			return Si::visit<Value &&>(
+						storage,
+						[](Value &value) -> Value && { return std::move(value); },
+						[](Error const &e) -> Value && { boost::throw_exception(boost::system::system_error(e)); });
+		}
+
+		Value const &value() const &
 		{
 			return Si::visit<Value const &>(
 						storage,
