@@ -3,9 +3,23 @@
 
 #include <silicium/optional.hpp>
 #include <boost/system/system_error.hpp>
+#include <system_error>
 
 namespace Si
 {
+	namespace detail
+	{
+		inline BOOST_NORETURN void throw_system_error(boost::system::error_code error)
+		{
+			boost::throw_exception(boost::system::system_error(error));
+		}
+
+		inline BOOST_NORETURN void throw_system_error(std::error_code error)
+		{
+			boost::throw_exception(std::system_error(error));
+		}
+	}
+
 	template <class Value, class Error = boost::system::error_code>
 	struct error_or
 	{
@@ -44,7 +58,7 @@ namespace Si
 			return Si::visit<Value &>(
 						storage,
 						[](Value &value) -> Value & { return value; },
-						[](Error const &e) -> Value & { boost::throw_exception(boost::system::system_error(e)); });
+						[](Error const &e) -> Value & { detail::throw_system_error(e); });
 		}
 
 		Value &&value() &&
@@ -52,7 +66,7 @@ namespace Si
 			return Si::visit<Value &&>(
 						storage,
 						[](Value &value) -> Value && { return std::move(value); },
-						[](Error const &e) -> Value && { boost::throw_exception(boost::system::system_error(e)); });
+						[](Error const &e) -> Value && { detail::throw_system_error(e); });
 		}
 
 		Value const &value() const &
@@ -60,7 +74,7 @@ namespace Si
 			return Si::visit<Value const &>(
 						storage,
 						[](Value const &value) -> Value const & { return value; },
-						[](Error const &e) -> Value const & { boost::throw_exception(boost::system::system_error(e)); });
+						[](Error const &e) -> Value const & { detail::throw_system_error(e); });
 		}
 
 	private:
