@@ -11,22 +11,9 @@ namespace Si
 {
 	namespace detail
 	{
-		struct error_stripper : boost::static_visitor<boost::optional<Si::incoming_bytes>>
-		{
-			boost::optional<Si::incoming_bytes> operator()(Si::incoming_bytes bytes) const
-			{
-				return bytes;
-			}
-
-			boost::optional<Si::incoming_bytes> operator()(boost::system::error_code) const
-			{
-				return boost::none;
-			}
-		};
-
 		boost::optional<Si::incoming_bytes> strip_error(Si::received_from_socket received)
 		{
-			return Si::apply_visitor(error_stripper{}, received);
+			return received.get_ptr() ? boost::optional<Si::incoming_bytes>(*received.get_ptr()) : boost::none;
 		}
 	}
 

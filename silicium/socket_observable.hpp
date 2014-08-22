@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_SOCKET_OBSERVABLE_HPP
 #define SILICIUM_REACTIVE_SOCKET_OBSERVABLE_HPP
 
-#include <silicium/fast_variant.hpp>
+#include <silicium/error_or.hpp>
 #include <silicium/override.hpp>
 #include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
@@ -26,7 +26,7 @@ namespace Si
 		}
 	};
 
-	typedef Si::fast_variant<incoming_bytes, boost::system::error_code> received_from_socket;
+	typedef error_or<incoming_bytes> received_from_socket;
 
 	struct socket_observable
 	{
