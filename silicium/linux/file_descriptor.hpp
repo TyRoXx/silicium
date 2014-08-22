@@ -1,6 +1,7 @@
 #ifndef SILICIUM_LINUX_FILE_DESCRIPTOR_HPP
 #define SILICIUM_LINUX_FILE_DESCRIPTOR_HPP
 
+#include <silicium/exchange.hpp>
 #include <boost/config.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
@@ -10,7 +11,11 @@ namespace Si
 {
 	namespace linux
 	{
-		inline void terminating_close(int file) BOOST_NOEXCEPT
+		using native_file_handle = int;
+
+		native_file_handle const no_file_handle = -1;
+
+		inline void terminating_close(native_file_handle file) BOOST_NOEXCEPT
 		{
 			if (close(file) < 0)
 			{
@@ -21,20 +26,18 @@ namespace Si
 
 		struct file_descriptor : private boost::noncopyable
 		{
-			int handle;
+			native_file_handle handle = no_file_handle;
 
 			file_descriptor() BOOST_NOEXCEPT
-				: handle(-1)
 			{
 			}
 
 			file_descriptor(file_descriptor &&other) BOOST_NOEXCEPT
-				: handle(-1)
 			{
 				swap(other);
 			}
 
-			explicit file_descriptor(int handle) BOOST_NOEXCEPT
+			explicit file_descriptor(native_file_handle handle) BOOST_NOEXCEPT
 				: handle(handle)
 			{
 			}
@@ -54,6 +57,11 @@ namespace Si
 			void close() BOOST_NOEXCEPT
 			{
 				file_descriptor().swap(*this);
+			}
+
+			native_file_handle release() BOOST_NOEXCEPT
+			{
+				return Si::exchange(handle, no_file_handle);
 			}
 
 			~file_descriptor() BOOST_NOEXCEPT
