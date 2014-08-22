@@ -9,7 +9,6 @@
 #include <silicium/ptr_observable.hpp>
 #include <silicium/transform.hpp>
 #include <silicium/bridge.hpp>
-#include <silicium/take.hpp>
 #include <silicium/enumerate.hpp>
 #include <silicium/cache.hpp>
 #include <silicium/empty.hpp>
@@ -28,18 +27,6 @@
 namespace Si
 {
 #if SILICIUM_RX_TUPLE_AVAILABLE
-	BOOST_AUTO_TEST_CASE(reactive_take)
-	{
-		auto zeros = Si::generate([]{ return 0; });
-		auto ones  = Si::generate([]{ return 1; });
-		auto both = Si::make_tuple(zeros, ones);
-		std::vector<std::tuple<int, int>> const expected(4, std::make_tuple(0, 1));
-		std::vector<std::tuple<int, int>> const generated = Si::take(both, expected.size());
-		BOOST_CHECK(expected == generated);
-	}
-#endif
-
-#if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_transform)
 	{
 		auto twos = Si::generate([]{ return 2; });
@@ -49,8 +36,13 @@ namespace Si
 		{
 			return std::get<0>(element) + std::get<1>(element);
 		});
-		std::vector<int> const expected(4, 3);
-		std::vector<int> const generated = Si::take(added, expected.size());
+		std::vector<int> generated;
+		auto consumer = Si::consume<int>([&generated](int element)
+		{
+			generated.emplace_back(element);
+		});
+		added.async_get_one(consumer);
+		std::vector<int> const expected(1, 3);
 		BOOST_CHECK(expected == generated);
 	}
 #endif
@@ -207,7 +199,6 @@ namespace Si
 		};
 
 		BOOST_CHECK(expected == produced);
-		BOOST_CHECK(!Si::get_immediate(variants));
 	}
 #endif
 
