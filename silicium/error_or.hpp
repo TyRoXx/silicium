@@ -77,6 +77,22 @@ namespace Si
 						[](Error const &e) -> Value const & { detail::throw_system_error(e); });
 		}
 
+		Value *get_ptr() BOOST_NOEXCEPT
+		{
+			return Si::visit<Value *>(
+						storage,
+						[](Value &value) -> Value * { return &value; },
+						[](Error const &) -> Value * { return nullptr; });
+		}
+
+		Value const *get_ptr() const BOOST_NOEXCEPT
+		{
+			return Si::visit<Value const *>(
+						storage,
+						[](Value const &value) -> Value const * { return &value; },
+						[](Error const &) -> Value const * { return nullptr; });
+		}
+
 	private:
 
 		fast_variant<Value, Error> storage;
