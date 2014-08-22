@@ -53,7 +53,7 @@ namespace Si
 						[](Error const &e) { return e; });
 		}
 
-		Value &value() &
+		Value &get() &
 		{
 			return Si::visit<Value &>(
 						storage,
@@ -61,7 +61,7 @@ namespace Si
 						[](Error const &e) -> Value & { detail::throw_system_error(e); });
 		}
 
-		Value &&value() &&
+		Value &&get() &&
 		{
 			return Si::visit<Value &&>(
 						storage,
@@ -69,7 +69,7 @@ namespace Si
 						[](Error const &e) -> Value && { detail::throw_system_error(e); });
 		}
 
-		Value const &value() const &
+		Value const &get() const &
 		{
 			return Si::visit<Value const &>(
 						storage,

@@ -47,7 +47,7 @@ namespace Si
 		explicit directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
 			: inotify(io)
 			, impl(enumerate(ref(inotify)), linux::to_portable_file_notification)
-			, root(inotify.watch(watched, IN_ALL_EVENTS).value())
+			, root(inotify.watch(watched, IN_ALL_EVENTS).get())
 		{
 		}
 
