@@ -1,5 +1,6 @@
 #include <silicium/file_source.hpp>
 #include <silicium/linux/file_descriptor.hpp>
+#include <silicium/linux/open.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace

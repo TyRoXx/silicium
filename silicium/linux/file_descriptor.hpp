@@ -2,9 +2,9 @@
 #define SILICIUM_LINUX_FILE_DESCRIPTOR_HPP
 
 #include <boost/config.hpp>
-#include <boost/filesystem/path.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/throw_exception.hpp>
 #include <unistd.h>
-#include <fcntl.h>
 
 namespace Si
 {
@@ -15,7 +15,7 @@ namespace Si
 			if (close(file) < 0)
 			{
 				//it is intended that this will terminate the process because of noexcept
-				throw boost::system::system_error(errno, boost::system::system_category());
+				boost::throw_exception(boost::system::system_error(errno, boost::system::system_category()));
 			}
 		}
 
@@ -64,16 +64,6 @@ namespace Si
 				}
 			}
 		};
-
-		inline Si::linux::file_descriptor open_reading(boost::filesystem::path const &name)
-		{
-			int const fd = ::open(name.c_str(), O_RDONLY);
-			if (fd < 0)
-			{
-				boost::throw_exception(boost::system::system_error(boost::system::error_code(errno, boost::system::system_category())));
-			}
-			return Si::linux::file_descriptor(fd);
-		}
 	}
 }
 
