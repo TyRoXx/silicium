@@ -498,6 +498,15 @@ namespace Si
 	{
 		return transforming_source<To, From, typename std::decay<Transformation>::type>(original, std::forward<Transformation>(transform));
 	}
+
+	template <class Element>
+	auto take(source<Element> &from, std::size_t count)
+	{
+		std::vector<Element> taken(count);
+		auto end = from.copy_next(boost::make_iterator_range(taken.data(), taken.data() + taken.size()));
+		taken.resize(std::distance(taken.data(), end));
+		return taken;
+	}
 }
 
 #endif
