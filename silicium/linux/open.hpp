@@ -2,23 +2,23 @@
 #define SILICIUM_LINUX_OPEN_HPP
 
 #include <silicium/error_or.hpp>
-#include <silicium/linux/file_descriptor.hpp>
+#include <silicium/file_descriptor.hpp>
 #include <boost/filesystem/path.hpp>
-#include <fcntl.h>
+
+#ifdef __linux__
+#	include <fcntl.h>
+#endif
 
 namespace Si
 {
-	namespace linux
+	inline error_or<Si:::file_descriptor> open_reading(boost::filesystem::path const &name)
 	{
-		inline error_or<Si::linux::file_descriptor> open_reading(boost::filesystem::path const &name)
+		native_file_handle const fd = ::open(name.c_str(), O_RDONLY);
+		if (fd < 0)
 		{
-			int const fd = ::open(name.c_str(), O_RDONLY);
-			if (fd < 0)
-			{
-				return boost::system::error_code(errno, boost::system::system_category());
-			}
-			return Si::linux::file_descriptor(fd);
+			return boost::system::error_code(errno, boost::system::system_category());
 		}
+		return Si:::file_descriptor(fd);
 	}
 }
 

@@ -500,7 +500,7 @@ namespace Si
 	}
 
 	template <class Element>
-	auto take(source<Element> &from, std::size_t count)
+	auto take(source<Element> &from, std::size_t count) -> std::vector<Element>
 	{
 		std::vector<Element> taken(count);
 		auto end = from.copy_next(boost::make_iterator_range(taken.data(), taken.data() + taken.size()));

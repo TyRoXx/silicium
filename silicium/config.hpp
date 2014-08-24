@@ -22,6 +22,13 @@
 #	define SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT 0
 #endif
 
+#ifdef _MSC_VER
+#	define SILICIUM_NORETURN __declspec(noreturn)
+#else
+//	GCC
+#	define SILICIUM_NORETURN __attribute__ ((__noreturn__))
+#endif
+
 namespace Si
 {
 	struct nothing

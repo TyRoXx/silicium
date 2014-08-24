@@ -3,18 +3,19 @@
 
 #include <silicium/optional.hpp>
 #include <boost/system/system_error.hpp>
+#include <boost/throw_exception.hpp>
 #include <system_error>
 
 namespace Si
 {
 	namespace detail
 	{
-		inline BOOST_NORETURN void throw_system_error(boost::system::error_code error)
+		inline SILICIUM_NORETURN void throw_system_error(boost::system::error_code error)
 		{
 			boost::throw_exception(boost::system::system_error(error));
 		}
 
-		inline BOOST_NORETURN void throw_system_error(std::error_code error)
+		inline SILICIUM_NORETURN void throw_system_error(std::error_code error)
 		{
 			boost::throw_exception(std::system_error(error));
 		}
@@ -37,6 +38,17 @@ namespace Si
 		{
 		}
 
+		error_or(error_or &&other) BOOST_NOEXCEPT
+			: storage(std::move(other.storage))
+		{
+		}
+
+		error_or &operator = (error_or &&other) BOOST_NOEXCEPT
+		{
+			storage = std::move(other.storage);
+			return *this;
+		}
+
 		bool is_error() const BOOST_NOEXCEPT
 		{
 			return Si::visit<bool>(
@@ -53,6 +65,7 @@ namespace Si
 						[](Error const &e) { return e; });
 		}
 
+#ifndef _MSC_VER
 		Value &get() &
 		{
 			return Si::visit<Value &>(
@@ -60,8 +73,12 @@ namespace Si
 						[](Value &value) -> Value & { return value; },
 						[](Error const &e) -> Value & { detail::throw_system_error(e); });
 		}
+#endif
 
-		Value &&get() &&
+		Value &&get()
+#ifndef _MSC_VER
+			&&
+#endif
 		{
 			return Si::visit<Value &&>(
 						storage,
@@ -69,7 +86,10 @@ namespace Si
 						[](Error const &e) -> Value && { detail::throw_system_error(e); });
 		}
 
-		Value const &get() const &
+		Value const &get() const
+#ifndef _MSC_VER
+			&
+#endif
 		{
 			return Si::visit<Value const &>(
 						storage,

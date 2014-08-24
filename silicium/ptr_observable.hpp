@@ -73,7 +73,7 @@ namespace Si
 	using unique_observable = ptr_observable<Element, std::unique_ptr<observable<Element>>>;
 
 	template <class Element, class Content>
-	auto box(Content &&content) -> ptr_observable<Element, std::unique_ptr<observable<Element>>>
+	auto box(Content &&content) -> unique_observable<Element>
 	{
 		return ptr_observable<Element, std::unique_ptr<observable<Element>>>(std::unique_ptr<observable<Element>>(new typename std::decay<Content>::type(std::forward<Content>(content))));
 	}
