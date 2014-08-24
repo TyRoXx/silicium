@@ -37,10 +37,10 @@ namespace Si
 				if (error)
 				{
 					assert(error == boost::asio::error::operation_aborted); //TODO: remove this assumption
-					assert(!receiver_); //cancel() should have reset the receiver already
+					assert(!this->receiver_); //cancel() should have reset the receiver already
 					return;
 				}
-				exchange(receiver_, nullptr)->got_element(timer_elapsed{});
+				Si::exchange(this->receiver_, nullptr)->got_element(timer_elapsed{});
 			});
 		}
 

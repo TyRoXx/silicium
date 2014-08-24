@@ -7,7 +7,7 @@
 
 namespace Si
 {
-#ifndef _MSC_VER
+#if SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	template <class Input, class Duration>
 	auto delay(Input &&input, boost::asio::io_service &io, Duration duration)
 	{
