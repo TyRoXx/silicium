@@ -11,7 +11,7 @@
 #include <memory>
 
 #ifdef __linux__
-#	include <silicium/linux/file_descriptor.hpp>
+#	include <silicium/file_descriptor.hpp>
 #	include <fcntl.h>
 #	include <sys/wait.h>
 #endif
@@ -57,7 +57,7 @@ namespace Si
 
 			struct pipe
 			{
-				linux::file_descriptor write, read;
+				file_descriptor write, read;
 
 				void close() BOOST_NOEXCEPT
 				{
@@ -79,8 +79,8 @@ namespace Si
 					throw boost::system::system_error(errno, boost::system::system_category());
 				}
 				pipe result;
-				result.read  = linux::file_descriptor(fds[0]);
-				result.write = linux::file_descriptor(fds[1]);
+				result.read  = file_descriptor(fds[0]);
+				result.write = file_descriptor(fds[1]);
 				return result;
 			}
 		}

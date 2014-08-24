@@ -38,6 +38,7 @@ namespace Si
 		{
 		}
 
+#ifdef _MSC_VER
 		error_or(error_or &&other) BOOST_NOEXCEPT
 			: storage(std::move(other.storage))
 		{
@@ -48,6 +49,7 @@ namespace Si
 			storage = std::move(other.storage);
 			return *this;
 		}
+#endif
 
 		bool is_error() const BOOST_NOEXCEPT
 		{
