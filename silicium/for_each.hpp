@@ -10,13 +10,13 @@ namespace Si
 {
 	template <class Input, class Handler>
 	auto for_each(Input &&input, Handler &&handle_element)
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> total_consumer<unique_observable<nothing>>
 #endif
 	{
 		typedef typename std::decay<Input>::type::element_type element;
 		return make_total_consumer(
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			erase_unique
 #endif
 			(transform(std::forward<Input>(input), [handle_element](element value) -> nothing

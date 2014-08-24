@@ -1,6 +1,7 @@
 #ifndef SILICIUM_VIRTUALIZE_HPP
 #define SILICIUM_VIRTUALIZE_HPP
 
+#include <silicium/config.hpp>
 #include <silicium/observable.hpp>
 #include <silicium/override.hpp>
 #include <utility>
@@ -21,7 +22,7 @@ namespace Si
 		{
 		}
 
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_GENERATES_MOVES
 		virtualized_observable(virtualized_observable &&other)
 			: next(std::move(other.next))
 		{

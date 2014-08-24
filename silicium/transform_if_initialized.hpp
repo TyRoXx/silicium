@@ -6,6 +6,7 @@
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <cassert>
+#include <stdexcept>
 #include <boost/config.hpp>
 
 namespace Si
@@ -39,9 +40,9 @@ namespace Si
 
 		conditional_transformer &operator = (conditional_transformer &&other)
 		{
-			original = std:move(other.original);
-			transform = std:move(other.transform);
-			receiver_ = std:move(other.receiver_);
+			original = std::move(other.original);
+			transform = std::move(other.transform);
+			receiver_ = std::move(other.receiver_);
 			return *this;
 		}
 #endif

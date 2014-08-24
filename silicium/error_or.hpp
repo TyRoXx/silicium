@@ -67,7 +67,7 @@ namespace Si
 						[](Error const &e) { return e; });
 		}
 
-#ifndef _MSC_VER
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 		Value &get() &
 		{
 			return Si::visit<Value &>(
@@ -78,7 +78,7 @@ namespace Si
 #endif
 
 		Value &&get()
-#ifndef _MSC_VER
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 			&&
 #endif
 		{
@@ -89,7 +89,7 @@ namespace Si
 		}
 
 		Value const &get() const
-#ifndef _MSC_VER
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 			&
 #endif
 		{

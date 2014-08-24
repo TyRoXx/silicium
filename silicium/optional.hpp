@@ -75,7 +75,7 @@ namespace Si
 			return content.which() == 0;
 		}
 
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 		T &operator * () BOOST_NOEXCEPT
 		{
 			assert(*this);

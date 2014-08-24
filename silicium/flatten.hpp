@@ -24,7 +24,7 @@ namespace Si
 		{
 		}
 
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_GENERATES_MOVES
 		flattener(flattener &&other)
 		{
 			*this = std::move(other);

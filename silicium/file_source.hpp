@@ -16,12 +16,12 @@ namespace Si
 	using file_read_result = Si::fast_variant<std::size_t, boost::system::error_code>;
 
 	inline auto make_file_source(native_file_handle file, boost::iterator_range<char *> read_buffer)
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> generator_source<file_read_result, std::function<boost::optional<file_read_result>()>>
 #endif
 	{
 		return make_generator_source<file_read_result>(
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			std::function<boost::optional<file_read_result>()>
 #endif
 			([file, read_buffer]() -> boost::optional<file_read_result>

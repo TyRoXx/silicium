@@ -29,6 +29,18 @@
 #	define SILICIUM_NORETURN __attribute__ ((__noreturn__))
 #endif
 
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)
+#	define SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER 1
+#else
+#	define SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER 0
+#endif
+
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)
+#	define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 1
+#else
+#	define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 0
+#endif
+
 namespace Si
 {
 	struct nothing
