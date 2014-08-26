@@ -22,4 +22,21 @@ namespace Si
 		};
 		BOOST_CHECK(expected_arguments == parsed->arguments);
 	}
+
+	BOOST_AUTO_TEST_CASE(http_write_request_header)
+	{
+		std::string generated;
+		auto sink = Si::make_container_sink(generated);
+		http::request_header header;
+		header.http_version = "HTTP/1.1";
+		header.method = "POST";
+		header.path = "/p";
+		header.arguments["Content-Length"] = "13";
+		http::write_header(sink, header);
+		BOOST_CHECK_EQUAL(
+			"POST /p HTTP/1.1\r\n"
+			"Content-Length: 13\r\n"
+			"\r\n",
+			generated);
+	}
 }

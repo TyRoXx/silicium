@@ -22,6 +22,7 @@ namespace Si
 		};
 
 		boost::optional<request_header> parse_header(Si::source<char> &in);
+		void write_header(Si::sink<char> &out, request_header const &header);
 
 		struct response_header
 		{
