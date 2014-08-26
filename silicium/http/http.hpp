@@ -32,6 +32,7 @@ namespace Si
 			std::map<std::string, std::string> arguments;
 		};
 
+		boost::optional<response_header> parse_response_header(Si::source<char> &in);
 		void write_header(Si::sink<char> &out, response_header const &header);
 	}
 }

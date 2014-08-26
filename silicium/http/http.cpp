@@ -90,6 +90,33 @@ namespace Si
 			append(out, "\r\n");
 		}
 
+		boost::optional<response_header> parse_response_header(Si::source<char> &in)
+		{
+			Si::line_source lines(in);
+			auto first_line = get(lines);
+			if (!first_line)
+			{
+				return boost::none;
+			}
+			response_header header;
+			//TODO parse first line
+			for (;;)
+			{
+				auto value_line = get(lines);
+				if (!value_line)
+				{
+					return boost::none;
+				}
+				if (value_line->empty())
+				{
+					break;
+				}
+				auto value = detail::split_value_line(*value_line);
+				header.arguments[value.first] = std::move(value.second);
+			}
+			return std::move(header);
+		}
+
 		void write_header(Si::sink<char> &out, response_header const &header)
 		{
 			append(out, header.http_version);
