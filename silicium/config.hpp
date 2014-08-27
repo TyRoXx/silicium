@@ -2,6 +2,7 @@
 #define SILICIUM_SILICIUM_CONFIG_HPP
 
 #include <memory>
+#include <boost/config.hpp>
 
 #ifdef _MSC_VER
 #	define SILICIUM_UNREACHABLE() __assume(false)
@@ -45,6 +46,9 @@ namespace Si
 {
 	struct nothing
 	{
+		BOOST_CONSTEXPR nothing() BOOST_NOEXCEPT
+		{
+		}
 	};
 
 	template <class T, class ...Args>

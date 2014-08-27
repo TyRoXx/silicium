@@ -8,7 +8,7 @@ namespace Si
 {
 	using none_t = nothing;
 
-	static none_t const none;
+	static none_t BOOST_CONSTEXPR_OR_CONST none;
 
 	template <class T>
 	struct optional
