@@ -101,6 +101,7 @@ namespace Si
 
 			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
 			{
+				boost::ignore_unused(target);
 				throw std::logic_error("todo");
 			}
 		};

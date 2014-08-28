@@ -399,17 +399,27 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 	BOOST_CHECK_EQUAL(1U, elapsed_count);
 }
 
-#if 0 //TODO: make the following test finish (currently it sometimes will block forever in wait())
-
-typedef boost::mpl::list<Si::std_threading, Si::boost_threading> threading_apis;
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(reactive_async, ThreadingAPI, threading_apis)
+BOOST_AUTO_TEST_CASE(reactive_async_empty)
 {
-	auto a = Si::make_thread<int, ThreadingAPI>([](Si::yield_context_2<int> &yield)
+	auto a = Si::make_thread<int, Si::std_threading>([](Si::yield_context<int> &)
 	{
-		yield.push_result(1);
-		yield.push_result(2);
-		yield.push_result(3);
+	});
+	auto consumer = Si::consume<int>([](int element)
+	{
+		boost::ignore_unused_variable_warning(element);
+		BOOST_FAIL("No element expected here");
+	});
+	a.async_get_one(consumer);
+	a.wait();
+}
+
+BOOST_AUTO_TEST_CASE(reactive_async)
+{
+	auto a = Si::make_thread<int, Si::std_threading>([](Si::yield_context<int> &yield)
+	{
+		yield(1);
+		yield(2);
+		yield(3);
 	});
 	std::vector<int> const expected{1, 2, 3};
 	std::vector<int> produced;
@@ -427,5 +437,3 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(reactive_async, ThreadingAPI, threading_apis)
 	a.wait();
 	BOOST_CHECK(expected == produced);
 }
-
-#endif
