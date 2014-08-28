@@ -9,7 +9,7 @@
 #include <future>
 #include <boost/thread/future.hpp>
 #include <boost/optional.hpp>
-#include <boost/utility.hpp>
+#include <boost/concept_check.hpp>
 
 namespace Si
 {
