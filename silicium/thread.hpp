@@ -5,22 +5,13 @@
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/yield_context.hpp>
 #include <future>
 #include <boost/thread/future.hpp>
 #include <boost/optional.hpp>
 
 namespace Si
 {
-	template <class Element>
-	struct yield_context_2
-	{
-		virtual ~yield_context_2()
-		{
-		}
-
-		virtual void push_result(Element result) = 0;
-	};
-
 	template <class Element, class ThreadingAPI>
 	struct thread_observable
 	{
@@ -70,7 +61,7 @@ namespace Si
 
 	private:
 
-		struct movable_state : private yield_context_2<Element>
+		struct movable_state : private detail::yield_context_impl<Element>
 		{
 			typename ThreadingAPI::template future<void> thread;
 			typename ThreadingAPI::mutex result_mutex;
@@ -84,7 +75,8 @@ namespace Si
 				//start the background thread after the initialization of all the members
 				thread = ThreadingAPI::template launch_async([this, action]() -> void
 				{
-					action(static_cast<yield_context_2<Element> &>(*this));
+					yield_context<Element> yield(*this);
+					action(yield);
 				});
 			}
 
@@ -105,6 +97,11 @@ namespace Si
 				{
 					cached_result = std::move(result);
 				}
+			}
+
+			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
+			{
+				throw std::logic_error("todo");
 			}
 		};
 

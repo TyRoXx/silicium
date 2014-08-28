@@ -3,6 +3,9 @@
 
 #include <silicium/fast_variant.hpp>
 #include <silicium/observable.hpp>
+#include <silicium/transform.hpp>
+#include <silicium/virtualize.hpp>
+#include <silicium/ref.hpp>
 
 namespace Si
 {
