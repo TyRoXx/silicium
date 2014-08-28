@@ -9,6 +9,7 @@
 #include <future>
 #include <boost/thread/future.hpp>
 #include <boost/optional.hpp>
+#include <boost/utility.hpp>
 
 namespace Si
 {
@@ -101,7 +102,7 @@ namespace Si
 
 			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
 			{
-				boost::ignore_unused(target);
+				boost::ignore_unused_variable_warning(target);
 				throw std::logic_error("todo");
 			}
 		};
