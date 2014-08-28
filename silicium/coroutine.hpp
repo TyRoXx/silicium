@@ -5,97 +5,38 @@
 #include <silicium/config.hpp>
 #include <silicium/ref.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/yield_context.hpp>
 #include <boost/coroutine/all.hpp>
-#include <silicium/fast_variant.hpp>
 
 namespace Si
 {
 	namespace detail
 	{
 		template <class Element>
-		struct result
+		struct coroutine_yield_context_impl : detail::yield_context_impl<Element>
 		{
-			Element value;
+			typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type>::push_type consumer_type;
 
-			result()
+			explicit coroutine_yield_context_impl(consumer_type &consumer)
+				: consumer(&consumer)
 			{
 			}
 
-			explicit result(Element value)
-				: value(std::move(value))
+			virtual void push_result(Element result) SILICIUM_OVERRIDE
 			{
+				(*consumer)(detail::result<Element>(std::move(result)));
 			}
 
-#ifdef _MSC_VER
-			result(result &&other)
-				: value(std::move(other.value))
+			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
 			{
+				(*consumer)(detail::yield{&target});
 			}
 
-			result &operator = (result &&other)
-			{
-				value = std::move(other.value);
-				return *this;
-			}
+		private:
 
-			result(result const &other)
-				: value(other.value)
-			{
-			}
-
-			result &operator = (result const &other)
-			{
-				value = other.value;
-				return *this;
-			}
-#endif
-		};
-
-		struct yield
-		{
-			Si::observable<nothing> *target;
-		};
-
-		template <class Element>
-		struct make_command
-		{
-			typedef Si::fast_variant<result<Element>, yield> type;
+			consumer_type *consumer = nullptr;
 		};
 	}
-
-	template <class Element = nothing>
-	struct yield_context
-	{
-		typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type>::push_type consumer_type;
-
-		explicit yield_context(consumer_type &consumer)
-			: consumer(&consumer)
-		{
-		}
-
-		void operator()(Element result)
-		{
-			(*consumer)(detail::result<Element>{std::move(result)});
-		}
-
-		template <class Observable, class Gotten = typename Observable::element_type>
-		boost::optional<Gotten> get_one(Observable &from)
-		{
-			boost::optional<Gotten> result;
-			auto tf = Si::virtualize(Si::transform(Si::ref(from), [&result](Gotten element)
-			{
-				assert(!result);
-				result = std::move(element);
-				return nothing{};
-			}));
-			(*consumer)(detail::yield{&tf});
-			return result;
-		}
-
-	private:
-
-		consumer_type *consumer;
-	};
 
 	template <class Element>
 	struct coroutine_observable
@@ -129,7 +70,8 @@ namespace Si
 #endif
 			[action](typename boost::coroutines::coroutine<command_type>::push_type &push)
 			{
-				yield_context<Element> yield(push);
+				detail::coroutine_yield_context_impl<Element> yield_impl(push);
+				yield_context<Element> yield(yield_impl); //TODO: save this indirection
 				return action(yield);
 			})
 #ifdef _MSC_VER
