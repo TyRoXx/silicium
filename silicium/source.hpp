@@ -499,12 +499,19 @@ namespace Si
 		return transforming_source<To, From, typename std::decay<Transformation>::type>(original, std::forward<Transformation>(transform));
 	}
 
-	template <class Element>
-	auto take(source<Element> &from, std::size_t count) -> std::vector<Element>
+	template <class Container>
+	auto data(Container &container)
 	{
-		std::vector<Element> taken(count);
-		auto end = from.copy_next(boost::make_iterator_range(taken.data(), taken.data() + taken.size()));
-		taken.resize(std::distance(taken.data(), end));
+		return container.empty() ? nullptr : &container[0];
+	}
+
+	template <class Element, class Sequence = std::vector<Element>>
+	auto take(source<Element> &from, std::size_t count) -> Sequence
+	{
+		Sequence taken;
+		taken.resize(count);
+		auto end = from.copy_next(boost::make_iterator_range(data(taken), data(taken) + taken.size()));
+		taken.resize(std::distance(data(taken), end));
 		return taken;
 	}
 }
