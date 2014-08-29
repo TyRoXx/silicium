@@ -13,6 +13,23 @@
 
 namespace Si
 {
+	namespace detail
+	{
+		template <class Element>
+		struct thread_yield_context_impl : yield_context_impl<Element>
+		{
+			virtual void push_result(Element result) SILICIUM_OVERRIDE
+			{
+				throw std::logic_error("to do");
+			}
+
+			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
+			{
+				throw std::logic_error("to do");
+			}
+		};
+	}
+
 	template <class Element, class ThreadingAPI>
 	struct thread_observable
 	{
@@ -24,96 +41,156 @@ namespace Si
 
 		template <class Action>
 		explicit thread_observable(Action &&action)
-			: state(make_unique<movable_state>(std::forward<Action>(action)))
+			: state(Si::make_unique<state_type>(std::forward<Action>(action)))
 		{
 		}
 
 		void wait()
 		{
-			assert(state);
-			state->thread.get();
+			return state->wait();
 		}
 
 		void async_get_one(observer<element_type> &receiver)
 		{
-			assert(state);
-			typename ThreadingAPI::unique_lock lock(state->result_mutex);
-			assert(!state->receiver_);
-			state->receiver_ = &receiver;
-			if (!state->cached_result)
-			{
-				if (!state->thread.valid())
-				{
-					lock.unlock();
-					return Si::exchange(state->receiver_, nullptr)->ended();
-				}
-				return;
-			}
-			auto ready_result = std::move(*state->cached_result);
-			state->result_retrieved.notify_one();
-			lock.unlock();
-			Si::exchange(state->receiver_, nullptr)->got_element(std::move(ready_result));
+			return state->async_get_one(receiver);
 		}
 
 		void cancel()
 		{
-			throw std::logic_error("to do");
+			return state->cancel();
 		}
 
 	private:
 
-		struct movable_state : private detail::yield_context_impl<Element>
+		struct state_type
+			: private detail::yield_context_impl<Element>
+			, private observer<nothing>
 		{
-			typename ThreadingAPI::template future<void> thread;
-			typename ThreadingAPI::mutex result_mutex;
-			typename ThreadingAPI::condition_variable result_retrieved;
-			observer<element_type> *receiver_ = nullptr;
-			boost::optional<Element> cached_result;
-
 			template <class Action>
-			explicit movable_state(Action &&action)
+			explicit state_type(Action &&action)
 			{
-				//start the background thread after the initialization of all the members
-				thread = ThreadingAPI::template launch_async([this, action]() -> void
+				worker = ThreadingAPI::launch_async([&]
 				{
 					yield_context<Element> yield(*this);
-					action(yield);
+					std::forward<Action>(action)(yield);
+
+					typename ThreadingAPI::unique_lock lock(receiver_mutex);
+					if (receiver)
+					{
+						Si::exchange(receiver, nullptr)->ended();
+					}
+					else
+					{
+						has_ended = true;
+					}
 				});
 			}
 
-			virtual void push_result(Element result) SILICIUM_OVERRIDE
+			void async_get_one(observer<Element> &new_receiver)
 			{
-				typename ThreadingAPI::unique_lock lock(result_mutex);
-				while (cached_result.is_initialized())
+				typename ThreadingAPI::unique_lock lock(receiver_mutex);
+				assert(!receiver);
+				if (ready_result)
 				{
-					result_retrieved.wait(lock);
-				}
-				if (receiver_)
-				{
-					auto receiver = Si::exchange(receiver_, nullptr);
+					Element result = std::move(*ready_result);
+					ready_result = boost::none;
+					receiver_ready.notify_one();
 					lock.unlock();
-					receiver->got_element(std::move(result));
+					new_receiver.got_element(std::move(result));
 				}
 				else
 				{
-					cached_result = std::move(result);
+					if (has_ended)
+					{
+						return new_receiver.ended();
+					}
+					receiver = &new_receiver;
+					receiver_ready.notify_one();
+				}
+			}
+
+			void cancel()
+			{
+				throw std::logic_error("to do");
+			}
+
+			void wait()
+			{
+				worker.get();
+			}
+
+		private:
+
+			typename ThreadingAPI::template future<void> worker;
+			typename ThreadingAPI::mutex receiver_mutex;
+			observer<Element> *receiver = nullptr;
+			boost::optional<Element> ready_result;
+			typename ThreadingAPI::condition_variable receiver_ready;
+			bool has_ended = false;
+
+			typename ThreadingAPI::mutex got_something_mutex;
+			typename ThreadingAPI::condition_variable got_something_set;
+			bool got_something = false;
+
+			virtual void push_result(Element result) SILICIUM_OVERRIDE
+			{
+				typename ThreadingAPI::unique_lock lock(receiver_mutex);
+				while (ready_result && !receiver)
+				{
+					receiver_ready.wait(lock);
+				}
+				if (receiver)
+				{
+					auto * const receiver_ = Si::exchange(receiver, nullptr);
+					lock.unlock();
+					receiver_->got_element(std::move(result));
+				}
+				else
+				{
+					ready_result = std::move(result);
 				}
 			}
 
 			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
 			{
-				boost::ignore_unused_variable_warning(target);
-				throw std::logic_error("todo");
+				assert(![this]() { typename ThreadingAPI::unique_lock lock(got_something_mutex); return got_something; }());
+				target.async_get_one(*this);
+
+				typename ThreadingAPI::unique_lock lock(got_something_mutex);
+				while (!got_something)
+				{
+					got_something_set.wait(lock);
+				}
+				got_something = false;
+			}
+
+			virtual void got_element(nothing) SILICIUM_OVERRIDE
+			{
+				wake_get_one();
+			}
+
+			virtual void ended() SILICIUM_OVERRIDE
+			{
+				wake_get_one();
+			}
+
+			void wake_get_one()
+			{
+				typename ThreadingAPI::unique_lock lock(got_something_mutex);
+				got_something = true;
+				got_something_set.notify_one();
 			}
 		};
 
-		std::unique_ptr<movable_state> state;
+		std::unique_ptr<state_type> state;
 	};
 
 	struct std_threading
 	{
 		template <class T>
 		using future = std::future<T>;
+		template <class T>
+		using promise = std::promise<T>;
 		using mutex = std::mutex;
 		using condition_variable = std::condition_variable;
 		using unique_lock = std::unique_lock<std::mutex>;
@@ -128,6 +205,8 @@ namespace Si
 	{
 		template <class T>
 		using future = boost::unique_future<T>;
+		template <class T>
+		using promise = boost::promise<T>;
 		using mutex = boost::mutex;
 		using condition_variable = boost::condition_variable;
 		using unique_lock = boost::unique_lock<boost::mutex>;
