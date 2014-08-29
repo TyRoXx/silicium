@@ -72,7 +72,7 @@ namespace Si
 				worker = ThreadingAPI::launch_async([action, this]() mutable
 				{
 					yield_context<Element> yield(*this);
-					std::forward<Action>(action)(yield);
+					(std::forward<Action>(action))(yield);
 
 					typename ThreadingAPI::unique_lock lock(receiver_mutex);
 					if (receiver)
