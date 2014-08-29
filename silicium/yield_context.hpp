@@ -1,66 +1,15 @@
 #ifndef SILICIUM_YIELD_CONTEXT_HPP
 #define SILICIUM_YIELD_CONTEXT_HPP
 
-#include <silicium/fast_variant.hpp>
-#include <silicium/observable.hpp>
 #include <silicium/transform.hpp>
 #include <silicium/virtualize.hpp>
 #include <silicium/ref.hpp>
+#include <boost/optional.hpp>
 
 namespace Si
 {
 	namespace detail
 	{
-		template <class Element>
-		struct result
-		{
-			Element value;
-
-			result()
-			{
-			}
-
-			explicit result(Element value)
-				: value(std::move(value))
-			{
-			}
-
-#ifdef _MSC_VER
-			result(result &&other)
-				: value(std::move(other.value))
-			{
-			}
-
-			result &operator = (result &&other)
-			{
-				value = std::move(other.value);
-				return *this;
-			}
-
-			result(result const &other)
-				: value(other.value)
-			{
-			}
-
-			result &operator = (result const &other)
-			{
-				value = other.value;
-				return *this;
-			}
-#endif
-		};
-
-		struct yield
-		{
-			Si::observable<nothing> *target;
-		};
-
-		template <class Element>
-		struct make_command
-		{
-			typedef Si::fast_variant<result<Element>, yield> type;
-		};
-
 		template <class Element>
 		struct yield_context_impl
 		{

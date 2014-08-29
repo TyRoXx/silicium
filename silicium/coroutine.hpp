@@ -1,17 +1,65 @@
 #ifndef SILICIUM_REACTIVE_COROUTINE_HPP
 #define SILICIUM_REACTIVE_COROUTINE_HPP
 
-#include <silicium/transform.hpp>
-#include <silicium/config.hpp>
-#include <silicium/ref.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/yield_context.hpp>
+#include <silicium/fast_variant.hpp>
 #include <boost/coroutine/all.hpp>
 
 namespace Si
 {
 	namespace detail
 	{
+		template <class Element>
+		struct result
+		{
+			Element value;
+
+			result()
+			{
+			}
+
+			explicit result(Element value)
+				: value(std::move(value))
+			{
+			}
+
+#ifdef _MSC_VER
+			result(result &&other)
+				: value(std::move(other.value))
+			{
+			}
+
+			result &operator = (result &&other)
+			{
+				value = std::move(other.value);
+				return *this;
+			}
+
+			result(result const &other)
+				: value(other.value)
+			{
+			}
+
+			result &operator = (result const &other)
+			{
+				value = other.value;
+				return *this;
+			}
+#endif
+		};
+
+		struct yield
+		{
+			Si::observable<nothing> *target;
+		};
+
+		template <class Element>
+		struct make_command
+		{
+			typedef Si::fast_variant<result<Element>, yield> type;
+		};
+
 		template <class Element>
 		struct coroutine_yield_context_impl : detail::yield_context_impl<Element>
 		{
