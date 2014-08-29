@@ -140,6 +140,7 @@ namespace Si
 
 		void next()
 		{
+
 			if (!Si::exchange(first, false))
 			{
 				coro()();

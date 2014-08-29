@@ -69,7 +69,7 @@ namespace Si
 			template <class Action>
 			explicit state_type(Action &&action)
 			{
-				worker = ThreadingAPI::launch_async([&]
+				worker = ThreadingAPI::launch_async([action, this]() mutable
 				{
 					yield_context<Element> yield(*this);
 					std::forward<Action>(action)(yield);
