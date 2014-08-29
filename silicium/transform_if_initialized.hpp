@@ -89,7 +89,8 @@ namespace Si
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			SILICIUM_UNREACHABLE();
+			assert(receiver_);
+			Si::exchange(receiver_, nullptr)->ended();
 		}
 	};
 
