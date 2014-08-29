@@ -57,26 +57,14 @@ namespace Si
 		coroutine_observable &operator = (coroutine_observable &&other)
 		{
 			coro_ = std::move(other.coro_);
+			action = std::move(other.action);
 			receiver_ = std::move(other.receiver_);
-			first = std::move(other.first);
 			return *this;
 		}
 
 		template <class Action>
-		explicit coroutine_observable(Action action)
-			: coro_(
-#ifdef _MSC_VER
-			std::make_shared<coroutine_type>(
-#endif
-			[action](typename boost::coroutines::coroutine<command_type>::push_type &push)
-			{
-				detail::coroutine_yield_context_impl<Element> yield_impl(push);
-				yield_context<Element> yield(yield_impl); //TODO: save this indirection
-				return action(yield);
-			})
-#ifdef _MSC_VER
-			)
-#endif
+		explicit coroutine_observable(Action &&action)
+			: action(std::forward<Action>(action))
 		{
 		}
 
@@ -116,8 +104,8 @@ namespace Si
 			;
 
 		coroutine_holder coro_;
+		std::function<void (yield_context<Element> &)> action;
 		Si::observer<Element> *receiver_ = nullptr;
-		bool first = true;
 
 		coroutine_type &coro()
 		{
@@ -140,8 +128,24 @@ namespace Si
 
 		void next()
 		{
-
-			if (!Si::exchange(first, false))
+			if (action)
+			{
+				auto bound_action = action;
+				coro_ =
+#ifdef _MSC_VER
+					std::make_shared<coroutine_type>
+#else
+					coroutine_type
+#endif
+						([bound_action](typename boost::coroutines::coroutine<command_type>::push_type &push)
+						{
+							detail::coroutine_yield_context_impl<Element> yield_impl(push);
+							yield_context<Element> yield(yield_impl); //TODO: save this indirection
+							return bound_action(yield);
+						});
+				action = nullptr;
+			}
+			else if (coro())
 			{
 				coro()();
 			}
