@@ -4,10 +4,14 @@
 #include <memory>
 #include <boost/config.hpp>
 
-#ifdef _MSC_VER
-#	define SILICIUM_UNREACHABLE() __assume(false)
+#ifdef NDEBUG
+#	ifdef _MSC_VER
+#		define SILICIUM_UNREACHABLE() __assume(false)
+#	else
+#		define SILICIUM_UNREACHABLE() __builtin_unreachable()
+#	endif
 #else
-#	define SILICIUM_UNREACHABLE() __builtin_unreachable()
+#	define SILICIUM_UNREACHABLE() do { throw std::logic_error("unreachable " __FILE__ ":" BOOST_STRINGIZE(__LINE__)); } while(false)
 #endif
 
 #if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__)
