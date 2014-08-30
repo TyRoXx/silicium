@@ -14,23 +14,6 @@
 
 namespace Si
 {
-	namespace detail
-	{
-		template <class Element>
-		struct thread_yield_context_impl : yield_context_impl<Element>
-		{
-			virtual void push_result(Element result) SILICIUM_OVERRIDE
-			{
-				throw std::logic_error("to do");
-			}
-
-			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
-			{
-				throw std::logic_error("to do");
-			}
-		};
-	}
-
 	template <class Element, class ThreadingAPI>
 	struct thread_observable
 	{
