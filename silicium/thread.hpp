@@ -14,6 +14,49 @@
 
 namespace Si
 {
+	namespace detail
+	{
+		template <class ThreadingAPI>
+		struct event : private observer<nothing>
+		{
+			template <class NothingObservable>
+			void block(NothingObservable &&blocked_on)
+			{
+				assert(!got_something);
+				blocked_on.async_get_one(*this);
+				typename ThreadingAPI::unique_lock lock(got_something_mutex);
+				while (!got_something)
+				{
+					got_something_set.wait(lock);
+				}
+				got_something = false;
+			}
+
+		private:
+
+			typename ThreadingAPI::mutex got_something_mutex;
+			typename ThreadingAPI::condition_variable got_something_set;
+			bool got_something = false;
+
+			virtual void got_element(nothing) SILICIUM_OVERRIDE
+			{
+				wake_get_one();
+			}
+
+			virtual void ended() SILICIUM_OVERRIDE
+			{
+				wake_get_one();
+			}
+
+			void wake_get_one()
+			{
+				typename ThreadingAPI::unique_lock lock(got_something_mutex);
+				got_something = true;
+				got_something_set.notify_one();
+			}
+		};
+	}
+
 	template <class Element, class ThreadingAPI>
 	struct thread_observable
 	{
@@ -46,9 +89,7 @@ namespace Si
 
 	private:
 
-		struct state_type
-			: private detail::yield_context_impl<Element>
-			, private observer<nothing>
+		struct state_type : private detail::yield_context_impl<Element>
 		{
 			template <class Action>
 			explicit state_type(Action &&action)
@@ -112,9 +153,7 @@ namespace Si
 			typename ThreadingAPI::condition_variable receiver_ready;
 			bool has_ended = false;
 
-			typename ThreadingAPI::mutex got_something_mutex;
-			typename ThreadingAPI::condition_variable got_something_set;
-			bool got_something = false;
+			detail::event<ThreadingAPI> got_something;
 
 			virtual void push_result(Element result) SILICIUM_OVERRIDE
 			{
@@ -137,32 +176,7 @@ namespace Si
 
 			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
 			{
-				assert(![this]() { typename ThreadingAPI::unique_lock lock(got_something_mutex); return got_something; }());
-				target.async_get_one(*this);
-
-				typename ThreadingAPI::unique_lock lock(got_something_mutex);
-				while (!got_something)
-				{
-					got_something_set.wait(lock);
-				}
-				got_something = false;
-			}
-
-			virtual void got_element(nothing) SILICIUM_OVERRIDE
-			{
-				wake_get_one();
-			}
-
-			virtual void ended() SILICIUM_OVERRIDE
-			{
-				wake_get_one();
-			}
-
-			void wake_get_one()
-			{
-				typename ThreadingAPI::unique_lock lock(got_something_mutex);
-				got_something = true;
-				got_something_set.notify_one();
+				got_something.block(target);
 			}
 		};
 
