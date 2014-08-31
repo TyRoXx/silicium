@@ -33,7 +33,7 @@ namespace Si
 
 			void async_get_one(observer<element_type> &receiver)
 			{
-				boost::unique_lock<boost::mutex> lock(state->access);
+				boost::unique_lock<Lockable> lock(state->access);
 				assert(!state->receiver);
 				if (state->message)
 				{
@@ -70,7 +70,7 @@ namespace Si
 			
 			void async_get_one(observer<element_type> &receiver, Message &message)
 			{
-				boost::unique_lock<boost::mutex> lock(state->access);
+				boost::unique_lock<Lockable> lock(state->access);
 				assert(!state->message);
 				assert(!state->delivery);
 				if (state->receiver)
@@ -97,7 +97,7 @@ namespace Si
 		};
 	}
 
-	template <class Message, class ThreadingAPI = boost_threading>
+	template <class Message, class ThreadingAPI = std_threading>
 	struct channel
 	{
 		//TODO: use a simpler spinlock
