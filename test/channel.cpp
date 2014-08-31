@@ -104,7 +104,7 @@ namespace Si
 		using mutex = typename ThreadingAPI::mutex;
 
 		channel()
-			: receiving(state)
+			: receiving(detail::channel_receiving_end<Message, mutex>(state))
 			, sending(state)
 		{
 		}
@@ -119,16 +119,15 @@ namespace Si
 			yield.get_one(message_bound);
 		}
 
-		template <class YieldContext>
-		boost::optional<Message> receive(YieldContext &yield)
+		observable<Message> &receiver()
 		{
-			return yield.get_one(receiving);
+			return receiving;
 		}
 
 	private:
 
 		detail::channel_common_state<Message, mutex> state;
-		detail::channel_receiving_end<Message, mutex> receiving;
+		virtualized_observable<detail::channel_receiving_end<Message, mutex>> receiving;
 		detail::channel_sending_end<Message, mutex> sending;
 	};
 }
@@ -143,10 +142,10 @@ BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 	});
 	auto s = Si::make_coroutine<int>([&channel](Si::yield_context<int> &yield)
 	{
-		auto a = channel.receive(yield);
+		auto a = yield.get_one(channel.receiver());
 		BOOST_REQUIRE(a);
 		BOOST_CHECK_EQUAL(2, *a);
-		auto b = channel.receive(yield);
+		auto b = yield.get_one(channel.receiver());
 		BOOST_REQUIRE(b);
 		BOOST_CHECK_EQUAL(3, *b);
 		int result = *a + *b;
@@ -175,10 +174,10 @@ BOOST_AUTO_TEST_CASE(channel_with_thread)
 	});
 	auto s = Si::make_thread<int, Si::boost_threading>([&channel](Si::yield_context<int> &yield)
 	{
-		auto a = channel.receive(yield);
+		auto a = yield.get_one(channel.receiver());
 		BOOST_REQUIRE(a);
 		BOOST_CHECK_EQUAL(2, *a);
-		auto b = channel.receive(yield);
+		auto b = yield.get_one(channel.receiver());
 		BOOST_REQUIRE(b);
 		BOOST_CHECK_EQUAL(3, *b);
 		int result = *a + *b;
