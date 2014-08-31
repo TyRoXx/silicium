@@ -11,22 +11,21 @@ namespace Si
 		{
 		};
 
-		template <class Message>
+		template <class Message, class Lockable>
 		struct channel_common_state
 		{
-			//TODO: use a much simpler spinlock
-			boost::mutex access;
+			Lockable access;
 			observer<Message> *receiver = nullptr;
 			observer<delivered> *delivery = nullptr;
 			Message *message = nullptr;
 		};
 
-		template <class Message>
+		template <class Message, class Lockable>
 		struct channel_receiving_end
 		{
 			using element_type = Message;
 
-			explicit channel_receiving_end(channel_common_state<Message> &state)
+			explicit channel_receiving_end(channel_common_state<Message, Lockable> &state)
 				: state(&state)
 			{
 			}
@@ -55,15 +54,15 @@ namespace Si
 
 		private:
 
-			channel_common_state<Message> *state;
+			channel_common_state<Message, Lockable> *state;
 		};
 
-		template <class Message>
+		template <class Message, class Lockable>
 		struct channel_sending_end
 		{
 			using element_type = delivered;
 
-			explicit channel_sending_end(channel_common_state<Message> &state)
+			explicit channel_sending_end(channel_common_state<Message, Lockable> &state)
 				: state(&state)
 			{
 			}
@@ -106,34 +105,37 @@ namespace Si
 
 		private:
 
-			channel_common_state<Message> *state;
+			channel_common_state<Message, Lockable> *state;
 		};
 	}
 
-	template <class Message>
+	template <class Message, class ThreadingAPI = boost_threading>
 	struct channel
 	{
+		//TODO: use a simpler spinlock
+		using mutex = typename ThreadingAPI::mutex;
+
 		channel()
 			: receiving(state)
 			, sending(state)
 		{
 		}
 
-		detail::channel_receiving_end<Message> &receiver()
+		detail::channel_receiving_end<Message, mutex> &receiver()
 		{
 			return receiving;
 		}
 
-		detail::channel_sending_end<Message> &sender()
+		detail::channel_sending_end<Message, mutex> &sender()
 		{
 			return sending;
 		}
 
 	private:
 
-		detail::channel_common_state<Message> state;
-		detail::channel_receiving_end<Message> receiving;
-		detail::channel_sending_end<Message> sending;
+		detail::channel_common_state<Message, mutex> state;
+		detail::channel_receiving_end<Message, mutex> receiving;
+		detail::channel_sending_end<Message, mutex> sending;
 	};
 
 	template <class Message, class YieldContext>
