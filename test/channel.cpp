@@ -49,10 +49,6 @@ namespace Si
 				}
 			}
 
-			void cancel()
-			{
-			}
-
 		private:
 
 			channel_common_state<Message, Lockable> *state;
@@ -85,10 +81,6 @@ namespace Si
 					state->message = &message;
 					state->delivery = &receiver;
 				}
-			}
-
-			void cancel()
-			{
 			}
 
 		private:
