@@ -162,9 +162,12 @@ BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 	{
 		auto a = Si::receive(channel, yield);
 		BOOST_REQUIRE(a);
+		BOOST_CHECK_EQUAL(2, *a);
 		auto b = Si::receive(channel, yield);
 		BOOST_REQUIRE(b);
+		BOOST_CHECK_EQUAL(3, *b);
 		int result = *a + *b;
+		BOOST_CHECK_EQUAL(5, result);
 		yield(result);
 	});
 	bool got = false;
@@ -191,9 +194,12 @@ BOOST_AUTO_TEST_CASE(channel_with_thread)
 	{
 		auto a = Si::receive(channel, yield);
 		BOOST_REQUIRE(a);
+		BOOST_CHECK_EQUAL(2, *a);
 		auto b = Si::receive(channel, yield);
 		BOOST_REQUIRE(b);
+		BOOST_CHECK_EQUAL(3, *b);
 		int result = *a + *b;
+		BOOST_CHECK_EQUAL(5, result);
 		yield(result);
 	});
 	bool got = false;
