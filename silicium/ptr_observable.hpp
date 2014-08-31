@@ -58,12 +58,6 @@ namespace Si
 			return content->async_get_one(receiver);
 		}
 
-		void cancel()
-		{
-			assert(content);
-			return content->cancel();
-		}
-
 	private:
 
 		Ptr content;

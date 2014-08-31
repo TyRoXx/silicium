@@ -40,11 +40,6 @@ namespace Si
 			return next.async_get_one(receiver);
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-			return next.cancel();
-		}
-
 	private:
 
 		Observable next;

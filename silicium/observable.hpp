@@ -15,7 +15,6 @@ namespace Si
 		}
 
 		virtual void async_get_one(observer<element_type> &receiver) = 0;
-		virtual void cancel() = 0;
 	};
 }
 

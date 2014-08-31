@@ -37,12 +37,6 @@ namespace Si
 			this->receiver = &receiver;
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-			assert(receiver);
-			receiver = nullptr;
-		}
-
 	private:
 
 		observer<element_type> *receiver = nullptr;

@@ -31,13 +31,6 @@ namespace Si
 			return async_get_one_impl<0, Parts...>();
 		}
 
-		void cancel()
-		{
-			assert(receiver_);
-			cancel_impl<0, sizeof...(Parts)>();
-			receiver_ = nullptr;
-		}
-
 	private:
 
 		template <class Element, std::size_t Index>
@@ -47,22 +40,12 @@ namespace Si
 
 			virtual void got_element(Element value) SILICIUM_OVERRIDE
 			{
-				cancel_others();
 				Si::exchange(combinator->receiver_, nullptr)->got_element(element_type{std::move(value)});
 			}
 
 			virtual void ended() SILICIUM_OVERRIDE
 			{
-				cancel_others();
 				Si::exchange(combinator->receiver_, nullptr)->ended();
-			}
-
-		private:
-
-			void cancel_others()
-			{
-				combinator->cancel_impl<0, Index>();
-				combinator->cancel_impl<Index + 1, sizeof...(Parts)>();
 			}
 		};
 
@@ -85,34 +68,17 @@ namespace Si
 		void async_get_one_impl()
 		{
 			auto &observer = std::get<Index>(observers);
-			observer.combinator = this;
-			auto &part = std::get<Index>(parts);
-			part.async_get_one(observer);
+			if (!observer.combinator)
+			{
+				observer.combinator = this;
+				auto &part = std::get<Index>(parts);
+				part.async_get_one(observer);
+			}
 			return async_get_one_impl<Index + 1, Tail...>();
 		}
 
 		template <std::size_t Index>
 		void async_get_one_impl()
-		{
-		}
-
-		template <std::size_t Begin, std::size_t End>
-		void cancel_impl()
-		{
-			return cancel_impl<Begin, End>(std::integral_constant<bool, (Begin < End)>());
-		}
-
-		template <std::size_t Begin, std::size_t End>
-		void cancel_impl(std::true_type)
-		{
-			assert(receiver_);
-			auto &part = std::get<Begin>(parts);
-			part.cancel();
-			return cancel_impl<Begin + 1, End>();
-		}
-
-		template <std::size_t Begin, std::size_t End>
-		void cancel_impl(std::false_type)
 		{
 		}
 	};
