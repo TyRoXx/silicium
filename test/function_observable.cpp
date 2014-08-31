@@ -14,5 +14,6 @@ BOOST_AUTO_TEST_CASE(function_observable_trivial)
 	{
 		result = r;
 	});
+	o.async_get_one(consumer);
 	BOOST_CHECK_EQUAL(boost::make_optional(2), result);
 }
