@@ -69,6 +69,7 @@ namespace Si
 
 			void set_message(Message &message)
 			{
+				//TODO: combine this lock with the one in async_get_one
 				boost::unique_lock<boost::mutex> lock(state->access);
 				assert(!state->message);
 				if (state->receiver)
