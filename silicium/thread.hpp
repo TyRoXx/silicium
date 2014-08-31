@@ -72,6 +72,19 @@ namespace Si
 		{
 		}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		thread_observable(thread_observable &&other) BOOST_NOEXCEPT
+			: state(std::move(other.state))
+		{
+		}
+
+		thread_observable &operator = (thread_observable &&other) BOOST_NOEXCEPT
+		{
+			state = std::move(other.state);
+			return *this;
+		}
+#endif
+
 		void wait()
 		{
 			return state->wait();

@@ -500,7 +500,7 @@ namespace Si
 	}
 
 	template <class Container>
-	auto data(Container &container)
+	auto data(Container &container) -> decltype(&container[0])
 	{
 		return container.empty() ? nullptr : &container[0];
 	}
