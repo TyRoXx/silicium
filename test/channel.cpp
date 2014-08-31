@@ -121,14 +121,17 @@ namespace Si
 		{
 		}
 
-		detail::channel_receiving_end<Message, mutex> &receiver()
+		template <class YieldContext>
+		void send(Message message, YieldContext &yield)
 		{
-			return receiving;
+			sending.set_message(message);
+			yield.get_one(sending);
 		}
 
-		detail::channel_sending_end<Message, mutex> &sender()
+		template <class YieldContext>
+		boost::optional<Message> receive(YieldContext &yield)
 		{
-			return sending;
+			return yield.get_one(receiving);
 		}
 
 	private:
@@ -137,19 +140,6 @@ namespace Si
 		detail::channel_receiving_end<Message, mutex> receiving;
 		detail::channel_sending_end<Message, mutex> sending;
 	};
-
-	template <class Message, class YieldContext>
-	void send(channel<Message> &chan, Message message, YieldContext &yield)
-	{
-		chan.sender().set_message(message);
-		yield.get_one(chan.sender());
-	}
-
-	template <class Message, class YieldContext>
-	boost::optional<Message> receive(channel<Message> &chan, YieldContext &yield)
-	{
-		return yield.get_one(chan.receiver());
-	}
 }
 
 BOOST_AUTO_TEST_CASE(channel_with_coroutine)
@@ -157,15 +147,15 @@ BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 	Si::channel<int> channel;
 	auto t = Si::make_coroutine<int>([&channel](Si::yield_context<int> &yield)
 	{
-		Si::send(channel, 2, yield);
-		Si::send(channel, 3, yield);
+		channel.send(2, yield);
+		channel.send(3, yield);
 	});
 	auto s = Si::make_coroutine<int>([&channel](Si::yield_context<int> &yield)
 	{
-		auto a = Si::receive(channel, yield);
+		auto a = channel.receive(yield);
 		BOOST_REQUIRE(a);
 		BOOST_CHECK_EQUAL(2, *a);
-		auto b = Si::receive(channel, yield);
+		auto b = channel.receive(yield);
 		BOOST_REQUIRE(b);
 		BOOST_CHECK_EQUAL(3, *b);
 		int result = *a + *b;
@@ -189,15 +179,15 @@ BOOST_AUTO_TEST_CASE(channel_with_thread)
 	Si::channel<int> channel;
 	auto t = Si::make_thread<int, Si::boost_threading>([&channel](Si::yield_context<int> &yield)
 	{
-		Si::send(channel, 2, yield);
-		Si::send(channel, 3, yield);
+		channel.send(2, yield);
+		channel.send(3, yield);
 	});
 	auto s = Si::make_thread<int, Si::boost_threading>([&channel](Si::yield_context<int> &yield)
 	{
-		auto a = Si::receive(channel, yield);
+		auto a = channel.receive(yield);
 		BOOST_REQUIRE(a);
 		BOOST_CHECK_EQUAL(2, *a);
-		auto b = Si::receive(channel, yield);
+		auto b = channel.receive(yield);
 		BOOST_REQUIRE(b);
 		BOOST_CHECK_EQUAL(3, *b);
 		int result = *a + *b;
