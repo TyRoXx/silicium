@@ -7,13 +7,14 @@
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/override.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace Si
 {
 #define SILICIUM_RX_VARIANT_AVAILABLE 1
 
 #if SILICIUM_RX_VARIANT_AVAILABLE
-	template <template <class ...T> class variant, class ...Parts>
+	template <template <class ...T> class variant, class Lockable, class ...Parts>
 	struct variant_observable
 	{
 		typedef variant<typename Parts::element_type...> element_type;
@@ -21,11 +22,35 @@ namespace Si
 		template <class ...P>
 		explicit variant_observable(P &&...parts)
 			: parts(std::forward<P>(parts)...)
+			, mutex(new Lockable)
 		{
 		}
 
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		variant_observable(variant_observable &&other) = default;
+		variant_observable &operator = (variant_observable &&other) = default;
+#else
+		variant_observable(variant_observable &&other)
+			: parts(std::move(other.parts))
+			, observers(std::move(other.observers))
+			, receiver_(other.receiver_)
+			, mutex(std::move(other.mutex))
+		{
+		}
+
+		variant_observable &operator = (variant_observable &&other)
+		{
+			parts = std::move(other.parts);
+			observers = std::move(other.observers);
+			receiver_ = other.receiver_;
+			mutex = std::move(other.mutex);
+			return *this;
+		}
+#endif
+
 		void async_get_one(Si::observer<element_type> &receiver)
 		{
+			boost::unique_lock<Lockable> lock(*mutex);
 			assert(!receiver_);
 			receiver_ = &receiver;
 			return async_get_one_impl<0, Parts...>();
@@ -37,15 +62,32 @@ namespace Si
 		struct tuple_observer : observer<Element>
 		{
 			variant_observable *combinator = nullptr;
+			boost::optional<Element> cached;
 
 			virtual void got_element(Element value) SILICIUM_OVERRIDE
 			{
-				Si::exchange(combinator->receiver_, nullptr)->got_element(element_type{std::move(value)});
+				assert(!cached);
+				boost::unique_lock<Lockable> lock(*combinator->mutex);
+				auto * const receiver = Si::exchange(Si::exchange(combinator, nullptr)->receiver_, nullptr);
+				if (!receiver)
+				{
+					cached = std::move(value);
+					return;
+				}
+				lock.unlock();
+				receiver->got_element(element_type{std::move(value)});
 			}
 
 			virtual void ended() SILICIUM_OVERRIDE
 			{
-				Si::exchange(combinator->receiver_, nullptr)->ended();
+				boost::unique_lock<Lockable> lock(*combinator->mutex);
+				auto * const receiver = Si::exchange(Si::exchange(combinator, nullptr)->receiver_, nullptr);
+				if (!receiver)
+				{
+					return;
+				}
+				lock.unlock();
+				receiver->ended();
 			}
 		};
 
@@ -63,6 +105,7 @@ namespace Si
 		std::tuple<Parts...> parts;
 		observers_type observers;
 		Si::observer<element_type> *receiver_ = nullptr;
+		std::unique_ptr<Lockable> mutex;
 
 		template <std::size_t Index, class Head, class ...Tail>
 		void async_get_one_impl()
@@ -70,6 +113,12 @@ namespace Si
 			auto &observer = std::get<Index>(observers);
 			if (!observer.combinator)
 			{
+				if (observer.cached)
+				{
+					auto value = std::move(*observer.cached);
+					Si::exchange(receiver_, nullptr)->got_element(std::move(value));
+					return;
+				}
 				observer.combinator = this;
 				auto &part = std::get<Index>(parts);
 				part.async_get_one(observer);
@@ -81,18 +130,27 @@ namespace Si
 		void async_get_one_impl()
 		{
 		}
+
+		BOOST_DELETED_FUNCTION(variant_observable(variant_observable const &));
+		BOOST_DELETED_FUNCTION(variant_observable &operator = (variant_observable const &));
 	};
 
-	template <class ...Parts>
-	auto make_variant(Parts &&...parts) -> variant_observable<Si::fast_variant, typename std::decay<Parts>::type...>
+	template <class Lockable = boost::recursive_mutex, class ...Parts>
+	auto make_variant(Parts &&...parts)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> variant_observable<Si::fast_variant, Lockable, typename std::decay<Parts>::type...>
+#endif
 	{
-		return variant_observable<Si::fast_variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
+		return variant_observable<Si::fast_variant, Lockable, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}
 
-	template <template <class ...T> class variant, class ...Parts>
-	auto make_variant(Parts &&...parts) -> variant_observable<variant, typename std::decay<Parts>::type...>
+	template <template <class ...T> class variant, class Lockable = boost::recursive_mutex, class ...Parts>
+	auto make_variant(Parts &&...parts)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> variant_observable<variant, Lockable, typename std::decay<Parts>::type...>
+#endif
 	{
-		return variant_observable<variant, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
+		return variant_observable<variant, Lockable, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}
 #endif
 }

@@ -2,6 +2,7 @@
 #include <silicium/consume.hpp>
 #include <silicium/thread.hpp>
 #include <silicium/function_observable.hpp>
+#include <silicium/variant_observable.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
@@ -178,6 +179,49 @@ BOOST_AUTO_TEST_CASE(channel_with_thread)
 	});
 	bool got = false;
 	auto consumer = Si::consume<int>([&s, &got](int result)
+	{
+		BOOST_CHECK(!got);
+		got = true;
+		BOOST_CHECK_EQUAL(5, result);
+	});
+	t.async_get_one(consumer);
+	s.async_get_one(consumer);
+	t.wait();
+	s.wait();
+	BOOST_CHECK(got);
+}
+
+BOOST_AUTO_TEST_CASE(channel_select)
+{
+	Si::channel<int> channel_1;
+	Si::channel<long> channel_2;
+	auto t = Si::make_thread<long, Si::boost_threading>([&](Si::yield_context<long> &yield)
+	{
+		channel_1.send(2, yield);
+		channel_2.send(3L, yield);
+	});
+	auto s = Si::make_thread<long, Si::boost_threading>([&](Si::yield_context<long> &yield)
+	{
+		auto both = Si::make_variant(Si::ref(channel_1.receiver()), Si::ref(channel_2.receiver()));
+		boost::optional<Si::fast_variant<int, long>> a = yield.get_one(both);
+		BOOST_REQUIRE(a);
+		boost::optional<Si::fast_variant<int, long>> b = yield.get_one(both);
+		BOOST_REQUIRE(b);
+		long const result = Si::visit<long>(
+			*a,
+			[&b](int left)
+		{
+			return Si::visit<long>(
+				*b,
+				[](int) -> long { BOOST_FAIL("wrong type"); SILICIUM_UNREACHABLE(); },
+				[left](long right) { return left + right; });
+		},
+			[](long) -> long { BOOST_FAIL("wrong type"); SILICIUM_UNREACHABLE(); });
+		BOOST_CHECK_EQUAL(5L, result);
+		yield(result);
+	});
+	bool got = false;
+	auto consumer = Si::consume<long>([&s, &got](long result)
 	{
 		BOOST_CHECK(!got);
 		got = true;
