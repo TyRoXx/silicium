@@ -131,8 +131,8 @@ namespace Si
 		{
 		}
 
-		BOOST_DELETED_FUNCTION(variant_observable(variant_observable const &));
-		BOOST_DELETED_FUNCTION(variant_observable &operator = (variant_observable const &));
+		BOOST_DELETED_FUNCTION(variant_observable(variant_observable const &))
+		BOOST_DELETED_FUNCTION(variant_observable &operator = (variant_observable const &))
 	};
 
 	template <class Lockable = boost::recursive_mutex, class ...Parts>

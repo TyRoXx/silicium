@@ -57,13 +57,6 @@ namespace Si
 			input.async_get_one(*this);
 		}
 
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-			assert(receiver_);
-			receiver_ = nullptr;
-			input.cancel();
-		}
-
 	private:
 
 		Input input;
