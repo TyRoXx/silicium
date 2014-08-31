@@ -1,6 +1,7 @@
 #include <silicium/coroutine.hpp>
 #include <silicium/consume.hpp>
 #include <silicium/thread.hpp>
+#include <silicium/function_observable.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
@@ -66,37 +67,23 @@ namespace Si
 				: state(&state)
 			{
 			}
-
-			void set_message(Message &message)
+			
+			void async_get_one(observer<element_type> &receiver, Message &message)
 			{
-				//TODO: combine this lock with the one in async_get_one
 				boost::unique_lock<boost::mutex> lock(state->access);
 				assert(!state->message);
+				assert(!state->delivery);
 				if (state->receiver)
 				{
-					auto * const receiver = Si::exchange(state->receiver, nullptr);
+					auto * const message_receiver = Si::exchange(state->receiver, nullptr);
 					lock.unlock();
-					receiver->got_element(std::move(message));
+					message_receiver->got_element(std::move(message));
+					receiver.got_element(delivered());
 				}
 				else
 				{
 					state->message = &message;
-				}
-			}
-
-			void async_get_one(observer<element_type> &receiver)
-			{
-				boost::unique_lock<boost::mutex> lock(state->access);
-				assert(!state->delivery);
-				if (state->message)
-				{
 					state->delivery = &receiver;
-				}
-				else
-				{
-					assert(!state->receiver);
-					lock.unlock();
-					receiver.got_element(delivered());
 				}
 			}
 
@@ -125,8 +112,11 @@ namespace Si
 		template <class YieldContext>
 		void send(Message message, YieldContext &yield)
 		{
-			sending.set_message(message);
-			yield.get_one(sending);
+			auto message_bound = make_function_observable<detail::delivered>([this, &message](observer<detail::delivered> &receiver)
+			{
+				return sending.async_get_one(receiver, message);
+			});
+			yield.get_one(message_bound);
 		}
 
 		template <class YieldContext>
