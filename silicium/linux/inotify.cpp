@@ -72,13 +72,5 @@ namespace Si
 			});
 			receiver_ = &receiver;
 		}
-
-		void inotify_observable::cancel()
-		{
-			assert(receiver_);
-			assert(notifier);
-			notifier->cancel();
-			receiver_ = nullptr;
-		}
 	}
 }

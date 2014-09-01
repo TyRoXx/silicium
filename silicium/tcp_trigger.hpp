@@ -11,7 +11,6 @@ namespace Si
 		explicit tcp_trigger(boost::asio::io_service &io, boost::asio::ip::tcp::endpoint address);
 		template <class Handler>
 		void async_wait(Handler handler);
-		void cancel();
 
 	private:
 

@@ -95,11 +95,6 @@ namespace Si
 			return state->async_get_one(receiver);
 		}
 
-		void cancel()
-		{
-			return state->cancel();
-		}
-
 	private:
 
 		struct state_type : private detail::yield_context_impl<Element>

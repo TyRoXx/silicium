@@ -26,13 +26,6 @@ namespace Si
 			input.async_get_one(*this);
 		}
 
-		void cancel()
-		{
-			assert(receiver_);
-			receiver_ = nullptr;
-			return input.cancel();
-		}
-
 	private:
 
 		Input input;

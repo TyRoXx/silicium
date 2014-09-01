@@ -56,11 +56,6 @@ namespace Si
 			impl.async_get_one(receiver);
 		}
 
-		void cancel()
-		{
-			impl.cancel();
-		}
-
 	private:
 
 		linux::inotify_observable inotify;

@@ -210,12 +210,6 @@ namespace Si
 			}
 		}
 
-		void cancel()
-		{
-			assert(s->receiver);
-			s.reset();
-		}
-
 	private:
 
 		struct state

@@ -56,11 +56,6 @@ namespace Si
 			original.async_get_one(*this);
 		}
 
-		void cancel()
-		{
-			return original.cancel();
-		}
-
 	private:
 
 		Transform transform; //TODO empty base optimization

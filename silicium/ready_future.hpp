@@ -50,11 +50,6 @@ namespace Si
 			receiver.got_element(std::move(value));
 		}
 
-		void cancel()
-		{
-			SILICIUM_UNREACHABLE();
-		}
-
 	private:
 
 		Element value;

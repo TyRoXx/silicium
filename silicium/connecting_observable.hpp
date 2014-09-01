@@ -28,12 +28,6 @@ namespace Si
 			});
 		}
 
-		void cancel()
-		{
-			assert(receiver_);
-			throw std::logic_error("to do");
-		}
-
 	private:
 
 		boost::asio::ip::tcp::socket *socket = nullptr;

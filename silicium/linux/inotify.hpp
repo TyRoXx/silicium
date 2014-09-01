@@ -76,7 +76,6 @@ namespace Si
 			explicit inotify_observable(boost::asio::io_service &io);
 			error_or<watch_descriptor> watch(boost::filesystem::path const &target, boost::uint32_t mask);
 			void async_get_one(observer<element_type> &receiver);
-			void cancel();
 
 		private:
 

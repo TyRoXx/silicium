@@ -9,8 +9,8 @@ namespace Si
 {
 	template <class Input, class Predicate>
 	struct filter_observable
-			: public observable<typename Input::element_type>
-			, private observer<typename Input::element_type>
+		: public observable<typename Input::element_type>
+		, private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 
@@ -25,11 +25,6 @@ namespace Si
 			assert(!receiver_);
 			receiver_ = &receiver;
 			input.async_get_one(*this);
-		}
-
-		virtual void cancel() SILICIUM_OVERRIDE
-		{
-			assert(receiver_);
 		}
 
 	private:

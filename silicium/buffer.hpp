@@ -59,13 +59,6 @@ namespace Si
 			}
 		}
 
-		void cancel()
-		{
-			assert(receiver);
-			assert(fetching);
-			return from.cancel();
-		}
-
 		void prefetch()
 		{
 			check_fetch();

@@ -39,10 +39,6 @@ namespace Si
 			return receiver.got_element(generate());
 		}
 
-		void cancel()
-		{
-		}
-
 	private:
 
 		Generated generate;

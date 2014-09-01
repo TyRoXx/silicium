@@ -122,11 +122,6 @@ namespace Si
 			next();
 		}
 
-		void cancel()
-		{
-			throw std::logic_error("not implemented");
-		}
-
 		//TODO make private
 		void operator()(detail::result<element_type> command)
 		{

@@ -14,11 +14,6 @@ namespace Si
 		{
 			return receiver.ended();
 		}
-
-		void cancel()
-		{
-			throw std::logic_error("empty observable cannot be cancelled");
-		}
 	};
 }
 

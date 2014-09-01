@@ -65,14 +65,6 @@ namespace Si
 			});
 		}
 
-		void cancel()
-		{
-			assert(receiver_);
-			assert(underlying);
-			underlying->cancel();
-			receiver_ = nullptr;
-		}
-
 	private:
 
 		boost::asio::ip::tcp::acceptor *underlying = nullptr;

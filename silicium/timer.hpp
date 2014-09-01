@@ -44,13 +44,6 @@ namespace Si
 			});
 		}
 
-		void cancel()
-		{
-			assert(receiver_);
-			impl.cancel();
-			receiver_ = nullptr;
-		}
-
 	private:
 
 		timer_impl impl;

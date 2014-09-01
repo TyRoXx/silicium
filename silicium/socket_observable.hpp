@@ -63,13 +63,6 @@ namespace Si
 			});
 		}
 
-		void cancel()
-		{
-			assert(receiver_);
-			socket->cancel();
-			receiver_ = nullptr;
-		}
-
 	private:
 
 		boost::asio::ip::tcp::socket *socket;

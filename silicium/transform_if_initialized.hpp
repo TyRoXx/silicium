@@ -54,11 +54,6 @@ namespace Si
 			fetch();
 		}
 
-		void cancel()
-		{
-			throw std::logic_error("to do");
-		}
-
 	private:
 
 		Input original;

@@ -45,11 +45,6 @@ namespace Si
 			});
 		}
 
-		void cancel()
-		{
-			throw std::logic_error("to do");
-		}
-
 		element_type get_one()
 		{
 			return act();

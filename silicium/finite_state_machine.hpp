@@ -54,11 +54,6 @@ namespace Si
 			in.async_get_one(*this);
 		}
 
-		void cancel()
-		{
-			//TODO
-		}
-
 	private:
 
 		In in;

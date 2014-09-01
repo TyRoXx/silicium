@@ -68,12 +68,6 @@ namespace Si
 			}
 		}
 
-		void cancel()
-		{
-			assert(receiver_);
-			throw std::logic_error("not implemented");
-		}
-
 	private:
 
 		RangeObservable input;

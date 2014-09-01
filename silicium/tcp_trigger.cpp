@@ -6,9 +6,4 @@ namespace Si
 		: m_acceptor(io, address, true)
 	{
 	}
-
-	void tcp_trigger::cancel()
-	{
-		m_acceptor.cancel();
-	}
 }

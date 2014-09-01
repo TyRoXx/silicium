@@ -58,11 +58,6 @@ namespace Si
 			return async_get_one_impl<0, Parts...>();
 		}
 
-		void cancel()
-		{
-			return cancel_impl<0, Parts...>();
-		}
-
 	private:
 
 		template <class Element, std::size_t Index>
@@ -114,20 +109,6 @@ namespace Si
 
 		template <std::size_t Index>
 		void async_get_one_impl()
-		{
-		}
-
-		template <std::size_t Index, class Head, class ...Tail>
-		void cancel_impl()
-		{
-			assert(receiver);
-			auto &part = std::get<Index>(parts);
-			part.cancel();
-			return cancel_impl<Index + 1, Tail...>();
-		}
-
-		template <std::size_t Index>
-		void cancel_impl()
 		{
 		}
 
