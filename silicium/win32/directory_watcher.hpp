@@ -56,11 +56,6 @@ namespace Si
 			return impl.async_get_one(receiver);
 		}
 
-		void cancel()
-		{
-			return impl.cancel();
-		}
-
 	private:
 
 		//TODO: save the memory for the function pointer
