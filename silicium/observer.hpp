@@ -3,10 +3,10 @@
 
 namespace Si
 {
-	template <class E>
+	template <class Element>
 	struct observer
 	{
-		typedef E element_type;
+		typedef Element element_type;
 
 		virtual ~observer()
 		{

@@ -7,10 +7,10 @@
 
 namespace Si
 {
-	template <class E>
+	template <class Element>
 	struct observable
 	{
-		typedef E element_type;
+		typedef Element element_type;
 
 		virtual ~observable()
 		{
