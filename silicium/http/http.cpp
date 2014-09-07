@@ -1,4 +1,5 @@
 #include <silicium/http/http.hpp>
+#include <silicium/detail/line_source.hpp>
 
 namespace Si
 {
@@ -21,7 +22,7 @@ namespace Si
 
 		boost::optional<request_header> parse_header(Si::source<char> &in)
 		{
-			Si::line_source lines(in);
+			Si::detail::line_source lines(in);
 			auto first_line = get(lines);
 			if (!first_line)
 			{
@@ -92,7 +93,7 @@ namespace Si
 
 		boost::optional<response_header> parse_response_header(Si::source<char> &in)
 		{
-			Si::line_source lines(in);
+			Si::detail::line_source lines(in);
 			auto first_line = get(lines);
 			if (!first_line)
 			{

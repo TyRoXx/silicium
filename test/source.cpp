@@ -1,5 +1,6 @@
 #include <silicium/generator_source.hpp>
 #include <silicium/memory_source.hpp>
+#include <silicium/detail/line_source.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
@@ -7,7 +8,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(line_source_empty)
 	{
 		memory_source<char> empty;
-		line_source lines(empty);
+		detail::line_source lines(empty);
 		BOOST_CHECK_EQUAL(0, lines.minimum_size());
 		BOOST_REQUIRE(lines.maximum_size());
 		BOOST_CHECK_EQUAL(static_cast<boost::uintmax_t>(0), *lines.maximum_size());
@@ -21,7 +22,7 @@ namespace Si
 	{
 		std::string const original = "abc\r\n123";
 		memory_source<char> source(boost::make_iterator_range(original.data(), original.data() + original.size()));
-		line_source lines(source);
+		detail::line_source lines(source);
 		BOOST_CHECK_EQUAL(0, lines.minimum_size());
 		BOOST_REQUIRE(lines.maximum_size());
 		BOOST_CHECK_EQUAL(static_cast<boost::uintmax_t>(original.size()), *lines.maximum_size());
