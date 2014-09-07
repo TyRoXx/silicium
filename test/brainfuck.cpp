@@ -128,15 +128,15 @@ namespace bf
 	template <class Input, class CommandRange, class MemoryRange>
 	auto execute(Input &&input, CommandRange const &program, MemoryRange &memory, std::size_t original_pointer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> Si::coroutine_observable<char>
+		-> Si::coroutine_observable<boost::uint8_t>
 #endif
 	{
-		return Si::make_coroutine<char>([
+		return Si::make_coroutine<boost::uint8_t>([
 			input SILICIUM_CAPTURE(std::forward<Input>(input)),
 			program,
 			&memory,
 			original_pointer
-			](Si::yield_context<char> &yield) mutable
+			](Si::yield_context<boost::uint8_t> &yield) mutable
 		{
 			std::unordered_map<std::ptrdiff_t, typename CommandRange::const_iterator> loop_pairs;
 			auto pointer = original_pointer;
@@ -222,10 +222,10 @@ namespace bf
 
 BOOST_AUTO_TEST_CASE(bf_empty)
 {
-	Si::empty<char> input;
-	std::array<char, 1> memory{{}};
+	Si::empty<boost::uint8_t> input;
+	std::array<boost::uint8_t, 1> memory{ {} };
 	auto interpreter = bf::execute(input, boost::iterator_range<bf::command const *>(), memory, 0);
-	auto done = Si::for_each(std::move(interpreter), [](char output)
+	auto done = Si::for_each(std::move(interpreter), [](boost::uint8_t output)
 	{
 		boost::ignore_unused_variable_warning(output);
 		BOOST_FAIL("no output expected");
@@ -259,11 +259,11 @@ namespace
 BOOST_AUTO_TEST_CASE(bf_hello_world)
 {
 	std::string const hello_world = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
-	std::array<char, 100> memory{ {} };
-	Si::empty<char> input;
+	std::array<boost::uint8_t, 100> memory{ {} };
+	Si::empty<boost::uint8_t> input;
 	auto interpreter = bf::execute(input, scan_all(Si::make_container_source(hello_world)), memory, 0);
 	std::string printed;
-	auto done = Si::for_each(std::move(interpreter), [&printed](char output)
+	auto done = Si::for_each(std::move(interpreter), [&printed](boost::uint8_t output)
 	{
 		printed.push_back(output);
 	});
