@@ -37,19 +37,31 @@ namespace bf
 
 	template <class Source>
 	auto scan(Source &&source)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> Si::conditional_transformer<command, typename std::decay<Source>::type, boost::optional<command>(*)(char)>
+#endif
 	{
 		return Si::transform_if_initialized(std::forward<Source>(source), detect_command);
 	}
 
-	template <class Input, class CommandRange>
-	auto execute(Input &&input, CommandRange const &program, std::vector<boost::uint8_t> memory, std::size_t original_pointer)
+#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
+#	define SILICIUM_CAPTURE(x) = (x)
+#else
+#	define SILICIUM_CAPTURE(x)
+#endif
+
+	template <class Input, class CommandRange, class MemoryRange>
+	auto execute(Input &&input, CommandRange const &program, MemoryRange &memory, std::size_t original_pointer)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> Si::coroutine_observable<char>
+#endif
 	{
 		return Si::make_coroutine<char>([
-			input = std::forward<Input>(input),
+			input SILICIUM_CAPTURE(std::forward<Input>(input)),
 			program,
-			memory = std::move(memory),
+			&memory,
 			original_pointer
-			](Si::yield_context<char> &yield) mutable /*for memory*/
+			](Si::yield_context<char> &yield) mutable
 		{
 			auto pointer = original_pointer;
 			for (command com : program)
@@ -58,7 +70,7 @@ namespace bf
 				{
 				case command::ptr_increment:
 					++pointer;
-					if (pointer == memory.size())
+					if (pointer == boost::size(memory))
 					{
 						pointer = 0;
 					}
@@ -67,7 +79,7 @@ namespace bf
 				case command::ptr_decrement:
 					if (pointer == 0)
 					{
-						pointer = memory.size() - 1;
+						pointer = boost::size(memory) - 1;
 					}
 					else
 					{
@@ -106,7 +118,8 @@ namespace bf
 BOOST_AUTO_TEST_CASE(bf_empty)
 {
 	Si::empty<char> source;
-	auto interpreter = bf::execute(source, boost::iterator_range<bf::command const *>(), std::vector<boost::uint8_t>(), 0);
+	std::array<char, 1> memory{{}};
+	auto interpreter = bf::execute(source, boost::iterator_range<bf::command const *>(), memory, 0);
 	auto done = Si::for_each(std::move(interpreter), [](char output)
 	{
 		boost::ignore_unused_variable_warning(output);

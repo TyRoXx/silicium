@@ -46,6 +46,12 @@
 #	define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 0
 #endif
 
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) || defined(__clang__)
+#	define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 1
+#else
+#	define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 0
+#endif
+
 namespace Si
 {
 	struct nothing
