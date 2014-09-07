@@ -445,7 +445,7 @@ namespace Si
 	{
 		template <class Transformation2>
 		explicit transforming_source(source<From> &original, Transformation2 &&transform)
-			: original(original)
+			: original(&original)
 			, transform(std::forward<Transformation2>(transform))
 		{
 		}
@@ -461,7 +461,8 @@ namespace Si
 			auto i = boost::begin(destination);
 			for (; i != boost::end(destination); ++i)
 			{
-				auto next = Si::get(original);
+				assert(original);
+				auto next = Si::get(*original);
 				if (!next)
 				{
 					break;
@@ -473,23 +474,23 @@ namespace Si
 
 		virtual boost::uintmax_t minimum_size() override
 		{
-			return original.minimum_size();
+			return original->minimum_size();
 		}
 
 		virtual boost::optional<boost::uintmax_t> maximum_size() override
 		{
-			return original.maximum_size();
+			return original->maximum_size();
 		}
 
 		virtual std::size_t skip(std::size_t count) override
 		{
-			return original.skip(count);
+			return original->skip(count);
 		}
 
 	private:
 
-		source<From> &original;
-		Transformation const transform;
+		source<From> *original = nullptr;
+		Transformation transform;
 	};
 
 	template <class To, class From, class Transformation>
