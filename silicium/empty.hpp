@@ -10,6 +10,8 @@ namespace Si
 	template <class Element>
 	struct empty
 	{
+		using element_type = Element;
+
 		void async_get_one(observer<Element> &receiver)
 		{
 			return receiver.ended();
