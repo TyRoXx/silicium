@@ -1,4 +1,4 @@
-#include <silicium/source.hpp>
+#include <silicium/generator_source.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
