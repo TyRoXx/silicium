@@ -20,7 +20,7 @@ namespace Si
 		};
 
 		template <class F, class R, class ...Args>
-		using proper_value_function = proper_value_function_impl<F, std::is_default_constructible<F>::value && std::is_copy_assignable<F>::value, R, Args...>;
+		using proper_value_function = proper_value_function_impl<F, std::is_default_constructible<F>::value && std::is_move_assignable<F>::value, R, Args...>;
 	}
 }
 
