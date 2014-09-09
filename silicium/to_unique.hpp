@@ -13,9 +13,4 @@ namespace Si
 	}
 }
 
-namespace Si
-{
-	using Si::to_unique;
-}
-
 #endif
