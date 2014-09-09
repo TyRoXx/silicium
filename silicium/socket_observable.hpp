@@ -33,6 +33,10 @@ namespace Si
 		typedef received_from_socket element_type;
 		typedef boost::iterator_range<char *> buffer_type;
 
+		socket_observable()
+		{
+		}
+
 		socket_observable(boost::asio::ip::tcp::socket &socket, buffer_type buffer)
 			: socket(&socket)
 			, buffer(buffer)

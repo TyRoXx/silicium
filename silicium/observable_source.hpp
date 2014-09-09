@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_OBSERVABLE_SOURCE_HPP
-#define SILICIUM_REACTIVE_OBSERVABLE_SOURCE_HPP
+#ifndef SILICIUM_OBSERVABLE_SOURCE_HPP
+#define SILICIUM_OBSERVABLE_SOURCE_HPP
 
 #include <silicium/observable.hpp>
 #include <silicium/source.hpp>
@@ -10,6 +10,10 @@ namespace Si
 	struct observable_source
 	{
 		typedef typename Observable::element_type element_type;
+
+		observable_source()
+		{
+		}
 
 		observable_source(Observable input, YieldContext &yield)
 			: input(std::move(input))
