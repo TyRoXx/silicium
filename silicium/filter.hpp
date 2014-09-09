@@ -3,7 +3,7 @@
 
 #include <silicium/observable.hpp>
 #include <silicium/override.hpp>
-#include <utility>
+#include <silicium/detail/proper_value_function.hpp>
 #include <cassert>
 
 namespace Si
@@ -29,14 +29,16 @@ namespace Si
 
 	private:
 
+		using proper_predicate = typename detail::proper_value_function<Predicate, bool, element_type const &>::type;
+
 		Input input;
-		Predicate is_propagated;
+		proper_predicate is_propagated;
 		observer<element_type> *receiver_ = nullptr;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
-			if (!is_propagated(static_cast<typename std::add_const<element_type>::type>(value)))
+			if (!is_propagated(static_cast<typename std::add_const<element_type>::type &>(value)))
 			{
 				input.async_get_one(*this);
 				return;
@@ -57,8 +59,8 @@ namespace Si
 		typename std::decay<Predicate>::type>
 	{
 		return filter_observable<
-				typename std::decay<Input>::type,
-				typename std::decay<Predicate>::type>(std::forward<Input>(input), std::forward<Predicate>(is_propagated));
+			typename std::decay<Input>::type,
+			typename std::decay<Predicate>::type>(std::forward<Input>(input), std::forward<Predicate>(is_propagated));
 	}
 }
 
