@@ -2,12 +2,17 @@
 #define SILICIUM_GENERATOR_SOURCE_HPP
 
 #include <silicium/source.hpp>
+#include <silicium/detail/proper_value_function.hpp>
 
 namespace Si
 {
 	template <class Element, class Generator>
 	struct generator_source SILICIUM_FINAL : source<Element>
 	{
+		generator_source()
+		{
+		}
+
 		explicit generator_source(Generator generate_next)
 			: m_generate_next(std::move(generate_next))
 		{
@@ -59,7 +64,9 @@ namespace Si
 
 	private:
 
-		Generator m_generate_next;
+		using proper_generator = typename detail::proper_value_function<Generator, boost::optional<Element>>::type;
+
+		proper_generator m_generate_next;
 	};
 
 	template <class Element, class Generator>

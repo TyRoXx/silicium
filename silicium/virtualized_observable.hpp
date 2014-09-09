@@ -1,5 +1,5 @@
-#ifndef SILICIUM_VIRTUALIZE_HPP
-#define SILICIUM_VIRTUALIZE_HPP
+#ifndef SILICIUM_VIRTUALIZED_OBSERVABLE_HPP
+#define SILICIUM_VIRTUALIZED_OBSERVABLE_HPP
 
 #include <silicium/config.hpp>
 #include <silicium/observable.hpp>

@@ -7,6 +7,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/concept_check.hpp>
 #include <vector>
 
 namespace Si
@@ -14,16 +15,58 @@ namespace Si
 	template <class Element>
 	struct source
 	{
+		using element_type = Element;
+
 		virtual ~source()
 		{
 		}
 
-		virtual boost::iterator_range<Element const *> map_next(std::size_t size) = 0;
-		virtual Element *copy_next(boost::iterator_range<Element *> destination) = 0;
+		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) = 0;
+		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) = 0;
 		virtual boost::uintmax_t minimum_size() = 0;
 		virtual boost::optional<boost::uintmax_t> maximum_size() = 0;
 		virtual std::size_t skip(std::size_t count) = 0;
 	};
+
+	template <class X>
+	struct Source
+	{
+		using element_type = typename X::element_type;
+
+		BOOST_CONCEPT_USAGE(Source)
+		{
+			X move_constructed = std::move(source);
+			boost::ignore_unused_variable_warning(move_constructed);
+			source = std::move(move_constructed);
+			X default_constructible;
+			boost::ignore_unused_variable_warning(default_constructible);
+			boost::iterator_range<element_type const *> mapped = source.map_next(std::size_t(0));
+			boost::ignore_unused_variable_warning(mapped);
+			element_type * const copied = source.copy_next(boost::iterator_range<element_type *>());
+			boost::ignore_unused_variable_warning(copied);
+		}
+
+	private:
+
+		X source;
+		element_type element;
+	};
+
+	namespace detail
+	{
+		//example and test for the smallest possible Source
+		struct minimum_source
+		{
+			using element_type = int;
+			boost::iterator_range<element_type const *> map_next(std::size_t size);
+			element_type *copy_next(boost::iterator_range<element_type *> destination);
+			boost::uintmax_t minimum_size();
+			boost::optional<boost::uintmax_t> maximum_size();
+			std::size_t skip(std::size_t count);
+		};
+
+		BOOST_CONCEPT_ASSERT((Source<minimum_source>));
+	}
 
 	template <class Element>
 	struct mutable_source : source<Element>

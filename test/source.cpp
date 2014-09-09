@@ -1,5 +1,6 @@
 #include <silicium/generator_source.hpp>
 #include <silicium/memory_source.hpp>
+#include <silicium/virtualized_source.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -115,5 +116,10 @@ namespace Si
 		{
 			BOOST_REQUIRE(i == Si::get(buffer));
 		}
+	}
+
+	BOOST_AUTO_TEST_CASE(virtualized_source_test)
+	{
+		auto v = Si::virtualize(Si::make_generator_source<int>([]() { return 0; }));
 	}
 }
