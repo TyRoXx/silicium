@@ -13,6 +13,8 @@
 #include <silicium/cache.hpp>
 #include <silicium/empty.hpp>
 #include <silicium/thread.hpp>
+#include <silicium/boost_threading.hpp>
+#include <silicium/std_threading.hpp>
 #include <silicium/deref_optional.hpp>
 #include <silicium/to_unique.hpp>
 #include <boost/container/string.hpp>

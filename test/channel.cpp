@@ -3,6 +3,8 @@
 #include <silicium/thread.hpp>
 #include <silicium/function_observable.hpp>
 #include <silicium/variant_observable.hpp>
+#include <silicium/std_threading.hpp>
+#include <silicium/boost_threading.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si

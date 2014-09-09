@@ -6,7 +6,6 @@
 #include <silicium/config.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/yield_context.hpp>
-#include <silicium/threading.hpp>
 #include <future>
 #include <boost/thread/future.hpp>
 #include <boost/optional.hpp>
