@@ -1,16 +1,16 @@
-#ifndef SILICIUM_REACTIVE_FILTER_HPP
-#define SILICIUM_REACTIVE_FILTER_HPP
+#ifndef SILICIUM_FILTER_HPP
+#define SILICIUM_FILTER_HPP
 
 #include <silicium/observable.hpp>
 #include <silicium/override.hpp>
 #include <utility>
+#include <cassert>
 
 namespace Si
 {
 	template <class Input, class Predicate>
 	struct filter_observable
-		: public observable<typename Input::element_type>
-		, private observer<typename Input::element_type>
+		: private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 
@@ -20,7 +20,7 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		void async_get_one(observer<element_type> &receiver)
 		{
 			assert(!receiver_);
 			receiver_ = &receiver;
