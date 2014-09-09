@@ -14,6 +14,10 @@ namespace Si
 	{
 		typedef typename Input::element_type element_type;
 
+		filter_observable()
+		{
+		}
+
 		filter_observable(Input input, Predicate is_propagated)
 			: input(std::move(input))
 			, is_propagated(std::move(is_propagated))
