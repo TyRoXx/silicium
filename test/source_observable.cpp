@@ -8,6 +8,8 @@ namespace
 	template <class Element>
 	struct end_observer : Si::observer<Element>
 	{
+		using element_type = Element;
+
 		bool has_ended = false;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE

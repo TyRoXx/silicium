@@ -5,7 +5,7 @@
 #include <silicium/tcp_acceptor.hpp>
 #include <silicium/coroutine.hpp>
 #include <silicium/http/http.hpp>
-#include <silicium/virtualize.hpp>
+#include <silicium/virtualized_observable.hpp>
 #include <silicium/total_consumer.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
