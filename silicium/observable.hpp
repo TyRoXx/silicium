@@ -29,6 +29,8 @@ namespace Si
 			X moved = std::move(observable);
 			moved = std::move(observable);
 			observable.async_get_one(observer);
+			X default_constructible;
+			boost::ignore_unused_variable_warning(default_constructible);
 		}
 
 	private:
