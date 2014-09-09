@@ -6,6 +6,7 @@
 #include <silicium/coroutine.hpp>
 #include <silicium/http/http.hpp>
 #include <silicium/virtualized_observable.hpp>
+#include <silicium/virtualized_source.hpp>
 #include <silicium/total_consumer.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
@@ -53,7 +54,7 @@ namespace
 			, yield(&yield)
 			, received(4096)
 			, receiver(socket, boost::make_iterator_range(received.data(), received.data() + received.size()))
-			, receiving_(receiver, yield)
+			, receiving_(Si::observable_source<Si::socket_observable, Si::yield_context<Si::nothing>>(receiver, yield))
 		{
 		}
 
@@ -67,7 +68,7 @@ namespace
 			assert(socket);
 			assert(yield);
 
-			auto sending = Si::virtualize(Si::sending_observable(*socket, data));
+			auto sending = Si::virtualize_observable(Si::sending_observable(*socket, data));
 
 			//ignore error
 			yield->get_one(sending);
@@ -85,7 +86,7 @@ namespace
 		Si::yield_context<Si::nothing> *yield = nullptr;
 		std::vector<char> received;
 		Si::socket_observable receiver;
-		Si::observable_source<Si::socket_observable, Si::yield_context<Si::nothing>> receiving_;
+		Si::virtualized_source<Si::observable_source<Si::socket_observable, Si::yield_context<Si::nothing>>> receiving_;
 	};
 
 	struct thread_socket_source : Si::source<Si::received_from_socket>

@@ -55,7 +55,7 @@ namespace Si
 	BOOST_CONCEPT_REQUIRES(
 		((Si::Source<typename std::decay<Source>::type>)),
 		(virtualized_source<typename std::decay<Source>::type>))
-	virtualize(Source &&next)
+	virtualize_source(Source &&next)
 	{
 		return virtualized_source<typename std::decay<Source>::type>(std::forward<Source>(next));
 	}

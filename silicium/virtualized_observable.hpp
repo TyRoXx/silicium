@@ -50,7 +50,7 @@ namespace Si
 	BOOST_CONCEPT_REQUIRES(
 		((Si::Observable<typename std::decay<Observable>::type>)),
 		(virtualized_observable<typename std::decay<Observable>::type>))
-	virtualize(Observable &&next)
+	virtualize_observable(Observable &&next)
 	{
 		return virtualized_observable<typename std::decay<Observable>::type>(std::forward<Observable>(next));
 	}

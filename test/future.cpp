@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(ready_future)
 
 BOOST_AUTO_TEST_CASE(virtualize)
 {
-	auto f = Si::virtualize(Si::make_ready_future(42));
+	auto f = Si::virtualize_observable(Si::make_ready_future(42));
 
 	//a virtualized observable implements the observable interface
 	Si::observable<int> &v = f;

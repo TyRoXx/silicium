@@ -39,7 +39,7 @@ namespace Si
 		boost::optional<Gotten> get_one(Observable &from)
 		{
 			boost::optional<Gotten> result;
-			auto tf = Si::virtualize(Si::transform(Si::ref(from), [&result](Gotten element)
+			auto tf = Si::virtualize_observable(Si::transform(Si::ref(from), [&result](Gotten element)
 			{
 				assert(!result);
 				result = std::move(element);

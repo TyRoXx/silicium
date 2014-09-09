@@ -7,7 +7,7 @@
 namespace Si
 {
 	template <class Observable, class YieldContext>
-	struct observable_source : Si::source<typename Observable::element_type>
+	struct observable_source
 	{
 		typedef typename Observable::element_type element_type;
 
@@ -17,13 +17,13 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		boost::iterator_range<element_type const *> map_next(std::size_t size)
 		{
 			(void)size;
 			return {};
 		}
 
-		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		element_type *copy_next(boost::iterator_range<element_type *> destination)
 		{
 			using boost::begin;
 			using boost::end;
@@ -41,17 +41,17 @@ namespace Si
 			return i;
 		}
 
-		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
+		boost::uintmax_t minimum_size()
 		{
 			return 0;
 		}
 
-		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
+		boost::optional<boost::uintmax_t> maximum_size()
 		{
 			return boost::none;
 		}
 
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
+		std::size_t skip(std::size_t count)
 		{
 			size_t skipped = 0;
 			assert(yield);
