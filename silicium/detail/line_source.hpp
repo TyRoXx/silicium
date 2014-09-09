@@ -59,19 +59,6 @@ namespace Si
 				return i;
 			}
 
-			virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
-			{
-				return 0;
-			}
-
-			virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
-			{
-				assert(m_next);
-				auto max_chars = m_next->maximum_size();
-				//a line can be a single character ('\n')
-				return max_chars;
-			}
-
 			virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
 			{
 				std::vector<char> thrown_away;

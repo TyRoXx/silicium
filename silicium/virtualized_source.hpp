@@ -31,16 +31,6 @@ namespace Si
 			return original.copy_next(destination);
 		}
 
-		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
-		{
-			return original.minimum_size();
-		}
-
-		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
-		{
-			return original.maximum_size();
-		}
-
 		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
 		{
 			return original.skip(count);

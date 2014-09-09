@@ -23,8 +23,6 @@ namespace Si
 
 		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) = 0;
 		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) = 0;
-		virtual boost::uintmax_t minimum_size() = 0;
-		virtual boost::optional<boost::uintmax_t> maximum_size() = 0;
 		virtual std::size_t skip(std::size_t count) = 0;
 	};
 
@@ -125,23 +123,6 @@ namespace Si
 			Element * const result = m_next->copy_next(boost::make_iterator_range(next, destination.end()));
 			m_buffer.erase_begin(taken_from_buffer);
 			return result;
-		}
-
-		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
-		{
-			assert(m_next);
-			return m_buffer.size() + m_next->minimum_size();
-		}
-
-		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
-		{
-			assert(m_next);
-			auto next_max = m_next->maximum_size();
-			if (next_max)
-			{
-				return (*next_max + m_buffer.size());
-			}
-			return boost::none;
 		}
 
 		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE

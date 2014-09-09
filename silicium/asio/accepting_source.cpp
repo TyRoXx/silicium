@@ -27,16 +27,6 @@ namespace Si
 		return destination.end();
 	}
 
-	boost::uintmax_t accepting_source::minimum_size()
-	{
-		return 0;
-	}
-
-	boost::optional<boost::uintmax_t> accepting_source::maximum_size()
-	{
-		return boost::none;
-	}
-
 	std::size_t accepting_source::skip(std::size_t count)
 	{
 		for (size_t i = 0; i < count; ++i)

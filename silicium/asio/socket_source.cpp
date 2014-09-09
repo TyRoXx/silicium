@@ -21,16 +21,6 @@ namespace Si
 		return destination.begin() + read;
 	}
 
-	boost::uintmax_t socket_source::minimum_size()
-	{
-		return 0;
-	}
-
-	boost::optional<boost::uintmax_t> socket_source::maximum_size()
-	{
-		return boost::none;
-	}
-
 	std::size_t socket_source::skip(std::size_t count)
 	{
 		assert(m_socket);

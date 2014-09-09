@@ -10,9 +10,6 @@ namespace Si
 	{
 		memory_source<char> empty;
 		detail::line_source lines(empty);
-		BOOST_CHECK_EQUAL(0, lines.minimum_size());
-		BOOST_REQUIRE(lines.maximum_size());
-		BOOST_CHECK_EQUAL(static_cast<boost::uintmax_t>(0), *lines.maximum_size());
 		BOOST_CHECK(lines.map_next(1).empty());
 		std::vector<char> line;
 		auto * const result = lines.copy_next(boost::make_iterator_range(&line, &line + 1));
@@ -24,9 +21,6 @@ namespace Si
 		std::string const original = "abc\r\n123";
 		memory_source<char> source(boost::make_iterator_range(original.data(), original.data() + original.size()));
 		detail::line_source lines(source);
-		BOOST_CHECK_EQUAL(0, lines.minimum_size());
-		BOOST_REQUIRE(lines.maximum_size());
-		BOOST_CHECK_EQUAL(static_cast<boost::uintmax_t>(original.size()), *lines.maximum_size());
 		BOOST_CHECK(lines.map_next(1).empty());
 		std::vector<char> line;
 		auto * const result = lines.copy_next(boost::make_iterator_range(&line, &line + 1));

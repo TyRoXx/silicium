@@ -37,16 +37,6 @@ namespace Si
 			return i;
 		}
 
-		virtual boost::uintmax_t minimum_size() override
-		{
-			return original->minimum_size();
-		}
-
-		virtual boost::optional<boost::uintmax_t> maximum_size() override
-		{
-			return original->maximum_size();
-		}
-
 		virtual std::size_t skip(std::size_t count) override
 		{
 			return original->skip(count);

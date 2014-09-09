@@ -40,20 +40,6 @@ namespace Si
 		return copied;
 	}
 
-	boost::uintmax_t connecting_source::minimum_size()
-	{
-		assert(io);
-		assert(yield);
-		return 0;
-	}
-
-	boost::optional<boost::uintmax_t> connecting_source::maximum_size()
-	{
-		assert(io);
-		assert(yield);
-		return boost::none;
-	}
-
 	std::size_t connecting_source::skip(std::size_t count)
 	{
 		assert(io);

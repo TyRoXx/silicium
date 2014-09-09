@@ -131,16 +131,6 @@ namespace
 			return i;
 		}
 
-		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
-		{
-			return 0;
-		}
-
-		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
-		{
-			return boost::none;
-		}
-
 		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
 		{
 			(void)count;

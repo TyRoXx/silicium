@@ -15,8 +15,6 @@ namespace Si
 		explicit accepting_source(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context &yield);
 		virtual boost::iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE;
 		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE;
-		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE;
-		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE;
 		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE;
 
 	private:
