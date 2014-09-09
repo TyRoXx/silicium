@@ -7,10 +7,26 @@
 #include <type_traits>
 #include <utility>
 #include <cassert>
+#include <functional>
 #include <boost/config.hpp>
 
 namespace Si
 {
+	namespace detail
+	{
+		template <class F, bool IsProperValue, class R, class ...Args>
+		struct proper_value_function
+		{
+			using type = std::function<R (Args...)>;
+		};
+
+		template <class F, class R, class ...Args>
+		struct proper_value_function<F, true, R, Args...>
+		{
+			using type = F;
+		};
+	}
+
 	template <class Transform, class Original>
 	struct transformation
 		: private observer<typename Original::element_type>
@@ -58,7 +74,14 @@ namespace Si
 
 	private:
 
-		Transform transform; //TODO empty base optimization
+		using proper_transform = typename detail::proper_value_function<
+			Transform,
+			std::is_copy_assignable<Transform>::value && std::is_default_constructible<Transform>::value,
+			element_type,
+			from_type
+		>::type;
+
+		proper_transform transform; //TODO empty base optimization
 		Original original;
 		observer<element_type> *receiver = nullptr;
 

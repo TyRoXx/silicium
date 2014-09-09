@@ -45,6 +45,20 @@ namespace Si
 		std::vector<int> const expected(1, 3);
 		BOOST_CHECK(expected == generated);
 	}
+
+	template <class Observable>
+	void test_value_semantics(Observable &&original)
+	{
+		auto move_constructed = std::move(original);
+		original = std::move(move_constructed);
+		typename std::decay<decltype(original)>::type default_constructed;
+	}
+
+	BOOST_AUTO_TEST_CASE(transform_value_semantics)
+	{
+		int dummy;
+		test_value_semantics(Si::transform(Si::empty<int>(), [&dummy](int) { return 0; }));
+	}
 #endif
 
 #if SILICIUM_RX_TUPLE_AVAILABLE
