@@ -107,10 +107,10 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(generator_source_never_empty)
 	{
 		int next = 0;
-		auto source = Si::make_generator_source<int>([&next]() -> boost::optional<int>
+		auto source = Si::virtualize(Si::make_generator_source<int>([&next]() -> boost::optional<int>
 		{
 			return next++;
-		});
+		}));
 		auto buffer = Si::make_buffer(source, 2);
 		for (int i = 0; i < 10; ++i)
 		{

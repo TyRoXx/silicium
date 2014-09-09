@@ -7,8 +7,10 @@
 namespace Si
 {
 	template <class Element, class Generator>
-	struct generator_source SILICIUM_FINAL : source<Element>
+	struct generator_source
 	{
+		using element_type = Element;
+
 		generator_source()
 		{
 		}
@@ -18,13 +20,13 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		boost::iterator_range<Element const *> map_next(std::size_t size)
 		{
 			(void)size;
 			return boost::iterator_range<Element const *>();
 		}
 
-		virtual Element *copy_next(boost::iterator_range<Element *> destination) SILICIUM_OVERRIDE
+		Element *copy_next(boost::iterator_range<Element *> destination)
 		{
 			auto copied = destination.begin();
 			for (; copied != destination.end(); ++copied)
@@ -39,17 +41,17 @@ namespace Si
 			return copied;
 		}
 
-		virtual boost::uintmax_t minimum_size() SILICIUM_OVERRIDE
+		boost::uintmax_t minimum_size()
 		{
 			return 0;
 		}
 
-		virtual boost::optional<boost::uintmax_t> maximum_size() SILICIUM_OVERRIDE
+		boost::optional<boost::uintmax_t> maximum_size()
 		{
 			return boost::none;
 		}
 
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
+		std::size_t skip(std::size_t count)
 		{
 			std::size_t i = 0;
 			for (; i < count; ++i)

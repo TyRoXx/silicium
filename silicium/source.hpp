@@ -74,10 +74,10 @@ namespace Si
 		virtual boost::iterator_range<Element *> map_next_mutable(std::size_t size) = 0;
 	};
 
-	template <class Element>
-	boost::optional<Element> get(Si::source<Element> &from)
+	template <class Source>
+	boost::optional<typename Source::element_type> get(Source &from)
 	{
-		Element result;
+		typename Source::element_type result;
 		if (&result == from.copy_next(boost::make_iterator_range(&result, &result + 1)))
 		{
 			return boost::none;
@@ -88,6 +88,8 @@ namespace Si
 	template <class Element>
 	struct buffering_source SILICIUM_FINAL : mutable_source<Element>
 	{
+		using element_type = Element;
+
 		explicit buffering_source(source<Element> &next, std::size_t capacity)
 			: m_next(&next)
 			, m_buffer(capacity)
