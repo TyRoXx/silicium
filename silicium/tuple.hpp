@@ -17,20 +17,20 @@ namespace Si
 
 #if SILICIUM_RX_TUPLE_AVAILABLE
 	template <class ...Parts>
-	struct and_combinator
+	struct tuple_observable
 	{
 		using element_type = std::tuple<typename Parts::element_type...>;
 		typedef std::tuple<Parts...> parts_tuple;
 		typedef element_type buffer_tuple;
 
 		template <class PartsTuple>
-		explicit and_combinator(PartsTuple &&parts)
+		explicit tuple_observable(PartsTuple &&parts)
 			: parts(std::forward<PartsTuple>(parts))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		and_combinator(and_combinator &&other)
+		tuple_observable(tuple_observable &&other)
 			: parts(std::move(other.parts))
 			, receiver(std::move(other.receiver))
 			, buffer(std::move(other.buffer))
@@ -39,7 +39,7 @@ namespace Si
 		{
 		}
 
-		and_combinator &operator = (and_combinator &&other)
+		tuple_observable &operator = (tuple_observable &&other)
 		{
 			parts = std::move(other.parts);
 			receiver = std::move(other.receiver);
@@ -63,7 +63,7 @@ namespace Si
 		template <class Element, std::size_t Index>
 		struct tuple_observer : observer<Element>
 		{
-			and_combinator *combinator = nullptr;
+			tuple_observable *combinator = nullptr;
 
 			virtual void got_element(Element value) SILICIUM_OVERRIDE
 			{
@@ -126,9 +126,12 @@ namespace Si
 	};
 
 	template <class ...Parts>
-	auto make_tuple(Parts &&...parts) -> and_combinator<typename std::decay<Parts>::type...>
+	auto make_tuple(Parts &&...parts)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> tuple_observable<typename std::decay<Parts>::type...>
+#endif
 	{
-		return and_combinator<typename std::decay<Parts>::type...>(std::make_tuple(std::forward<Parts>(parts)...));
+		return tuple_observable<typename std::decay<Parts>::type...>(std::make_tuple(std::forward<Parts>(parts)...));
 	}
 #endif
 }
