@@ -16,6 +16,10 @@ namespace Si
 		typedef error_or<std::size_t> element_type;
 		typedef boost::iterator_range<char const *> buffer_type;
 
+		sending_observable()
+		{
+		}
+
 		explicit sending_observable(boost::asio::ip::tcp::socket &socket, buffer_type buffer)
 			: socket(&socket)
 			, buffer(buffer)
