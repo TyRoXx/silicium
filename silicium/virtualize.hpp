@@ -5,6 +5,7 @@
 #include <silicium/observable.hpp>
 #include <silicium/override.hpp>
 #include <utility>
+#include <boost/concept/requires.hpp>
 
 namespace Si
 {
@@ -46,7 +47,10 @@ namespace Si
 	};
 
 	template <class Observable>
-	auto virtualize(Observable &&next) -> virtualized_observable<typename std::decay<Observable>::type>
+	BOOST_CONCEPT_REQUIRES(
+		((Si::Observable<typename std::decay<Observable>::type>)),
+		(virtualized_observable<typename std::decay<Observable>::type>))
+	virtualize(Observable &&next)
 	{
 		return virtualized_observable<typename std::decay<Observable>::type>(std::forward<Observable>(next));
 	}
