@@ -37,11 +37,6 @@ namespace Si
 			return i;
 		}
 
-		virtual std::size_t skip(std::size_t count) override
-		{
-			return original->skip(count);
-		}
-
 	private:
 
 		source<From> *original = nullptr;

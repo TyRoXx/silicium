@@ -36,7 +36,6 @@ namespace Si
 		BOOST_CHECK(buffer.map_next(1).empty());
 		char c = 0;
 		BOOST_CHECK_EQUAL(&c, buffer.copy_next(boost::make_iterator_range(&c, &c + 1)));
-		BOOST_CHECK_EQUAL(0U, buffer.skip(1));
 	}
 
 	BOOST_AUTO_TEST_CASE(buffering_source_non_empty)
@@ -49,7 +48,6 @@ namespace Si
 		BOOST_CHECK_EQUAL('x', mapped.front());
 		char c = 0;
 		BOOST_CHECK_EQUAL(&c + 1, buffer.copy_next(boost::make_iterator_range(&c, &c + 1)));
-		BOOST_CHECK_EQUAL(0U, buffer.skip(1));
 	}
 
 	BOOST_AUTO_TEST_CASE(mutable_source_iterator_empty)

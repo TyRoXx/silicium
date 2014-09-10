@@ -39,15 +39,4 @@ namespace Si
 		}
 		return copied;
 	}
-
-	std::size_t connecting_source::skip(std::size_t count)
-	{
-		assert(io);
-		assert(yield);
-		std::size_t skipped = 0;
-		for (; (skipped < count) && Si::get(*this); ++skipped)
-		{
-		}
-		return skipped;
-	}
 }

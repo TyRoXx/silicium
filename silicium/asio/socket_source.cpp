@@ -20,25 +20,4 @@ namespace Si
 		size_t const read = m_socket->async_read_some(boost::asio::buffer(destination.begin(), destination.size()), *m_yield);
 		return destination.begin() + read;
 	}
-
-	std::size_t socket_source::skip(std::size_t count)
-	{
-		assert(m_socket);
-		assert(m_yield);
-		std::size_t skipped = 0;
-		while (skipped < count)
-		{
-			std::array<char, 1U << 12U> thrown_away;
-			auto const rest = (count - skipped);
-			assert(m_socket);
-			assert(m_yield);
-			auto const read = m_socket->async_read_some(boost::asio::buffer(thrown_away.data(), std::min(rest, thrown_away.size())), *m_yield);
-			skipped += read;
-			if (read == 0)
-			{
-				break;
-			}
-		}
-		return skipped;
-	}
 }

@@ -131,12 +131,6 @@ namespace
 			return i;
 		}
 
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
-		{
-			(void)count;
-			throw std::logic_error("to do");
-		}
-
 	private:
 
 		boost::asio::ip::tcp::socket *socket = nullptr;

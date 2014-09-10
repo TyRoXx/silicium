@@ -31,11 +31,6 @@ namespace Si
 			return original.copy_next(destination);
 		}
 
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
-		{
-			return original.skip(count);
-		}
-
 	private:
 
 		Original original;

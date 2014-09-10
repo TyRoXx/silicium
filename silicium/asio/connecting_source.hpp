@@ -19,7 +19,6 @@ namespace Si
 		explicit connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield, boost::asio::ip::tcp::endpoint remote_endpoint);
 		virtual boost::iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE;
 		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE;
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE;
 
 	private:
 

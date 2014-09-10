@@ -19,7 +19,6 @@ namespace Si
 
 		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) = 0;
 		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) = 0;
-		virtual std::size_t skip(std::size_t count) = 0;
 	};
 
 	template <class X>

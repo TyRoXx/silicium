@@ -34,13 +34,6 @@ namespace Si
 			return destination.begin();
 		}
 
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
-		{
-			auto skipped = std::min(count, static_cast<size_t>(m_elements.size()));
-			m_elements.advance_begin(skipped);
-			return skipped;
-		}
-
 	private:
 
 		boost::iterator_range<Element const *> m_elements;

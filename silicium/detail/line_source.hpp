@@ -59,19 +59,6 @@ namespace Si
 				return i;
 			}
 
-			virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
-			{
-				std::vector<char> thrown_away;
-				for (size_t i = 0; i < count; ++i)
-				{
-					if (copy_next(boost::make_iterator_range(&thrown_away, &thrown_away + 1)) == &thrown_away)
-					{
-						return i;
-					}
-				}
-				return count;
-			}
-
 		private:
 
 			Si::source<char> *m_next = nullptr;

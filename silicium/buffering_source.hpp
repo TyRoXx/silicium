@@ -11,6 +11,7 @@ namespace Si
 	struct mutable_source : source<Element>
 	{
 		virtual boost::iterator_range<Element *> map_next_mutable(std::size_t size) = 0;
+		virtual std::size_t skip(std::size_t count) = 0;
 	};
 
 	template <class Element>
@@ -60,8 +61,7 @@ namespace Si
 			assert(m_next);
 			auto skipped_buffer = std::min(count, m_buffer.size());
 			m_buffer.erase_begin(skipped_buffer);
-			auto rest = (count - skipped_buffer);
-			return skipped_buffer + m_next->skip(rest);
+			return skipped_buffer;
 		}
 
 		virtual boost::iterator_range<Element *> map_next_mutable(std::size_t size) SILICIUM_OVERRIDE

@@ -61,7 +61,12 @@ namespace Si
 			return copied;
 		}
 
-		virtual std::size_t skip(std::size_t count) SILICIUM_OVERRIDE
+	private:
+
+		Si::source<Si::received_from_socket> *original = nullptr;
+		Si::incoming_bytes rest;
+
+		std::size_t skip(std::size_t count)
 		{
 			std::size_t skipped = 0;
 			auto const rest_size = std::distance(rest.begin, rest.end);
@@ -75,11 +80,6 @@ namespace Si
 			}
 			return skipped;
 		}
-
-	private:
-
-		Si::source<Si::received_from_socket> *original = nullptr;
-		Si::incoming_bytes rest;
 	};
 }
 
