@@ -13,7 +13,7 @@
 
 namespace Si
 {
-	struct file_descriptor //: private boost::noncopyable
+	struct file_descriptor : private boost::noncopyable
 	{
 		native_file_handle handle = no_file_handle;
 
