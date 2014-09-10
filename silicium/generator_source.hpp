@@ -2,6 +2,7 @@
 #define SILICIUM_GENERATOR_SOURCE_HPP
 
 #include <silicium/source.hpp>
+#include <silicium/config.hpp>
 #include <silicium/detail/proper_value_function.hpp>
 
 namespace Si
@@ -72,7 +73,10 @@ namespace Si
 	};
 
 	template <class Element, class Generator>
-	generator_source<Element, typename std::decay<Generator>::type> make_generator_source(Generator &&generate_next)
+	auto make_generator_source(Generator &&generate_next)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> generator_source<Element, typename std::decay<Generator>::type>
+#endif
 	{
 		return generator_source<Element, typename std::decay<Generator>::type>{std::forward<Generator>(generate_next)};
 	}

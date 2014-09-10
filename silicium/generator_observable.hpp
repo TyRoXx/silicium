@@ -3,6 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <silicium/observer.hpp>
+#include <silicium/detail/proper_value_function.hpp>
 
 namespace Si
 {
@@ -40,7 +41,9 @@ namespace Si
 
 	private:
 
-		Generator generate;
+		using proper_generator = typename detail::proper_value_function<Generator, Element>::type;
+
+		proper_generator generate;
 	};
 
 	template <class Generator>
