@@ -3,11 +3,12 @@
 
 #include <silicium/config.hpp>
 #include <silicium/observer.hpp>
+#include <silicium/detail/element_from_optional_like.hpp>
 #include <silicium/detail/proper_value_function.hpp>
 
 namespace Si
 {
-	template <class Generator, class Element = typename std::result_of<Generator ()>::type>
+	template <class Generator, class Element = typename detail::element_from_optional_like<typename std::result_of<Generator ()>::type>::type>
 	struct generator_observable
 	{
 		using element_type = Element;
@@ -36,12 +37,20 @@ namespace Si
 
 		void async_get_one(observer<Element> &receiver)
 		{
-			return receiver.got_element(generate());
+			boost::optional<Element> element = generate();
+			if (element)
+			{
+				receiver.got_element(std::move(*element));
+			}
+			else
+			{
+				receiver.ended();
+			}
 		}
 
 	private:
 
-		using proper_generator = typename detail::proper_value_function<Generator, Element>::type;
+		using proper_generator = typename detail::proper_value_function<Generator, typename std::result_of<Generator ()>::type>::type;
 
 		proper_generator generate;
 	};
