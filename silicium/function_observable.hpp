@@ -2,6 +2,7 @@
 #define SILICIUM_FUNCTION_OBSERVABLE_HPP
 
 #include <silicium/observer.hpp>
+#include <silicium/detail/proper_value_function.hpp>
 #include <utility>
 
 namespace Si
@@ -25,13 +26,11 @@ namespace Si
 			return get(receiver);
 		}
 
-		void cancel()
-		{
-		}
-
 	private:
 
-		AsyncGetOne get;
+		using proper_get = typename detail::proper_value_function<AsyncGetOne, void, observer<element_type> &>::type;
+
+		proper_get get;
 	};
 
 	template <class Element, class AsyncGetOne>
