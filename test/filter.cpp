@@ -7,7 +7,7 @@
 BOOST_AUTO_TEST_CASE(filter_true)
 {
 	Si::bridge<int> input;
-	auto filtered = Si::filter(Si::ref(input), [](int element)
+	auto filtered = Si::make_filter_observable(Si::ref(input), [](int element)
 	{
 		BOOST_CHECK_EQUAL(3, element);
 		return true;
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(filter_true)
 BOOST_AUTO_TEST_CASE(filter_false)
 {
 	Si::bridge<int> input;
-	auto filtered = Si::filter(Si::ref(input), [](int element)
+	auto filtered = Si::make_filter_observable(Si::ref(input), [](int element)
 	{
 		BOOST_CHECK_EQUAL(3, element);
 		return false;
