@@ -5,6 +5,7 @@
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/asio/accepting_source.hpp>
+#include <silicium/buffering_source.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
