@@ -56,7 +56,10 @@ namespace Si
 	};
 
 	template <class Element>
-	auto make_ready_future(Element &&value) -> ready_future<typename std::decay<Element>::type>
+	auto make_ready_future(Element &&value)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> ready_future<typename std::decay<Element>::type>
+#endif
 	{
 		return ready_future<typename std::decay<Element>::type>(std::forward<Element>(value));
 	}

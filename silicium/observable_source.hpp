@@ -3,6 +3,7 @@
 
 #include <silicium/observable.hpp>
 #include <silicium/source.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -72,7 +73,10 @@ namespace Si
 	};
 
 	template <class Observable, class YieldContext>
-	auto make_observable_source(Observable &&input, YieldContext &yield) -> observable_source<typename std::decay<Observable>::type, YieldContext>
+	auto make_observable_source(Observable &&input, YieldContext &yield)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> observable_source<typename std::decay<Observable>::type, YieldContext>
+#endif
 	{
 		return observable_source<typename std::decay<Observable>::type, YieldContext>(std::forward<Observable>(input), yield);
 	}
