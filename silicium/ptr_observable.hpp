@@ -69,14 +69,6 @@ namespace Si
 	template <class Element>
 	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element>>>;
 
-	template <class Observable, class ...Args>
-	auto make_wrapped(Args &&...args) -> ptr_observable<typename Observable::element_type, std::shared_ptr<Observable>>
-	{
-		typedef typename Observable::element_type element_type;
-		typedef std::shared_ptr<Observable> ptr_type;
-		return ptr_observable<element_type, ptr_type>(std::make_shared<Observable>(std::forward<Args>(args)...));
-	}
-
 	template <class Input>
 	auto erase_unique(Input &&input) -> Si::unique_observable<typename std::decay<Input>::type::element_type>
 	{
