@@ -3,7 +3,7 @@
 #include <silicium/transform.hpp>
 #include <silicium/while.hpp>
 #include <silicium/finite_state_machine.hpp>
-#include <silicium/filter.hpp>
+#include <silicium/filter_observable.hpp>
 #include <silicium/generator_observable.hpp>
 #include <silicium/ptr_observable.hpp>
 #include <silicium/cache.hpp>

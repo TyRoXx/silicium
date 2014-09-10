@@ -76,7 +76,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(generator_source_empty)
 	{
-		auto source = Si::make_generator_source<element>([]() -> boost::optional<element>
+		auto source = Si::make_generator_source([]() -> boost::optional<element>
 		{
 			return boost::none;
 		});
@@ -86,7 +86,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(generator_source_limited)
 	{
 		bool first = true;
-		auto source = Si::make_generator_source<int>([&first]() -> boost::optional<int>
+		auto source = Si::make_generator_source([&first]() -> boost::optional<int>
 		{
 			auto result = first ? boost::make_optional(12) : boost::none;
 			first = false;
@@ -100,7 +100,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(generator_source_never_empty)
 	{
 		int next = 0;
-		auto source = Si::virtualize_source(Si::make_generator_source<int>([&next]() -> boost::optional<int>
+		auto source = Si::virtualize_source(Si::make_generator_source([&next]() -> boost::optional<int>
 		{
 			return next++;
 		}));
@@ -113,7 +113,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(virtualized_source_test)
 	{
-		auto v = Si::virtualize_source(Si::make_generator_source<int>([]() { return 0; }));
+		auto v = Si::virtualize_source(Si::make_generator_source([]() { return 0; }));
 		BOOST_CHECK_EQUAL(0, Si::get(v));
 	}
 }

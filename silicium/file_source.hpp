@@ -17,10 +17,10 @@ namespace Si
 
 	inline auto make_file_source(native_file_handle file, boost::iterator_range<char *> read_buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> generator_source<file_read_result, std::function<boost::optional<file_read_result>()>>
+		-> generator_source<std::function<boost::optional<file_read_result>()>>
 #endif
 	{
-		return make_generator_source<file_read_result>(
+		return make_generator_source(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			std::function<boost::optional<file_read_result>()>
 #endif

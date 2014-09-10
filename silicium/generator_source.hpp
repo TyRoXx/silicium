@@ -7,7 +7,22 @@
 
 namespace Si
 {
-	template <class Element, class Generator>
+	namespace detail
+	{
+		template <class Element>
+		struct element_from_optional_like
+		{
+			using type = Element;
+		};
+
+		template <class Element>
+		struct element_from_optional_like<boost::optional<Element>>
+		{
+			using type = Element;
+		};
+	}
+
+	template <class Generator, class Element = typename detail::element_from_optional_like<typename std::result_of<Generator ()>::type>::type>
 	struct generator_source
 	{
 		using element_type = Element;
@@ -72,13 +87,13 @@ namespace Si
 		proper_generator m_generate_next;
 	};
 
-	template <class Element, class Generator>
+	template <class Generator>
 	auto make_generator_source(Generator &&generate_next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> generator_source<Element, typename std::decay<Generator>::type>
+		-> generator_source<typename std::decay<Generator>::type>
 #endif
 	{
-		return generator_source<Element, typename std::decay<Generator>::type>{std::forward<Generator>(generate_next)};
+		return generator_source<typename std::decay<Generator>::type>{std::forward<Generator>(generate_next)};
 	}
 }
 

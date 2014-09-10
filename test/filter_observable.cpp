@@ -1,4 +1,4 @@
-#include <silicium/filter.hpp>
+#include <silicium/filter_observable.hpp>
 #include <silicium/for_each.hpp>
 #include <silicium/bridge.hpp>
 #include <silicium/ref.hpp>

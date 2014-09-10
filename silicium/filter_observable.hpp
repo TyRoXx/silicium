@@ -1,5 +1,5 @@
-#ifndef SILICIUM_FILTER_HPP
-#define SILICIUM_FILTER_HPP
+#ifndef SILICIUM_FILTER_OBSERVABLE_HPP
+#define SILICIUM_FILTER_OBSERVABLE_HPP
 
 #include <silicium/observable.hpp>
 #include <silicium/override.hpp>
