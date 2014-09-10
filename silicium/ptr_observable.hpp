@@ -69,12 +69,6 @@ namespace Si
 	template <class Element>
 	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element>>>;
 
-	template <class Element, class Content>
-	auto wrap(Content &&content) -> ptr_observable<Element, std::shared_ptr<typename std::decay<Content>::type>>
-	{
-		return ptr_observable<Element, std::shared_ptr<typename std::decay<Content>::type>>(std::make_shared<typename std::decay<Content>::type>(std::forward<Content>(content)));
-	}
-
 	template <class Observable, class ...Args>
 	auto make_wrapped(Args &&...args) -> ptr_observable<typename Observable::element_type, std::shared_ptr<Observable>>
 	{
