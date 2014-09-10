@@ -2,6 +2,8 @@
 #define SILICIUM_MEMORY_SOURCE_HPP
 
 #include <silicium/source.hpp>
+#include <vector>
+#include <string>
 
 namespace Si
 {

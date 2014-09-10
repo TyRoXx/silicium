@@ -13,7 +13,7 @@
 
 namespace Si
 {
-	struct file_descriptor : private boost::noncopyable
+	struct file_descriptor
 	{
 		native_file_handle handle = no_file_handle;
 
@@ -60,6 +60,11 @@ namespace Si
 				terminating_close(handle);
 			}
 		}
+
+	private:
+
+		BOOST_DELETED_FUNCTION(file_descriptor(file_descriptor const &));
+		BOOST_DELETED_FUNCTION(file_descriptor &operator = (file_descriptor const &));
 	};
 }
 

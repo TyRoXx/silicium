@@ -44,9 +44,20 @@ namespace Si
 		{
 		}
 
+		error_or(error_or const &other)
+			: storage(other.storage)
+		{
+		}
+
 		error_or &operator = (error_or &&other) BOOST_NOEXCEPT
 		{
 			storage = std::move(other.storage);
+			return *this;
+		}
+
+		error_or &operator = (error_or const &other)
+		{
+			storage = other.storage;
 			return *this;
 		}
 #endif

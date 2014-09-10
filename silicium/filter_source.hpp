@@ -56,6 +56,12 @@ namespace Si
 
 	template <class Input, class Predicate>
 	auto make_filter_source(Input &&input, Predicate &&is_propagated)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> filter_source<
+			typename std::decay<Input>::type,
+			typename std::decay<Predicate>::type
+		>
+#endif
 	{
 		return filter_source<
 				typename std::decay<Input>::type,
