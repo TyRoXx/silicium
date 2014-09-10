@@ -1,7 +1,7 @@
 #include <silicium/buffer.hpp>
 #include <silicium/variant_observable.hpp>
 #include <silicium/coroutine.hpp>
-#include <silicium/generate.hpp>
+#include <silicium/generator_observable.hpp>
 #include <silicium/consume.hpp>
 #include <silicium/timer.hpp>
 #include <silicium/tuple.hpp>
@@ -31,8 +31,8 @@ namespace Si
 #if SILICIUM_RX_TUPLE_AVAILABLE
 	BOOST_AUTO_TEST_CASE(reactive_transform)
 	{
-		auto twos = Si::generate([]{ return 2; });
-		auto ones  = Si::generate([]{ return 1; });
+		auto twos = Si::make_generator_observable([]{ return 2; });
+		auto ones  = Si::make_generator_observable([]{ return 1; });
 		auto both = Si::make_tuple(twos, ones);
 		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
 		{
@@ -68,7 +68,7 @@ namespace Si
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
 		Si::ptr_observable<int, std::shared_ptr<Si::observable<int>>> first(bridge);
-		auto ones  = Si::generate([]{ return 1; });
+		auto ones  = Si::make_generator_observable([]{ return 1; });
 		auto both = Si::make_tuple(first, ones);
 		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
 		{
