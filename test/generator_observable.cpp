@@ -2,10 +2,6 @@
 #include <silicium/consume.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace
-{
-}
-
 BOOST_AUTO_TEST_CASE(generator_observable_optional)
 {
 	auto g = Si::make_generator_observable([]()
