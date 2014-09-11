@@ -612,12 +612,14 @@ namespace Si
 		template <class Result, std::size_t Index, class ...T>
 		Result visit_impl(fast_variant<T...> &)
 		{
+			BOOST_STATIC_ASSERT_MSG(Index == sizeof...(T), "You did not provide the required number of handlers to Si::visit");
 			SILICIUM_UNREACHABLE();
 		}
 
 		template <class Result, std::size_t Index, class ...T>
 		Result visit_impl(fast_variant<T...> const &)
 		{
+			BOOST_STATIC_ASSERT_MSG(Index == sizeof...(T), "You did not provide the required number of handlers to Si::visit");
 			SILICIUM_UNREACHABLE();
 		}
 
