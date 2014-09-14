@@ -166,7 +166,7 @@ namespace Si
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			Si::exchange(receiver_, nullptr)->ended();
+			next();
 		}
 
 		void next()
