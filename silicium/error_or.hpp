@@ -126,6 +126,26 @@ namespace Si
 						[](Error const &) -> Value const * { return nullptr; });
 		}
 
+		Value *operator -> ()
+		{
+			return &get();
+		}
+
+		Value const *operator -> () const
+		{
+			return &get();
+		}
+
+		boost::optional<Value> get_optional() &&
+		{
+			auto *value = get_ptr();
+			if (!value)
+			{
+				return boost::none;
+			}
+			return std::move(*value);
+		}
+
 	private:
 
 		fast_variant<Value, Error> storage;
