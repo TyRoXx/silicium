@@ -109,7 +109,9 @@ namespace Si
 					typename ThreadingAPI::unique_lock lock(receiver_mutex);
 					if (receiver)
 					{
-						Si::exchange(receiver, nullptr)->ended();
+						auto receiver_ = Si::exchange(receiver, nullptr);
+						lock.unlock();
+						receiver_->ended();
 					}
 					else
 					{
