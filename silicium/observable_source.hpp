@@ -30,10 +30,8 @@ namespace Si
 
 		element_type *copy_next(boost::iterator_range<element_type *> destination)
 		{
-			using boost::begin;
-			using boost::end;
-			auto i = begin(destination);
-			for (; i != end(destination); ++i)
+			auto i = boost::begin(destination);
+			for (; i != boost::end(destination); ++i)
 			{
 				assert(yield);
 				auto element = yield->get_one(input);
