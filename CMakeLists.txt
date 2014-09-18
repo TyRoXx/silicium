@@ -6,7 +6,12 @@ if(${CMAKE_SYSTEM} MATCHES "Linux")
 endif()
 
 if(UNIX)
-	add_definitions("-Wall -Wextra -pedantic -std=c++1y -Wconversion -Wvla")
+	add_definitions("-Wall -Wextra -std=c++1y -Wconversion -Wvla")
+
+	option(SILICIUM_PEDANTIC "pass -pedantic to the compiler (may generate useless warnings)" OFF)
+	if(SILICIUM_PEDANTIC)
+		add_definitions("-Wpedantic")
+	endif()
 endif()
 
 if(MSVC)
