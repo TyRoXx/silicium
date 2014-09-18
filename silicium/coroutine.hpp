@@ -57,7 +57,7 @@ namespace Si
 		template <class Element>
 		struct make_command
 		{
-			typedef Si::fast_variant<result<Element>, yield> type;
+			typedef Si::fast_variant<result<Element *>, yield> type;
 		};
 
 		template <class Element>
@@ -72,7 +72,7 @@ namespace Si
 
 			virtual void push_result(Element result) SILICIUM_OVERRIDE
 			{
-				(*consumer)(detail::result<Element>(std::move(result)));
+				(*consumer)(detail::result<Element *>(&result));
 			}
 
 			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
@@ -123,9 +123,9 @@ namespace Si
 		}
 
 		//TODO make private
-		void operator()(detail::result<element_type> command)
+		void operator()(detail::result<element_type *> command)
 		{
-			return Si::exchange(receiver_, nullptr)->got_element(std::move(command.value));
+			return Si::exchange(receiver_, nullptr)->got_element(std::move(*command.value));
 		}
 
 		//TODO make private
