@@ -52,6 +52,12 @@ namespace Si
 	{
 		return memory_source<Element>({container.data(), container.data() + container.size()});
 	}
+
+	template <class Element>
+	memory_source<Element> make_c_str_source(Element const *c_str)
+	{
+		return memory_source<Element>(boost::make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
+	}
 }
 
 #endif
