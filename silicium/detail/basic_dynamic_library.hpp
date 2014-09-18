@@ -81,8 +81,8 @@ namespace Si
 
 			std::unique_ptr<void, deleter> handle;
 
-			BOOST_DELETED_FUNCTION(basic_dynamic_library(basic_dynamic_library const &))
-			BOOST_DELETED_FUNCTION(basic_dynamic_library &operator = (basic_dynamic_library const &))
+			SILICIUM_DELETED_FUNCTION(basic_dynamic_library(basic_dynamic_library const &))
+			SILICIUM_DELETED_FUNCTION(basic_dynamic_library &operator = (basic_dynamic_library const &))
 		};
 	}
 }

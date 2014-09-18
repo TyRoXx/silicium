@@ -10,6 +10,7 @@
 #endif
 
 #include <silicium/exchange.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -63,8 +64,8 @@ namespace Si
 
 	private:
 
-		BOOST_DELETED_FUNCTION(file_descriptor(file_descriptor const &))
-		BOOST_DELETED_FUNCTION(file_descriptor &operator = (file_descriptor const &))
+		SILICIUM_DELETED_FUNCTION(file_descriptor(file_descriptor const &))
+		SILICIUM_DELETED_FUNCTION(file_descriptor &operator = (file_descriptor const &))
 	};
 }
 

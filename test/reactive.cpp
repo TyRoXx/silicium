@@ -334,8 +334,8 @@ namespace Si
 		signal_observer_map<Element> *connections = nullptr;
 		observer<Element> *receiver_ = nullptr;
 
-		BOOST_DELETED_FUNCTION(connection(connection const &))
-		BOOST_DELETED_FUNCTION(connection &operator = (connection const &))
+		SILICIUM_DELETED_FUNCTION(connection(connection const &))
+		SILICIUM_DELETED_FUNCTION(connection &operator = (connection const &))
 	};
 
 	template <class Element>

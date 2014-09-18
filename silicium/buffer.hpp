@@ -3,6 +3,7 @@
 
 #include <silicium/override.hpp>
 #include <silicium/observer.hpp>
+#include <silicium/config.hpp>
 #include <boost/circular_buffer.hpp>
 #include <cassert>
 #include <cstddef>
@@ -119,8 +120,8 @@ namespace Si
 			from.async_get_one(*this);
 		}
 
-		BOOST_DELETED_FUNCTION(buffer(buffer const &))
-		BOOST_DELETED_FUNCTION(buffer &operator = (buffer const &))
+		SILICIUM_DELETED_FUNCTION(buffer(buffer const &))
+		SILICIUM_DELETED_FUNCTION(buffer &operator = (buffer const &))
 	};
 
 	template <class Original>

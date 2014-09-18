@@ -86,8 +86,8 @@ namespace Si
 			receiver_copy->ended();
 		}
 
-		BOOST_DELETED_FUNCTION(transformation(transformation const &))
-		BOOST_DELETED_FUNCTION(transformation &operator = (transformation const &))
+		SILICIUM_DELETED_FUNCTION(transformation(transformation const &))
+		SILICIUM_DELETED_FUNCTION(transformation &operator = (transformation const &))
 	};
 
 	template <class Transform, class Original>

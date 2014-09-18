@@ -101,8 +101,8 @@ namespace Si
 			return exchange(receiver_, nullptr)->got_element(std::move(element));
 		}
 
-		BOOST_DELETED_FUNCTION(enumerator(enumerator const &))
-		BOOST_DELETED_FUNCTION(enumerator &operator = (enumerator const &))
+		SILICIUM_DELETED_FUNCTION(enumerator(enumerator const &))
+		SILICIUM_DELETED_FUNCTION(enumerator &operator = (enumerator const &))
 	};
 
 	template <class RangeObservable>

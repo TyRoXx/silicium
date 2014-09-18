@@ -3,6 +3,7 @@
 
 #include <silicium/observer.hpp>
 #include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <cassert>
 #include <boost/optional.hpp>
 
@@ -93,8 +94,8 @@ namespace Si
 			}
 		}
 
-		BOOST_DELETED_FUNCTION(finite_state_machine(finite_state_machine const &))
-		BOOST_DELETED_FUNCTION(finite_state_machine &operator = (finite_state_machine const &))
+		SILICIUM_DELETED_FUNCTION(finite_state_machine(finite_state_machine const &))
+		SILICIUM_DELETED_FUNCTION(finite_state_machine &operator = (finite_state_machine const &))
 	};
 
 	template <class In, class State, class Step>

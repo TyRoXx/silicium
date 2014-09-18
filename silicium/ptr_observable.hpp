@@ -16,7 +16,9 @@ namespace Si
 	{
 		typedef Element element_type;
 
-		BOOST_DEFAULTED_FUNCTION(ptr_observable(), {})
+		ptr_observable()
+		{
+		}
 
 		explicit ptr_observable(Ptr content)
 			: content(std::move(content))

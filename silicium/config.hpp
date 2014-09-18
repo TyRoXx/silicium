@@ -52,6 +52,12 @@
 #	define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 0
 #endif
 
+#ifdef BOOST_DELETED_FUNCTION
+#	define SILICIUM_DELETED_FUNCTION BOOST_DELETED_FUNCTION
+#else
+#	define SILICIUM_DELETED_FUNCTION(f) private: f;
+#endif
+
 namespace Si
 {
 	struct nothing
