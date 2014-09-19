@@ -143,11 +143,6 @@ namespace Si
 				}
 			}
 
-			void cancel()
-			{
-				throw std::logic_error("to do");
-			}
-
 			void wait()
 			{
 				worker.get();

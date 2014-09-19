@@ -11,7 +11,7 @@ namespace Si
 {
 	namespace detail
 	{
-		boost::optional<Si::incoming_bytes> strip_error(Si::received_from_socket received)
+		inline boost::optional<Si::incoming_bytes> strip_error(Si::received_from_socket received)
 		{
 			return received.get_ptr() ? boost::optional<Si::incoming_bytes>(*received.get_ptr()) : boost::none;
 		}
@@ -22,6 +22,11 @@ namespace Si
 		explicit received_from_socket_source(Si::source<Si::received_from_socket> &original)
 			: original(&original)
 		{
+		}
+
+		Si::incoming_bytes buffered() const
+		{
+			return rest;
 		}
 
 		virtual boost::iterator_range<char const *> map_next(std::size_t) SILICIUM_OVERRIDE

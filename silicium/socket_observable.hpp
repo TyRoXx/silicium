@@ -24,6 +24,11 @@ namespace Si
 			, end(end)
 		{
 		}
+
+		std::size_t size() const BOOST_NOEXCEPT
+		{
+			return static_cast<std::size_t>(end - begin);
+		}
 	};
 
 	typedef error_or<incoming_bytes> received_from_socket;
