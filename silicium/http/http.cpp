@@ -100,7 +100,31 @@ namespace Si
 				return boost::none;
 			}
 			response_header header;
-			//TODO parse first line
+			{
+				auto const version_end = std::find(first_line->begin(), first_line->end(), ' ');
+				if (version_end == first_line->end())
+				{
+					return boost::none;
+				}
+				header.http_version.assign(first_line->begin(), version_end);
+
+				auto const status_begin = version_end + 1;
+				auto const status_end = std::find(status_begin, first_line->end(), ' ');
+				if (status_end == first_line->end())
+				{
+					return boost::none;
+				}
+				try
+				{
+					header.status = boost::lexical_cast<unsigned>(std::string(status_begin, status_end));
+				}
+				catch (boost::bad_lexical_cast const &)
+				{
+					return boost::none;
+				}
+
+				header.status_text.assign(status_end + 1, first_line->end());
+			}
 			for (;;)
 			{
 				auto value_line = get(lines);
