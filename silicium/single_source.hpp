@@ -1,6 +1,7 @@
 #ifndef SILICIUM_SINGLE_SOURCE_HPP
 #define SILICIUM_SINGLE_SOURCE_HPP
 
+#include <silicium/config.hpp>
 #include <boost/range/iterator_range.hpp>
 
 namespace Si
@@ -49,6 +50,9 @@ namespace Si
 
 	template <class Element>
 	auto make_single_source(Element &&element)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> single_source<typename std::decay<Element>::type>
+#endif
 	{
 		return single_source<typename std::decay<Element>::type>(std::forward<Element>(element));
 	}
