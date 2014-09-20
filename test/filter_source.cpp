@@ -5,7 +5,7 @@
 
 BOOST_AUTO_TEST_CASE(filter_source_true)
 {
-	auto f = Si::make_filter_source(Si::make_generator_source([](){ return 2; }), [](int element)
+	auto f = Si::make_filter_source(Si::make_generator_source([]() -> boost::optional<int> { return 2; }), [](int element)
 	{
 		BOOST_REQUIRE_EQUAL(2, element);
 		return true;
