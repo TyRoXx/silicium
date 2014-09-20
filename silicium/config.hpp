@@ -4,6 +4,13 @@
 #include <memory>
 #include <boost/config.hpp>
 
+#ifdef _MSC_VER
+//avoid useless warning C4127 (conditional expression is constant)
+#	define SILICIUM_FALSE (!"")
+#else
+#	define SILICIUM_FALSE false
+#endif
+
 #ifdef NDEBUG
 #	ifdef _MSC_VER
 #		define SILICIUM_UNREACHABLE() __assume(false)
@@ -11,7 +18,7 @@
 #		define SILICIUM_UNREACHABLE() __builtin_unreachable()
 #	endif
 #else
-#	define SILICIUM_UNREACHABLE() do { throw ::std::logic_error("unreachable " __FILE__ ":" BOOST_STRINGIZE(__LINE__)); } while(false)
+#	define SILICIUM_UNREACHABLE() do { throw ::std::logic_error("unreachable " __FILE__ ":" BOOST_STRINGIZE(__LINE__)); } while(SILICIUM_FALSE)
 #endif
 
 #if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__)
