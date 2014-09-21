@@ -86,11 +86,11 @@ BOOST_AUTO_TEST_CASE(wrap_blocking_coroutine)
 		yield(*intermediate_result + 3);
 	});
 	boost::asio::io_service io;
-	boost::optional<boost::asio::io_service::work> work(boost::in_place(boost::ref(io)));
+	std::unique_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(io));
 	auto consumer = Si::consume<int>([&work](int element)
 	{
 		BOOST_CHECK_EQUAL(5, element);
-		work = boost::none;
+		work.reset();
 	});
 	coro.async_get_one(consumer);
 	io.run();

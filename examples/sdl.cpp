@@ -119,9 +119,16 @@ namespace
 
 	struct game_state
 	{
-		int x = 100;
-		int y = 100;
-		int count = 1;
+		int x;
+		int y;
+		int count;
+
+		game_state()
+			: x(100)
+			, y(100)
+			, count(1)
+		{
+		}
 	};
 
 	int const max_rect_count = 5;
@@ -189,15 +196,15 @@ namespace
 
 	template <class Events>
 	auto make_frames(Events &&input)
-#ifdef _MSC_VER
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> Si::unique_observable<frame>
 #endif
 	{
 		game_state initial_state;
 		auto model = Si::make_finite_state_machine(std::forward<Events>(input), initial_state, step_game_state);
 		return
-#ifdef _MSC_VER
-			Si::box<frame>
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			Si::erase_unique
 #endif
 			(Si::transform(std::move(model), draw_game_state));
 	}

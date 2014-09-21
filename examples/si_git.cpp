@@ -113,7 +113,7 @@ namespace
 
 	private:
 
-		std::ostream *m_out = nullptr;
+		std::ostream *m_out;
 	};
 
 	std::pair<Si::report, Si::report_finalizer> create_simple_file_report(boost::filesystem::path const &parent, std::string name)

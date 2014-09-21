@@ -102,20 +102,17 @@ namespace Si
 {
 	using std::is_copy_constructible;
 	using std::is_copy_assignable;
-	using std::is_default_constructible;
-	using std::is_move_assignable;
 #elif BOOST_VERSION >= 105500 //1.55
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 }
 #include <boost/type_traits/is_copy_constructible.hpp>
-#include <boost/type_traits/is_default_constructible.hpp>
-#include <boost/type_traits/is_move_assignable.hpp>
 namespace Si
 {
 	using boost::is_copy_constructible;
-	using boost::is_copy_assignable;
-	using boost::is_default_constructible;
-	using boost::is_move_assignable;
+	template <class T>
+	struct is_copy_assignable : std::true_type
+	{
+	};
 #else
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 0
 	template <class T>
@@ -126,6 +123,16 @@ namespace Si
 	struct is_copy_assignable : std::true_type
 	{
 	};
+#endif
+
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+}
+#include <type_traits>
+namespace Si
+{
+	using std::is_default_constructible;
+	using std::is_move_assignable;
+#else
 	template <class T>
 	struct is_default_constructible : std::false_type
 	{
