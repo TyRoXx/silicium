@@ -10,6 +10,7 @@ namespace Si
 		struct line_source SILICIUM_FINAL : Si::source<std::vector<char>>
 		{
 			line_source()
+				: m_next(nullptr)
 			{
 			}
 
@@ -61,7 +62,7 @@ namespace Si
 
 		private:
 
-			Si::source<char> *m_next = nullptr;
+			Si::source<char> *m_next;
 		};
 	}
 }

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <boost/config.hpp>
+#include <boost/version.hpp>
 
 #ifdef _MSC_VER
 //avoid useless warning C4127 (conditional expression is constant)
@@ -59,6 +60,12 @@
 #	define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 0
 #endif
 
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#	define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 1
+#else
+#	define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 0
+#endif
+
 #ifdef BOOST_DELETED_FUNCTION
 #	define SILICIUM_DELETED_FUNCTION BOOST_DELETED_FUNCTION
 #else
@@ -79,6 +86,30 @@ namespace Si
 	{
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
+
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#define SILICIUM_HAS_PROPER_COPY_TRAITS 1
+	using std::is_copy_constructible;
+	using std::is_copy_assignable;
+#elif BOOST_VERSION >= 105500 //1.55
+#define SILICIUM_HAS_PROPER_COPY_TRAITS 1
+}
+#include <boost/type_traits/is_copy_constructible.hpp>
+namespace Si
+{
+	using boost::is_copy_constructible;
+	using boost::is_copy_assignable;
+#else
+#define SILICIUM_HAS_PROPER_COPY_TRAITS 0
+	template <class T>
+	struct is_copy_constructible : std::true_type
+	{
+	};
+	template <class T>
+	struct is_copy_assignable : std::true_type
+	{
+	};
+#endif
 }
 
 #endif

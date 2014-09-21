@@ -24,6 +24,7 @@ namespace Si
 		explicit timer(boost::asio::io_service &io, Duration delay)
 			: impl(io)
 			, delay(std::chrono::duration_cast<duration>(delay))
+			, receiver_(nullptr)
 		{
 		}
 
@@ -48,7 +49,7 @@ namespace Si
 
 		timer_impl impl;
 		duration delay;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 	};
 }
 

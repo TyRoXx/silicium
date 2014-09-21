@@ -16,13 +16,15 @@ namespace Si
 {
 	struct file_descriptor
 	{
-		native_file_handle handle = no_file_handle;
+		native_file_handle handle;
 
 		file_descriptor() BOOST_NOEXCEPT
+			: handle(no_file_handle)
 		{
 		}
 
 		file_descriptor(file_descriptor &&other) BOOST_NOEXCEPT
+			: handle(no_file_handle)
 		{
 			swap(other);
 		}

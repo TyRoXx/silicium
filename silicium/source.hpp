@@ -12,7 +12,7 @@ namespace Si
 	template <class Element>
 	struct source
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		virtual ~source()
 		{
@@ -25,7 +25,7 @@ namespace Si
 	template <class X>
 	struct Source
 	{
-		using element_type = typename X::element_type;
+		typedef typename X::element_type element_type;
 
 		BOOST_CONCEPT_USAGE(Source)
 		{
@@ -51,7 +51,7 @@ namespace Si
 		//example and test for the smallest possible Source
 		struct minimum_source
 		{
-			using element_type = int;
+			typedef int element_type;
 			boost::iterator_range<element_type const *> map_next(std::size_t size);
 			element_type *copy_next(boost::iterator_range<element_type *> destination);
 			boost::uintmax_t minimum_size();

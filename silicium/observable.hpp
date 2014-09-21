@@ -22,7 +22,7 @@ namespace Si
 	template <class X>
 	struct Observable
 	{
-		using element_type = typename X::element_type;
+		typedef typename X::element_type element_type;
 
 		BOOST_CONCEPT_USAGE(Observable)
 		{
@@ -56,7 +56,7 @@ namespace Si
 		//example and test for the smallest possible Observable
 		struct minimum_observable
 		{
-			using element_type = int;
+			typedef int element_type;
 			void async_get_one(observer<element_type> &)
 			{
 			}

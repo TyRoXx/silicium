@@ -7,9 +7,11 @@
 #include <memory>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/mpl/find.hpp>
+#include <boost/mpl/push_front.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/integer.hpp>
 #include <boost/optional.hpp>
+#include <boost/type_traits.hpp>
 
 namespace Si
 {
@@ -48,7 +50,7 @@ namespace Si
 		template <class Which, std::size_t Size>
 		struct combined_storage
 		{
-			using which_type = Which;
+			typedef Which which_type;
 
 			combined_storage() BOOST_NOEXCEPT
 			{
@@ -77,7 +79,7 @@ namespace Si
 
 		private:
 
-			using alignment_unit = unsigned;
+			typedef unsigned alignment_unit;
 			enum
 			{
 				which_offset = (Size + sizeof(which_type) - 1) / sizeof(which_type) * sizeof(which_type),
@@ -158,14 +160,53 @@ namespace Si
 			return std::forward<Visitor>(visitor)(*static_cast<T const *>(element));
 		}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION
 		template <class First, class ...Rest>
 		struct first
 		{
-			using type = First;
+			typedef First type;
+		};
+#else
+		template <class ...Sequence>
+		struct first;
+
+		template <class First, class ...Rest>
+		struct first<First, Rest...>
+		{
+			typedef First type;
+		};
+#endif
+
+#if SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION
+		template <class ...All>
+		struct make_mpl_vector
+		{
+			typedef boost::mpl::vector<All...> type;
+		};
+#else
+		//workaround for GCC 4.6
+
+		template <class ...All>
+		struct make_mpl_vector;
+
+		template <class Head, class ...Tail>
+		struct make_mpl_vector<Head, Tail...>
+		{
+			typedef typename boost::mpl::push_front<
+				typename make_mpl_vector<Tail...>::type,
+				Head
+			>::type type;
 		};
 
+		template <>
+		struct make_mpl_vector<>
+		{
+			typedef boost::mpl::vector<> type;
+		};
+#endif
+
 		template <class Element, class ...All>
-		struct index_of : boost::mpl::find<boost::mpl::vector<All...>, Element>::type::pos
+		struct index_of : boost::mpl::find<typename make_mpl_vector<All...>::type, Element>::type::pos
 		{
 		};
 
@@ -176,8 +217,8 @@ namespace Si
 		struct are_noexcept_movable<First, T...>
 			: boost::mpl::and_<
 				boost::mpl::and_<
-					std::is_nothrow_move_constructible<First>,
-					std::is_nothrow_move_assignable<First>
+					boost::is_nothrow_move_constructible<First>,
+					boost::is_nothrow_move_assignable<First>
 				>,
 				are_noexcept_movable<T...>
 			>::type
@@ -209,11 +250,11 @@ namespace Si
 			BOOST_STATIC_ASSERT_MSG(detail::are_noexcept_movable<T...>::value, "All contained types must be nothrow/noexcept-movable");
 #endif
 
-			using which_type = unsigned;
+			typedef unsigned which_type;
 
 			fast_variant_base() BOOST_NOEXCEPT
 			{
-				using constructed = typename first<T...>::type;
+				typedef typename first<T...>::type constructed;
 				new (reinterpret_cast<constructed *>(&storage.storage())) constructed();
 			}
 
@@ -273,7 +314,7 @@ namespace Si
 			template <class Visitor>
 			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
 			{
-				using result = typename std::decay<Visitor>::type::result_type;
+				typedef typename std::decay<Visitor>::type::result_type result;
 				std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f
 				{{
 					&apply_visitor_impl<Visitor, T, result>...
@@ -284,7 +325,7 @@ namespace Si
 			template <class Visitor>
 			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
 			{
-				using result = typename std::decay<Visitor>::type::result_type;
+				typedef typename std::decay<Visitor>::type::result_type result;
 				std::array<result (*)(Visitor &&, void const *), sizeof...(T)> const f
 				{{
 					&apply_visitor_const_impl<Visitor, T, result>...
@@ -330,8 +371,8 @@ namespace Si
 
 		protected: //TODO: make private somehow
 
-			using internal_which_type = typename boost::uint_value_t<sizeof...(T)>::least;
-			using storage_type = combined_storage<internal_which_type, sizeof(union_<T...>)>; //TODO: ensure proper alignment
+			typedef typename boost::uint_value_t<sizeof...(T)>::least internal_which_type;
+			typedef combined_storage<internal_which_type, sizeof(union_<T...>)> storage_type; //TODO: ensure proper alignment
 
 			storage_type storage;
 
@@ -384,7 +425,7 @@ namespace Si
 		template <class ...T>
 		struct fast_variant_base<true, T...> : fast_variant_base<false, T...>
 		{
-			using base = fast_variant_base<false, T...>;
+			typedef fast_variant_base<false, T...> base;
 
 			fast_variant_base() BOOST_NOEXCEPT
 			{
@@ -462,8 +503,8 @@ namespace Si
 		struct are_copyable<First, T...>
 			: boost::mpl::and_<
 				boost::mpl::and_<
-					std::is_copy_constructible<First>,
-					std::is_copy_assignable<First>
+					Si::is_copy_constructible<First>,
+					Si::is_copy_assignable<First>
 				>,
 				are_copyable<T...>
 			>::type
@@ -482,11 +523,17 @@ namespace Si
 #ifndef _MSC_VER
 		//In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
 		//so this assert would fail.
+#if SILICIUM_HAS_PROPER_COPY_TRAITS
+		//GCC 4.6 with Boost < 1.55 is also a problem
 		BOOST_STATIC_ASSERT(!are_copyable<int, std::unique_ptr<int>>::value);
+#endif
 #endif
 
 		template <class ...T>
-		using select_fast_variant_base = fast_variant_base<are_copyable<T...>::value, T...>;
+		struct select_fast_variant_base
+		{
+			typedef fast_variant_base<are_copyable<T...>::value, T...> type;
+		};
 
 		struct ostream_visitor : boost::static_visitor<>
 		{

@@ -13,6 +13,7 @@ namespace Si
 		typedef typename Observable::element_type element_type;
 
 		observable_source()
+			: yield(nullptr)
 		{
 		}
 
@@ -67,7 +68,7 @@ namespace Si
 	private:
 
 		Observable input;
-		YieldContext *yield = nullptr;
+		YieldContext *yield;
 	};
 
 	template <class Observable, class YieldContext>

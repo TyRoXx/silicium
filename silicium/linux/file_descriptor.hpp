@@ -8,7 +8,7 @@
 
 namespace Si
 {
-	using native_file_handle = int;
+	typedef int native_file_handle;
 
 	native_file_handle const no_file_handle = -1;
 

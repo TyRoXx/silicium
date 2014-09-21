@@ -40,6 +40,7 @@ namespace Si
 	struct buffering_sink SILICIUM_FINAL : flushable_sink<Element>
 	{
 		buffering_sink()
+			: m_destination(nullptr)
 		{
 		}
 
@@ -101,7 +102,7 @@ namespace Si
 
 	private:
 
-		sink<Element> *m_destination = nullptr;
+		sink<Element> *m_destination;
 		Buffer m_fallback_buffer;
 		std::size_t m_buffer_used;
 	};
@@ -150,6 +151,7 @@ namespace Si
 	struct ostream_ref_sink SILICIUM_FINAL : flushable_sink<char>
 	{
 		ostream_ref_sink()
+			: m_file(nullptr)
 		{
 		}
 
@@ -181,7 +183,7 @@ namespace Si
 
 	private:
 
-		std::ostream *m_file = nullptr;
+		std::ostream *m_file;
 	};
 
 	struct ostream_sink SILICIUM_FINAL : flushable_sink<char>
