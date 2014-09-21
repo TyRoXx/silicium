@@ -49,12 +49,12 @@ namespace
 
 	struct coroutine_socket
 	{
-		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, Si::yield_context<Si::nothing> &yield)
+		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, Si::push_context<Si::nothing> &yield)
 			: socket(&socket)
 			, yield(&yield)
 			, received(4096)
 			, receiver(socket, boost::make_iterator_range(received.data(), received.data() + received.size()))
-			, receiving_(Si::observable_source<Si::socket_observable, Si::yield_context<Si::nothing>>(receiver, yield))
+			, receiving_(Si::observable_source<Si::socket_observable, Si::push_context<Si::nothing>>(receiver, yield))
 		{
 		}
 
@@ -83,10 +83,10 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::socket *socket = nullptr;
-		Si::yield_context<Si::nothing> *yield = nullptr;
+		Si::push_context<Si::nothing> *yield = nullptr;
 		std::vector<char> received;
 		Si::socket_observable receiver;
-		Si::virtualized_source<Si::observable_source<Si::socket_observable, Si::yield_context<Si::nothing>>> receiving_;
+		Si::virtualized_source<Si::observable_source<Si::socket_observable, Si::push_context<Si::nothing>>> receiving_;
 	};
 
 	struct thread_socket_source : Si::source<Si::received_from_socket>
@@ -174,7 +174,7 @@ namespace
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
 			, clients(acceptor)
-			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
+			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::push_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
 				for (;;)
@@ -189,7 +189,7 @@ namespace
 						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client) -> events
 					{
 						auto visitor_number_ = visitor_count;
-						auto client_handler = Si::erase_shared(Si::make_coroutine<Si::nothing>([client, visitor_number_](Si::yield_context<Si::nothing> &yield) -> void
+						auto client_handler = Si::erase_shared(Si::make_coroutine<Si::nothing>([client, visitor_number_](Si::push_context<Si::nothing> &yield) -> void
 						{
 							coroutine_socket coro_socket(*client, yield);
 							return serve_client(coro_socket, visitor_number_);
@@ -226,7 +226,7 @@ namespace
 		explicit thread_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
 			, clients(acceptor)
-			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::yield_context<events> &yield) -> void
+			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine<events>([this](Si::push_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
 				for (;;)

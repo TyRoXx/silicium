@@ -136,7 +136,7 @@ namespace bf
 			program,
 			&memory,
 			original_pointer
-			](Si::yield_context<boost::uint8_t> &yield) mutable
+			](Si::push_context<boost::uint8_t> &yield) mutable
 		{
 			std::unordered_map<std::ptrdiff_t, typename CommandRange::const_iterator> loop_pairs;
 			auto pointer = original_pointer;

@@ -61,7 +61,7 @@ namespace Si
 		};
 
 		template <class Element>
-		struct coroutine_yield_context_impl : detail::yield_context_impl<Element>
+		struct coroutine_yield_context_impl : detail::push_context_impl<Element>
 		{
 			typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type>::push_type consumer_type;
 
@@ -147,7 +147,7 @@ namespace Si
 			;
 
 		coroutine_holder coro_;
-		std::function<void (yield_context<Element> &)> action;
+		std::function<void (push_context<Element> &)> action;
 		Si::observer<Element> *receiver_ = nullptr;
 
 		coroutine_type &coro()
@@ -183,7 +183,7 @@ namespace Si
 						([bound_action](typename boost::coroutines::coroutine<command_type>::push_type &push)
 						{
 							detail::coroutine_yield_context_impl<Element> yield_impl(push);
-							yield_context<Element> yield(yield_impl); //TODO: save this indirection
+							push_context<Element> yield(yield_impl); //TODO: save this indirection
 							return bound_action(yield);
 						});
 				action = nullptr;

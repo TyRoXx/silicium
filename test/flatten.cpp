@@ -9,7 +9,7 @@
 BOOST_AUTO_TEST_CASE(flatten_trivial)
 {
 	Si::bridge<int> a, b, c;
-	auto all = Si::flatten<boost::interprocess::null_mutex>(Si::make_coroutine<Si::shared_observable<int>>([&](Si::yield_context<Si::shared_observable<int>> &yield)
+	auto all = Si::flatten<boost::interprocess::null_mutex>(Si::make_coroutine<Si::shared_observable<int>>([&](Si::push_context<Si::shared_observable<int>> &yield)
 	{
 		yield(Si::erase_shared(Si::ref(a)));
 		yield(Si::erase_shared(Si::ref(b)));

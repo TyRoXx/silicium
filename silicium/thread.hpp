@@ -96,14 +96,14 @@ namespace Si
 
 	private:
 
-		struct state_type : private detail::yield_context_impl<Element>
+		struct state_type : private detail::push_context_impl<Element>
 		{
 			template <class Action>
 			explicit state_type(Action &&action)
 			{
 				worker = ThreadingAPI::launch_async([action, this]() mutable
 				{
-					yield_context<Element> yield(*this);
+					push_context<Element> yield(*this);
 					(std::forward<Action>(action))(yield);
 
 					typename ThreadingAPI::unique_lock lock(receiver_mutex);

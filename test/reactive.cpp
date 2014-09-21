@@ -126,7 +126,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(reactive_coroutine_generate)
 	{
-		auto co = Si::make_coroutine<int>([](Si::yield_context<int> &yield) -> void
+		auto co = Si::make_coroutine<int>([](Si::push_context<int> &yield) -> void
 		{
 			yield(1);
 			yield(2);
@@ -154,7 +154,7 @@ namespace Si
 	{
 		Si::bridge<int> asyncs;
 		bool exited_cleanly = false;
-		auto co = Si::make_coroutine<int>([&asyncs, &exited_cleanly](Si::yield_context<int> &yield) -> void
+		auto co = Si::make_coroutine<int>([&asyncs, &exited_cleanly](Si::push_context<int> &yield) -> void
 		{
 			auto a = yield.get_one(asyncs);
 			BOOST_REQUIRE(a);
@@ -395,7 +395,7 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 	boost::asio::io_service io;
 	Si::timer<> t(io, std::chrono::microseconds(1));
 	std::size_t elapsed_count = 0;
-	auto coro = Si::make_total_consumer(Si::make_coroutine<Si::nothing>([&t, &elapsed_count](Si::yield_context<> &yield)
+	auto coro = Si::make_total_consumer(Si::make_coroutine<Si::nothing>([&t, &elapsed_count](Si::push_context<> &yield)
 	{
 		BOOST_REQUIRE_EQUAL(0U, elapsed_count);
 		boost::optional<Si::timer_elapsed> e = yield.get_one(t);
@@ -409,7 +409,7 @@ BOOST_AUTO_TEST_CASE(reactive_timer)
 
 BOOST_AUTO_TEST_CASE(reactive_async_empty)
 {
-	auto a = Si::make_thread<int, Si::std_threading>([](Si::yield_context<int> &)
+	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &)
 	{
 	});
 	auto consumer = Si::consume<int>([](int element)
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(reactive_async_empty)
 
 BOOST_AUTO_TEST_CASE(reactive_async)
 {
-	auto a = Si::make_thread<int, Si::std_threading>([](Si::yield_context<int> &yield)
+	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &yield)
 	{
 		yield(1);
 		yield(2);
@@ -448,9 +448,9 @@ BOOST_AUTO_TEST_CASE(reactive_async)
 
 BOOST_AUTO_TEST_CASE(reactive_async_get_one)
 {
-	auto a = Si::make_thread<int, Si::std_threading>([](Si::yield_context<int> &yield)
+	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &yield)
 	{
-		auto b = Si::make_thread<int, Si::boost_threading>([](Si::yield_context<int> &yield)
+		auto b = Si::make_thread<int, Si::boost_threading>([](Si::push_context<int> &yield)
 		{
 			yield(1);
 			yield(2);

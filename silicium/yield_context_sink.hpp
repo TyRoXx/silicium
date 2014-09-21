@@ -9,7 +9,7 @@ namespace Si
 	template <class Element>
 	struct yield_context_sink : Si::sink<Element>
 	{
-		explicit yield_context_sink(Si::yield_context<Element> &yield)
+		explicit yield_context_sink(Si::push_context<Element> &yield)
 			: yield(&yield)
 		{
 		}
@@ -34,7 +34,7 @@ namespace Si
 
 	private:
 
-		Si::yield_context<Element> *yield = nullptr;
+		Si::push_context<Element> *yield = nullptr;
 	};
 }
 

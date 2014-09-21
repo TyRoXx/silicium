@@ -78,7 +78,7 @@ namespace
 
 BOOST_AUTO_TEST_CASE(wrap_blocking_coroutine)
 {
-	auto coro = Si::make_coroutine<int>([](Si::yield_context<int> &yield)
+	auto coro = Si::make_coroutine<int>([](Si::push_context<int> &yield)
 	{
 		auto blocking = Si::wrap_blocking(blocking_stuff);
 		auto const intermediate_result = yield.get_one(blocking);

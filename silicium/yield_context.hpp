@@ -10,29 +10,26 @@ namespace Si
 {
 	namespace detail
 	{
-		template <class Element>
-		struct yield_context_impl
+		struct basic_yield_context
 		{
-			virtual ~yield_context_impl()
+			virtual ~basic_yield_context()
 			{
 			}
-
-			virtual void push_result(Element result) = 0;
 			virtual void get_one(observable<nothing> &target) = 0;
+		};
+
+		template <class Element>
+		struct push_context_impl : basic_yield_context
+		{
+			virtual void push_result(Element result) = 0;
 		};
 	}
 
-	template <class Element = nothing>
 	struct yield_context
 	{
-		explicit yield_context(detail::yield_context_impl<Element> &impl)
+		explicit yield_context(detail::basic_yield_context &impl)
 			: impl(&impl)
 		{
-		}
-
-		void operator()(Element result)
-		{
-			return impl->push_result(std::move(result));
 		}
 
 		template <class Observable, class Gotten = typename Observable::element_type>
@@ -49,9 +46,23 @@ namespace Si
 			return result;
 		}
 
-	private:
+	protected:
 
-		detail::yield_context_impl<Element> *impl = nullptr;
+		detail::basic_yield_context *impl = nullptr;
+	};
+
+	template <class Element = nothing>
+	struct push_context : yield_context
+	{
+		explicit push_context(detail::push_context_impl<Element> &impl)
+			: yield_context(impl)
+		{
+		}
+
+		void operator()(Element result)
+		{
+			return static_cast<detail::push_context_impl<Element> *>(impl)->push_result(std::move(result));
+		}
 	};
 }
 

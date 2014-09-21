@@ -130,12 +130,12 @@ namespace Si
 BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 {
 	Si::channel<int> channel;
-	auto t = Si::make_coroutine<int>([&channel](Si::yield_context<int> &yield)
+	auto t = Si::make_coroutine<int>([&channel](Si::push_context<int> &yield)
 	{
 		channel.send(2, yield);
 		channel.send(3, yield);
 	});
-	auto s = Si::make_coroutine<int>([&channel](Si::yield_context<int> &yield)
+	auto s = Si::make_coroutine<int>([&channel](Si::push_context<int> &yield)
 	{
 		auto a = yield.get_one(channel.receiver());
 		BOOST_REQUIRE(a);
@@ -162,12 +162,12 @@ BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 BOOST_AUTO_TEST_CASE(channel_with_thread)
 {
 	Si::channel<int> channel;
-	auto t = Si::make_thread<int, Si::boost_threading>([&channel](Si::yield_context<int> &yield)
+	auto t = Si::make_thread<int, Si::boost_threading>([&channel](Si::push_context<int> &yield)
 	{
 		channel.send(2, yield);
 		channel.send(3, yield);
 	});
-	auto s = Si::make_thread<int, Si::boost_threading>([&channel](Si::yield_context<int> &yield)
+	auto s = Si::make_thread<int, Si::boost_threading>([&channel](Si::push_context<int> &yield)
 	{
 		auto a = yield.get_one(channel.receiver());
 		BOOST_REQUIRE(a);
@@ -197,12 +197,12 @@ BOOST_AUTO_TEST_CASE(channel_select)
 {
 	Si::channel<int> channel_1;
 	Si::channel<long> channel_2;
-	auto t = Si::make_thread<long, Si::boost_threading>([&](Si::yield_context<long> &yield)
+	auto t = Si::make_thread<long, Si::boost_threading>([&](Si::push_context<long> &yield)
 	{
 		channel_1.send(2, yield);
 		channel_2.send(3L, yield);
 	});
-	auto s = Si::make_thread<long, Si::boost_threading>([&](Si::yield_context<long> &yield)
+	auto s = Si::make_thread<long, Si::boost_threading>([&](Si::push_context<long> &yield)
 	{
 		auto both = Si::make_variant(Si::ref(channel_1.receiver()), Si::ref(channel_2.receiver()));
 		boost::optional<Si::fast_variant<int, long>> a = yield.get_one(both);
