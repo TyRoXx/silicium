@@ -6,7 +6,14 @@ if(${CMAKE_SYSTEM} MATCHES "Linux")
 endif()
 
 if(UNIX)
-	add_definitions("-Wall -Wextra -std=c++0x -Wconversion -Wvla")
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	if(4.7 VERSION_GREATER GCC_VERSION)
+		add_definitions("-std=c++0x")
+	else()
+		add_definitions("-std=c++1y")
+	endif()
+
+	add_definitions("-Wall -Wextra -Wconversion -Wvla")
 
 	option(SILICIUM_PEDANTIC "pass -pedantic to the compiler (may generate useless warnings)" OFF)
 	if(SILICIUM_PEDANTIC)
