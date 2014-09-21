@@ -3,6 +3,7 @@
 
 #include <silicium/observable.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/config.hpp>
 #include <silicium/override.hpp>
 #include <cassert>
 
@@ -64,6 +65,9 @@ namespace Si
 
 	template <class Input>
 	auto make_end_observable(Input &&input)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> end_observable<typename std::decay<Input>::type>
+#endif
 	{
 		return end_observable<typename std::decay<Input>::type>(std::forward<Input>(input));
 	}
