@@ -21,11 +21,17 @@ namespace Si
 		typedef typename sub_observable::element_type element_type;
 
 		flattener()
+			: input_ended(false)
+			, receiver_(nullptr)
+			, is_fetching(false)
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		flattener(flattener &&other)
+			: input_ended(false)
+			, receiver_(nullptr)
+			, is_fetching(false)
 		{
 			*this = std::move(other);
 		}
@@ -92,11 +98,11 @@ namespace Si
 		};
 
 		ObservableObservable input;
-		bool input_ended = false;
-		observer<element_type> *receiver_ = nullptr;
+		bool input_ended;
+		observer<element_type> *receiver_;
 		std::unordered_map<child *, std::unique_ptr<child>> children;
 		std::unique_ptr<Mutex> children_mutex;
-		bool is_fetching = false;
+		bool is_fetching;
 
 		void fetch()
 		{

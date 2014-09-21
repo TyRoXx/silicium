@@ -12,7 +12,7 @@ namespace Si
 	template <class Observable>
 	struct virtualized_observable : observable<typename Observable::element_type>
 	{
-		using element_type = typename Observable::element_type;
+		typedef typename Observable::element_type element_type;
 
 		virtualized_observable()
 		{

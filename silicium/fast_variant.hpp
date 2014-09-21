@@ -551,16 +551,30 @@ namespace Si
 			}
 		};
 
-		template <class ...T>
-		std::ostream &operator << (std::ostream &out, select_fast_variant_base<T...> const &v)
+		template <bool IsCopyable, class ...T>
+		std::ostream &operator << (std::ostream &out, fast_variant_base<IsCopyable, T...> const &v)
 		{
 			Si::apply_visitor(ostream_visitor{ out }, v);
 			return out;
 		}
 	}
 
+#if SILICIUM_COMPILER_HAS_USING
 	template <class ...T>
-	using fast_variant = detail::select_fast_variant_base<T...>;
+	using fast_variant = typename detail::select_fast_variant_base<T...>::type;
+#else
+	template <class ...T>
+	struct fast_variant : detail::select_fast_variant_base<T...>::type
+	{
+		typedef typename detail::select_fast_variant_base<T...>::type base;
+
+		template <class Initializer>
+		fast_variant(Initializer &&init)
+			: base(std::forward<Initializer>(init))
+		{
+		}
+	};
+#endif
 
 	template <class ...T>
 	bool operator != (fast_variant<T...> const &left, fast_variant<T...> const &right)
@@ -645,15 +659,24 @@ namespace Si
 
 	namespace detail
 	{
+#if SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION
 		template <std::size_t Index, class First, class ...T>
 		struct at : at<Index - 1, T...>
 		{
 		};
+#else
+		template <std::size_t Index, class ...T>
+		struct at;
 
+		template <std::size_t Index, class First, class ...T>
+		struct at<Index, First, T...> : at<Index - 1, T...>
+		{
+		};
+#endif
 		template <class First, class ...T>
 		struct at<0, First, T...>
 		{
-			using type = First;
+			typedef First type;
 		};
 
 		template <class Result, std::size_t Index, class ...T>
@@ -673,7 +696,7 @@ namespace Si
 		template <class Result, std::size_t Index, class ...T, class FirstVisitor, class ...Visitors>
 		Result visit_impl(fast_variant<T...> &var, FirstVisitor const &first_visitor, Visitors const & ...visitors)
 		{
-			using element_type = typename at<Index, T...>::type;
+			typedef typename at<Index, T...>::type element_type;
 			if (var.which() == Index)
 			{
 				auto * const element = try_get_ptr<element_type>(var);
@@ -686,7 +709,7 @@ namespace Si
 		template <class Result, std::size_t Index, class ...T, class FirstVisitor, class ...Visitors>
 		Result visit_impl(fast_variant<T...> const &var, FirstVisitor const &first_visitor, Visitors const & ...visitors)
 		{
-			using element_type = typename at<Index, T...>::type;
+			typedef typename at<Index, T...>::type element_type;
 			if (var.which() == Index)
 			{
 				auto * const element = try_get_ptr<element_type>(var);

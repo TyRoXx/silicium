@@ -17,7 +17,7 @@ namespace Si
 	template <class Element>
 	struct buffering_source SILICIUM_FINAL : mutable_source<Element>
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		explicit buffering_source(source<Element> &next, std::size_t capacity)
 			: m_next(&next)
@@ -76,7 +76,7 @@ namespace Si
 
 	private:
 
-		source<Element> *m_next = nullptr;
+		source<Element> *m_next;
 		boost::circular_buffer<Element> m_buffer;
 
 		void pull()

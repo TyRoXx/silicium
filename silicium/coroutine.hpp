@@ -82,7 +82,7 @@ namespace Si
 
 		private:
 
-			consumer_type *consumer = nullptr;
+			consumer_type *consumer;
 		};
 	}
 
@@ -94,10 +94,12 @@ namespace Si
 		typedef Element element_type;
 
 		coroutine_observable()
+			: receiver_(nullptr)
 		{
 		}
 
 		coroutine_observable(coroutine_observable &&other)
+			: receiver_(nullptr)
 		{
 			*this = std::move(other);
 		}
@@ -138,17 +140,17 @@ namespace Si
 
 		typedef typename detail::make_command<element_type>::type command_type;
 		typedef typename boost::coroutines::coroutine<command_type>::pull_type coroutine_type;
-		using coroutine_holder =
+		typedef
 #ifdef _MSC_VER
 			std::shared_ptr<coroutine_type>
 #else
 			coroutine_type
 #endif
-			;
+			coroutine_holder;
 
 		coroutine_holder coro_;
 		std::function<void (push_context<Element> &)> action;
-		Si::observer<Element> *receiver_ = nullptr;
+		Si::observer<Element> *receiver_;
 
 		coroutine_type &coro()
 		{

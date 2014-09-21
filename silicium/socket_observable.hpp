@@ -13,9 +13,11 @@ namespace Si
 {
 	struct incoming_bytes
 	{
-		char const *begin = nullptr, *end = nullptr;
+		char const *begin, *end;
 
 		incoming_bytes() BOOST_NOEXCEPT
+			: begin(nullptr)
+			, end(nullptr)
 		{
 		}
 
@@ -39,12 +41,14 @@ namespace Si
 		typedef boost::iterator_range<char *> buffer_type;
 
 		socket_observable()
+			: receiver_(nullptr)
 		{
 		}
 
 		socket_observable(boost::asio::ip::tcp::socket &socket, buffer_type buffer)
 			: socket(&socket)
 			, buffer(buffer)
+			, receiver_(nullptr)
 		{
 			assert(!buffer.empty());
 		}
@@ -76,7 +80,7 @@ namespace Si
 
 		boost::asio::ip::tcp::socket *socket;
 		buffer_type buffer;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 	};
 }
 

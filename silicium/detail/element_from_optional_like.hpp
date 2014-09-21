@@ -10,13 +10,13 @@ namespace Si
 		template <class Element>
 		struct element_from_optional_like
 		{
-			using type = Element;
+			typedef Element type;
 		};
 
 		template <class Element>
 		struct element_from_optional_like<boost::optional<Element>>
 		{
-			using type = Element;
+			typedef Element type;
 		};
 	}
 }

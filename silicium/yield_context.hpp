@@ -48,7 +48,7 @@ namespace Si
 
 	protected:
 
-		detail::basic_yield_context *impl = nullptr;
+		detail::basic_yield_context *impl;
 	};
 
 	template <class Element = nothing>

@@ -7,11 +7,13 @@ namespace Si
 	namespace linux
 	{
 		inotify_observable::inotify_observable()
+			: receiver_(nullptr)
 		{
 		}
 
 		inotify_observable::inotify_observable(boost::asio::io_service &io)
 			: notifier(boost::in_place(boost::ref(io)))
+			, receiver_(nullptr)
 		{
 			int fd = inotify_init();
 			if (fd < 0)

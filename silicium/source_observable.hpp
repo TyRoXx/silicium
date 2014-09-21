@@ -11,7 +11,7 @@ namespace Si
 	template <class Element, class Source>
 	struct source_observable
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		source_observable()
 		{

@@ -9,7 +9,7 @@ namespace Si
 	template <class Input, class Predicate>
 	struct filter_source
 	{
-		using element_type = typename Input::element_type;
+		typedef typename Input::element_type element_type;
 
 		filter_source()
 		{
@@ -48,7 +48,7 @@ namespace Si
 
 	private:
 
-		using proper_predicate = typename detail::proper_value_function<Predicate, bool, element_type const &>::type;
+		typedef typename detail::proper_value_function<Predicate, bool, element_type const &>::type proper_predicate;
 
 		Input input;
 		proper_predicate is_propagated;

@@ -6,7 +6,7 @@
 
 namespace Si
 {
-	using none_t = nothing;
+	typedef nothing none_t;
 
 	static none_t BOOST_CONSTEXPR_OR_CONST none;
 

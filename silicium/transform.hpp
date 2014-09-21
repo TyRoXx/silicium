@@ -21,12 +21,14 @@ namespace Si
 		typedef typename Original::element_type from_type;
 
 		transformation()
+			: receiver(nullptr)
 		{
 		}
 
 		explicit transformation(Transform transform, Original original)
 			: transform(std::move(transform))
 			, original(std::move(original))
+			, receiver(nullptr)
 		{
 		}
 
@@ -60,15 +62,15 @@ namespace Si
 
 	private:
 
-		using proper_transform = typename detail::proper_value_function<
+		typedef typename detail::proper_value_function<
 			Transform,
 			element_type,
 			from_type
-		>::type;
+		>::type proper_transform;
 
 		proper_transform transform; //TODO empty base optimization
 		Original original;
-		observer<element_type> *receiver = nullptr;
+		observer<element_type> *receiver;
 
 		virtual void got_element(from_type value) SILICIUM_OVERRIDE
 		{

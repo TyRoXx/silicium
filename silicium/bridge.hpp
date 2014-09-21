@@ -14,6 +14,11 @@ namespace Si
 	{
 		typedef Element element_type;
 
+		bridge()
+			: receiver(nullptr)
+		{
+		}
+
 		bool is_waiting() const
 		{
 			return receiver != nullptr;
@@ -39,7 +44,7 @@ namespace Si
 
 	private:
 
-		observer<element_type> *receiver = nullptr;
+		observer<element_type> *receiver;
 	};
 }
 

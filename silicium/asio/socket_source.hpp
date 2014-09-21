@@ -15,8 +15,8 @@ namespace Si
 
 	private:
 
-		boost::asio::ip::tcp::socket *m_socket = nullptr;
-		boost::asio::yield_context *m_yield = nullptr;
+		boost::asio::ip::tcp::socket *m_socket;
+		boost::asio::yield_context *m_yield;
 	};
 }
 

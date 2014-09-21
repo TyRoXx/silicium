@@ -11,7 +11,7 @@ namespace Si
 	template <class Generator, class Element = typename detail::element_from_optional_like<typename std::result_of<Generator ()>::type>::type>
 	struct generator_observable
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		generator_observable()
 		{
@@ -50,7 +50,7 @@ namespace Si
 
 	private:
 
-		using proper_generator = typename detail::proper_value_function<Generator, typename std::result_of<Generator ()>::type>::type;
+		typedef typename detail::proper_value_function<Generator, typename std::result_of<Generator ()>::type>::type proper_generator;
 
 		proper_generator generate;
 	};

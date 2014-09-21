@@ -24,6 +24,8 @@ namespace Si
 		struct watch_descriptor
 		{
 			watch_descriptor() BOOST_NOEXCEPT
+				: notifier(-1)
+				, watch(-1)
 			{
 			}
 
@@ -64,8 +66,8 @@ namespace Si
 
 		private:
 
-			int notifier = -1;
-			int watch = -1;
+			int notifier;
+			int watch;
 		};
 
 		struct inotify_observable : private boost::noncopyable
@@ -81,7 +83,7 @@ namespace Si
 
 			boost::optional<boost::asio::posix::stream_descriptor> notifier;
 			std::vector<char> read_buffer;
-			observer<element_type> *receiver_ = nullptr;
+			observer<element_type> *receiver_;
 		};
 	}
 }

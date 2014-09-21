@@ -10,7 +10,7 @@ namespace Si
 	template <class Original>
 	struct virtualized_source : source<typename Original::element_type>
 	{
-		using element_type = typename Original::element_type;
+		typedef typename Original::element_type element_type;
 
 		virtualized_source()
 		{
