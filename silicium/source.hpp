@@ -6,6 +6,7 @@
 #include <boost/optional.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/cstdint.hpp>
+#include <vector>
 
 namespace Si
 {
