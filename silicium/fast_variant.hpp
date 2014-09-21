@@ -529,11 +529,16 @@ namespace Si
 #endif
 #endif
 
+#if SILICIUM_COMPILER_HAS_USING
+		template <class ...T>
+		using select_fast_variant_base = fast_variant_base<are_copyable<T...>::value, T...>;
+#else
 		template <class ...T>
 		struct select_fast_variant_base
 		{
 			typedef fast_variant_base<are_copyable<T...>::value, T...> type;
 		};
+#endif
 
 		struct ostream_visitor : boost::static_visitor<>
 		{
@@ -561,7 +566,7 @@ namespace Si
 
 #if SILICIUM_COMPILER_HAS_USING
 	template <class ...T>
-	using fast_variant = typename detail::select_fast_variant_base<T...>::type;
+	using fast_variant = detail::select_fast_variant_base<T...>;
 #else
 	template <class ...T>
 	struct fast_variant : detail::select_fast_variant_base<T...>::type

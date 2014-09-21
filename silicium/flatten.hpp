@@ -49,6 +49,8 @@ namespace Si
 
 		explicit flattener(ObservableObservable input)
 			: input(std::move(input))
+			, input_ended(false)
+			, receiver_(nullptr)
 			, children_mutex(make_unique<Mutex>())
 		{
 		}
