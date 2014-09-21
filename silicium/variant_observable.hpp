@@ -15,7 +15,6 @@
 
 namespace Si
 {
-
 #if SILICIUM_RX_VARIANT_AVAILABLE
 	template <template <class ...T> class variant, class Lockable, class ...Parts>
 	struct variant_observable

@@ -14,6 +14,7 @@ namespace Si
 		explicit connecting_observable(boost::asio::ip::tcp::socket &socket, boost::asio::ip::tcp::endpoint destination)
 			: socket(&socket)
 			, destination(destination)
+			, receiver_(nullptr)
 		{
 		}
 
@@ -30,9 +31,9 @@ namespace Si
 
 	private:
 
-		boost::asio::ip::tcp::socket *socket = nullptr;
+		boost::asio::ip::tcp::socket *socket;
 		boost::asio::ip::tcp::endpoint destination;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 	};
 }
 

@@ -17,12 +17,15 @@ namespace Si
 		typedef boost::iterator_range<char const *> buffer_type;
 
 		sending_observable()
+			: socket(nullptr)
+			, receiver_(nullptr)
 		{
 		}
 
 		explicit sending_observable(boost::asio::ip::tcp::socket &socket, buffer_type buffer)
 			: socket(&socket)
 			, buffer(buffer)
+			, receiver_(nullptr)
 		{
 		}
 
@@ -45,9 +48,9 @@ namespace Si
 
 	private:
 
-		boost::asio::ip::tcp::socket *socket = nullptr;
+		boost::asio::ip::tcp::socket *socket;
 		buffer_type buffer;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 	};
 }
 

@@ -157,7 +157,7 @@ namespace Si
 
 		private:
 
-			typename ThreadingAPI::template future<void> worker;
+			typename ThreadingAPI::template future<void>::type worker;
 			typename ThreadingAPI::mutex receiver_mutex;
 			observer<Element> *receiver;
 			boost::optional<Element> ready_result;

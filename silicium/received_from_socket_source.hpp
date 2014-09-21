@@ -68,7 +68,7 @@ namespace Si
 
 	private:
 
-		Si::source<Si::received_from_socket> *original = nullptr;
+		Si::source<Si::received_from_socket> *original;
 		Si::incoming_bytes rest;
 
 		std::size_t skip(std::size_t count)

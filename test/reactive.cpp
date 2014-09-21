@@ -224,12 +224,13 @@ namespace Si
 		boost::asio::io_service *dispatcher;
 		boost::optional<boost::asio::io_service::work> blocker;
 		Action action;
-		Si::observable<Element> *from = nullptr;
+		Si::observable<Element> *from;
 
 		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
 			: dispatcher(&dispatcher)
 			, blocker(boost::in_place(boost::ref(dispatcher)))
 			, action(std::move(action))
+			, from(nullptr)
 		{
 		}
 
@@ -270,13 +271,16 @@ namespace Si
 namespace Si
 {
 	template <class Element>
-	using signal_observer_map =
+	struct signal_observer_map
+	{
+		typedef
 #ifdef _MSC_VER
-		std::unordered_map
+			std::unordered_map
 #else
-		boost::container::flat_map
+			boost::container::flat_map
 #endif
-		<observer<Element> *, bool>;
+			<observer<Element> *, bool> type;
+	};
 
 	template <class Element>
 	struct connection : observable<Element>
@@ -284,11 +288,14 @@ namespace Si
 		typedef Element element_type;
 
 		connection()
+			: connections(nullptr)
+			, receiver_(nullptr)
 		{
 		}
 
-		explicit connection(signal_observer_map<Element> &connections)
+		explicit connection(typename signal_observer_map<Element>::type &connections)
 			: connections(&connections)
+			, receiver_(nullptr)
 		{
 		}
 
@@ -331,8 +338,8 @@ namespace Si
 
 	private:
 
-		signal_observer_map<Element> *connections = nullptr;
-		observer<Element> *receiver_ = nullptr;
+		typename signal_observer_map<Element>::type *connections;
+		observer<Element> *receiver_;
 
 		SILICIUM_DELETED_FUNCTION(connection(connection const &))
 		SILICIUM_DELETED_FUNCTION(connection &operator = (connection const &))
@@ -362,7 +369,7 @@ namespace Si
 
 	private:
 
-		signal_observer_map<Element> observers;
+		typename signal_observer_map<Element>::type observers;
 	};
 }
 

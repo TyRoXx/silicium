@@ -82,8 +82,8 @@ namespace
 
 	private:
 
-		boost::asio::ip::tcp::socket *socket = nullptr;
-		Si::push_context<Si::nothing> *yield = nullptr;
+		boost::asio::ip::tcp::socket *socket;
+		Si::push_context<Si::nothing> *yield;
 		std::vector<char> received;
 		Si::socket_observable receiver;
 		Si::virtualized_source<Si::observable_source<Si::socket_observable, Si::push_context<Si::nothing>>> receiving_;
@@ -133,7 +133,7 @@ namespace
 
 	private:
 
-		boost::asio::ip::tcp::socket *socket = nullptr;
+		boost::asio::ip::tcp::socket *socket;
 		std::vector<char> received;
 	};
 
@@ -167,7 +167,7 @@ namespace
 		thread_socket_source receiving_;
 	};
 
-	using events = Si::shared_observable<Si::nothing>;
+	typedef Si::shared_observable<Si::nothing> events;
 
 	struct coroutine_web_server
 	{

@@ -81,7 +81,7 @@ namespace Si
 		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(f));
 
 		f = fast_variant<int>(2);
-		BOOST_CHECK_EQUAL(boost::make_optional(fast_variant<int>(2)), try_get<fast_variant<int>>(f));
+		BOOST_CHECK(boost::make_optional(fast_variant<int>(2)) == try_get<fast_variant<int>>(f));
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant_construct_const)
@@ -100,24 +100,24 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(fast_variant_less)
 	{
 		fast_variant<int, noexcept_string> f(1), g(2), h(noexcept_string("a")), i(noexcept_string("b"));
-		BOOST_CHECK_LT(f, g);
-		BOOST_CHECK_LT(f, h);
-		BOOST_CHECK_LT(f, i);
-		BOOST_CHECK_LT(h, i);
+		BOOST_CHECK(f < g);
+		BOOST_CHECK(f < h);
+		BOOST_CHECK(f < i);
+		BOOST_CHECK(h < i);
 	}
 
 	// default constructor
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_default)
 	{
-		using variant = fast_variant<int>;
+		typedef fast_variant<int> variant;
 		variant v;
 		BOOST_CHECK_EQUAL(0U, v.which());
 	}
 
 	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_default)
 	{
-		using variant = fast_variant<std::unique_ptr<int>>;
+		typedef fast_variant<std::unique_ptr<int>> variant;
 		variant v;
 		BOOST_CHECK_EQUAL(0U, v.which());
 	}
@@ -126,7 +126,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_construct_move)
 	{
-		using variant = fast_variant<std::unique_ptr<int>>;
+		typedef fast_variant<std::unique_ptr<int>> variant;
 		variant v(Si::make_unique<int>(2));
 		variant w(std::move(v));
 		BOOST_CHECK(v != w);
@@ -136,7 +136,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_construct_copy)
 	{
-		using variant = fast_variant<int>;
+		typedef fast_variant<int> variant;
 		variant v;
 		variant w(v);
 		BOOST_CHECK(v == w);
@@ -144,7 +144,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_copy)
 	{
-		using variant = fast_variant<int>;
+		typedef fast_variant<int> variant;
 		variant v;
 		variant w(2);
 		BOOST_CHECK(v != w);
@@ -156,9 +156,9 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_move)
 	{
-		using variant = fast_variant<noexcept_string>;
-		BOOST_STATIC_ASSERT(std::is_copy_assignable<variant>::value);
-		BOOST_STATIC_ASSERT(std::is_copy_constructible<variant>::value);
+		typedef fast_variant<noexcept_string> variant;
+		BOOST_STATIC_ASSERT(Si::is_copy_assignable<variant>::value);
+		BOOST_STATIC_ASSERT(Si::is_copy_constructible<variant>::value);
 		variant v;
 		variant w(noexcept_string(1000, 'a'));
 		BOOST_CHECK(v != w);
@@ -168,7 +168,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_non_copyable_operator_move)
 	{
-		using variant = fast_variant<std::unique_ptr<int>>;
+		typedef fast_variant<std::unique_ptr<int>> variant;
 		variant v;
 		variant w(Si::make_unique<int>(2));
 		BOOST_CHECK(v != w);
@@ -180,7 +180,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_copy_to_same)
 	{
-		using variant = fast_variant<int, double>;
+		typedef fast_variant<int, double> variant;
 		variant v;
 		variant w(3);
 		BOOST_CHECK(v != w);
@@ -190,7 +190,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_copy_to_different)
 	{
-		using variant = fast_variant<int, double>;
+		typedef fast_variant<int, double> variant;
 		variant v(1.0);
 		variant w(3);
 		BOOST_CHECK(v != w);
@@ -200,7 +200,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_operator_copy_raw)
 	{
-		using variant = fast_variant<int, double>;
+		typedef fast_variant<int, double> variant;
 		variant v;
 		variant w(3);
 		BOOST_CHECK(v != w);
@@ -229,7 +229,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_apply_visitor_mutable)
 	{
-		using variant = fast_variant<int, double>;
+		typedef fast_variant<int, double> variant;
 		variant v(2);
 		bool success = apply_visitor(test_visitor_1(), v);
 		BOOST_CHECK(success);
@@ -237,7 +237,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_copyable_apply_visitor_const)
 	{
-		using variant = fast_variant<int, double>;
+		typedef fast_variant<int, double> variant;
 		variant const v(2);
 		bool success = apply_visitor(test_visitor_1(), v);
 		BOOST_CHECK(success);
@@ -324,7 +324,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_hash)
 	{
-		using variant = fast_variant<int, float>;
+		typedef fast_variant<int, float> variant;
 		std::unordered_set<variant> s;
 		s.insert(2);
 		BOOST_CHECK_EQUAL(1U, s.count(2));
@@ -342,7 +342,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_const_visit)
 	{
-		using variant = fast_variant<int, float>;
+		typedef fast_variant<int, float> variant;
 		variant const v(2);
 		BOOST_CHECK_EQUAL(2 + 1, visit<int>(
 			v,
@@ -359,7 +359,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(fast_variant_mutable_visit)
 	{
-		using variant = fast_variant<int, float>;
+		typedef fast_variant<int, float> variant;
 		variant v(2);
 		BOOST_CHECK_EQUAL(2 + 1, visit<int>(
 			v,

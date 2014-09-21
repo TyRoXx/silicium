@@ -8,12 +8,18 @@ namespace Si
 	struct boost_threading
 	{
 		template <class T>
-		using future = boost::unique_future<T>;
+		struct future
+		{
+			typedef boost::unique_future<T> type;
+		};
 		template <class T>
-		using promise = boost::promise<T>;
-		using mutex = boost::mutex;
-		using condition_variable = boost::condition_variable;
-		using unique_lock = boost::unique_lock<boost::mutex>;
+		struct promise
+		{
+			typedef boost::promise<T> type;
+		};
+		typedef boost::mutex mutex;
+		typedef boost::condition_variable condition_variable;
+		typedef boost::unique_lock<boost::mutex> unique_lock;
 		template <class Action, class ...Args>
 		static auto launch_async(Action &&action, Args &&...args) -> boost::unique_future<decltype(action(std::forward<Args>(args)...))>
 		{

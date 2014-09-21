@@ -9,21 +9,24 @@
 
 namespace Si
 {
-	using tcp_acceptor_result = Si::fast_variant<
+	typedef Si::fast_variant<
 		std::shared_ptr<boost::asio::ip::tcp::socket>, //until socket itself is noexcept-movable
 		boost::system::error_code
-	>;
+	> tcp_acceptor_result;
 
 	struct tcp_acceptor : private boost::noncopyable
 	{
 		typedef tcp_acceptor_result element_type;
 
 		tcp_acceptor()
+			: underlying(nullptr)
+			, receiver_(nullptr)
 		{
 		}
 
 		explicit tcp_acceptor(boost::asio::ip::tcp::acceptor &underlying)
 			: underlying(&underlying)
+			, receiver_(nullptr)
 		{
 		}
 
@@ -67,9 +70,9 @@ namespace Si
 
 	private:
 
-		boost::asio::ip::tcp::acceptor *underlying = nullptr;
+		boost::asio::ip::tcp::acceptor *underlying;
 		std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 	};
 }
 

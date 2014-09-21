@@ -582,6 +582,12 @@ namespace Si
 			: base(std::forward<Initializer>(init))
 		{
 		}
+
+		template <class Other>
+		void assign(Other &&other)
+		{
+			base::assign(static_cast<typename std::decay<Other>::type::base const &>(other));
+		}
 	};
 #endif
 

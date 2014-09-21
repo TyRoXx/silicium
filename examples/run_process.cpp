@@ -78,7 +78,7 @@ namespace
 
 	private:
 
-		std::ostream *m_out = nullptr;
+		std::ostream *m_out;
 	};
 }
 

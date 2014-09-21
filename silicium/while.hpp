@@ -16,6 +16,7 @@ namespace Si
 		while_observable(Input input, ElementPredicate is_not_end)
 			: input(std::move(input))
 			, is_not_end(std::move(is_not_end))
+			, receiver_(nullptr)
 		{
 		}
 
@@ -30,7 +31,7 @@ namespace Si
 
 		Input input;
 		ElementPredicate is_not_end;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 
 		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
 		{

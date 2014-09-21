@@ -1,5 +1,6 @@
 #include <silicium/bridge.hpp>
 #include <silicium/consume.hpp>
+#include <silicium/config.hpp>
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <boost/test/unit_test.hpp>
@@ -90,6 +91,7 @@ namespace Si
 	struct pinned_value
 	{
 		pinned_value() BOOST_NOEXCEPT
+			: lua(nullptr)
 		{
 		}
 
@@ -144,10 +146,10 @@ namespace Si
 
 	private:
 
-		lua_State *lua = nullptr;
+		lua_State *lua;
 
-		BOOST_DELETED_FUNCTION(pinned_value(pinned_value const &))
-		BOOST_DELETED_FUNCTION(pinned_value &operator = (pinned_value const &))
+		SILICIUM_DELETED_FUNCTION(pinned_value(pinned_value const &))
+		SILICIUM_DELETED_FUNCTION(pinned_value &operator = (pinned_value const &))
 
 		void remove_this()
 		{
@@ -165,7 +167,7 @@ namespace Si
 	template <class Element, class ElementFromLua>
 	struct lua_thread
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		explicit lua_thread(lua_State &thread, ElementFromLua from_lua)
 			: s(std::make_shared<state>(thread, std::move(from_lua)))
@@ -214,15 +216,17 @@ namespace Si
 
 		struct state
 		{
-			lua_State *thread = nullptr;
+			lua_State *thread;
 			ElementFromLua from_lua;
-			bool was_resumed = false;
-			observer<element_type> *receiver = nullptr;
+			bool was_resumed;
+			observer<element_type> *receiver;
 			pinned_value thread_pin;
 
 			explicit state(lua_State &thread, ElementFromLua from_lua)
 				: thread(&thread)
 				, from_lua(std::move(from_lua))
+				, was_resumed(false)
+				, receiver(nullptr)
 			{
 				lua_pushthread(&thread);
 				thread_pin = pinned_value(thread, -1);

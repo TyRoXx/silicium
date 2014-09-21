@@ -16,10 +16,11 @@ namespace Si
 
 	struct file_notification
 	{
-		file_notification_type type = file_notification_type::change;
+		file_notification_type type;
 		boost::filesystem::path name;
 
 		file_notification()
+			: type(file_notification_type::change)
 		{
 		}
 

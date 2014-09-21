@@ -8,12 +8,18 @@ namespace Si
 	struct std_threading
 	{
 		template <class T>
-		using future = std::future<T>;
+		struct future
+		{
+			typedef std::future<T> type;
+		};
 		template <class T>
-		using promise = std::promise<T>;
-		using mutex = std::mutex;
-		using condition_variable = std::condition_variable;
-		using unique_lock = std::unique_lock<std::mutex>;
+		struct promise
+		{
+			typedef std::promise<T> type;
+		};
+		typedef std::mutex mutex;
+		typedef std::condition_variable condition_variable;
+		typedef std::unique_lock<std::mutex> unique_lock;
 		template <class Action, class ...Args>
 		static auto launch_async(Action &&action, Args &&...args) -> std::future<decltype(action(std::forward<Args>(args)...))>
 		{

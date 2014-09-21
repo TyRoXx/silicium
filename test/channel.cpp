@@ -19,15 +19,22 @@ namespace Si
 		struct channel_common_state
 		{
 			Lockable access;
-			observer<Message> *receiver = nullptr;
-			observer<delivered> *delivery = nullptr;
-			Message *message = nullptr;
+			observer<Message> *receiver;
+			observer<delivered> *delivery;
+			Message *message;
+
+			channel_common_state()
+				: receiver(nullptr)
+				, delivery(nullptr)
+				, message(nullptr)
+			{
+			}
 		};
 
 		template <class Message, class Lockable>
 		struct channel_receiving_end
 		{
-			using element_type = Message;
+			typedef Message element_type;
 
 			explicit channel_receiving_end(channel_common_state<Message, Lockable> &state)
 				: state(&state)
@@ -60,7 +67,7 @@ namespace Si
 		template <class Message, class Lockable>
 		struct channel_sending_end
 		{
-			using element_type = delivered;
+			typedef delivered element_type;
 
 			explicit channel_sending_end(channel_common_state<Message, Lockable> &state)
 				: state(&state)
@@ -96,7 +103,7 @@ namespace Si
 	struct channel
 	{
 		//TODO: use a simpler spinlock
-		using mutex = typename ThreadingAPI::mutex;
+		typedef typename ThreadingAPI::mutex mutex;
 
 		channel()
 			: receiving(detail::channel_receiving_end<Message, mutex>(state))
@@ -193,6 +200,7 @@ BOOST_AUTO_TEST_CASE(channel_with_thread)
 	BOOST_CHECK(got);
 }
 
+#if SILICIUM_RX_VARIANT_AVAILABLE
 BOOST_AUTO_TEST_CASE(channel_select)
 {
 	Si::channel<int> channel_1;
@@ -235,3 +243,4 @@ BOOST_AUTO_TEST_CASE(channel_select)
 	s.wait();
 	BOOST_CHECK(got);
 }
+#endif

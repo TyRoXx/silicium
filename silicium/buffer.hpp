@@ -30,12 +30,13 @@ namespace Si
 		{
 		}
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || (BOOST_VERSION <= 105400)
 		buffer(buffer &&other)
-			: receiver(nullptr)
+			: from(std::move(other.from))
+			, elements(std::move(other.elements))
+			, receiver(nullptr)
 			, fetching(false)
 		{
-			*this = std::move(other);
 		}
 
 		buffer &operator = (buffer &&other)

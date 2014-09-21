@@ -13,7 +13,7 @@
 
 namespace Si
 {
-	using file_read_result = Si::fast_variant<std::size_t, boost::system::error_code>;
+	typedef Si::fast_variant<std::size_t, boost::system::error_code> file_read_result;
 
 	inline auto make_file_source(native_file_handle file, boost::iterator_range<char *> read_buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE

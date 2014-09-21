@@ -16,6 +16,9 @@ namespace Si
 		typedef State element_type;
 
 		finite_state_machine()
+			: fetching(false)
+			, has_ended(false)
+			, receiver_(nullptr)
 		{
 		}
 
@@ -23,11 +26,17 @@ namespace Si
 			: in(std::move(in))
 			, state(std::move(initial_state))
 			, step(std::move(step))
+			, fetching(false)
+			, has_ended(false)
+			, receiver_(nullptr)
 		{
 		}
 
 #ifdef _MSC_VER
 		finite_state_machine(finite_state_machine &&other)
+			: fetching(false)
+			, has_ended(false)
+			, receiver_(nullptr)
 		{
 			*this = std::move(other);
 		}
@@ -60,9 +69,9 @@ namespace Si
 		In in;
 		element_type state;
 		Step step;
-		bool fetching = false;
-		bool has_ended = false;
-		observer<element_type> *receiver_ = nullptr;
+		bool fetching;
+		bool has_ended;
+		observer<element_type> *receiver_;
 
 		virtual void got_element(typename In::element_type value) SILICIUM_OVERRIDE
 		{
