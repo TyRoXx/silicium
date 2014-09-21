@@ -17,17 +17,23 @@ namespace Si
 		typedef Element element_type;
 
 		buffer()
+			: receiver(nullptr)
+			, fetching(false)
 		{
 		}
 
 		explicit buffer(Original from, std::size_t size)
 			: from(std::move(from))
 			, elements(size)
+			, receiver(nullptr)
+			, fetching(false)
 		{
 		}
 
 #ifdef _MSC_VER
 		buffer(buffer &&other)
+			: receiver(nullptr)
+			, fetching(false)
 		{
 			*this = std::move(other);
 		}
@@ -69,8 +75,8 @@ namespace Si
 
 		Original from;
 		boost::circular_buffer<Element> elements;
-		observer<element_type> *receiver = nullptr;
-		bool fetching = false;
+		observer<element_type> *receiver;
+		bool fetching;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{

@@ -14,7 +14,7 @@ namespace Si
 	template <class Action>
 	struct blocking_observable
 	{
-		using element_type = decltype(std::declval<Action>()());
+		typedef decltype(std::declval<Action>()()) element_type;
 
 		explicit blocking_observable(Action act)
 			: act(std::move(act))

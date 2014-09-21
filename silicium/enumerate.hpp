@@ -26,11 +26,13 @@ namespace Si
 		typedef typename RangeObservable::element_type range_type;
 
 		enumerator()
+			: receiver_(nullptr)
 		{
 		}
 
 		explicit enumerator(RangeObservable input)
 			: input(std::move(input))
+			, receiver_(nullptr)
 		{
 		}
 
@@ -72,7 +74,7 @@ namespace Si
 
 		RangeObservable input;
 		std::queue<element_type> buffered;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 
 		virtual void got_element(range_type value) SILICIUM_OVERRIDE
 		{

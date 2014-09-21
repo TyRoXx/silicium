@@ -568,6 +568,10 @@ namespace Si
 	{
 		typedef typename detail::select_fast_variant_base<T...>::type base;
 
+		fast_variant()
+		{
+		}
+
 		template <class Initializer>
 		fast_variant(Initializer &&init)
 			: base(std::forward<Initializer>(init))

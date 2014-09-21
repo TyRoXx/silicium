@@ -17,6 +17,11 @@ namespace Si
 
 	struct future_runtime_checked
 	{
+		future_runtime_checked()
+			: got(false)
+		{
+		}
+
 		template <class Element>
 		void begin_get(Element const &)
 		{
@@ -26,13 +31,13 @@ namespace Si
 
 	private:
 
-		bool got = false;
+		bool got;
 	};
 
 	template <class Element, class CheckPolicy = future_unchecked>
 	struct ready_future : private CheckPolicy
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		ready_future()
 		{

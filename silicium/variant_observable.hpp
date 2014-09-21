@@ -4,14 +4,17 @@
 #include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/config.hpp>
-#include <silicium/detail/integer_sequence.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/override.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#define SILICIUM_RX_VARIANT_AVAILABLE SILICIUM_COMPILER_HAS_USING
+#if SILICIUM_RX_VARIANT_AVAILABLE
+#	include <silicium/detail/integer_sequence.hpp>
+#endif
+
 namespace Si
 {
-#define SILICIUM_RX_VARIANT_AVAILABLE 1
 
 #if SILICIUM_RX_VARIANT_AVAILABLE
 	template <template <class ...T> class variant, class Lockable, class ...Parts>

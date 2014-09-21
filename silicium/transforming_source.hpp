@@ -15,13 +15,13 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<To const *> map_next(std::size_t size) override
+		virtual boost::iterator_range<To const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			(void)size;
 			return {};
 		}
 
-		virtual To *copy_next(boost::iterator_range<To *> destination) override
+		virtual To *copy_next(boost::iterator_range<To *> destination) SILICIUM_OVERRIDE
 		{
 			auto i = boost::begin(destination);
 			for (; i != boost::end(destination); ++i)
@@ -39,7 +39,7 @@ namespace Si
 
 	private:
 
-		source<From> *original = nullptr;
+		source<From> *original;
 		Transformation transform;
 	};
 

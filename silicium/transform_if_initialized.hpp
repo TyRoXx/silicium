@@ -18,12 +18,14 @@ namespace Si
 		typedef Element element_type;
 
 		conditional_transformer()
+			: receiver_(nullptr)
 		{
 		}
 
 		explicit conditional_transformer(Input original, Transformation transform)
 			: original(std::move(original))
 			, transform(std::move(transform))
+			, receiver_(nullptr)
 		{
 		}
 
@@ -58,7 +60,7 @@ namespace Si
 
 		Input original;
 		Transformation transform; //TODO: optimize for emptiness
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 
 		SILICIUM_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &))
 		SILICIUM_DELETED_FUNCTION(conditional_transformer &operator = (conditional_transformer const &))

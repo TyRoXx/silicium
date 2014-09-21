@@ -10,7 +10,7 @@ namespace Si
 	template <class Element, class AsyncGetOne>
 	struct function_observable
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		function_observable()
 		{
@@ -28,7 +28,7 @@ namespace Si
 
 	private:
 
-		using proper_get = typename detail::proper_value_function<AsyncGetOne, void, observer<element_type> &>::type;
+		typedef typename detail::proper_value_function<AsyncGetOne, void, observer<element_type> &>::type proper_get;
 
 		proper_get get;
 	};

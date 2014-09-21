@@ -13,13 +13,13 @@
 
 namespace Si
 {
-	using dynamic_library = detail::basic_dynamic_library<
+	typedef detail::basic_dynamic_library<
 #ifdef __linux__
 		linux::dynamic_library_impl
 #else
 		win32::dynamic_library_impl
 #endif
-	>;
+	> dynamic_library;
 
 	BOOST_STATIC_ASSERT(sizeof(dynamic_library) == sizeof(void *));
 }

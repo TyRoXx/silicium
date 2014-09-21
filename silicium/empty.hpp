@@ -8,7 +8,7 @@ namespace Si
 	template <class Element>
 	struct empty
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		void async_get_one(observer<Element> &receiver)
 		{

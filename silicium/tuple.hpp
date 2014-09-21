@@ -3,23 +3,26 @@
 
 #include <silicium/observer.hpp>
 #include <silicium/config.hpp>
-#include <silicium/detail/integer_sequence.hpp>
 #include <silicium/override.hpp>
 #include <bitset>
 
-namespace Si
-{
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || !SILICIUM_COMPILER_HAS_USING
 #	define SILICIUM_RX_TUPLE_AVAILABLE 0
 #else
 #	define SILICIUM_RX_TUPLE_AVAILABLE 1
 #endif
 
 #if SILICIUM_RX_TUPLE_AVAILABLE
+#	include <silicium/detail/integer_sequence.hpp>
+#endif
+
+namespace Si
+{
+#if SILICIUM_RX_TUPLE_AVAILABLE
 	template <class ...Parts>
 	struct tuple_observable
 	{
-		using element_type = std::tuple<typename Parts::element_type...>;
+		typedef std::tuple<typename Parts::element_type...> element_type;
 		typedef std::tuple<Parts...> parts_tuple;
 		typedef element_type buffer_tuple;
 

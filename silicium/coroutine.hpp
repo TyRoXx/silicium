@@ -63,7 +63,11 @@ namespace Si
 		template <class Element>
 		struct coroutine_yield_context_impl : detail::push_context_impl<Element>
 		{
+#if BOOST_VERSION >= 105500
 			typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type>::push_type consumer_type;
+#else
+			typedef typename boost::coroutines::coroutine<typename detail::make_command<Element>::type ()>::caller_type consumer_type;
+#endif
 
 			explicit coroutine_yield_context_impl(consumer_type &consumer)
 				: consumer(&consumer)
@@ -139,7 +143,13 @@ namespace Si
 	private:
 
 		typedef typename detail::make_command<element_type>::type command_type;
-		typedef typename boost::coroutines::coroutine<command_type>::pull_type coroutine_type;
+		typedef
+#if BOOST_VERSION >= 105500
+			typename boost::coroutines::coroutine<command_type>::pull_type
+#else
+			boost::coroutines::coroutine<command_type ()>
+#endif
+		coroutine_type;
 		typedef
 #ifdef _MSC_VER
 			std::shared_ptr<coroutine_type>
@@ -182,7 +192,13 @@ namespace Si
 #else
 					coroutine_type
 #endif
-						([bound_action](typename boost::coroutines::coroutine<command_type>::push_type &push)
+						([bound_action](
+#if BOOST_VERSION >= 105500
+							typename boost::coroutines::coroutine<command_type>::push_type
+#else
+							typename coroutine_type::caller_type
+#endif
+							&push)
 						{
 							detail::coroutine_yield_context_impl<Element> yield_impl(push);
 							push_context<Element> yield(yield_impl); //TODO: save this indirection

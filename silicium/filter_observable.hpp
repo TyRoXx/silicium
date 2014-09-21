@@ -15,12 +15,14 @@ namespace Si
 		typedef typename Input::element_type element_type;
 
 		filter_observable()
+			: receiver_(nullptr)
 		{
 		}
 
 		filter_observable(Input input, Predicate is_propagated)
 			: input(std::move(input))
 			, is_propagated(std::move(is_propagated))
+			, receiver_(nullptr)
 		{
 		}
 
@@ -33,11 +35,11 @@ namespace Si
 
 	private:
 
-		using proper_predicate = typename detail::proper_value_function<Predicate, bool, element_type const &>::type;
+		typedef typename detail::proper_value_function<Predicate, bool, element_type const &>::type proper_predicate;
 
 		Input input;
 		proper_predicate is_propagated;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{

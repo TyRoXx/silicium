@@ -18,6 +18,11 @@ namespace Si
 		template <class ThreadingAPI>
 		struct event : private observer<nothing>
 		{
+			event()
+				: got_something(false)
+			{
+			}
+
 			template <class NothingObservable>
 			void block(NothingObservable &&blocked_on)
 			{
@@ -35,7 +40,7 @@ namespace Si
 
 			typename ThreadingAPI::mutex got_something_mutex;
 			typename ThreadingAPI::condition_variable got_something_set;
-			bool got_something = false;
+			bool got_something;
 
 			virtual void got_element(nothing) SILICIUM_OVERRIDE
 			{
@@ -100,6 +105,8 @@ namespace Si
 		{
 			template <class Action>
 			explicit state_type(Action &&action)
+				: receiver(nullptr)
+				, has_ended(false)
 			{
 				worker = ThreadingAPI::launch_async([action, this]() mutable
 				{
@@ -152,10 +159,10 @@ namespace Si
 
 			typename ThreadingAPI::template future<void> worker;
 			typename ThreadingAPI::mutex receiver_mutex;
-			observer<Element> *receiver = nullptr;
+			observer<Element> *receiver;
 			boost::optional<Element> ready_result;
 			typename ThreadingAPI::condition_variable receiver_ready;
-			bool has_ended = false;
+			bool has_ended;
 
 			detail::event<ThreadingAPI> got_something;
 

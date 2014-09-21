@@ -16,7 +16,9 @@ namespace Si
 
 		explicit cache_observable(Input input, boost::optional<element_type> cached)
 			: input(std::move(input))
+			, receiver_(nullptr)
 			, cached(std::move(cached))
+			, is_fetching(false)
 		{
 		}
 
@@ -60,9 +62,9 @@ namespace Si
 	private:
 
 		Input input;
-		observer<element_type> *receiver_ = nullptr;
+		observer<element_type> *receiver_;
 		boost::optional<element_type> cached;
-		bool is_fetching = false;
+		bool is_fetching;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{

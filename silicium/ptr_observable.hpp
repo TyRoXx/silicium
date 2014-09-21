@@ -72,7 +72,13 @@ namespace Si
 	template <class Element>
 	struct unique_observable : ptr_observable<Element, std::unique_ptr<observable<Element>>>
 	{
+		typedef ptr_observable<Element, std::unique_ptr<observable<Element>>> base;
 
+		template <class Initializer>
+		unique_observable(Initializer &&init)
+			: base(std::forward<Initializer>(init))
+		{
+		}
 	};
 #endif
 
@@ -83,6 +89,13 @@ namespace Si
 	template <class Element>
 	struct shared_observable : ptr_observable<Element, std::shared_ptr<observable<Element>>>
 	{
+		typedef ptr_observable<Element, std::shared_ptr<observable<Element>>> base;
+
+		template <class Initializer>
+		shared_observable(Initializer &&init)
+			: base(std::forward<Initializer>(init))
+		{
+		}
 	};
 #endif
 
