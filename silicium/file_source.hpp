@@ -34,16 +34,16 @@ namespace Si
 			}
 #else
 			ssize_t const read_bytes = ::read(file, read_buffer.begin(), read_buffer.size());
-			if (read_bytes == 0)
-			{
-				//end of file
-				return boost::none;
-			}
 			if (read_bytes < 0)
 			{
 				return file_read_result{boost::system::error_code(errno, boost::system::system_category())};
 			}
 #endif
+			if (read_bytes == 0)
+			{
+				//end of file
+				return boost::none;
+			}
 			return file_read_result{static_cast<std::size_t>(read_bytes)};
 		}));
 	}
