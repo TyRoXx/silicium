@@ -3,6 +3,8 @@
 
 #include <silicium/sink.hpp>
 #include <boost/asio/ip/tcp.hpp>
+
+#if BOOST_VERSION >= 105400
 #include <boost/asio/spawn.hpp>
 
 namespace Si
@@ -20,5 +22,6 @@ namespace Si
 		boost::asio::yield_context *m_yield;
 	};
 }
+#endif
 
 #endif

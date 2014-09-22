@@ -1,4 +1,6 @@
 #include <silicium/asio/socket_sink.hpp>
+
+#if BOOST_VERSION >= 105400
 #include <boost/asio/write.hpp>
 
 namespace Si
@@ -25,3 +27,4 @@ namespace Si
 		boost::asio::async_write(*m_socket, boost::asio::buffer(data.begin(), data.size()), *m_yield);
 	}
 }
+#endif

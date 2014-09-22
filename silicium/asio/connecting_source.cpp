@@ -1,5 +1,6 @@
 #include <silicium/asio/connecting_source.hpp>
 
+#if BOOST_VERSION >= 105400
 namespace Si
 {
 	connecting_source::connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield, boost::asio::ip::tcp::endpoint remote_endpoint)
@@ -40,3 +41,4 @@ namespace Si
 		return copied;
 	}
 }
+#endif

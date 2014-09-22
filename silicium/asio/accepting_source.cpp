@@ -1,5 +1,6 @@
 #include <silicium/asio/accepting_source.hpp>
 
+#if BOOST_VERSION >= 105400
 namespace Si
 {
 	accepting_source::accepting_source(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context &yield)
@@ -27,3 +28,4 @@ namespace Si
 		return destination.end();
 	}
 }
+#endif

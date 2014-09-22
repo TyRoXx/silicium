@@ -1,8 +1,11 @@
 add_executable(run_process "run_process.cpp")
 target_link_libraries(run_process silicium ${Boost_LIBRARIES})
 
-add_executable(hellohttp "hellohttp.cpp")
-target_link_libraries(hellohttp silicium ${Boost_LIBRARIES})
+if(NOT (${Boost_VERSION} LESS 105300))
+	message(STATUS ${Boost_VERSION})
+	add_executable(hellohttp "hellohttp.cpp")
+	target_link_libraries(hellohttp silicium ${Boost_LIBRARIES})
+endif()
 
 if(NOT MSVC) #disabled because VC++ 2013 crashes with "internal compiler error in self.cpp"
 	add_executable(self "self.cpp")

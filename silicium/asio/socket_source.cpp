@@ -1,5 +1,6 @@
 #include <silicium/asio/socket_source.hpp>
 
+#if BOOST_VERSION >= 105400
 namespace Si
 {
 	socket_source::socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
@@ -21,3 +22,4 @@ namespace Si
 		return destination.begin() + read;
 	}
 }
+#endif
