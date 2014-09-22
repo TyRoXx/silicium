@@ -1,8 +1,7 @@
 add_executable(run_process "run_process.cpp")
 target_link_libraries(run_process silicium ${Boost_LIBRARIES})
 
-if(NOT (${Boost_VERSION} LESS 105300))
-	message(STATUS ${Boost_VERSION})
+if(NOT (Boost_VERSION LESS 105300))
 	add_executable(hellohttp "hellohttp.cpp")
 	target_link_libraries(hellohttp silicium ${Boost_LIBRARIES})
 endif()
