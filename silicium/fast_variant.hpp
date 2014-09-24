@@ -381,15 +381,6 @@ namespace Si
 
 			storage_type storage;
 
-			static void copy_construct_storage(which_type which, char &destination, char const &source)
-			{
-				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
-				{{
-					&detail::copy_construct_storage<T>...
-				}};
-				f[which](&destination, &source);
-			}
-
 			static void move_construct_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
 				std::array<void (*)(void *, void *), sizeof...(T)> const f =
@@ -406,15 +397,6 @@ namespace Si
 					&detail::destroy_storage<T>...
 				}};
 				f[which](&destroyed);
-			}
-
-			static void copy_storage(which_type which, char &destination, char const &source)
-			{
-				std::array<void (*)(void *, void const *), sizeof...(T)> const f =
-				{{
-					&detail::copy_storage<T>...
-				}};
-				f[which](&destination, &source);
 			}
 
 			static void move_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
@@ -466,7 +448,7 @@ namespace Si
 				: base()
 			{
 				this->storage.which(other.storage.which());
-				base::copy_construct_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
+				copy_construct_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
 			}
 
 			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
@@ -479,12 +461,12 @@ namespace Si
 			{
 				if (this->storage.which() == other.storage.which())
 				{
-					base::copy_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
+					copy_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
 				}
 				else
 				{
 					typename base::storage_type temporary;
-					base::copy_construct_storage(other.storage.which(), temporary.storage(), other.storage.storage());
+					copy_construct_storage(other.storage.which(), temporary.storage(), other.storage.storage());
 					base::destroy_storage(this->storage.which(), this->storage.storage());
 					base::move_construct_storage(other.storage.which(), this->storage.storage(), temporary.storage());
 					this->storage.which(other.storage.which());
@@ -498,6 +480,26 @@ namespace Si
 			void assign(fast_variant_base<IsOtherCopyable, U...> const &other)
 			{
 				*this = Si::apply_visitor(construction_visitor<fast_variant_base>(), other);
+			}
+
+		private:
+
+			static void copy_construct_storage(which_type which, char &destination, char const &source)
+			{
+				std::array<void(*)(void *, void const *), sizeof...(T)> const f =
+				{{
+					&detail::copy_construct_storage<T>...
+				}};
+				f[which](&destination, &source);
+			}
+
+			static void copy_storage(which_type which, char &destination, char const &source)
+			{
+				std::array<void(*)(void *, void const *), sizeof...(T)> const f =
+				{{
+					&detail::copy_storage<T>...
+				}};
+				f[which](&destination, &source);
 			}
 		};
 
