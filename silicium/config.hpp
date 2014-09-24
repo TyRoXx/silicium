@@ -94,7 +94,7 @@ namespace Si
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 }
 #include <type_traits>
@@ -106,11 +106,16 @@ namespace Si
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 }
 #include <boost/type_traits/is_copy_constructible.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 namespace Si
 {
 	using boost::is_copy_constructible;
 	template <class T>
 	struct is_copy_assignable : std::true_type
+	{
+	};
+	template <class T, class D>
+	struct is_copy_assignable<std::unique_ptr<T, D>> : std::false_type
 	{
 	};
 #else

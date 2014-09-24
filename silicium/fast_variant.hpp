@@ -527,13 +527,11 @@ namespace Si
 		BOOST_STATIC_ASSERT(are_copyable<int>::value);
 		BOOST_STATIC_ASSERT(are_copyable<int BOOST_PP_COMMA() float>::value);
 
-#ifndef _MSC_VER
 		//In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
 		//so this assert would fail.
 #if SILICIUM_HAS_PROPER_COPY_TRAITS
 		//GCC 4.6 with Boost < 1.55 is also a problem
 		BOOST_STATIC_ASSERT(!are_copyable<int BOOST_PP_COMMA() std::unique_ptr<int>>::value);
-#endif
 #endif
 
 #if SILICIUM_COMPILER_HAS_USING
