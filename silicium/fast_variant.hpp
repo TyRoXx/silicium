@@ -413,6 +413,7 @@ namespace Si
 		struct fast_variant_base<true, T...> : fast_variant_base<false, T...>
 		{
 			typedef fast_variant_base<false, T...> base;
+			typedef typename base::which_type which_type;
 
 			fast_variant_base() BOOST_NOEXCEPT
 			{

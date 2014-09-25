@@ -5,6 +5,7 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/container/string.hpp>
 #include <ostream>
 #include <array>
 #include <memory>
@@ -267,6 +268,12 @@ namespace Si
 
 	template <class Element>
 	void append(Si::sink<Element> &out, std::basic_string<Element> const &str)
+	{
+		out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
+	}
+
+	template <class Element>
+	void append(Si::sink<Element> &out, boost::container::basic_string<Element> const &str)
 	{
 		out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
 	}

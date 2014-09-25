@@ -1,5 +1,6 @@
 #include <silicium/http/http.hpp>
 #include <silicium/detail/line_source.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -8,7 +9,7 @@ namespace Si
 		namespace detail
 		{
 			template <class CharRange>
-			std::pair<std::string, std::string> split_value_line(CharRange const &line)
+			std::pair<noexcept_string, noexcept_string> split_value_line(CharRange const &line)
 			{
 				auto colon = boost::range::find(line, ':');
 				auto second_begin = colon + 1;
@@ -16,7 +17,7 @@ namespace Si
 				{
 					++second_begin;
 				}
-				return std::make_pair(std::string(begin(line), colon), std::string(second_begin, end(line)));
+				return std::make_pair(noexcept_string(begin(line), colon), noexcept_string(second_begin, end(line)));
 			}
 		}
 
@@ -67,7 +68,7 @@ namespace Si
 
 		namespace
 		{
-			void write_arguments_map(Si::sink<char> &out, std::map<std::string, std::string> const &arguments)
+			void write_arguments_map(Si::sink<char> &out, std::map<noexcept_string, noexcept_string> const &arguments)
 			{
 				for (auto const &argument : arguments)
 				{
@@ -100,6 +101,7 @@ namespace Si
 				return boost::none;
 			}
 			response_header header;
+			header.arguments = Si::make_unique<std::map<noexcept_string, noexcept_string>>();
 			{
 				auto const version_end = std::find(first_line->begin(), first_line->end(), ' ');
 				if (version_end == first_line->end())
@@ -137,7 +139,7 @@ namespace Si
 					break;
 				}
 				auto value = detail::split_value_line(*value_line);
-				header.arguments[value.first] = std::move(value.second);
+				(*header.arguments)[value.first] = std::move(value.second);
 			}
 			return std::move(header);
 		}
@@ -150,7 +152,7 @@ namespace Si
 			append(out, " ");
 			append(out, header.status_text);
 			append(out, "\r\n");
-			write_arguments_map(out, header.arguments);
+			write_arguments_map(out, *header.arguments);
 			append(out, "\r\n");
 		}
 	}

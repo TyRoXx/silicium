@@ -1,9 +1,9 @@
 #ifndef SILICIUM_HTTP_HTTP_HPP
 #define SILICIUM_HTTP_HTTP_HPP
 
-
 #include <silicium/sink.hpp>
 #include <silicium/source.hpp>
+#include <silicium/noexcept_string.hpp>
 #include <boost/range/algorithm/find.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>
@@ -15,10 +15,10 @@ namespace Si
 	{
 		struct request_header
 		{
-			std::string method;
-			std::string path;
-			std::string http_version;
-			std::map<std::string, std::string> arguments;
+			noexcept_string method;
+			noexcept_string path;
+			noexcept_string http_version;
+			std::map<noexcept_string, noexcept_string> arguments;
 		};
 
 		boost::optional<request_header> parse_header(Si::source<char> &in);
@@ -26,10 +26,10 @@ namespace Si
 
 		struct response_header
 		{
-			std::string http_version;
+			noexcept_string http_version;
 			int status;
-			std::string status_text;
-			std::map<std::string, std::string> arguments;
+			noexcept_string status_text;
+			std::unique_ptr<std::map<noexcept_string, noexcept_string>> arguments;
 		};
 
 		boost::optional<response_header> parse_response_header(Si::source<char> &in);

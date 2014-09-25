@@ -3,6 +3,7 @@
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/buffering_source.hpp>
+#include <silicium/config.hpp>
 #include <boost/format.hpp>
 
 namespace
@@ -34,12 +35,13 @@ namespace
 			std::string const content = "Hello, " + client_name + "!";
 
 			Si::http::response_header response;
+			response.arguments = Si::make_unique<std::map<Si::noexcept_string, Si::noexcept_string>>();
 			response.status = 200;
 			response.status_text = "OK";
 			response.http_version = "HTTP/1.0";
-			response.arguments["Content-Length"] = boost::lexical_cast<std::string>(content.size());
-			response.arguments["Connection"] = "close";
-			response.arguments["Content-Type"] = "text/html";
+			(*response.arguments)["Content-Length"] = boost::lexical_cast<Si::noexcept_string>(content.size());
+			(*response.arguments)["Connection"] = "close";
+			(*response.arguments)["Content-Type"] = "text/html";
 			Si::http::write_header(buffered_sender, response);
 			Si::append(buffered_sender, content);
 			buffered_sender.flush();

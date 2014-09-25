@@ -30,12 +30,13 @@ namespace
 		{
 			auto response_sink = Si::make_container_sink(send_buffer);
 			Si::http::response_header response;
+			response.arguments = Si::make_unique<std::map<Si::noexcept_string, Si::noexcept_string>>();
 			response.http_version = "HTTP/1.0";
 			response.status = 200;
 			response.status_text = "OK";
 			std::string const body = boost::str(boost::format("Hello, visitor %1%") % visitor_number);
-			response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
-			response.arguments["Connection"] = "close";
+			(*response.arguments)["Content-Length"] = boost::lexical_cast<Si::noexcept_string>(body.size());
+			(*response.arguments)["Connection"] = "close";
 			Si::http::write_header(response_sink, response);
 			Si::append(response_sink, body);
 		}

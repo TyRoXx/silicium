@@ -17,7 +17,7 @@ namespace Si
 		BOOST_CHECK_EQUAL("GET", parsed->method);
 		BOOST_CHECK_EQUAL("/", parsed->path);
 		BOOST_CHECK_EQUAL("HTTP/1.0", parsed->http_version);
-		std::map<std::string, std::string> const expected_arguments
+		std::map<noexcept_string, noexcept_string> const expected_arguments
 		{
 			{"Key", "Value"}
 		};

@@ -6,6 +6,7 @@
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/buffering_source.hpp>
+#include <silicium/config.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -356,12 +357,13 @@ int main(int argc, char **argv)
 		}
 
 		Si::http::response_header response;
+		response.arguments = Si::make_unique<std::map<Si::noexcept_string, Si::noexcept_string>>();
 		response.status = 200;
 		response.status_text = "OK";
 		response.http_version = "HTTP/1.0";
-		response.arguments["Content-Length"] = boost::lexical_cast<std::string>(body.size());
-		response.arguments["Content-Type"] = "text/html";
-		response.arguments["Connection"] = "close";
+		(*response.arguments)["Content-Length"] = boost::lexical_cast<Si::noexcept_string>(body.size());
+		(*response.arguments)["Content-Type"] = "text/html";
+		(*response.arguments)["Connection"] = "close";
 
 		Si::buffering_sink<char> buffered_out(out);
 		write_header(buffered_out, response);
