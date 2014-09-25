@@ -20,6 +20,16 @@ namespace Si
 		}
 		return file_descriptor(fd);
 	}
+
+	inline error_or<file_descriptor> create_file(boost::filesystem::path const &name)
+	{
+		native_file_handle const fd = ::open(name.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+		if (fd < 0)
+		{
+			return boost::system::error_code(errno, boost::system::system_category());
+		}
+		return file_descriptor(fd);
+	}
 }
 
 #endif
