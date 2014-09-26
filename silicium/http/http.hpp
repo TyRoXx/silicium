@@ -6,6 +6,7 @@
 #include <silicium/noexcept_string.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <silicium/config.hpp>
+#include <silicium/to_unique.hpp>
 #include <boost/range/algorithm/find.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>
@@ -118,6 +119,46 @@ namespace Si
 			int status;
 			noexcept_string status_text;
 			std::unique_ptr<std::map<noexcept_string, noexcept_string>> arguments;
+
+#ifdef _MSC_VER
+			response_header()
+			{
+			}
+
+			response_header(response_header &&other)
+				: http_version(std::move(other.http_version))
+				, status(other.status)
+				, status_text(std::move(other.status_text))
+				, arguments(std::move(other.arguments))
+			{
+			}
+
+			response_header(response_header const &other)
+				: http_version(other.http_version)
+				, status(other.status)
+				, status_text(other.status_text)
+				, arguments(other.arguments ? to_unique(*other.arguments) : nullptr)
+			{
+			}
+
+			response_header &operator = (response_header &&other)
+			{
+				http_version = std::move(other.http_version);
+				status = std::move(other.status);
+				status_text = std::move(other.status_text);
+				arguments = std::move(other.arguments);
+				return *this;
+			}
+
+			response_header &operator = (response_header const &other)
+			{
+				http_version = other.http_version;
+				status = other.status;
+				status_text = other.status_text;
+				arguments = other.arguments ? to_unique(*other.arguments) : nullptr;
+				return *this;
+			}
+#endif
 		};
 
 		template <class CharSource>

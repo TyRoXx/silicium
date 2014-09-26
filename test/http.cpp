@@ -40,4 +40,18 @@ namespace Si
 			"\r\n",
 			generated);
 	}
+
+	BOOST_AUTO_TEST_CASE(response_header_move)
+	{
+		http::response_header a;
+		http::response_header b(std::move(a));
+		a = std::move(b);
+	}
+
+	BOOST_AUTO_TEST_CASE(response_header_copy)
+	{
+		http::response_header a;
+		http::response_header b(a);
+		a = b;
+	}
 }
