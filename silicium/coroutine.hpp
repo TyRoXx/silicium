@@ -220,6 +220,9 @@ namespace Si
 				Si::exchange(receiver_, nullptr)->ended();
 			}
 		}
+
+		SILICIUM_DELETED_FUNCTION(coroutine_observable(coroutine_observable const &))
+		SILICIUM_DELETED_FUNCTION(coroutine_observable &operator = (coroutine_observable const &))
 	};
 
 	template <class Element, class Action>
