@@ -120,7 +120,6 @@ namespace Si
 			noexcept_string status_text;
 			std::unique_ptr<std::map<noexcept_string, noexcept_string>> arguments;
 
-#ifdef _MSC_VER
 			response_header()
 			{
 			}
@@ -158,7 +157,6 @@ namespace Si
 				arguments = other.arguments ? to_unique(*other.arguments) : nullptr;
 				return *this;
 			}
-#endif
 		};
 
 		template <class CharSource>
