@@ -13,6 +13,20 @@
 #	define SILICIUM_FALSE false
 #endif
 
+#ifdef _MSC_VER
+#	define SILICIUM_COMPILER_CXX11 1
+#	define SILICIUM_COMPILER_CXX14 1
+#elif __cplusplus > 201103L
+#	define SILICIUM_COMPILER_CXX11 1
+#	define SILICIUM_COMPILER_CXX14 1
+#elif __cplusplus >= 201103L
+#	define SILICIUM_COMPILER_CXX11 1
+#	define SILICIUM_COMPILER_CXX14 1 /* actually 0, assume 1 for now */
+#else
+#	define SILICIUM_COMPILER_CXX11 0
+#	define SILICIUM_COMPILER_CXX14 0
+#endif
+
 #ifdef NDEBUG
 #	ifdef _MSC_VER
 #		define SILICIUM_UNREACHABLE() __assume(false)
@@ -49,7 +63,7 @@
 #	define SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER 0
 #endif
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) || defined(__clang__)
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) && SILICIUM_COMPILER_CXX14) || defined(__clang__)
 #	define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 1
 #else
 #	define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 0
