@@ -1,5 +1,6 @@
 #include <silicium/http/http.hpp>
 #include <silicium/memory_source.hpp>
+#include <silicium/fast_variant.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
@@ -53,5 +54,14 @@ namespace Si
 		http::response_header a;
 		http::response_header b(a);
 		a = b;
+	}
+
+	BOOST_AUTO_TEST_CASE(response_header_compatible_with_fast_variant)
+	{
+		fast_variant<http::response_header> v;
+		auto w = v;
+		w = std::move(v);
+		auto u = std::move(w);
+		u = v;
 	}
 }

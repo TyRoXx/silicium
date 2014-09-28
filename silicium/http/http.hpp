@@ -120,11 +120,11 @@ namespace Si
 			noexcept_string status_text;
 			std::unique_ptr<std::map<noexcept_string, noexcept_string>> arguments;
 
-			response_header()
+			response_header() BOOST_NOEXCEPT
 			{
 			}
 
-			response_header(response_header &&other)
+			response_header(response_header &&other) BOOST_NOEXCEPT
 				: http_version(std::move(other.http_version))
 				, status(other.status)
 				, status_text(std::move(other.status_text))
@@ -140,7 +140,7 @@ namespace Si
 			{
 			}
 
-			response_header &operator = (response_header &&other)
+			response_header &operator = (response_header &&other) BOOST_NOEXCEPT
 			{
 				http_version = std::move(other.http_version);
 				status = std::move(other.status);
