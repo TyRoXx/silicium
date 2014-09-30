@@ -1,6 +1,6 @@
 option(SILICIUM_TEST_INCLUDES "" ON)
 if(SILICIUM_TEST_INCLUDES)
-	file(GLOB sources "dummy.cpp" "sources/*.cpp")
+	file(GLOB_RECURSE sources "dummy.cpp" "sources/*.cpp")
 	add_library(test_includes ${sources})
 
 	add_executable(test_includes_generate "generate_sources.cpp")
