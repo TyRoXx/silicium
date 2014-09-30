@@ -2,6 +2,9 @@
 #define SILICIUM_ASIO_WRITING_OBSERVABLE_HPP
 
 #include <silicium/error_or.hpp>
+#include <silicium/observer.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <boost/asio/write.hpp>
 
 namespace Si
 {

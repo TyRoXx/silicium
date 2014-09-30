@@ -2,6 +2,8 @@
 #define SILICIUM_ASIO_READING_OBSERVABLE_HPP
 
 #include <silicium/error_or.hpp>
+#include <silicium/socket_observable.hpp>
+#include <boost/range/iterator_range.hpp>
 
 namespace Si
 {
