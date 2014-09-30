@@ -28,8 +28,9 @@ namespace Si
 		{
 		}
 
-		error_or(Value value) BOOST_NOEXCEPT
-			: storage(std::move(value))
+		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
+		error_or(ConvertibleToValue &&value) BOOST_NOEXCEPT
+			: storage(Value(std::forward<ConvertibleToValue>(value)))
 		{
 		}
 

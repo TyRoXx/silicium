@@ -53,3 +53,22 @@ BOOST_AUTO_TEST_CASE(error_or_std)
 		return ex.code() == ec;
 	});
 }
+
+struct base
+{
+	virtual ~base()
+	{
+	}
+};
+
+struct derived : base
+{
+};
+
+BOOST_AUTO_TEST_CASE(error_or_construct_from_convertible)
+{
+	Si::error_or<long> e(2u);
+	BOOST_CHECK_EQUAL(2L, e.get());
+	Si::error_or<std::unique_ptr<base>> f(Si::make_unique<derived>());
+	BOOST_CHECK(f.get() != nullptr);
+}
