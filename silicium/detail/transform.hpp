@@ -62,7 +62,6 @@ namespace Si
 
 		using proper_transform = typename detail::proper_value_function<
 			Transform,
-			std::is_copy_assignable<Transform>::value && std::is_default_constructible<Transform>::value,
 			element_type,
 			from_type
 		>::type;
