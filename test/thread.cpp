@@ -6,7 +6,7 @@
 #include <silicium/to_unique.hpp>
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(reactive_async_empty)
+BOOST_AUTO_TEST_CASE(make_thread_empty)
 {
 	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &)
 	{
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(reactive_async_empty)
 	a.wait();
 }
 
-BOOST_AUTO_TEST_CASE(reactive_async)
+BOOST_AUTO_TEST_CASE(make_thread_non_empty)
 {
 	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &yield)
 	{
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(reactive_async)
 	BOOST_CHECK(expected == produced);
 }
 
-BOOST_AUTO_TEST_CASE(reactive_async_get_one)
+BOOST_AUTO_TEST_CASE(make_thread_nesting)
 {
 	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &yield)
 	{
