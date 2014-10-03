@@ -2,6 +2,8 @@
 #define SILICIUM_WIN32_HPP
 
 #include <memory>
+//asio does not like to be included after Windows headers
+#include <boost/asio.hpp>
 #include <Windows.h>
 
 namespace Si

@@ -1,7 +1,10 @@
 #ifndef SILICIUM_WIN32_PROCESS_HPP
 #define SILICIUM_WIN32_PROCESS_HPP
 
-#include <Windows.h>
+#include <silicium/process_parameters.hpp>
+#include <silicium/win32/win32.hpp>
+#include <cassert>
+#include <stdexcept>
 
 namespace Si
 {
@@ -9,7 +12,7 @@ namespace Si
 	{
 		typedef std::basic_string<WCHAR> winapi_string;
 
-		winapi_string utf8_to_winapi_string(char const *original, size_t length)
+		inline winapi_string utf8_to_winapi_string(char const *original, size_t length)
 		{
 			if (length > static_cast<size_t>((std::numeric_limits<int>::max)()))
 			{
@@ -31,12 +34,12 @@ namespace Si
 			return result;
 		}
 
-		winapi_string utf8_to_winapi_string(std::string const &str)
+		inline winapi_string utf8_to_winapi_string(std::string const &str)
 		{
 			return utf8_to_winapi_string(str.data(), str.size());
 		}
 
-		winapi_string build_command_line(std::vector<std::string> const &arguments)
+		inline winapi_string build_command_line(std::vector<std::string> const &arguments)
 		{
 			winapi_string command_line;
 			for (auto a = begin(arguments); a != end(arguments); ++a)
@@ -76,7 +79,7 @@ namespace Si
 			}
 		};
 
-		pipe create_anonymous_pipe()
+		inline pipe create_anonymous_pipe()
 		{
 			SECURITY_ATTRIBUTES security{};
 			security.nLength = sizeof(security);
@@ -93,7 +96,7 @@ namespace Si
 		}
 	}
 
-	int run_process(process_parameters const &parameters)
+	inline int run_process(process_parameters const &parameters)
 	{
 		win32::winapi_string const executable = win32::utf8_to_winapi_string(parameters.executable.string());
 		win32::winapi_string command_line = win32::build_command_line(parameters.arguments);

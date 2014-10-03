@@ -1,4 +1,5 @@
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <fstream>
 #include <unordered_set>
 
@@ -40,7 +41,7 @@ namespace
 					{
 						throw std::runtime_error("Cannot open file " + source.string());
 					}
-					source_file << "#include <silicium/" << (relative_include_path / header_leaf).string() << ">\n";
+					source_file << "#include <silicium/" << boost::algorithm::replace_all_copy((relative_include_path / header_leaf).string(), "\\", "/") << ">\n";
 					if (!source_file)
 					{
 						throw std::runtime_error("Could not write to " + source.string());

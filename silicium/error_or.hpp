@@ -173,15 +173,6 @@ namespace Si
 		{
 			return To(std::forward<From>(from));
 		}
-
-		template <class To, class From>
-		auto convert_if_necessary(From &&from)
-		{
-			return convert_if_necessary<To>(
-				std::forward<From>(from),
-				std::is_same<typename std::decay<To>::type, typename std::decay<From>::type>()
-			);
-		}
 	}
 
 	template <class Value, class Error>
@@ -197,7 +188,7 @@ namespace Si
 		{
 			return false;
 		}
-		return left.get() == detail::convert_if_necessary<Value>(right);
+		return left.get() == detail::convert_if_necessary<Value>(right, std::is_same<typename std::decay<Value>::type, typename std::decay<ConvertibleToValue>::type>());
 	}
 
 	template <class Value, class Error>

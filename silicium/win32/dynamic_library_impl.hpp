@@ -1,8 +1,8 @@
 #ifndef SILICIUM_WIN32_DYNAMIC_LIBRARY_IMPL_HPP
 #define SILICIUM_WIN32_DYNAMIC_LIBRARY_IMPL_HPP
 
+#include <silicium/win32/win32.hpp>
 #include <boost/filesystem/path.hpp>
-#include <Windows.h>
 
 namespace Si
 {

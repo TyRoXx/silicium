@@ -2,6 +2,7 @@
 #define SILICIUM_ASIO_WRITING_OBSERVABLE_HPP
 
 #include <silicium/error_or.hpp>
+#include <silicium/config.hpp>
 #include <silicium/observer.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/asio/write.hpp>
@@ -39,6 +40,9 @@ namespace Si
 
 	template <class AsyncStream>
 	auto make_writing_observable(AsyncStream &stream, boost::iterator_range<char const *> buffer)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> writing_observable<AsyncStream>
+#endif
 	{
 		return writing_observable<AsyncStream>(stream, buffer);
 	}

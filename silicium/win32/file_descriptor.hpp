@@ -1,13 +1,10 @@
 #ifndef SILICIUM_WIN32_FILE_DESCRIPTOR_HPP
 #define SILICIUM_WIN32_FILE_DESCRIPTOR_HPP
 
+#include <silicium/win32/win32.hpp>
 #include <boost/config.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
-
-#ifdef _WIN32
-#	include <Windows.h>
-#endif
 
 namespace Si
 {

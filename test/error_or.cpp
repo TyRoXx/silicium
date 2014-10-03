@@ -95,15 +95,36 @@ struct move_only_comparable
 {
 	T value;
 
-	move_only_comparable() = default;
+	move_only_comparable()
+	{
+	}
+
 	move_only_comparable(T value)
 		: value(std::move(value))
 	{
 	}
-	move_only_comparable(move_only_comparable &&) = default;
-	move_only_comparable(move_only_comparable const &) = delete;
-	move_only_comparable &operator = (move_only_comparable &&) = default;
-	move_only_comparable &operator = (move_only_comparable const &) = default;
+
+	move_only_comparable(move_only_comparable &&other)
+		: value(std::move(other.value))
+	{
+	}
+
+	move_only_comparable(move_only_comparable const &other)
+		: value(other.value)
+	{
+	}
+
+	move_only_comparable &operator = (move_only_comparable &&other)
+	{
+		value = std::move(other.value);
+		return *this;
+	}
+
+	move_only_comparable &operator = (move_only_comparable const &other)
+	{
+		value = other.value;
+		return *this;
+	}
 };
 
 template <class T>

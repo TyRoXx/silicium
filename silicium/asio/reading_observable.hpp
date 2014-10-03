@@ -1,6 +1,7 @@
 #ifndef SILICIUM_ASIO_READING_OBSERVABLE_HPP
 #define SILICIUM_ASIO_READING_OBSERVABLE_HPP
 
+#include <silicium/config.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/asio/socket_observable.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -44,6 +45,9 @@ namespace Si
 
 	template <class AsyncStream>
 	auto make_reading_observable(AsyncStream &stream, boost::iterator_range<char *> buffer)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> reading_observable<AsyncStream>
+#endif
 	{
 		return reading_observable<AsyncStream>(stream, buffer);
 	}
