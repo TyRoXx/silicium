@@ -154,6 +154,16 @@ namespace Si
 
 		fast_variant<Value, Error> storage;
 	};
+
+	template <class ErrorOr, class OnValue>
+	auto map(ErrorOr &&maybe, OnValue &&on_value)
+	{
+		if (maybe.is_error())
+		{
+			return *maybe.error();
+		}
+		return std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get());
+	}
 }
 
 #endif
