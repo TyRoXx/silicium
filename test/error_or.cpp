@@ -89,3 +89,48 @@ BOOST_AUTO_TEST_CASE(error_or_map_error)
 		return 0;
 	}));
 }
+
+BOOST_AUTO_TEST_CASE(error_or_equal)
+{
+	{
+		Si::error_or<int> a(2);
+		Si::error_or<int> b = a;
+		BOOST_CHECK_EQUAL(a, a);
+		BOOST_CHECK_EQUAL(a, b);
+		BOOST_CHECK_EQUAL(b, a);
+		BOOST_CHECK_EQUAL(b, b);
+	}
+
+	{
+		Si::error_or<int> c = boost::system::error_code();
+		Si::error_or<int> d = c;
+		BOOST_CHECK_EQUAL(c, c);
+		BOOST_CHECK_EQUAL(c, d);
+		BOOST_CHECK_EQUAL(d, c);
+		BOOST_CHECK_EQUAL(d, d);
+	}
+}
+
+BOOST_AUTO_TEST_CASE(error_or_not_equal)
+{
+	Si::error_or<int> a(2);
+	Si::error_or<int> b(3);
+	Si::error_or<int> c = boost::system::error_code(2, boost::system::generic_category());
+	Si::error_or<int> d = boost::system::error_code(3, boost::system::generic_category());
+
+	BOOST_CHECK_NE(a, b);
+	BOOST_CHECK_NE(a, c);
+	BOOST_CHECK_NE(a, d);
+
+	BOOST_CHECK_NE(b, a);
+	BOOST_CHECK_NE(b, c);
+	BOOST_CHECK_NE(b, d);
+
+	BOOST_CHECK_NE(c, a);
+	BOOST_CHECK_NE(c, b);
+	BOOST_CHECK_NE(c, d);
+
+	BOOST_CHECK_NE(d, a);
+	BOOST_CHECK_NE(d, b);
+	BOOST_CHECK_NE(d, c);
+}

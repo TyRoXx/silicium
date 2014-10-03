@@ -167,6 +167,12 @@ namespace Si
 	}
 
 	template <class Value, class Error>
+	bool operator != (error_or<Value, Error> const &left, error_or<Value, Error> const &right)
+	{
+		return !(left == right);
+	}
+
+	template <class Value, class Error>
 	std::ostream &operator << (std::ostream &out, error_or<Value, Error> const &value)
 	{
 		if (value.error())
@@ -180,7 +186,7 @@ namespace Si
 	struct is_error_or : std::false_type
 	{
 	};
-	
+
 	template <class Value, class Error>
 	struct is_error_or<error_or<Value, Error>> : std::true_type
 	{
