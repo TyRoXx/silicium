@@ -2,10 +2,23 @@
 #define SILICIUM_WRITE_FILE_HPP
 
 #include <boost/filesystem/path.hpp>
+#include <fstream>
 
 namespace Si
 {
-	void write_file(boost::filesystem::path const &file_name, char const *data, std::size_t size);
+	inline void write_file(boost::filesystem::path const &name, char const *data, std::size_t size)
+	{
+		std::ofstream file(name.string(), std::ios::binary);
+		if (!file)
+		{
+			throw std::runtime_error("Could not open file " + name.string() + " for writing");
+		}
+		file.write(data, size);
+		if (!file)
+		{
+			throw std::runtime_error("Could not write to file " + name.string());
+		}
+	}
 }
 
 #endif
