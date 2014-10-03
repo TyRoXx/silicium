@@ -90,33 +90,71 @@ BOOST_AUTO_TEST_CASE(error_or_map_error)
 	}));
 }
 
+template <class T>
+struct move_only_comparable
+{
+	T value;
+
+	move_only_comparable() = default;
+	move_only_comparable(T value)
+		: value(std::move(value))
+	{
+	}
+	move_only_comparable(move_only_comparable &&) = default;
+	move_only_comparable(move_only_comparable const &) = delete;
+	move_only_comparable &operator = (move_only_comparable &&) = default;
+	move_only_comparable &operator = (move_only_comparable const &) = default;
+};
+
+template <class T>
+bool operator == (move_only_comparable<T> const &left, move_only_comparable<T> const &right)
+{
+	return left.value == right.value;
+}
+
+template <class T>
+bool operator != (move_only_comparable<T> const &left, move_only_comparable<T> const &right)
+{
+	return left.value != right.value;
+}
+
+template <class T>
+std::ostream &operator << (std::ostream &out, move_only_comparable<T> const &value)
+{
+	return out << value.value;
+}
+
 BOOST_AUTO_TEST_CASE(error_or_equal)
 {
 	{
-		Si::error_or<int> a(2);
-		Si::error_or<int> b = a;
+		Si::error_or<move_only_comparable<int>> a(2);
+		Si::error_or<move_only_comparable<int>> b(2);
 		BOOST_CHECK_EQUAL(a, a);
 		BOOST_CHECK_EQUAL(a, b);
 		BOOST_CHECK_EQUAL(b, a);
 		BOOST_CHECK_EQUAL(b, b);
+		BOOST_CHECK_EQUAL(a, 2);
+		BOOST_CHECK_EQUAL(2, a);
 	}
 
 	{
-		Si::error_or<int> c = boost::system::error_code();
-		Si::error_or<int> d = c;
+		Si::error_or<move_only_comparable<int>> c = boost::system::error_code();
+		Si::error_or<move_only_comparable<int>> d = boost::system::error_code();
 		BOOST_CHECK_EQUAL(c, c);
 		BOOST_CHECK_EQUAL(c, d);
 		BOOST_CHECK_EQUAL(d, c);
 		BOOST_CHECK_EQUAL(d, d);
+		BOOST_CHECK_EQUAL(c, boost::system::error_code());
+		BOOST_CHECK_EQUAL(boost::system::error_code(), c);
 	}
 }
 
 BOOST_AUTO_TEST_CASE(error_or_not_equal)
 {
-	Si::error_or<int> a(2);
-	Si::error_or<int> b(3);
-	Si::error_or<int> c = boost::system::error_code(2, boost::system::generic_category());
-	Si::error_or<int> d = boost::system::error_code(3, boost::system::generic_category());
+	Si::error_or<move_only_comparable<int>> a(2);
+	Si::error_or<move_only_comparable<int>> b(3);
+	Si::error_or<move_only_comparable<int>> c = boost::system::error_code(2, boost::system::generic_category());
+	Si::error_or<move_only_comparable<int>> d = boost::system::error_code(3, boost::system::generic_category());
 
 	BOOST_CHECK_NE(a, b);
 	BOOST_CHECK_NE(a, c);
@@ -133,4 +171,7 @@ BOOST_AUTO_TEST_CASE(error_or_not_equal)
 	BOOST_CHECK_NE(d, a);
 	BOOST_CHECK_NE(d, b);
 	BOOST_CHECK_NE(d, c);
+
+	BOOST_CHECK_NE(a, 3);
+	BOOST_CHECK_NE(a, (boost::system::error_code(2 BOOST_PP_COMMA() boost::system::generic_category())));
 }

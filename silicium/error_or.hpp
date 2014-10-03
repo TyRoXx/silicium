@@ -160,14 +160,70 @@ namespace Si
 		fast_variant<Value, Error> storage;
 	};
 
+	namespace detail
+	{
+		template <class To, class From>
+		From &&convert_if_necessary(From &&from, std::true_type)
+		{
+			return std::forward<From>(from);
+		}
+
+		template <class To, class From>
+		To convert_if_necessary(From &&from, std::false_type)
+		{
+			return To(std::forward<From>(from));
+		}
+
+		template <class To, class From>
+		auto convert_if_necessary(From &&from)
+		{
+			return convert_if_necessary<To>(
+				std::forward<From>(from),
+				std::is_same<typename std::decay<To>::type, typename std::decay<From>::type>()
+			);
+		}
+	}
+
 	template <class Value, class Error>
 	bool operator == (error_or<Value, Error> const &left, error_or<Value, Error> const &right)
 	{
 		return left.equals(right);
 	}
 
+	template <class Value, class Error, class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
+	bool operator == (error_or<Value, Error> const &left, ConvertibleToValue const &right)
+	{
+		if (left.is_error())
+		{
+			return false;
+		}
+		return left.get() == detail::convert_if_necessary<Value>(right);
+	}
+
 	template <class Value, class Error>
-	bool operator != (error_or<Value, Error> const &left, error_or<Value, Error> const &right)
+	bool operator == (error_or<Value, Error> const &left, Error const &right)
+	{
+		if (!left.is_error())
+		{
+			return false;
+		}
+		return *left.error() == right;
+	}
+
+	template <class Anything, class Value, class Error>
+	bool operator == (Anything const &left, error_or<Value, Error> const &right)
+	{
+		return (right == left);
+	}
+
+	template <class Anything, class Value, class Error>
+	bool operator != (Anything const &left, error_or<Value, Error> const &right)
+	{
+		return !(left == right);
+	}
+
+	template <class Anything, class Value, class Error>
+	bool operator != (error_or<Value, Error> const &left, Anything const &right)
 	{
 		return !(left == right);
 	}
