@@ -93,9 +93,13 @@ BOOST_AUTO_TEST_CASE(error_or_map_error)
 template <class T>
 struct move_only_comparable
 {
+	BOOST_STATIC_ASSERT(std::is_nothrow_default_constructible<T>::value);
+	BOOST_STATIC_ASSERT(std::is_nothrow_move_constructible<T>::value);
+	BOOST_STATIC_ASSERT(std::is_nothrow_move_assignable<T>::value);
+
 	T value;
 
-	move_only_comparable()
+	move_only_comparable() BOOST_NOEXCEPT
 	{
 	}
 
@@ -104,7 +108,7 @@ struct move_only_comparable
 	{
 	}
 
-	move_only_comparable(move_only_comparable &&other)
+	move_only_comparable(move_only_comparable &&other) BOOST_NOEXCEPT
 		: value(std::move(other.value))
 	{
 	}
@@ -114,7 +118,7 @@ struct move_only_comparable
 	{
 	}
 
-	move_only_comparable &operator = (move_only_comparable &&other)
+	move_only_comparable &operator = (move_only_comparable &&other) BOOST_NOEXCEPT
 	{
 		value = std::move(other.value);
 		return *this;
