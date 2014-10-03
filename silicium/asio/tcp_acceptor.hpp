@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_TCP_ACCEPTOR_HPP
-#define SILICIUM_REACTIVE_TCP_ACCEPTOR_HPP
+#ifndef SILICIUM_ASIO_TCP_ACCEPTOR_HPP
+#define SILICIUM_ASIO_TCP_ACCEPTOR_HPP
 
 #include <silicium/observer.hpp>
 #include <silicium/exchange.hpp>

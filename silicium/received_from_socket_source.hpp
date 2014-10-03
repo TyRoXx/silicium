@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_RECEIVED_FROM_SOCKET_SOURCE_HPP
 #define SILICIUM_REACTIVE_RECEIVED_FROM_SOCKET_SOURCE_HPP
 
-#include <silicium/socket_observable.hpp>
+#include <silicium/asio/socket_observable.hpp>
 #include <silicium/source.hpp>
 #include <boost/optional.hpp>
 #include <boost/variant/static_visitor.hpp>
