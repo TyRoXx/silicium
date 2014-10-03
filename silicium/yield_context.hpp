@@ -32,8 +32,8 @@ namespace Si
 		{
 		}
 
-		template <class Observable, class Gotten = typename Observable::element_type>
-		boost::optional<Gotten> get_one(Observable &from)
+		template <class Observable, class Gotten = typename std::decay<Observable>::type::element_type>
+		boost::optional<Gotten> get_one(Observable &&from)
 		{
 			boost::optional<Gotten> result;
 			auto tf = Si::virtualize_observable(Si::transform(Si::ref(from), [&result](Gotten element)
