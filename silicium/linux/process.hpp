@@ -12,65 +12,62 @@ namespace Si
 {
 	namespace detail
 	{
-		namespace
+		inline void copy_all(int source, sink<char> &destination)
 		{
-			void copy_all(int source, sink<char> &destination)
+			for (;;)
 			{
-				for (;;)
+				buffering_sink<char> buffer_helper(destination);
+				auto const buffer = buffer_helper.make_append_space(std::numeric_limits<std::size_t>::max());
+				assert(!buffer.empty());
+				auto const rc = read(source, buffer.begin(), buffer.size());
+				if (rc == 0)
 				{
-					buffering_sink<char> buffer_helper(destination);
-					auto const buffer = buffer_helper.make_append_space(std::numeric_limits<std::size_t>::max());
-					assert(!buffer.empty());
-					auto const rc = read(source, buffer.begin(), buffer.size());
-					if (rc == 0)
-					{
-						break;
-					}
-					if (rc < 0)
-					{
-						throw boost::system::system_error(errno, boost::system::system_category());
-					}
-					commit(buffer_helper, static_cast<std::size_t>(rc));
+					break;
 				}
-			}
-
-			void set_close_on_exec(int file)
-			{
-				fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
-			}
-
-			struct pipe
-			{
-				file_descriptor write, read;
-
-				void close() BOOST_NOEXCEPT
-				{
-					pipe().swap(*this);
-				}
-
-				void swap(pipe &other) BOOST_NOEXCEPT
-				{
-					write.swap(other.write);
-					read.swap(other.read);
-				}
-			};
-
-			pipe make_pipe()
-			{
-				std::array<int, 2> fds;
-				if (::pipe(fds.data()) < 0)
+				if (rc < 0)
 				{
 					throw boost::system::system_error(errno, boost::system::system_category());
 				}
-				pipe result;
-				result.read  = file_descriptor(fds[0]);
-				result.write = file_descriptor(fds[1]);
-				return result;
+				commit(buffer_helper, static_cast<std::size_t>(rc));
 			}
+		}
+
+		inline void set_close_on_exec(int file)
+		{
+			fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
+		}
+
+		struct pipe
+		{
+			file_descriptor write, read;
+
+			void close() BOOST_NOEXCEPT
+			{
+				pipe().swap(*this);
+			}
+
+			void swap(pipe &other) BOOST_NOEXCEPT
+			{
+				write.swap(other.write);
+				read.swap(other.read);
+			}
+		};
+
+		inline pipe make_pipe()
+		{
+			std::array<int, 2> fds;
+			if (::pipe(fds.data()) < 0)
+			{
+				throw boost::system::system_error(errno, boost::system::system_category());
+			}
+			pipe result;
+			result.read  = file_descriptor(fds[0]);
+			result.write = file_descriptor(fds[1]);
+			return result;
 		}
 	}
 
-	int run_process(process_parameters const &parameters)
+	inline int run_process(process_parameters const &parameters)
 	{
 		auto executable = parameters.executable.string();
 		auto arguments = parameters.arguments;
