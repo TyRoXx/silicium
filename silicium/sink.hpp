@@ -6,7 +6,7 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/container/string.hpp>
-#include <ostream>
+#include <fstream>
 #include <array>
 #include <memory>
 
@@ -220,7 +220,15 @@ namespace Si
 		std::unique_ptr<std::ostream> m_file;
 	};
 
-	std::unique_ptr<flushable_sink<char>> make_file_sink(boost::filesystem::path const &name);
+	inline std::unique_ptr<flushable_sink<char>> make_file_sink(boost::filesystem::path const &name)
+	{
+		std::unique_ptr<std::ostream> file(new std::ofstream(name.string(), std::ios::binary));
+		if (!*file)
+		{
+			throw std::runtime_error("Cannot open file for writing: " + name.string());
+		}
+		return std::unique_ptr<flushable_sink<char>>(new ostream_sink(std::move(file)));
+	}
 
 	template <class Element>
 	struct auto_flush_sink SILICIUM_FINAL : sink<Element>
