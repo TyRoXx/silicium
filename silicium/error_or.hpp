@@ -150,13 +150,44 @@ namespace Si
 			return std::move(*value);
 		}
 
+		bool equals(error_or const &other) const
+		{
+			return storage == other.storage;
+		}
+
 	private:
 
 		fast_variant<Value, Error> storage;
 	};
 
-	template <class ErrorOr, class OnValue>
-	auto map(ErrorOr &&maybe, OnValue &&on_value)
+	template <class Value, class Error>
+	bool operator == (error_or<Value, Error> const &left, error_or<Value, Error> const &right)
+	{
+		return left.equals(right);
+	}
+
+	template <class Value, class Error>
+	std::ostream &operator << (std::ostream &out, error_or<Value, Error> const &value)
+	{
+		if (value.error())
+		{
+			return out << *value.error();
+		}
+		return out << value.get();
+	}
+
+	template <class T>
+	struct is_error_or : std::false_type
+	{
+	};
+	
+	template <class Value, class Error>
+	struct is_error_or<error_or<Value, Error>> : std::true_type
+	{
+	};
+
+	template <class ErrorOr, class OnValue, class CleanErrorOr = typename std::decay<ErrorOr>::type, class = typename std::enable_if<is_error_or<CleanErrorOr>::value, void>>
+	auto map(ErrorOr &&maybe, OnValue &&on_value) -> CleanErrorOr
 	{
 		if (maybe.is_error())
 		{

@@ -72,3 +72,20 @@ BOOST_AUTO_TEST_CASE(error_or_construct_from_convertible)
 	Si::error_or<std::unique_ptr<base>> f(Si::make_unique<derived>());
 	BOOST_CHECK(f.get() != nullptr);
 }
+
+BOOST_AUTO_TEST_CASE(error_or_map_value)
+{
+	BOOST_CHECK_EQUAL(Si::error_or<long>(3L), Si::map(Si::error_or<long>(2L), [](long value)
+	{
+		return value + 1;
+	}));
+}
+
+BOOST_AUTO_TEST_CASE(error_or_map_error)
+{
+	BOOST_CHECK_EQUAL(Si::error_or<long>(boost::system::error_code()), Si::map(Si::error_or<long>(boost::system::error_code()), [](long)
+	{
+		BOOST_FAIL("no value expected");
+		return 0;
+	}));
+}
