@@ -83,7 +83,10 @@ BOOST_AUTO_TEST_CASE(error_or_map_value)
 
 BOOST_AUTO_TEST_CASE(error_or_map_error)
 {
-	BOOST_CHECK_EQUAL(Si::error_or<long>(boost::system::error_code()), Si::map(Si::error_or<long>(boost::system::error_code()), [](long)
+	boost::system::error_code const test_error(2, boost::system::native_ecat);
+	BOOST_CHECK_EQUAL(
+		Si::error_or<long>(test_error),
+		Si::map(Si::error_or<long>(test_error), [](long)
 	{
 		BOOST_FAIL("no value expected");
 		return 0;
@@ -163,14 +166,15 @@ BOOST_AUTO_TEST_CASE(error_or_equal)
 	}
 
 	{
-		Si::error_or<move_only_comparable<int>> c = boost::system::error_code();
-		Si::error_or<move_only_comparable<int>> d = boost::system::error_code();
+		boost::system::error_code const test_error(2, boost::system::generic_category());
+		Si::error_or<move_only_comparable<int>> c = test_error;
+		Si::error_or<move_only_comparable<int>> d = test_error;
 		BOOST_CHECK_EQUAL(c, c);
 		BOOST_CHECK_EQUAL(c, d);
 		BOOST_CHECK_EQUAL(d, c);
 		BOOST_CHECK_EQUAL(d, d);
-		BOOST_CHECK_EQUAL(c, boost::system::error_code());
-		BOOST_CHECK_EQUAL(boost::system::error_code(), c);
+		BOOST_CHECK_EQUAL(c, test_error);
+		BOOST_CHECK_EQUAL(test_error, c);
 	}
 }
 

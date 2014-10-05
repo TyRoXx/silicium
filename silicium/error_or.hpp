@@ -25,58 +25,61 @@ namespace Si
 	struct error_or
 	{
 		error_or() BOOST_NOEXCEPT
+			: value(Value()) //initialize so that reading the value does not have undefined behaviour
 		{
 		}
 
 		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
 		error_or(ConvertibleToValue &&value) BOOST_NOEXCEPT
-			: storage(Value(std::forward<ConvertibleToValue>(value)))
+			: value(std::forward<ConvertibleToValue>(value))
 		{
 		}
 
 		error_or(Error error) BOOST_NOEXCEPT
-			: storage(std::move(error))
+			: error_(std::move(error))
 		{
 		}
 
 #ifdef _MSC_VER
 		error_or(error_or &&other) BOOST_NOEXCEPT
-			: storage(std::move(other.storage))
+			: error_(std::move(other.error_))
+			, value(std::move(other.value))
 		{
 		}
 
 		error_or(error_or const &other)
-			: storage(other.storage)
+			: error_(other.error_)
+			, value(other.value)
 		{
 		}
 
 		error_or &operator = (error_or &&other) BOOST_NOEXCEPT
 		{
-			storage = std::move(other.storage);
+			error_ = std::move(other.error_);
+			value = std::move(other.value);
 			return *this;
 		}
 
 		error_or &operator = (error_or const &other)
 		{
-			storage = other.storage;
+			error_ = other.error_;
+			value = other.value;
 			return *this;
 		}
 #endif
 
 		bool is_error() const BOOST_NOEXCEPT
 		{
-			return Si::visit<bool>(
-						storage,
-						[](Value const &) { return false; },
-						[](Error const &) { return true; });
+			return !!error_;
 		}
 
 		Si::optional<Error> error() const BOOST_NOEXCEPT
 		{
-			return Si::visit<Si::optional<Error>>(
-						storage,
-						[](Value const &) { return Si::optional<Error>(); },
-						[](Error const &e) { return e; });
+			if (error_)
+			{
+				return error_;
+			}
+			return none;
 		}
 
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
@@ -94,10 +97,11 @@ namespace Si
 			&&
 #endif
 		{
-			return Si::visit<Value &&>(
-						storage,
-						[](Value &value) -> Value && { return std::move(value); },
-						[](Error const &e) -> Value && { detail::throw_system_error(e); });
+			if (error_)
+			{
+				detail::throw_system_error(error_);
+			}
+			return std::move(value);
 		}
 
 		Value const &get() const
@@ -105,26 +109,29 @@ namespace Si
 			&
 #endif
 		{
-			return Si::visit<Value const &>(
-						storage,
-						[](Value const &value) -> Value const & { return value; },
-						[](Error const &e) -> Value const & { detail::throw_system_error(e); });
+			if (error_)
+			{
+				detail::throw_system_error(error_);
+			}
+			return value;
 		}
 
 		Value *get_ptr() BOOST_NOEXCEPT
 		{
-			return Si::visit<Value *>(
-						storage,
-						[](Value &value) -> Value * { return &value; },
-						[](Error const &) -> Value * { return nullptr; });
+			if (error_)
+			{
+				return nullptr;
+			}
+			return &value;
 		}
 
 		Value const *get_ptr() const BOOST_NOEXCEPT
 		{
-			return Si::visit<Value const *>(
-						storage,
-						[](Value const &value) -> Value const * { return &value; },
-						[](Error const &) -> Value const * { return nullptr; });
+			if (error_)
+			{
+				return nullptr;
+			}
+			return &value;
 		}
 
 		Value *operator -> ()
@@ -152,12 +159,21 @@ namespace Si
 
 		bool equals(error_or const &other) const
 		{
-			return storage == other.storage;
+			if (is_error() != other.is_error())
+			{
+				return false;
+			}
+			if (is_error())
+			{
+				return error_ == other.error_;
+			}
+			return value == other.value;
 		}
 
 	private:
 
-		fast_variant<Value, Error> storage;
+		Error error_;
+		Value value;
 	};
 
 	namespace detail

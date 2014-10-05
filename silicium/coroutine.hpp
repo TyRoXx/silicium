@@ -4,6 +4,7 @@
 #include <silicium/exchange.hpp>
 #include <silicium/yield_context.hpp>
 #include <silicium/fast_variant.hpp>
+#include <boost/asio.hpp>
 #include <boost/coroutine/all.hpp>
 
 namespace Si
