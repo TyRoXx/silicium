@@ -8,17 +8,14 @@
 
 namespace Si
 {
-	namespace detail
+	inline SILICIUM_NORETURN void throw_error(boost::system::error_code error)
 	{
-		inline SILICIUM_NORETURN void throw_system_error(boost::system::error_code error)
-		{
-			boost::throw_exception(boost::system::system_error(error));
-		}
+		boost::throw_exception(boost::system::system_error(error));
+	}
 
-		inline SILICIUM_NORETURN void throw_system_error(std::error_code error)
-		{
-			boost::throw_exception(std::system_error(error));
-		}
+	inline SILICIUM_NORETURN void throw_error(std::error_code error)
+	{
+		boost::throw_exception(std::system_error(error));
 	}
 
 	template <class Value, class Error = boost::system::error_code>
@@ -89,7 +86,7 @@ namespace Si
 		{
 			if (error_)
 			{
-				detail::throw_system_error(error_);
+				throw_error(error_);
 			}
 			return value;
 		}
@@ -99,7 +96,7 @@ namespace Si
 		{
 			if (error_)
 			{
-				detail::throw_system_error(error_);
+				throw_error(error_);
 			}
 			return std::move(value);
 		}
@@ -112,7 +109,7 @@ namespace Si
 		{
 			if (error_)
 			{
-				detail::throw_system_error(error_);
+				throw_error(error_);
 			}
 			return value;
 		}
