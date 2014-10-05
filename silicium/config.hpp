@@ -7,13 +7,6 @@
 #include <boost/version.hpp>
 
 #ifdef _MSC_VER
-//avoid useless warning C4127 (conditional expression is constant)
-#	define SILICIUM_FALSE (!"")
-#else
-#	define SILICIUM_FALSE false
-#endif
-
-#ifdef _MSC_VER
 #	define SILICIUM_COMPILER_CXX11 1
 #	define SILICIUM_COMPILER_CXX14 1
 #elif __cplusplus > 201103L
@@ -34,7 +27,7 @@
 #		define SILICIUM_UNREACHABLE() __builtin_unreachable()
 #	endif
 #else
-#	define SILICIUM_UNREACHABLE() do { throw ::std::logic_error("unreachable " __FILE__ ":" BOOST_STRINGIZE(__LINE__)); } while(SILICIUM_FALSE)
+#	define SILICIUM_UNREACHABLE() throw ::std::logic_error("unreachable " __FILE__ ":" BOOST_STRINGIZE(__LINE__))
 #endif
 
 #if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__)
