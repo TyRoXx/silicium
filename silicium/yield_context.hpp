@@ -46,6 +46,20 @@ namespace Si
 			return result;
 		}
 
+		template <class Observable, class Gotten = typename std::decay<Observable>::type::element_type>
+		bool get_one(Observable &&from, Gotten &result)
+		{
+			bool got_result = false;
+			auto tf = Si::virtualize_observable(Si::transform(Si::ref(from), [&result, &got_result](Gotten element)
+			{
+				result = std::move(element);
+				got_result = true;
+				return nothing{};
+			}));
+			impl->get_one(tf);
+			return got_result;
+		}
+
 	protected:
 
 		detail::basic_yield_context *impl;
