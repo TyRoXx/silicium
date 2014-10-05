@@ -82,20 +82,20 @@ namespace Si
 			return none;
 		}
 
+		Value &get()
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-		Value &get() &
+			&
+#endif
 		{
-			return Si::visit<Value &>(
-						storage,
-						[](Value &value) -> Value & { return value; },
-						[](Error const &e) -> Value & { detail::throw_system_error(e); });
+			if (error_)
+			{
+				detail::throw_system_error(error_);
+			}
+			return value;
 		}
-#endif
 
-		Value &&get()
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-			&&
-#endif
+		Value &&get() &&
 		{
 			if (error_)
 			{
@@ -103,6 +103,7 @@ namespace Si
 			}
 			return std::move(value);
 		}
+#endif
 
 		Value const &get() const
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER

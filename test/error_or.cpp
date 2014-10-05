@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(error_or_movable_only)
 	BOOST_REQUIRE(value.get_ptr());
 	BOOST_REQUIRE(*value.get_ptr());
 	BOOST_CHECK_EQUAL(2, **value.get_ptr());
-	std::unique_ptr<int> v = std::move(value).get();
+	std::unique_ptr<int> v = std::move(value.get());
 	BOOST_CHECK(!value.get());
 	BOOST_CHECK(!value.is_error());
 	BOOST_CHECK_EQUAL(2, *v);
