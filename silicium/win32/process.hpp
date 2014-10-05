@@ -29,7 +29,7 @@ namespace Si
 			result.resize(static_cast<size_t>(output_size));
 			if (!result.empty())
 			{
-				MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), &result[0], result.size());
+				MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), &result[0], output_size);
 			}
 			return result;
 		}
