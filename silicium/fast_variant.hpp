@@ -320,7 +320,7 @@ namespace Si
 			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
 			{
 				typedef typename std::decay<Visitor>::type::result_type result;
-				std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f
+				static std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f
 				{{
 					&apply_visitor_impl<Visitor, T, result>...
 				}};
@@ -331,7 +331,7 @@ namespace Si
 			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
 			{
 				typedef typename std::decay<Visitor>::type::result_type result;
-				std::array<result (*)(Visitor &&, void const *), sizeof...(T)> const f
+				static std::array<result(*)(Visitor &&, void const *), sizeof...(T)> const f
 				{{
 					&apply_visitor_const_impl<Visitor, T, result>...
 				}};
@@ -344,7 +344,7 @@ namespace Si
 				{
 					return false;
 				}
-				std::array<bool (*)(void const *, void const *), sizeof...(T)> const f =
+				static std::array<bool(*)(void const *, void const *), sizeof...(T)> const f =
 				{{
 					&equals<T>...
 				}};
@@ -361,7 +361,7 @@ namespace Si
 				{
 					return true;
 				}
-				std::array<bool (*)(void const *, void const *), sizeof...(T)> const f =
+				static std::array<bool(*)(void const *, void const *), sizeof...(T)> const f =
 				{{
 					&less<T>...
 				}};
@@ -383,7 +383,7 @@ namespace Si
 
 			static void move_construct_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
-				std::array<void (*)(void *, void *), sizeof...(T)> const f =
+				static std::array<void(*)(void *, void *), sizeof...(T)> const f =
 				{{
 					&detail::move_construct_storage<T>...
 				}};
@@ -392,7 +392,7 @@ namespace Si
 
 			static void destroy_storage(which_type which, char &destroyed) BOOST_NOEXCEPT
 			{
-				std::array<void (*)(void *), sizeof...(T)> const f =
+				static std::array<void(*)(void *), sizeof...(T)> const f =
 				{{
 					&detail::destroy_storage<T>...
 				}};
@@ -401,7 +401,7 @@ namespace Si
 
 			static void move_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
-				std::array<void (*)(void *, void *), sizeof...(T)> const f =
+				static std::array<void(*)(void *, void *), sizeof...(T)> const f =
 				{{
 					&detail::move_storage<T>...
 				}};
@@ -487,7 +487,7 @@ namespace Si
 
 			static void copy_construct_storage(which_type which, char &destination, char const &source)
 			{
-				std::array<void(*)(void *, void const *), sizeof...(T)> const f =
+				static std::array<void(*)(void *, void const *), sizeof...(T)> const f =
 				{{
 					&detail::copy_construct_storage<T>...
 				}};
@@ -496,7 +496,7 @@ namespace Si
 
 			static void copy_storage(which_type which, char &destination, char const &source)
 			{
-				std::array<void(*)(void *, void const *), sizeof...(T)> const f =
+				static std::array<void(*)(void *, void const *), sizeof...(T)> const f =
 				{{
 					&detail::copy_storage<T>...
 				}};
