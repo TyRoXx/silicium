@@ -13,28 +13,29 @@ namespace Si
 	struct error_code
 	{
 		error_code() BOOST_NOEXCEPT
-			: get_underlying(nullptr)
+			: underlying(nullptr)
 		{
 		}
 
 		template <int Value, UnderlyingCategory const &(*Category)()>
 		static error_code create()
 		{
-			return error_code(&error_code::create_underlying<Value, Category>);
+			static UnderlyingErrorCode const instance(Value, Category());
+			return error_code(instance);
 		}
 
 		UnderlyingErrorCode to_underlying() const
 		{
-			if (get_underlying)
+			if (underlying)
 			{
-				return get_underlying();
+				return *underlying;
 			}
 			return UnderlyingErrorCode();
 		}
 
 		void clear() BOOST_NOEXCEPT
 		{
-			get_underlying = nullptr;
+			underlying = nullptr;
 		}
 
 		int value() const BOOST_NOEXCEPT
@@ -49,17 +50,11 @@ namespace Si
 
 	private:
 
-		UnderlyingErrorCode (*get_underlying)();
+		UnderlyingErrorCode const *underlying;
 
-		explicit error_code(UnderlyingErrorCode (*get_underlying)()) BOOST_NOEXCEPT
-			: get_underlying(get_underlying)
+		explicit error_code(UnderlyingErrorCode const &underlying) BOOST_NOEXCEPT
+			: underlying(&underlying)
 		{
-		}
-
-		template <int Value, UnderlyingCategory const &(*Category)()>
-		static UnderlyingErrorCode create_underlying()
-		{
-			return UnderlyingErrorCode(Value, Category());
 		}
 	};
 
