@@ -13,29 +13,28 @@ namespace Si
 	struct error_code
 	{
 		error_code() BOOST_NOEXCEPT
-			: storage(nullptr)
+			: get_underlying(nullptr)
 		{
 		}
 
 		template <int Value, UnderlyingCategory const &(*Category)()>
 		static error_code create()
 		{
-			static concrete_storage<Value, Category> const instance;
-			return error_code(instance);
+			return error_code(&error_code::create_underlying<Value, Category>);
 		}
 
 		UnderlyingErrorCode to_underlying() const
 		{
-			if (storage)
+			if (get_underlying)
 			{
-				return storage->to_underlying();
+				return get_underlying();
 			}
 			return UnderlyingErrorCode();
 		}
 
 		void clear() BOOST_NOEXCEPT
 		{
-			storage = nullptr;
+			get_underlying = nullptr;
 		}
 
 		int value() const BOOST_NOEXCEPT
@@ -50,29 +49,17 @@ namespace Si
 
 	private:
 
-		struct basic_storage
-		{
-			virtual ~basic_storage()
-			{
-			}
+		UnderlyingErrorCode (*get_underlying)();
 
-			virtual UnderlyingErrorCode to_underlying() const = 0;
-		};
+		explicit error_code(UnderlyingErrorCode (*get_underlying)()) BOOST_NOEXCEPT
+			: get_underlying(get_underlying)
+		{
+		}
 
 		template <int Value, UnderlyingCategory const &(*Category)()>
-		struct concrete_storage : basic_storage
+		static UnderlyingErrorCode create_underlying()
 		{
-			virtual UnderlyingErrorCode to_underlying() const SILICIUM_OVERRIDE
-			{
-				return UnderlyingErrorCode(Value, Category());
-			}
-		};
-
-		basic_storage const *storage;
-
-		explicit error_code(basic_storage const &storage) BOOST_NOEXCEPT
-			: storage(&storage)
-		{
+			return UnderlyingErrorCode(Value, Category());
 		}
 	};
 
