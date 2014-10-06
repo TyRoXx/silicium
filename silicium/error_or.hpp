@@ -18,6 +18,21 @@ namespace Si
 		boost::throw_exception(std::system_error(error));
 	}
 
+	namespace detail
+	{
+		template <class To, class From>
+		From &&convert_if_necessary(From &&from, std::true_type)
+		{
+			return std::forward<From>(from);
+		}
+
+		template <class To, class From>
+		To convert_if_necessary(From &&from, std::false_type)
+		{
+			return To(std::forward<From>(from));
+		}
+	}
+
 	template <class Value, class Error = boost::system::error_code>
 	struct error_or
 	{
@@ -155,7 +170,8 @@ namespace Si
 			return std::move(*value);
 		}
 
-		bool equals(error_or const &other) const
+		template <class ComparableToValue>
+		bool equals(error_or<ComparableToValue, Error> const &other) const
 		{
 			if (is_error() != other.is_error())
 			{
@@ -163,9 +179,28 @@ namespace Si
 			}
 			if (is_error())
 			{
-				return error_ == other.error_;
+				return error_ == *other.error();
 			}
-			return value == other.value;
+			return value == other.get();
+		}
+
+		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
+		bool equals(ConvertibleToValue const &right) const
+		{
+			if (is_error())
+			{
+				return false;
+			}
+			return get() == detail::convert_if_necessary<Value>(right, std::is_same<typename std::decay<Value>::type, typename std::decay<ConvertibleToValue>::type>());
+		}
+
+		bool equals(Error const &right) const
+		{
+			if (!is_error())
+			{
+				return false;
+			}
+			return *error() == right;
 		}
 
 	private:
@@ -174,51 +209,26 @@ namespace Si
 		Value value;
 	};
 
-	namespace detail
+	template <class T>
+	struct is_error_or : std::false_type
 	{
-		template <class To, class From>
-		From &&convert_if_necessary(From &&from, std::true_type)
-		{
-			return std::forward<From>(from);
-		}
-
-		template <class To, class From>
-		To convert_if_necessary(From &&from, std::false_type)
-		{
-			return To(std::forward<From>(from));
-		}
-	}
+	};
 
 	template <class Value, class Error>
-	bool operator == (error_or<Value, Error> const &left, error_or<Value, Error> const &right)
+	struct is_error_or<error_or<Value, Error>> : std::true_type
+	{
+	};
+
+	template <class Value, class Error, class Anything>
+	bool operator == (error_or<Value, Error> const &left, Anything const &right)
 	{
 		return left.equals(right);
 	}
 
-	template <class Value, class Error, class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
-	bool operator == (error_or<Value, Error> const &left, ConvertibleToValue const &right)
-	{
-		if (left.is_error())
-		{
-			return false;
-		}
-		return left.get() == detail::convert_if_necessary<Value>(right, std::is_same<typename std::decay<Value>::type, typename std::decay<ConvertibleToValue>::type>());
-	}
-
-	template <class Value, class Error>
-	bool operator == (error_or<Value, Error> const &left, Error const &right)
-	{
-		if (!left.is_error())
-		{
-			return false;
-		}
-		return *left.error() == right;
-	}
-
-	template <class Anything, class Value, class Error>
+	template <class Anything, class Value, class Error, class = typename std::enable_if<!is_error_or<Anything>::value, void>::type>
 	bool operator == (Anything const &left, error_or<Value, Error> const &right)
 	{
-		return (right == left);
+		return right.equals(left);
 	}
 
 	template <class Anything, class Value, class Error>
@@ -243,18 +253,8 @@ namespace Si
 		return out << value.get();
 	}
 
-	template <class T>
-	struct is_error_or : std::false_type
-	{
-	};
-
-	template <class Value, class Error>
-	struct is_error_or<error_or<Value, Error>> : std::true_type
-	{
-	};
-
 	template <class ErrorOr, class OnValue, class CleanErrorOr = typename std::decay<ErrorOr>::type, class = typename std::enable_if<is_error_or<CleanErrorOr>::value, void>>
-	auto map(ErrorOr &&maybe, OnValue &&on_value) -> CleanErrorOr
+	auto map(ErrorOr &&maybe, OnValue &&on_value) -> error_or<decltype(std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get()))>
 	{
 		if (maybe.is_error())
 		{
