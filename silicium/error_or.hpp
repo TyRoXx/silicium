@@ -85,13 +85,9 @@ namespace Si
 			return !!error_;
 		}
 
-		Si::optional<Error> error() const BOOST_NOEXCEPT
+		Error error() const BOOST_NOEXCEPT
 		{
-			if (error_)
-			{
-				return error_;
-			}
-			return none;
+			return error_;
 		}
 
 		Value &get()
@@ -179,7 +175,7 @@ namespace Si
 			}
 			if (is_error())
 			{
-				return error_ == *other.error();
+				return error_ == other.error();
 			}
 			return value == other.get();
 		}
@@ -200,7 +196,7 @@ namespace Si
 			{
 				return false;
 			}
-			return *error() == right;
+			return error() == right;
 		}
 
 	private:
@@ -248,17 +244,18 @@ namespace Si
 	{
 		if (value.error())
 		{
-			return out << *value.error();
+			return out << value.error();
 		}
 		return out << value.get();
 	}
 
 	template <class ErrorOr, class OnValue, class CleanErrorOr = typename std::decay<ErrorOr>::type, class = typename std::enable_if<is_error_or<CleanErrorOr>::value, void>>
-	auto map(ErrorOr &&maybe, OnValue &&on_value) -> error_or<decltype(std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get()))>
+	auto map(ErrorOr &&maybe, OnValue &&on_value)
+		-> error_or<decltype(std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get()))>
 	{
 		if (maybe.is_error())
 		{
-			return *maybe.error();
+			return maybe.error();
 		}
 		return std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get());
 	}
