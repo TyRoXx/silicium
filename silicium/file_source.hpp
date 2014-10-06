@@ -2,7 +2,7 @@
 #define SILICIUM_FILE_SOURCE_HPP
 
 #include <silicium/generator_source.hpp>
-#include <silicium/fast_variant.hpp>
+#include <silicium/error_or.hpp>
 #include <silicium/file_descriptor.hpp>
 #include <boost/system/error_code.hpp>
 #include <functional>
@@ -13,7 +13,7 @@
 
 namespace Si
 {
-	typedef Si::fast_variant<std::size_t, boost::system::error_code> file_read_result;
+	typedef Si::error_or<std::size_t> file_read_result;
 
 	inline auto make_file_source(native_file_handle file, boost::iterator_range<char *> read_buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE

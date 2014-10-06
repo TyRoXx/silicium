@@ -9,8 +9,8 @@ namespace Si
 	struct transforming_source SILICIUM_FINAL : source<To>
 	{
 		template <class Transformation2>
-		explicit transforming_source(source<From> &original, Transformation2 &&transform)
-			: original(&original)
+		explicit transforming_source(From original, Transformation2 &&transform)
+			: original(std::move(original))
 			, transform(std::forward<Transformation2>(transform))
 		{
 		}
@@ -26,8 +26,7 @@ namespace Si
 			auto i = boost::begin(destination);
 			for (; i != boost::end(destination); ++i)
 			{
-				assert(original);
-				auto next = Si::get(*original);
+				auto next = Si::get(original);
 				if (!next)
 				{
 					break;
@@ -39,15 +38,15 @@ namespace Si
 
 	private:
 
-		source<From> *original;
+		From original;
 		Transformation transform;
 	};
 
 	template <class To, class From, class Transformation>
-	transforming_source<To, From, typename std::decay<Transformation>::type>
-	make_transforming_source(source<From> &original, Transformation &&transform)
+	auto make_transforming_source(From &&original, Transformation &&transform)
+		-> transforming_source<To, typename std::decay<From>::type, typename std::decay<Transformation>::type>
 	{
-		return transforming_source<To, From, typename std::decay<Transformation>::type>(original, std::forward<Transformation>(transform));
+		return transforming_source<To, typename std::decay<From>::type, typename std::decay<Transformation>::type>(std::forward<From>(original), std::forward<Transformation>(transform));
 	}
 }
 
