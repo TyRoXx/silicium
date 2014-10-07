@@ -9,12 +9,12 @@
 
 namespace Si
 {
-	struct socket_sink : Si::sink<char>
+	struct socket_sink : Si::sink<char, boost::system::error_code>
 	{
 		explicit socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
 		virtual boost::iterator_range<char *> make_append_space(std::size_t size) SILICIUM_OVERRIDE;
-		virtual void flush_append_space() SILICIUM_OVERRIDE;
-		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE;
+		virtual boost::system::error_code flush_append_space() SILICIUM_OVERRIDE;
+		virtual boost::system::error_code append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE;
 
 	private:
 

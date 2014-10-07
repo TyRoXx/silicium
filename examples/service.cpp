@@ -195,7 +195,8 @@ namespace
 			std::string const &log_name)
 	{
 		auto log = artifacts.begin_artifact(log_name);
-		auto flushing_log = Si::make_auto_flush_sink(*log);
+		auto throwing_log = Si::make_throwing_sink(Si::ref_sink(*log));
+		auto flushing_log = Si::make_auto_flush_sink(throwing_log);
 		return Si::run_process(executable, arguments, build_dir, flushing_log) == 0;
 	}
 
@@ -365,7 +366,7 @@ int main(int argc, char **argv)
 		(*response.arguments)["Content-Type"] = "text/html";
 		(*response.arguments)["Connection"] = "close";
 
-		Si::buffering_sink<char> buffered_out(out);
+		Si::buffering_sink<char, boost::system::error_code> buffered_out(out);
 		write_header(buffered_out, response);
 		append(buffered_out, body);
 		buffered_out.flush();

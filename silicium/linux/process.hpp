@@ -12,11 +12,12 @@ namespace Si
 {
 	namespace detail
 	{
-		inline void copy_all(int source, sink<char> &destination)
+		template <class Error>
+		inline void copy_all(int source, sink<char, Error> &destination)
 		{
 			for (;;)
 			{
-				buffering_sink<char> buffer_helper(destination);
+				buffering_sink<char, Error> buffer_helper(destination);
 				auto const buffer = buffer_helper.make_append_space(std::numeric_limits<std::size_t>::max());
 				assert(!buffer.empty());
 				auto const rc = read(source, buffer.begin(), buffer.size());

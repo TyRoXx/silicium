@@ -16,15 +16,18 @@ namespace Si
 		return boost::iterator_range<char *>();
 	}
 
-	void socket_sink::flush_append_space()
+	boost::system::error_code socket_sink::flush_append_space()
 	{
+		return {};
 	}
 
-	void socket_sink::append(boost::iterator_range<char const *> data)
+	boost::system::error_code socket_sink::append(boost::iterator_range<char const *> data)
 	{
 		assert(m_socket);
 		assert(m_yield);
-		boost::asio::async_write(*m_socket, boost::asio::buffer(data.begin(), data.size()), *m_yield);
+		boost::system::error_code ec;
+		boost::asio::async_write(*m_socket, boost::asio::buffer(data.begin(), data.size()), (*m_yield)[ec]);
+		return ec;
 	}
 }
 #endif

@@ -14,8 +14,8 @@ namespace Si
 		boost::filesystem::path executable;
 		std::vector<std::string> arguments;
 		boost::filesystem::path current_path;
-		sink<char> *out;
-		sink<char> *err;
+		sink<char, void> *out;
+		sink<char, void> *err;
 		source<char> *in;
 
 		process_parameters();

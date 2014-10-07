@@ -12,40 +12,111 @@
 
 namespace Si
 {
-	template <class Element>
+	template <class Element, class Error = boost::system::error_code>
 	struct sink
 	{
+		typedef Element element_type;
+
 		virtual ~sink()
 		{
 		}
 
 		virtual boost::iterator_range<Element *> make_append_space(std::size_t size) = 0;
-		virtual void flush_append_space() = 0;
-		virtual void append(boost::iterator_range<Element const *> data) = 0;
+		virtual Error flush_append_space() = 0;
+		virtual Error append(boost::iterator_range<Element const *> data) = 0;
 	};
 
-	template <class Element>
-	struct flushable_sink : sink<Element>
+	template <class Element, class Error>
+	struct flushable_sink : sink<Element, Error>
 	{
-		virtual void flush() = 0;
+		typedef Element element_type;
+
+		virtual Error flush() = 0;
 	};
 
-	template <class Element>
-	void commit(sink<Element> &destination, std::size_t count)
+	template <class Element, class Error>
+	Error commit(sink<Element, Error> &destination, std::size_t count)
 	{
 		destination.make_append_space(count);
-		destination.flush_append_space();
+		return destination.flush_append_space();
 	}
 
-	template <class Element, class Buffer = std::array<Element, ((1U << 13U) / sizeof(Element))>>
-	struct buffering_sink SILICIUM_FINAL : flushable_sink<Element>
+	namespace detail
 	{
+		template <class>
+		void default_construct(std::true_type)
+		{
+		}
+
+		template <class T>
+		T default_construct(std::false_type)
+		{
+			return T{};
+		}
+	}
+
+	template <class T>
+	T default_construct()
+	{
+		return detail::default_construct<T>(std::is_same<T, void>());
+	}
+
+	namespace detail
+	{
+		template <class Error>
+		struct then_impl
+		{
+			Error operator()() const
+			{
+				return Error();
+			}
+
+			template <class First, class ...Tail>
+			Error operator()(First &&first, Tail &&...tail) const
+			{
+				auto error = std::forward<First>(first)();
+				if (error)
+				{
+					return error;
+				}
+				return (*this)(std::forward<Tail>(tail)...);
+			}
+		};
+
+		template <>
+		struct then_impl<void>
+		{
+			void operator()() const
+			{
+			}
+
+			template <class First, class ...Tail>
+			void operator()(First &&first, Tail &&...tail) const
+			{
+				std::forward<First>(first)();
+				return (*this)(std::forward<Tail>(tail)...);
+			}
+		};
+	}
+
+	template <class First, class ...Sequence>
+	auto then(First &&first, Sequence &&...actions)
+	{
+		typedef decltype(std::forward<First>(first)()) result_type;
+		return detail::then_impl<result_type>()(std::forward<First>(first), std::forward<Sequence>(actions)...);
+	}
+
+	template <class Element, class Error, class Buffer = std::array<Element, ((1U << 13U) / sizeof(Element))>>
+	struct buffering_sink SILICIUM_FINAL : flushable_sink<Element, Error>
+	{
+		typedef Element element_type;
+
 		buffering_sink()
 			: m_destination(nullptr)
 		{
 		}
 
-		explicit buffering_sink(sink<Element> &destination, Buffer buffer = Buffer())
+		explicit buffering_sink(sink<Element, Error> &destination, Buffer buffer = Buffer())
 			: m_destination(&destination)
 			, m_fallback_buffer(std::move(buffer))
 			, m_buffer_used(0)
@@ -67,50 +138,56 @@ namespace Si
 			return boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used);
 		}
 
-		void flush_append_space() SILICIUM_OVERRIDE
+		Error flush_append_space() SILICIUM_OVERRIDE
 		{
 			assert(m_destination);
 			if (m_buffer_used)
 			{
-				flush();
+				return flush();
 			}
 			else
 			{
-				m_destination->flush_append_space();
+				return m_destination->flush_append_space();
 			}
 		}
 
-		void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
+		Error append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
 			assert(m_destination);
 			if (static_cast<size_t>(data.size()) <= (m_fallback_buffer.size() - m_buffer_used))
 			{
 				boost::range::copy(data, m_fallback_buffer.begin() + m_buffer_used);
 				m_buffer_used += data.size();
-				return;
+				return default_construct<Error>();
 			}
 
-			flush();
-			m_destination->append(data);
+			return then(
+				[this] { return flush(); },
+				[this, &data] { return m_destination->append(data);
+			});
 		}
 
-		void flush() SILICIUM_OVERRIDE
+		Error flush() SILICIUM_OVERRIDE
 		{
 			assert(m_destination);
-			m_destination->append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used));
-			m_buffer_used = 0;
+			return then(
+				[this] { return m_destination->append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used)); },
+				[this] { m_buffer_used = 0; return Error(); }
+			);
 		}
 
 	private:
 
-		sink<Element> *m_destination;
+		sink<Element, Error> *m_destination;
 		Buffer m_fallback_buffer;
 		std::size_t m_buffer_used;
 	};
 
 	template <class Element, class OutputIterator>
-	struct iterator_sink SILICIUM_FINAL : sink<Element>
+	struct iterator_sink SILICIUM_FINAL : sink<Element, void>
 	{
+		typedef Element element_type;
+
 		explicit iterator_sink(OutputIterator out)
 			: m_out(std::move(out))
 		{
@@ -149,7 +226,7 @@ namespace Si
 		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
 	}
 
-	struct ostream_ref_sink SILICIUM_FINAL : flushable_sink<char>
+	struct ostream_ref_sink SILICIUM_FINAL : flushable_sink<char, void>
 	{
 		ostream_ref_sink()
 			: m_file(nullptr)
@@ -187,7 +264,7 @@ namespace Si
 		std::ostream *m_file;
 	};
 
-	struct ostream_sink SILICIUM_FINAL : flushable_sink<char>
+	struct ostream_sink SILICIUM_FINAL : flushable_sink<char, boost::system::error_code>
 	{
 		//unique_ptr to make ostreams movable
 		explicit ostream_sink(std::unique_ptr<std::ostream> file)
@@ -201,18 +278,21 @@ namespace Si
 			return {};
 		}
 
-		virtual void flush_append_space() SILICIUM_OVERRIDE
+		virtual boost::system::error_code flush_append_space() SILICIUM_OVERRIDE
 		{
+			return {};
 		}
 
-		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
+		virtual boost::system::error_code append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
 		{
 			m_file->write(data.begin(), data.size());
+			return {};
 		}
 
-		virtual void flush() SILICIUM_OVERRIDE
+		virtual boost::system::error_code flush() SILICIUM_OVERRIDE
 		{
 			m_file->flush();
+			return {};
 		}
 
 	private:
@@ -220,25 +300,25 @@ namespace Si
 		std::unique_ptr<std::ostream> m_file;
 	};
 
-	inline std::unique_ptr<flushable_sink<char>> make_file_sink(boost::filesystem::path const &name)
+	inline std::unique_ptr<flushable_sink<char, boost::system::error_code>> make_file_sink(boost::filesystem::path const &name)
 	{
 		std::unique_ptr<std::ostream> file(new std::ofstream(name.string(), std::ios::binary));
 		if (!*file)
 		{
 			throw std::runtime_error("Cannot open file for writing: " + name.string());
 		}
-		return std::unique_ptr<flushable_sink<char>>(new ostream_sink(std::move(file)));
+		return std::unique_ptr<flushable_sink<char, boost::system::error_code>>(new ostream_sink(std::move(file)));
 	}
 
-	template <class Element>
-	struct auto_flush_sink SILICIUM_FINAL : sink<Element>
+	template <class Element, class Error>
+	struct auto_flush_sink SILICIUM_FINAL : sink<Element, Error>
 	{
 		auto_flush_sink()
 			: m_next(nullptr)
 		{
 		}
 
-		explicit auto_flush_sink(flushable_sink<Element> &next)
+		explicit auto_flush_sink(flushable_sink<Element, Error> &next)
 			: m_next(&next)
 		{
 		}
@@ -249,53 +329,160 @@ namespace Si
 			return m_next->make_append_space(size);
 		}
 
-		virtual void flush_append_space() SILICIUM_OVERRIDE
+		virtual Error flush_append_space() SILICIUM_OVERRIDE
 		{
 			assert(m_next);
-			m_next->flush_append_space();
-			m_next->flush();
+			return then(
+				[this] { return m_next->flush_append_space(); },
+				[this] { return m_next->flush(); }
+			);
 		}
 
-		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
+		virtual Error append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
 		{
 			assert(m_next);
-			m_next->append(data);
-			m_next->flush();
+			return then(
+				[this, &data] { return m_next->append(data); },
+				[this] { return m_next->flush(); }
+			);
 		}
 
 	private:
 
-		flushable_sink<Element> *m_next;
+		flushable_sink<Element, Error> *m_next;
 	};
 
-	template <class Element>
-	auto_flush_sink<Element> make_auto_flush_sink(flushable_sink<Element> &next)
+	template <class Element, class Error>
+	auto_flush_sink<Element, Error> make_auto_flush_sink(flushable_sink<Element, Error> &next)
 	{
-		return auto_flush_sink<Element>(next);
+		return auto_flush_sink<Element, Error>(next);
 	}
 
-	template <class Element>
-	void append(Si::sink<Element> &out, std::basic_string<Element> const &str)
+	template <class Element, class Error>
+	Error append(Si::sink<Element, Error> &out, std::basic_string<Element> const &str)
 	{
-		out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
+		return out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
 	}
 
-	template <class Element>
-	void append(Si::sink<Element> &out, boost::container::basic_string<Element> const &str)
+	template <class Element, class Error>
+	Error append(Si::sink<Element, Error> &out, boost::container::basic_string<Element> const &str)
 	{
-		out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
+		return out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));
 	}
 
-	template <class Element>
-	void append(Si::sink<Element> &out, Element const *c_str)
+	template <class Element, class Error>
+	Error append(Si::sink<Element, Error> &out, Element const *c_str)
 	{
-		out.append(boost::make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
+		return out.append(boost::make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
 	}
 
-	template <class Element>
-	void append(Si::sink<Element> &out, Element const &single)
+	template <class Element, class Error>
+	Error append(Si::sink<Element, Error> &out, Element const &single)
 	{
-		out.append(boost::make_iterator_range(&single, &single + 1));
+		return out.append(boost::make_iterator_range(&single, &single + 1));
+	}
+
+	template <class Next>
+	struct throwing_sink : flushable_sink<typename Next::element_type, void>
+	{
+		typedef typename Next::element_type element_type;
+
+		throwing_sink()
+		{
+		}
+
+		explicit throwing_sink(Next next)
+			: next(next)
+		{
+		}
+
+		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		{
+			return next.make_append_space(size);
+		}
+
+		virtual void flush_append_space() SILICIUM_OVERRIDE
+		{
+			auto error = next.flush_append_space();
+			if (error)
+			{
+				throw boost::system::system_error(error);
+			}
+		}
+
+		virtual void append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		{
+			auto error = next.append(data);
+			if (error)
+			{
+				throw boost::system::system_error(error);
+			}
+		}
+
+		virtual void flush() SILICIUM_OVERRIDE
+		{
+			auto error = next.flush();
+			if (error)
+			{
+				throw boost::system::system_error(error);
+			}
+		}
+
+	private:
+
+		Next next;
+	};
+
+	template <class Next>
+	auto make_throwing_sink(Next &&next)
+	{
+		return throwing_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
+	}
+
+	template <class Pointee>
+	struct ptr_sink : flushable_sink<typename Pointee::element_type, boost::system::error_code>
+	{
+		typedef typename Pointee::element_type element_type;
+
+		ptr_sink()
+			: next(nullptr)
+		{
+		}
+
+		explicit ptr_sink(Pointee &next)
+			: next(&next)
+		{
+		}
+
+		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		{
+			return next->make_append_space(size);
+		}
+
+		virtual boost::system::error_code flush_append_space() SILICIUM_OVERRIDE
+		{
+			return next->flush_append_space();
+		}
+
+		virtual boost::system::error_code append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		{
+			return next->append(data);
+		}
+
+		virtual boost::system::error_code flush() SILICIUM_OVERRIDE
+		{
+			return next->flush();
+		}
+
+	private:
+
+		Pointee *next;
+	};
+
+	template <class Pointee>
+	auto ref_sink(Pointee &next)
+	{
+		return ptr_sink<Pointee>(next);
 	}
 }
 

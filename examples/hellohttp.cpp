@@ -16,7 +16,7 @@ namespace
 		{
 			Si::socket_source receiver(*client, yield);
 			Si::socket_sink sender(*client, yield);
-			Si::buffering_sink<char> buffered_sender(sender);
+			Si::buffering_sink<char, boost::system::error_code> buffered_sender(sender);
 			auto buffered_receiver = receiver | Si::buffered(4096);
 			boost::optional<Si::http::request_header> const header = Si::http::parse_header(buffered_receiver);
 			if (!header)
