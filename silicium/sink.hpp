@@ -101,6 +101,7 @@ namespace Si
 
 	template <class First, class ...Sequence>
 	auto then(First &&first, Sequence &&...actions)
+		-> detail::then_impl<decltype(std::forward<First>(first)())>
 	{
 		typedef decltype(std::forward<First>(first)()) result_type;
 		return detail::then_impl<result_type>()(std::forward<First>(first), std::forward<Sequence>(actions)...);
@@ -435,6 +436,7 @@ namespace Si
 
 	template <class Next>
 	auto make_throwing_sink(Next &&next)
+		-> throwing_sink<typename std::decay<Next>::type>
 	{
 		return throwing_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
 	}
@@ -481,6 +483,7 @@ namespace Si
 
 	template <class Pointee>
 	auto ref_sink(Pointee &next)
+		-> ptr_sink<Pointee>
 	{
 		return ptr_sink<Pointee>(next);
 	}
