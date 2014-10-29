@@ -17,7 +17,6 @@ if(WIN32)
 endif()
 
 add_library(silicium ${sources} ${asioSources} ${gitSources} ${linuxSources} ${win32Sources})
-#target_link_libraries(silicium ${Boost_LIBRARIES})
 
 install(TARGETS silicium
 	RUNTIME DESTINATION "bin"
