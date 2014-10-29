@@ -39,7 +39,6 @@ namespace Si
 			explicit directory_changes(boost::filesystem::path const &watched, bool is_recursive);
 			directory_changes &operator = (directory_changes &&other);
 			void async_get_one(observer<element_type> &receiver);
-			void cancel();
 
 		private:
 

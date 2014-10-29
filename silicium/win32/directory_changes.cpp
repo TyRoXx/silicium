@@ -82,10 +82,5 @@ namespace Si
 				Si::exchange(this->receiver_, nullptr)->got_element(std::move(notifications));
 			});
 		}
-
-		void directory_changes::cancel()
-		{
-			throw std::logic_error("to do");
-		}
 	}
 }
