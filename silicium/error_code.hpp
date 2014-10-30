@@ -69,7 +69,11 @@ namespace Si
 	template <class UnderlyingErrorCode, class UnderlyingCategory>
 	inline SILICIUM_NORETURN void throw_error(error_code<UnderlyingErrorCode, UnderlyingCategory> error)
 	{
-		return throw_error(error.to_underlying());
+#ifndef __GNUC__
+		//GCC warns about a return in a "noreturn" function
+		return
+#endif
+			throw_error(error.to_underlying());
 	}
 
 	template <class UnderlyingErrorCode, class UnderlyingCategory>
