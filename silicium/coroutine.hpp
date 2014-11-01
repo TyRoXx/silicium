@@ -92,9 +92,7 @@ namespace Si
 	}
 
 	template <class Element>
-	struct coroutine_observable
-		: private Si::observer<nothing>
-		, public boost::static_visitor<> //TODO make private
+	struct coroutine_observable : private Si::observer<nothing>
 	{
 		typedef Element element_type;
 
@@ -127,18 +125,6 @@ namespace Si
 		{
 			receiver_ = &receiver;
 			next();
-		}
-
-		//TODO make private
-		void operator()(detail::result<element_type *> command)
-		{
-			return Si::exchange(receiver_, nullptr)->got_element(std::move(*command.value));
-		}
-
-		//TODO make private
-		void operator()(detail::yield command)
-		{
-			command.target->async_get_one(*this);
 		}
 
 	private:
@@ -214,7 +200,17 @@ namespace Si
 			if (coro())
 			{
 				command_type command = coro().get();
-				return Si::apply_visitor(*this, command);
+				return Si::visit<void>(
+					command,
+					[this](detail::result<element_type *> command)
+					{
+						return Si::exchange(receiver_, nullptr)->got_element(std::move(*command.value));
+					},
+					[this](detail::yield command)
+					{
+						command.target->async_get_one(*this);
+					}
+				);
 			}
 			else
 			{
