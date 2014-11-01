@@ -92,22 +92,22 @@ namespace Si
 	}
 
 	template <class Element>
-	struct coroutine_observable : private Si::observer<nothing>
+	struct coroutine_generator_observable : private Si::observer<nothing>
 	{
 		typedef Element element_type;
 
-		coroutine_observable()
+		coroutine_generator_observable()
 			: receiver_(nullptr)
 		{
 		}
 
-		coroutine_observable(coroutine_observable &&other)
+		coroutine_generator_observable(coroutine_generator_observable &&other)
 			: receiver_(nullptr)
 		{
 			*this = std::move(other);
 		}
 
-		coroutine_observable &operator = (coroutine_observable &&other)
+		coroutine_generator_observable &operator = (coroutine_generator_observable &&other)
 		{
 			coro_ = std::move(other.coro_);
 			action = std::move(other.action);
@@ -116,7 +116,7 @@ namespace Si
 		}
 
 		template <class Action>
-		explicit coroutine_observable(Action &&action)
+		explicit coroutine_generator_observable(Action &&action)
 			: action(std::forward<Action>(action))
 		{
 		}
@@ -218,14 +218,14 @@ namespace Si
 			}
 		}
 
-		SILICIUM_DELETED_FUNCTION(coroutine_observable(coroutine_observable const &))
-		SILICIUM_DELETED_FUNCTION(coroutine_observable &operator = (coroutine_observable const &))
+		SILICIUM_DELETED_FUNCTION(coroutine_generator_observable(coroutine_generator_observable const &))
+		SILICIUM_DELETED_FUNCTION(coroutine_generator_observable &operator = (coroutine_generator_observable const &))
 	};
 
 	template <class Element, class Action>
-	auto make_coroutine(Action &&action) -> coroutine_observable<Element>
+	auto make_coroutine_generator(Action &&action) -> coroutine_generator_observable<Element>
 	{
-		return coroutine_observable<Element>(std::forward<Action>(action));
+		return coroutine_generator_observable<Element>(std::forward<Action>(action));
 	}
 }
 

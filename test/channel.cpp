@@ -137,12 +137,12 @@ namespace Si
 BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 {
 	Si::channel<int> channel;
-	auto t = Si::make_coroutine<int>([&channel](Si::push_context<int> &yield)
+	auto t = Si::make_coroutine_generator<int>([&channel](Si::push_context<int> &yield)
 	{
 		channel.send(2, yield);
 		channel.send(3, yield);
 	});
-	auto s = Si::make_coroutine<int>([&channel](Si::push_context<int> &yield)
+	auto s = Si::make_coroutine_generator<int>([&channel](Si::push_context<int> &yield)
 	{
 		auto a = yield.get_one(channel.receiver());
 		BOOST_REQUIRE(a);

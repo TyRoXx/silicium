@@ -128,10 +128,10 @@ namespace bf
 	template <class Input, class CommandRange, class MemoryRange>
 	auto execute(Input &&input, CommandRange const &program, MemoryRange &memory, std::size_t original_pointer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> Si::coroutine_observable<boost::uint8_t>
+		-> Si::coroutine_generator_observable<boost::uint8_t>
 #endif
 	{
-		return Si::make_coroutine<boost::uint8_t>([
+		return Si::make_coroutine_generator<boost::uint8_t>([
 			input SILICIUM_CAPTURE(std::forward<Input>(input)),
 			program,
 			&memory,
