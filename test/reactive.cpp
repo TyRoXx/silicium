@@ -1,6 +1,6 @@
 #include <silicium/buffer.hpp>
 #include <silicium/variant_observable.hpp>
-#include <silicium/coroutine.hpp>
+#include <silicium/coroutine_generator.hpp>
 #include <silicium/generator_observable.hpp>
 #include <silicium/consume.hpp>
 #include <silicium/timer.hpp>

@@ -1,4 +1,4 @@
-#include <silicium/coroutine.hpp>
+#include <silicium/coroutine_generator.hpp>
 #include <silicium/consume.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread/future.hpp>

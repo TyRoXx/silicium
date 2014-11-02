@@ -8,6 +8,7 @@
 #include <silicium/virtualized_observable.hpp>
 #include <silicium/virtualized_source.hpp>
 #include <silicium/total_consumer.hpp>
+#include <silicium/coroutine_generator.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
 #include <thread>

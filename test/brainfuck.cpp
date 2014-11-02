@@ -2,7 +2,7 @@
 #include <boost/optional.hpp>
 #include <silicium/transform_if_initialized.hpp>
 #include <silicium/empty.hpp>
-#include <silicium/coroutine.hpp>
+#include <silicium/coroutine_generator.hpp>
 #include <silicium/memory_source.hpp>
 #include <silicium/transforming_source.hpp>
 #include <silicium/for_each.hpp>

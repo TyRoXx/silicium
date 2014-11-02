@@ -2,7 +2,7 @@
 #include <silicium/bridge.hpp>
 #include <silicium/ref.hpp>
 #include <silicium/for_each.hpp>
-#include <silicium/coroutine.hpp>
+#include <silicium/coroutine_generator.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/interprocess/sync/null_mutex.hpp>
 
