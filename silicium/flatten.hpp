@@ -43,6 +43,7 @@ namespace Si
 			receiver_ = std::move(other.receiver_);
 			children = std::move(other.children);
 			children_mutex = std::move(other.children_mutex);
+			is_fetching = other.is_fetching;
 			return *this;
 		}
 #endif
@@ -52,6 +53,7 @@ namespace Si
 			, input_ended(false)
 			, receiver_(nullptr)
 			, children_mutex(make_unique<Mutex>())
+			, is_fetching(false)
 		{
 		}
 
