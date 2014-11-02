@@ -10,6 +10,7 @@
 #include <silicium/transform.hpp>
 #include <silicium/bridge.hpp>
 #include <silicium/enumerate.hpp>
+#include <silicium/constant_observable.hpp>
 #include <silicium/cache.hpp>
 #include <silicium/empty.hpp>
 #include <silicium/thread.hpp>
@@ -345,7 +346,7 @@ namespace
 BOOST_AUTO_TEST_CASE(reactive_timer)
 {
 	boost::asio::io_service io;
-	Si::timer<> t(io, std::chrono::microseconds(1));
+	auto t = Si::make_timer(io, Si::make_constant_observable(std::chrono::microseconds(1)));
 	std::size_t elapsed_count = 0;
 	auto coro = Si::make_total_consumer(Si::make_coroutine_generator<Si::nothing>([&t, &elapsed_count](Si::push_context<> &yield)
 	{

@@ -4,6 +4,7 @@
 #include <silicium/timer.hpp>
 #include <silicium/tuple.hpp>
 #include <silicium/ptr_observable.hpp>
+#include <silicium/constant_observable.hpp>
 
 namespace Si
 {
@@ -13,7 +14,7 @@ namespace Si
 	{
 		typedef typename std::remove_reference<Input>::type clean_input;
 		typedef typename clean_input::element_type element_type;
-		auto delaying_timer = erase_shared(timer<>(io, duration));
+		auto delaying_timer = erase_shared(make_timer(io, make_constant_observable(duration)));
 		auto unpack = [](std::tuple<timer_elapsed, element_type> value)
 		{
 			return std::move(std::get<1>(value));
