@@ -31,63 +31,104 @@ namespace Si
 		{
 			return To(std::forward<From>(from));
 		}
+
+		template <class ErrorCode>
+		struct category
+		{
+			typedef typename std::decay<decltype(std::declval<ErrorCode>().category())>::type type;
+		};
 	}
 
 	template <class Value, class Error = boost::system::error_code>
 	struct error_or
 	{
 		error_or() BOOST_NOEXCEPT
-			: value(Value()) //initialize so that reading the value does not have undefined behaviour
+			: code(0)
+			, value(Value()) //initialize so that reading the value does not have undefined behaviour
 		{
 		}
 
 		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
 		error_or(ConvertibleToValue &&value) BOOST_NOEXCEPT
-			: value(std::forward<ConvertibleToValue>(value))
+			: code(0)
+			, value(std::forward<ConvertibleToValue>(value))
 		{
 		}
 
 		error_or(Error error) BOOST_NOEXCEPT
-			: error_(std::move(error))
-		{
-		}
-
-#ifdef _MSC_VER
-		error_or(error_or &&other) BOOST_NOEXCEPT
-			: error_(std::move(other.error_))
-			, value(std::move(other.value))
+			: code(error.value())
+			, category(&error.category())
 		{
 		}
 
 		error_or(error_or const &other)
-			: error_(other.error_)
-			, value(other.value)
+			: code(other.code)
 		{
-		}
-
-		error_or &operator = (error_or &&other) BOOST_NOEXCEPT
-		{
-			error_ = std::move(other.error_);
-			value = std::move(other.value);
-			return *this;
+			if (other.is_error())
+			{
+				category = other.category;
+			}
+			else
+			{
+				new (&value) Value(other.value);
+			}
 		}
 
 		error_or &operator = (error_or const &other)
 		{
-			error_ = other.error_;
-			value = other.value;
+			error_or copy(other);
+			*this = std::move(copy);
 			return *this;
 		}
-#endif
+
+		error_or(error_or &&other) BOOST_NOEXCEPT
+			: code(other.code)
+		{
+			if (other.is_error())
+			{
+				category = other.category;
+			}
+			else
+			{
+				new (&value) Value(std::move(other.value));
+			}
+		}
+
+		error_or &operator = (error_or &&other) BOOST_NOEXCEPT
+		{
+			if (!is_error())
+			{
+				value.~Value();
+			}
+			code = other.code;
+			if (other.is_error())
+			{
+				category = other.category;
+			}
+			else
+			{
+				new (&value) Value(std::move(other.value));
+			}
+			return *this;
+		}
+
+		~error_or() BOOST_NOEXCEPT
+		{
+			if (!is_error())
+			{
+				value.~Value();
+			}
+		}
 
 		bool is_error() const BOOST_NOEXCEPT
 		{
-			return !!error_;
+			return code != 0;
 		}
 
 		Error error() const BOOST_NOEXCEPT
 		{
-			return error_;
+			assert(is_error());
+			return Error(code, *category);
 		}
 
 		Value &get()
@@ -95,9 +136,9 @@ namespace Si
 			&
 #endif
 		{
-			if (error_)
+			if (is_error())
 			{
-				throw_error(error_);
+				throw_error(error());
 			}
 			return value;
 		}
@@ -105,9 +146,9 @@ namespace Si
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 		Value &&get() &&
 		{
-			if (error_)
+			if (is_error())
 			{
-				throw_error(error_);
+				throw_error(error());
 			}
 			return std::move(value);
 		}
@@ -118,16 +159,16 @@ namespace Si
 			&
 #endif
 		{
-			if (error_)
+			if (is_error())
 			{
-				throw_error(error_);
+				throw_error(error());
 			}
 			return value;
 		}
 
 		Value *get_ptr() BOOST_NOEXCEPT
 		{
-			if (error_)
+			if (is_error())
 			{
 				return nullptr;
 			}
@@ -136,7 +177,7 @@ namespace Si
 
 		Value const *get_ptr() const BOOST_NOEXCEPT
 		{
-			if (error_)
+			if (is_error())
 			{
 				return nullptr;
 			}
@@ -175,7 +216,7 @@ namespace Si
 			}
 			if (is_error())
 			{
-				return error_ == other.error();
+				return error() == other.error();
 			}
 			return value == other.get();
 		}
@@ -201,8 +242,14 @@ namespace Si
 
 	private:
 
-		Error error_;
-		Value value;
+		typedef typename detail::category<Error>::type category_type;
+
+		int code;
+		union
+		{
+			Value value;
+			category_type const *category;
+		};
 	};
 
 	template <class T>
