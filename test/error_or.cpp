@@ -2,13 +2,22 @@
 #include <boost/test/unit_test.hpp>
 #include <system_error>
 
-BOOST_AUTO_TEST_CASE(error_or_no_throw)
+BOOST_AUTO_TEST_CASE(error_or_from_value)
 {
 	Si::error_or<int> value(2);
 	BOOST_CHECK(!value.is_error());
 	BOOST_REQUIRE(value.get_ptr());
 	BOOST_CHECK_EQUAL(2, *value.get_ptr());
 	BOOST_CHECK_EQUAL(2, value.get());
+}
+
+BOOST_AUTO_TEST_CASE(error_or_from_value_const)
+{
+	Si::error_or<int> const value(2);
+	BOOST_CHECK(!value.is_error());
+	BOOST_CHECK_EQUAL(2, value.get());
+	BOOST_REQUIRE(value.get_ptr());
+	BOOST_CHECK_EQUAL(2, *value.get_ptr());
 }
 
 BOOST_AUTO_TEST_CASE(error_or_movable_only)
@@ -23,16 +32,96 @@ BOOST_AUTO_TEST_CASE(error_or_movable_only)
 	BOOST_CHECK_EQUAL(2, *v);
 }
 
-BOOST_AUTO_TEST_CASE(error_or_const)
+struct expected_exception : std::exception
 {
-	Si::error_or<int> const value(2);
-	BOOST_CHECK(!value.is_error());
-	BOOST_CHECK_EQUAL(2, value.get());
-	BOOST_REQUIRE(value.get_ptr());
-	BOOST_CHECK_EQUAL(2, *value.get_ptr());
+};
+
+struct throws_on_copy_construction
+{
+	bool active = true;
+
+	throws_on_copy_construction()
+	{
+	}
+
+	throws_on_copy_construction(throws_on_copy_construction const &other)
+		: active(other.active)
+	{
+		if (active)
+		{
+			throw expected_exception();
+		}
+	}
+
+	throws_on_copy_construction &operator = (throws_on_copy_construction const &) = delete;
+};
+
+BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_value_throws)
+{
+	BOOST_CHECK_EXCEPTION(
+		[]()
+	{
+		throws_on_copy_construction const original;
+		Si::error_or<throws_on_copy_construction> e((original));
+	}(),
+		expected_exception,
+		[](expected_exception const &)
+	{
+		return true;
+	});
 }
 
-BOOST_AUTO_TEST_CASE(error_or_throw)
+BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_error_or_throws)
+{
+	throws_on_copy_construction original;
+	original.active = false;
+	Si::error_or<throws_on_copy_construction> e(original);
+	e.get_ptr()->active = true;
+	BOOST_CHECK_EXCEPTION(
+		[&e]()
+	{
+		Si::error_or<throws_on_copy_construction> f((e));
+	}(),
+		expected_exception,
+		[](expected_exception const &)
+	{
+		return true;
+	});
+}
+
+struct throws_on_assignment
+{
+	throws_on_assignment()
+	{
+	}
+
+	throws_on_assignment(throws_on_assignment const &)
+	{
+	}
+
+	throws_on_assignment &operator = (throws_on_assignment const &)
+	{
+		throw expected_exception();
+	}
+};
+
+BOOST_AUTO_TEST_CASE(error_or_copy_assignment_from_value_throws)
+{
+	Si::error_or<throws_on_assignment> e((throws_on_assignment()));
+	BOOST_CHECK_EXCEPTION(
+		[&e]()
+	{
+		throws_on_assignment const original;
+		e = original;
+	}(),
+		expected_exception,
+		[](expected_exception const &)
+	{
+		return true;
+	});
+}
+
+BOOST_AUTO_TEST_CASE(error_or_throwing_get)
 {
 	boost::system::error_code const ec(123, boost::system::native_ecat);
 	Si::error_or<int> error(ec);

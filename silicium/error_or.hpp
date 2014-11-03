@@ -55,6 +55,18 @@ namespace Si
 		{
 		}
 
+		error_or(Value &&value) BOOST_NOEXCEPT
+			: code(0)
+			, value(std::move(value))
+		{
+		}
+
+		error_or(Value const &value)
+			: code(0)
+			, value(value)
+		{
+		}
+
 		error_or(Error error) BOOST_NOEXCEPT
 			: code(error.value())
 			, category(&error.category())
@@ -74,13 +86,6 @@ namespace Si
 			}
 		}
 
-		error_or &operator = (error_or const &other)
-		{
-			error_or copy(other);
-			*this = std::move(copy);
-			return *this;
-		}
-
 		error_or(error_or &&other) BOOST_NOEXCEPT
 			: code(other.code)
 		{
@@ -96,18 +101,65 @@ namespace Si
 
 		error_or &operator = (error_or &&other) BOOST_NOEXCEPT
 		{
-			if (!is_error())
+			if (is_error())
 			{
-				value.~Value();
-			}
-			code = other.code;
-			if (other.is_error())
-			{
-				category = other.category;
+				code = other.code;
+				if (other.is_error())
+				{
+					category = other.category;
+				}
+				else
+				{
+					new (&value) Value(std::move(other.value));
+				}
 			}
 			else
 			{
-				new (&value) Value(std::move(other.value));
+				if (other.is_error())
+				{
+					value.~Value();
+					code = other.code;
+					category = other.category;
+				}
+				else
+				{
+					value = std::move(other.value);
+				}
+			}
+			return *this;
+		}
+
+		error_or &operator = (error_or const &other)
+		{
+			error_or copy(other);
+			*this = std::move(copy);
+			return *this;
+		}
+
+		error_or &operator = (Value &&other) BOOST_NOEXCEPT
+		{
+			if (is_error())
+			{
+				code = 0;
+				new (&value) Value(std::move(other));
+			}
+			else
+			{
+				value = std::move(other);
+			}
+			return *this;
+		}
+
+		error_or &operator = (Value const &other)
+		{
+			if (is_error())
+			{
+				code = 0;
+				new (&value) Value(other);
+			}
+			else
+			{
+				value = other;
 			}
 			return *this;
 		}
