@@ -101,6 +101,18 @@ namespace Si
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 
+	template <class To, class From>
+	To function_ptr_cast(From from)
+	{
+		//TODO: check that the cast makes sense
+#ifdef __GNUC__
+		//silence Warnung: ISO C++ forbids casting between pointer-to-function and pointer-to-object [enabled by default]
+		__extension__
+#endif
+		To result = reinterpret_cast<To>(from);
+		return result;
+	}
+
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 }
