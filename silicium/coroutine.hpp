@@ -42,11 +42,13 @@ namespace Si
 
 		coroutine_observable()
 			: receiver_(nullptr)
+			, has_finished(false)
 		{
 		}
 
 		coroutine_observable(coroutine_observable &&other)
 			: receiver_(nullptr)
+			, has_finished(false)
 		{
 			*this = std::move(other);
 		}
@@ -55,6 +57,7 @@ namespace Si
 		explicit coroutine_observable(Action &&action)
 			: action(std::forward<Action>(action))
 			, receiver_(nullptr)
+			, has_finished(false)
 		{
 		}
 
@@ -63,6 +66,7 @@ namespace Si
 			coro_ = std::move(other.coro_);
 			action = std::move(other.action);
 			receiver_ = std::move(other.receiver_);
+			has_finished = other.has_finished;
 			return *this;
 		}
 
@@ -93,6 +97,7 @@ namespace Si
 		coroutine_holder coro_;
 		std::function<Element (yield_context)> action;
 		Si::observer<Element> *receiver_;
+		bool has_finished;
 
 		coroutine_type &coro()
 		{
@@ -115,6 +120,10 @@ namespace Si
 
 		void next()
 		{
+			if (has_finished)
+			{
+				return Si::exchange(receiver_, nullptr)->ended();
+			}
 			if (action)
 			{
 				auto bound_action = action;
@@ -135,6 +144,8 @@ namespace Si
 							detail::coroutine_yield_context yield_impl(push);
 							yield_context yield(yield_impl); //TODO: save this indirection
 							auto result = bound_action(yield);
+							assert(!has_finished);
+							has_finished = true;
 							Si::exchange(receiver_, nullptr)->got_element(std::move(result));
 						});
 				action = nullptr;

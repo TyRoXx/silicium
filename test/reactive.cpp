@@ -342,20 +342,3 @@ namespace
 		BOOST_CHECK(expected == generated);
 	}
 }
-
-BOOST_AUTO_TEST_CASE(reactive_timer)
-{
-	boost::asio::io_service io;
-	auto t = Si::make_timer(io, Si::make_constant_observable(std::chrono::microseconds(1)));
-	std::size_t elapsed_count = 0;
-	auto coro = Si::make_total_consumer(Si::make_coroutine_generator<Si::nothing>([&t, &elapsed_count](Si::push_context<> &yield)
-	{
-		BOOST_REQUIRE_EQUAL(0U, elapsed_count);
-		boost::optional<Si::timer_elapsed> e = yield.get_one(t);
-		BOOST_REQUIRE(e);
-		++elapsed_count;
-	}));
-	coro.start();
-	io.run();
-	BOOST_CHECK_EQUAL(1U, elapsed_count);
-}
