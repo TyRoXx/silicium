@@ -1,7 +1,11 @@
 #include <silicium/error_or.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/unordered_map.hpp>
+#include <boost/container/map.hpp>
 #include <system_error>
+#include <unordered_map>
+#include <map>
 
 BOOST_AUTO_TEST_CASE(error_or_from_value)
 {
@@ -328,4 +332,60 @@ BOOST_AUTO_TEST_CASE(error_or_copyable_in_container)
 	BOOST_CHECK(w == v);
 	BOOST_CHECK_EQUAL("Hello", w[0].get());
 	BOOST_CHECK(boost::system::error_code(23, boost::system::system_category()) == w[1]);
+}
+
+namespace boost
+{
+	// teach Boost.Test how to print std::pair
+	template <typename K, typename V>
+	wrap_stringstream &operator << (wrap_stringstream &wrapped, std::pair<const K, V> const &item)
+	{
+		return wrapped << '{' << item.first << ", " << item.second << '}';
+	}
+}
+
+namespace
+{
+	template <class Tree, class Hash>
+	void test_error_or_as_map_key()
+	{
+		Tree tree;
+		Hash hash;
+		for (int i = 0; i < 1000; ++i)
+		{
+			std::pair<Si::error_or<int>, long> entry(Si::error_or<int>(i), i);
+			tree.insert(entry);
+			BOOST_CHECK_EQUAL(1, tree.count(entry.first));
+			hash.insert(entry);
+			BOOST_CHECK_EQUAL(1, hash.count(entry.first));
+		}
+		for (int i = 1000; i < 2000; ++i)
+		{
+			std::pair<Si::error_or<int>, long> entry(Si::error_or<int>(boost::system::error_code(i, boost::system::system_category())), 1000 + i);
+			tree.insert(entry);
+			BOOST_CHECK_EQUAL(1, tree.count(entry.first));
+			hash.insert(entry);
+			BOOST_CHECK_EQUAL(1, hash.count(entry.first));
+		}
+		BOOST_CHECK_EQUAL(2000, tree.size());
+		BOOST_CHECK_EQUAL(2000, hash.size());
+		boost::container::map<Si::error_or<int>, long> tree_from_hash(hash.begin(), hash.end());
+		BOOST_CHECK_EQUAL_COLLECTIONS(tree.begin(), tree.end(), tree_from_hash.begin(), tree_from_hash.end());
+	}
+}
+
+BOOST_AUTO_TEST_CASE(error_or_as_boost_map_key)
+{
+	test_error_or_as_map_key<
+		boost::container::map<Si::error_or<int>, long>,
+		boost::unordered_map<Si::error_or<int>, long>
+		>();
+}
+
+BOOST_AUTO_TEST_CASE(error_or_as_std_map_key)
+{
+	test_error_or_as_map_key<
+		std::map<Si::error_or<int>, long>,
+		std::unordered_map<Si::error_or<int>, long>
+		>();
 }

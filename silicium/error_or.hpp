@@ -4,6 +4,7 @@
 #include <silicium/optional.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/functional/hash.hpp>
 #include <system_error>
 
 namespace Si
@@ -339,9 +340,51 @@ namespace Si
 	}
 
 	template <class Value, class Error>
+	bool operator < (error_or<Value, Error> const &left, error_or<Value, Error> const &right)
+	{
+		if (left.is_error())
+		{
+			if (right.is_error())
+			{
+				return left.error() < right.error();
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if (right.is_error())
+			{
+				return false;
+			}
+			else
+			{
+				return left.get() < right.get();
+			}
+		}
+	}
+
+	//TODO: overload all operators
+
+	template <class Value, class Error>
+	std::size_t hash_value(error_or<Value, Error> const &value)
+	{
+		if (value.is_error())
+		{
+			return boost::hash<Error>()(value.error());
+		}
+		else
+		{
+			return boost::hash<Value>()(value.get());
+		}
+	}
+
+	template <class Value, class Error>
 	std::ostream &operator << (std::ostream &out, error_or<Value, Error> const &value)
 	{
-		if (value.error())
+		if (value.is_error())
 		{
 			return out << value.error();
 		}
@@ -358,6 +401,18 @@ namespace Si
 		}
 		return std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get());
 	}
+}
+
+namespace std
+{
+	template <class Value, class Error>
+	struct hash<Si::error_or<Value, Error>>
+	{
+		std::size_t operator()(Si::error_or<Value, Error> const &value) const
+		{
+			return hash_value(value);
+		}
+	};
 }
 
 #endif
