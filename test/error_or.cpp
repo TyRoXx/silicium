@@ -1,4 +1,5 @@
 #include <silicium/error_or.hpp>
+#include <silicium/noexcept_string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <system_error>
 
@@ -18,6 +19,13 @@ BOOST_AUTO_TEST_CASE(error_or_from_value_const)
 	BOOST_CHECK_EQUAL(2, value.get());
 	BOOST_REQUIRE(value.get_ptr());
 	BOOST_CHECK_EQUAL(2, *value.get_ptr());
+}
+
+BOOST_AUTO_TEST_CASE(error_or_convert_from_value)
+{
+	Si::error_or<Si::noexcept_string> const value("C string literal");
+	BOOST_CHECK(!value.is_error());
+	BOOST_CHECK_EQUAL("C string literal", value.get());
 }
 
 BOOST_AUTO_TEST_CASE(error_or_movable_only)
@@ -105,20 +113,27 @@ struct throws_on_assignment
 	}
 };
 
-BOOST_AUTO_TEST_CASE(error_or_copy_assignment_from_value_throws)
+BOOST_AUTO_TEST_CASE(error_or_copy_assignment_from_value_to_success_throws)
 {
-	Si::error_or<throws_on_assignment> e((throws_on_assignment()));
+	Si::error_or<throws_on_assignment> to((throws_on_assignment()));
 	BOOST_CHECK_EXCEPTION(
-		[&e]()
+		[&to]()
 	{
 		throws_on_assignment const original;
-		e = original;
+		to = original;
 	}(),
 		expected_exception,
 		[](expected_exception const &)
 	{
 		return true;
 	});
+}
+
+BOOST_AUTO_TEST_CASE(error_or_copy_assignment_from_value_to_error)
+{
+	Si::error_or<throws_on_assignment> e(boost::system::error_code(23, boost::system::system_category()));
+	throws_on_assignment const original;
+	e = original; //should not throw because of the value is copy-constructed
 }
 
 BOOST_AUTO_TEST_CASE(error_or_throwing_get)
@@ -292,4 +307,25 @@ BOOST_AUTO_TEST_CASE(error_or_not_equal)
 
 	BOOST_CHECK_NE(a, 3);
 	BOOST_CHECK_NE(a, (boost::system::error_code(2 BOOST_PP_COMMA() boost::system::generic_category())));
+}
+
+BOOST_AUTO_TEST_CASE(error_or_move_only_in_container)
+{
+	std::vector<Si::error_or<std::unique_ptr<int>>> v;
+	v.emplace_back(Si::make_unique<int>(3));
+	v.emplace_back(boost::system::error_code(23, boost::system::system_category()));
+	auto w = std::move(v);
+	BOOST_CHECK_EQUAL(3, **w[0].get_ptr());
+	BOOST_CHECK(boost::system::error_code(23, boost::system::system_category()) == w[1]);
+}
+
+BOOST_AUTO_TEST_CASE(error_or_copyable_in_container)
+{
+	std::vector<Si::error_or<Si::noexcept_string>> v;
+	v.emplace_back("Hello");
+	v.emplace_back(boost::system::error_code(23, boost::system::system_category()));
+	auto w = v;
+	BOOST_CHECK(w == v);
+	BOOST_CHECK_EQUAL("Hello", w[0].get());
+	BOOST_CHECK(boost::system::error_code(23, boost::system::system_category()) == w[1]);
 }
