@@ -6,38 +6,47 @@
 
 namespace Si
 {
-	struct tcp_trigger
+	namespace asio
 	{
-		explicit tcp_trigger(boost::asio::io_service &io, boost::asio::ip::tcp::endpoint address);
-		template <class Handler>
-		void async_wait(Handler handler);
-
-	private:
-
-		boost::asio::ip::tcp::acceptor m_acceptor;
-		std::unique_ptr<boost::asio::ip::tcp::socket> m_accepting;
-	};
-
-	template <class Handler>
-	void tcp_trigger::async_wait(Handler handler)
-	{
-		if (m_accepting)
+		struct tcp_trigger
 		{
-			m_accepting->close();
+			explicit tcp_trigger(boost::asio::io_service &io, boost::asio::ip::tcp::endpoint address);
+
+			template <class Handler>
+			void async_wait(Handler handler);
+
+		private:
+
+			boost::asio::ip::tcp::acceptor m_acceptor;
+			std::unique_ptr<boost::asio::ip::tcp::socket> m_accepting;
+		};
+
+		inline tcp_trigger::tcp_trigger(boost::asio::io_service &io, boost::asio::ip::tcp::endpoint address)
+			: m_acceptor(io, address, true)
+		{
 		}
-		m_accepting.reset(new boost::asio::ip::tcp::socket(m_acceptor.get_io_service()));
-		m_acceptor.async_accept(*m_accepting, [this, handler](boost::system::error_code error)
+
+		template <class Handler>
+		void tcp_trigger::async_wait(Handler handler)
 		{
-			if (error)
+			if (m_accepting)
 			{
-				//TODO
+				m_accepting->close();
 			}
-			else
+			m_accepting.reset(new boost::asio::ip::tcp::socket(m_acceptor.get_io_service()));
+			m_acceptor.async_accept(*m_accepting, [this, handler](boost::system::error_code error)
 			{
-				m_accepting->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-				handler();
-			}
-		});
+				if (error)
+				{
+					//TODO
+				}
+				else
+				{
+					m_accepting->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+					handler();
+				}
+			});
+		}
 	}
 }
 

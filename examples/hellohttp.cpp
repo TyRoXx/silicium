@@ -14,8 +14,8 @@ namespace
 	{
 		try
 		{
-			Si::socket_source receiver(*client, yield);
-			Si::socket_sink sender(*client, yield);
+			Si::asio::socket_source receiver(*client, yield);
+			Si::asio::socket_sink sender(*client, yield);
 			Si::buffering_sink<char, boost::system::error_code> buffered_sender(sender);
 			auto buffered_receiver = receiver | Si::buffered(4096);
 			boost::optional<Si::http::request_header> const header = Si::http::parse_header(buffered_receiver);
@@ -59,7 +59,7 @@ int main()
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
 	boost::asio::spawn(io, [&acceptor](boost::asio::yield_context yield)
 	{
-		Si::accepting_source clients(acceptor, yield);
+		Si::asio::accepting_source clients(acceptor, yield);
 		for (auto client : clients | Si::buffered(1))
 		{
 			boost::asio::spawn(acceptor.get_io_service(), std::bind(serve_client, client, std::placeholders::_1));

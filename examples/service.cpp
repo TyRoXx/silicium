@@ -47,8 +47,8 @@ namespace
 					{
 						try
 						{
-							Si::socket_source request_source(*client, yield);
-							Si::socket_sink response_sink(*client, yield);
+							Si::asio::socket_source request_source(*client, yield);
+							Si::asio::socket_sink response_sink(*client, yield);
 							handle_request(request_source, response_sink, yield);
 						}
 						catch (boost::system::system_error const &)
@@ -301,7 +301,7 @@ int main(int argc, char **argv)
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 12345));
 	boost::asio::spawn(io, [&acceptor, &current_build, &build](boost::asio::yield_context yield)
 	{
-		Si::accepting_source clients(acceptor, yield);
+		Si::asio::accepting_source clients(acceptor, yield);
 		for (auto client : (clients | Si::buffered(1)))
 		{
 			(void)client;
