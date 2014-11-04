@@ -82,6 +82,11 @@ if(LUA51_FOUND)
 	include_directories(SYSTEM ${LUA_INCLUDE_DIR})
 endif()
 
+find_package(ZLIB)
+if(ZLIB_FOUND)
+	include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
+endif()
+
 include_directories(".")
 add_subdirectory("silicium")
 add_subdirectory("test")
