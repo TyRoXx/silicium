@@ -1,5 +1,6 @@
 #include <silicium/sink.hpp>
 #include <silicium/source.hpp>
+#include <silicium/fast_variant.hpp>
 #include <boost/test/unit_test.hpp>
 #include <zlib.h>
 
@@ -166,7 +167,7 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(zlib_inflate_stream &operator = (zlib_inflate_stream const &))
 	};
 
-	BOOST_AUTO_TEST_CASE(zlib_deflate)
+	BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 	{
 		zlib_deflate_stream deflator(Z_DEFAULT_COMPRESSION);
 		std::string const original = "Hello";
@@ -188,5 +189,83 @@ namespace Si
 		auto const decompressed_length = decompressed.size() - decompress_result.second;
 		BOOST_REQUIRE_EQUAL(original.size(), decompressed_length);
 		BOOST_CHECK_EQUAL(original, std::string(decompressed.begin(), decompressed.begin() + decompressed_length));
+	}
+
+	struct flush
+	{
+	};
+
+	typedef fast_variant<flush, boost::iterator_range<char const *>> zlib_sink_element;
+
+	template <class Next>
+	struct zlib_deflating_sink : sink<zlib_sink_element>
+	{
+		typedef zlib_sink_element element_type;
+
+		zlib_deflating_sink()
+		{
+		}
+
+		explicit zlib_deflating_sink(Next next)
+			: m_next(std::move(next))
+		{
+		}
+
+		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		{
+			boost::ignore_unused_variable_warning(size);
+			return {};
+		}
+
+		virtual boost::system::error_code flush_append_space() SILICIUM_OVERRIDE
+		{
+			return {};
+		}
+
+		virtual boost::system::error_code append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		{
+			for (element_type const &piece : data)
+			{
+				auto piece_content_and_flag = visit<std::pair<boost::iterator_range<char const *>, int>>(
+					piece,
+					[](flush)
+					{
+						return std::make_pair(boost::iterator_range<char const *>(), Z_FULL_FLUSH /* ?? */);
+					},
+						[](boost::iterator_range<char const *> content)
+					{
+						return std::make_pair(content, Z_NO_FLUSH);
+					}
+				);
+				char const *next_in = piece_content_and_flag.first.begin();
+				do
+				{
+					auto rest = boost::make_iterator_range(next_in, piece_content_and_flag.first.end());
+					boost::iterator_range<char *> buffer = m_next.make_append_space(std::max<size_t>(rest.size(), 4096));
+					auto result = m_stream.deflate(rest, buffer, piece_content_and_flag.second);
+					std::size_t written = buffer.size() - result.second;
+					m_next.make_append_space(written);
+					m_next.flush_append_space();
+					next_in += (rest.size() - result.first);
+				}
+				while (next_in != piece_content_and_flag.first.end());
+			}
+			return {};
+		}
+
+	private:
+
+		Next m_next;
+		zlib_deflate_stream m_stream;
+	};
+
+	template <class Next>
+	auto make_deflating_sink(Next &&next)
+	{
+		return zlib_deflating_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
+	}
+
+	BOOST_AUTO_TEST_CASE(zlib_sink)
+	{
 	}
 }
