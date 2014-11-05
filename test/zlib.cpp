@@ -232,7 +232,7 @@ namespace Si
 					{
 						return std::make_pair(boost::iterator_range<char const *>(), Z_FULL_FLUSH /* ?? */);
 					},
-						[](boost::iterator_range<char const *> content)
+					[](boost::iterator_range<char const *> content)
 					{
 						return std::make_pair(content, Z_NO_FLUSH);
 					}
