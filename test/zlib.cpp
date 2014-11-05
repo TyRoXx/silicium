@@ -177,6 +177,7 @@ namespace Si
 			Z_FULL_FLUSH
 		);
 		BOOST_CHECK_EQUAL(0, compress_result.first);
+		BOOST_CHECK_LT(compress_result.second, compressed.size());
 		std::array<char, 4096> decompressed;
 		zlib_inflate_stream inflator = zlib_inflate_stream::initialize();
 		std::pair<std::size_t, std::size_t> decompress_result = inflator.inflate(
