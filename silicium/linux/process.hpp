@@ -1,7 +1,7 @@
 #ifndef SILICIUM_LINUX_PROCESS_HPP
 #define SILICIUM_LINUX_PROCESS_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/ptr_sink.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/file_descriptor.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -17,7 +17,7 @@ namespace Si
 		{
 			for (;;)
 			{
-				buffering_sink<char, Error> buffer_helper(destination);
+				auto buffer_helper = make_buffering_sink(ref_sink(destination));
 				auto const buffer = buffer_helper.make_append_space(std::numeric_limits<std::size_t>::max());
 				assert(!buffer.empty());
 				auto const rc = read(source, buffer.begin(), buffer.size());

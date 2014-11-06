@@ -6,9 +6,10 @@
 namespace Si
 {
 	template <class Pointee>
-	struct ptr_sink : flushable_sink<typename Pointee::element_type, boost::system::error_code>
+	struct ptr_sink : sink<typename Pointee::element_type, typename Pointee::error_type>
 	{
 		typedef typename Pointee::element_type element_type;
+		typedef typename Pointee::error_type error_type;
 
 		ptr_sink()
 			: next(nullptr)
@@ -25,19 +26,14 @@ namespace Si
 			return next->make_append_space(size);
 		}
 
-		virtual boost::system::error_code flush_append_space() SILICIUM_OVERRIDE
+		virtual error_type flush_append_space() SILICIUM_OVERRIDE
 		{
 			return next->flush_append_space();
 		}
 
-		virtual boost::system::error_code append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		virtual error_type append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			return next->append(data);
-		}
-
-		virtual boost::system::error_code flush() SILICIUM_OVERRIDE
-		{
-			return next->flush();
 		}
 
 	private:

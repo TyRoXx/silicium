@@ -367,7 +367,7 @@ int main(int argc, char **argv)
 		(*response.arguments)["Content-Type"] = "text/html";
 		(*response.arguments)["Connection"] = "close";
 
-		Si::buffering_sink<char, boost::system::error_code> buffered_out(out);
+		auto buffered_out = make_buffering_sink(ref_sink(out));
 		write_header(buffered_out, response);
 		append(buffered_out, body);
 		buffered_out.flush();

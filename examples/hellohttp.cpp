@@ -4,6 +4,7 @@
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/buffering_source.hpp>
 #include <silicium/config.hpp>
+#include <silicium/ptr_sink.hpp>
 #include <boost/format.hpp>
 
 namespace
@@ -16,7 +17,7 @@ namespace
 		{
 			Si::asio::socket_source receiver(*client, yield);
 			Si::asio::socket_sink sender(*client, yield);
-			Si::buffering_sink<char, boost::system::error_code> buffered_sender(sender);
+			auto buffered_sender = Si::make_buffering_sink(Si::ref_sink(sender));
 			auto buffered_receiver = receiver | Si::buffered(4096);
 			boost::optional<Si::http::request_header> const header = Si::http::parse_header(buffered_receiver);
 			if (!header)

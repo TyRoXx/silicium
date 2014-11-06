@@ -7,9 +7,10 @@
 namespace Si
 {
 	template <class Next>
-	struct throwing_sink : flushable_sink<typename Next::element_type, void>
+	struct throwing_sink : sink<typename Next::element_type, void>
 	{
 		typedef typename Next::element_type element_type;
+		typedef void error_type;
 
 		throwing_sink()
 		{
@@ -25,7 +26,7 @@ namespace Si
 			return next.make_append_space(size);
 		}
 
-		virtual void flush_append_space() SILICIUM_OVERRIDE
+		virtual error_type flush_append_space() SILICIUM_OVERRIDE
 		{
 			auto error = next.flush_append_space();
 			if (error)
@@ -34,18 +35,9 @@ namespace Si
 			}
 		}
 
-		virtual void append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		virtual error_type append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			auto error = next.append(data);
-			if (error)
-			{
-				throw boost::system::system_error(error);
-			}
-		}
-
-		virtual void flush() SILICIUM_OVERRIDE
-		{
-			auto error = next.flush();
 			if (error)
 			{
 				throw boost::system::system_error(error);

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_COPY_HPP
 #define SILICIUM_COPY_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/ptr_sink.hpp>
 #include <silicium/source.hpp>
 
 namespace Si
@@ -11,7 +11,7 @@ namespace Si
 	{
 		for (;;)
 		{
-			buffering_sink<T, Error, std::array<T, 1>> buffer(to);
+			auto buffer = make_buffering_sink(ref_sink(to));
 			auto space = buffer.make_append_space(1);
 			auto copied_until = from.copy_next(space);
 			if (copied_until == space.begin())

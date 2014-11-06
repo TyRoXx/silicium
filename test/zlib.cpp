@@ -60,6 +60,17 @@ namespace Si
 			handle_zlib_status(deflateInit(&*m_stream, level));
 		}
 
+		zlib_deflate_stream(zlib_deflate_stream &&other) BOOST_NOEXCEPT
+		{
+			swap(m_stream, other.m_stream);
+		}
+
+		zlib_deflate_stream &operator = (zlib_deflate_stream &&other) BOOST_NOEXCEPT
+		{
+			swap(m_stream, other.m_stream);
+			return *this;
+		}
+
 		~zlib_deflate_stream() BOOST_NOEXCEPT
 		{
 			if (!m_stream)
@@ -76,8 +87,6 @@ namespace Si
 			) BOOST_NOEXCEPT
 		{
 			assert(m_stream);
-			assert(original.begin());
-			assert(original.size());
 			assert(deflated.begin());
 			assert(deflated.size());
 			m_stream->next_in = reinterpret_cast<Bytef *>(const_cast<char *>(original.begin()));
@@ -206,10 +215,17 @@ namespace Si
 		{
 		}
 
-		explicit zlib_deflating_sink(Next next)
+		explicit zlib_deflating_sink(Next next, zlib_deflate_stream stream)
 			: m_next(std::move(next))
+			, m_stream(std::move(stream))
 		{
 		}
+
+		BOOST_DEFAULTED_FUNCTION(zlib_deflating_sink(zlib_deflating_sink &&other),
+			: m_next(std::move(other.m_next))
+			BOOST_PP_COMMA() m_stream(std::move(other.m_stream))
+		{
+		})
 
 		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
 		{
@@ -242,6 +258,7 @@ namespace Si
 				{
 					auto rest = boost::make_iterator_range(next_in, piece_content_and_flag.first.end());
 					boost::iterator_range<char *> buffer = m_next.make_append_space(std::max<size_t>(rest.size(), 4096));
+					assert(!buffer.empty());
 					auto result = m_stream.deflate(rest, buffer, piece_content_and_flag.second);
 					std::size_t written = buffer.size() - result.second;
 					m_next.make_append_space(written);
@@ -260,12 +277,23 @@ namespace Si
 	};
 
 	template <class Next>
-	auto make_deflating_sink(Next &&next)
+	auto make_deflating_sink(Next &&next, zlib_deflate_stream stream)
 	{
-		return zlib_deflating_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
+		return zlib_deflating_sink<typename std::decay<Next>::type>(std::forward<Next>(next), std::move(stream));
+	}
+
+	template <class C>
+	auto make_c_str_range(C const *str)
+	{
+		return boost::make_iterator_range(str, str + std::char_traits<C>::length(str));
 	}
 
 	BOOST_AUTO_TEST_CASE(zlib_sink)
 	{
+		std::vector<char> compressed;
+		auto compressor = make_deflating_sink(make_buffering_sink(make_container_sink(compressed)), zlib_deflate_stream(Z_DEFAULT_COMPRESSION));
+		append(compressor, zlib_sink_element{make_c_str_range("Hello")});
+		append(compressor, zlib_sink_element{flush{}});
+		BOOST_CHECK_GE(compressed.size(), 1);
 	}
 }
