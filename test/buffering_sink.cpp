@@ -24,8 +24,6 @@ BOOST_AUTO_TEST_CASE(buffering_sink_make_append_space)
 	space[0] = 3;
 	BOOST_CHECK(v.empty());
 	buffer.flush_append_space();
-	BOOST_CHECK(v.empty());
-	buffer.flush();
 	BOOST_CHECK(!v.empty());
 	std::vector<int> const expected{3};
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), v.begin(), v.end());
