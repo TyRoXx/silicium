@@ -5,6 +5,7 @@
 #include <silicium/fast_variant.hpp>
 #include <silicium/file_descriptor.hpp>
 #include <silicium/memory_range.hpp>
+#include <sys/uio.h>
 
 namespace Si
 {
@@ -38,15 +39,61 @@ namespace Si
 
 		virtual error_type append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
-			for (auto &element : data)
+			boost::optional<size_t> write_streak_length;
+			size_t i = 0;
+			auto flush_writes = [&, this]() -> error_type
 			{
-				error_type err = append_one(element);
+				if (!write_streak_length)
+				{
+					return error_type();
+				}
+				if (*write_streak_length == 1)
+				{
+					auto error = write_piece(*try_get_ptr<memory_range>(*(data.begin() + i - *write_streak_length)));
+					write_streak_length = boost::none;
+					return error;
+				}
+				else
+				{
+					auto error = write_vector(data.begin() + i - *write_streak_length, data.begin() + i);
+					write_streak_length = boost::none;
+					return error;
+				}
+			};
+			for (; i < data.size(); ++i)
+			{
+				auto &element = data[i];
+				int const max_streak_length = 1024;
+				if (try_get_ptr<memory_range>(element))
+				{
+					if (write_streak_length)
+					{
+						++(*write_streak_length);
+						if (*write_streak_length < max_streak_length)
+						{
+							continue;
+						}
+					}
+					else
+					{
+						write_streak_length = 1;
+						continue;
+					}
+				}
+
+				error_type err = flush_writes();
+				if (err)
+				{
+					return err;
+				}
+
+				err = append_one(element);
 				if (err)
 				{
 					return err;
 				}
 			}
-			return error_type();
+			return flush_writes();
 		}
 
 	private:
@@ -112,6 +159,25 @@ namespace Si
 					return error_type();
 				}
 			);
+		}
+
+		error_type write_vector(element_type const *begin, element_type const *end)
+		{
+			std::vector<iovec> vector(std::distance(begin, end));
+			for (size_t i = 0; i < vector.size(); ++i, ++begin)
+			{
+				memory_range const &piece = *try_get_ptr<memory_range>(*begin);
+				vector[i].iov_base = const_cast<void *>(static_cast<void const *>(piece.begin()));
+				vector[i].iov_len = piece.size();
+			}
+			assert(vector.size() <= std::numeric_limits<int>::max());
+			ssize_t rc = ::writev(m_destination, vector.data(), static_cast<int>(vector.size()));
+			if (rc < 0)
+			{
+				return error_type(errno, boost::system::system_category());
+			}
+			//assume that everything has been written
+			return error_type();
 		}
 	};
 }

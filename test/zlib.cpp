@@ -27,17 +27,11 @@ BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 	BOOST_CHECK_EQUAL(original, std::string(decompressed.begin(), decompressed.begin() + decompressed_length));
 }
 
-template <class C>
-auto make_c_str_range(C const *str)
-{
-	return boost::make_iterator_range(str, str + std::char_traits<C>::length(str));
-}
-
 BOOST_AUTO_TEST_CASE(zlib_deflating_sink_test)
 {
 	std::vector<char> compressed;
 	auto compressor = Si::make_deflating_sink(Si::make_container_buffer(compressed), Si::zlib_deflate_stream(Z_DEFAULT_COMPRESSION));
-	Si::append(compressor, Si::zlib_sink_element{make_c_str_range("Hello")});
+	Si::append(compressor, Si::zlib_sink_element{Si::make_c_str_range("Hello")});
 	Si::append(compressor, Si::zlib_sink_element{Si::flush{}});
 	BOOST_CHECK_GE(compressed.size(), 1);
 }

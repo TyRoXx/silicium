@@ -37,6 +37,12 @@ namespace Si
 		BOOST_STATIC_ASSERT(std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<decltype(begin_)>::iterator_category>::value);
 		return make_memory_range(boost::addressof(*begin_), boost::addressof(*end_));
 	}
+
+	template <class C>
+	auto make_c_str_range(C const *str)
+	{
+		return make_memory_range(str, str + std::char_traits<C>::length(str));
+	}
 }
 
 #endif
