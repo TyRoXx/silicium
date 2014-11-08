@@ -3,9 +3,9 @@
 #include <silicium/observable/transform.hpp>
 #include <silicium/observable/while.hpp>
 #include <silicium/observable/finite_state_machine.hpp>
-#include <silicium/observable/filter_observable.hpp>
-#include <silicium/observable/generator_observable.hpp>
-#include <silicium/observable/ptr_observable.hpp>
+#include <silicium/observable/filter.hpp>
+#include <silicium/observable/generator.hpp>
+#include <silicium/observable/ptr.hpp>
 #include <silicium/observable/cache.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/variant.hpp>

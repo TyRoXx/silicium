@@ -1,4 +1,4 @@
-#include <silicium/observable/generator_observable.hpp>
+#include <silicium/observable/generator.hpp>
 #include <silicium/observable/consume.hpp>
 #include <boost/test/unit_test.hpp>
 

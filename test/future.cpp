@@ -1,5 +1,5 @@
 #include <silicium/observable/consume.hpp>
-#include <silicium/observable/virtualized_observable.hpp>
+#include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/ready_future.hpp>
 #include <boost/test/unit_test.hpp>
 

@@ -4,7 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>
-#include <silicium/observable/virtualized_observable.hpp>
+#include <silicium/observable/virtualized.hpp>
 #include <boost/config.hpp>
 #include <memory>
 #include <cassert>

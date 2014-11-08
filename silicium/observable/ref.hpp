@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_REF_HPP
 #define SILICIUM_REACTIVE_REF_HPP
 
-#include <silicium/observable/ptr_observable.hpp>
+#include <silicium/observable/ptr.hpp>
 
 namespace Si
 {

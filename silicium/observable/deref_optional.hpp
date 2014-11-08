@@ -2,7 +2,7 @@
 #define SILICIUM_DEREF_OPTIONAL_HPP
 
 #include <boost/optional.hpp>
-#include <silicium/observable/ptr_observable.hpp>
+#include <silicium/observable/ptr.hpp>
 #include <silicium/observable/while.hpp>
 #include <silicium/config.hpp>
 

@@ -2,7 +2,7 @@
 #include <silicium/observable/coroutine.hpp>
 #include <silicium/asio/timer.hpp>
 #include <silicium/observable/total_consumer.hpp>
-#include <silicium/observable/constant_observable.hpp>
+#include <silicium/observable/constant.hpp>
 #include <iostream>
 //TODO: fewer includes for such a simple example?
 

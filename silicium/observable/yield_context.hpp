@@ -2,7 +2,7 @@
 #define SILICIUM_YIELD_CONTEXT_HPP
 
 #include <silicium/observable/transform.hpp>
-#include <silicium/observable/virtualized_observable.hpp>
+#include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/ref.hpp>
 #include <boost/optional.hpp>
 

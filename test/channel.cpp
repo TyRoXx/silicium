@@ -1,8 +1,8 @@
 #include <silicium/observable/coroutine_generator.hpp>
 #include <silicium/observable/consume.hpp>
 #include <silicium/observable/thread.hpp>
-#include <silicium/observable/function_observable.hpp>
-#include <silicium/observable/variant_observable.hpp>
+#include <silicium/observable/function.hpp>
+#include <silicium/observable/variant.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/boost_threading.hpp>
 #include <boost/test/unit_test.hpp>

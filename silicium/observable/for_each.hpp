@@ -4,7 +4,7 @@
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/transform.hpp>
 #include <silicium/config.hpp>
-#include <silicium/observable/ptr_observable.hpp>
+#include <silicium/observable/ptr.hpp>
 
 namespace Si
 {

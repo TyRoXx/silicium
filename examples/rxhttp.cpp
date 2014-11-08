@@ -4,10 +4,10 @@
 #include <silicium/source/observable_source.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/observable/coroutine.hpp>
-#include <silicium/observable/constant_observable.hpp>
+#include <silicium/observable/constant.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/http/http.hpp>
-#include <silicium/observable/virtualized_observable.hpp>
+#include <silicium/observable/virtualized.hpp>
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/coroutine_generator.hpp>
