@@ -4,6 +4,7 @@
 #include <silicium/fast_variant.hpp>
 #include <silicium/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
+#include <silicium/memory_range.hpp>
 #include <boost/optional.hpp>
 
 namespace Si
@@ -74,7 +75,7 @@ namespace Si
 	{
 	};
 
-	typedef fast_variant<flush, boost::iterator_range<char const *>> zlib_sink_element;
+	typedef fast_variant<flush, memory_range> zlib_sink_element;
 
 	template <class Next>
 	struct zlib_deflating_sink : sink<zlib_sink_element>
