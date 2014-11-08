@@ -1,7 +1,7 @@
 #ifndef SILICIUM_VIRTUALIZED_SOURCE_HPP
 #define SILICIUM_VIRTUALIZED_SOURCE_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <silicium/override.hpp>
 #include <boost/concept/requires.hpp>
 

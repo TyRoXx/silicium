@@ -1,7 +1,7 @@
 #ifndef SILICIUM_PROCESS_PARAMETERS_HPP
 #define SILICIUM_PROCESS_PARAMETERS_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <silicium/sink/sink.hpp>
 #include <vector>
 #include <string>

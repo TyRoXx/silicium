@@ -2,7 +2,7 @@
 #define SILICIUM_SOURCE_OBSERVABLE_HPP
 
 #include <silicium/observer.hpp>
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <boost/optional.hpp>
 #include <utility>
 

@@ -2,7 +2,7 @@
 #define SILICIUM_OBSERVABLE_SOURCE_HPP
 
 #include <silicium/observable.hpp>
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <silicium/config.hpp>
 
 namespace Si

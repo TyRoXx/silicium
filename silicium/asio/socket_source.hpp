@@ -1,7 +1,7 @@
 #ifndef SILICIUM_ASIO_SOCKET_SOURCE_HPP
 #define SILICIUM_ASIO_SOCKET_SOURCE_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 #if BOOST_VERSION >= 105400

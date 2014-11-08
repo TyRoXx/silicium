@@ -1,7 +1,7 @@
 #ifndef SILICIUM_GENERATOR_SOURCE_HPP
 #define SILICIUM_GENERATOR_SOURCE_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/element_from_optional_like.hpp>
 #include <silicium/detail/proper_value_function.hpp>

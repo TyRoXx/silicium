@@ -1,7 +1,7 @@
 #ifndef SILICIUM_FILE_SOURCE_HPP
 #define SILICIUM_FILE_SOURCE_HPP
 
-#include <silicium/generator_source.hpp>
+#include <silicium/source/generator_source.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/file_descriptor.hpp>
 #include <boost/system/error_code.hpp>

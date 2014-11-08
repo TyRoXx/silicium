@@ -1,6 +1,6 @@
-#include <silicium/filter_source.hpp>
-#include <silicium/generator_source.hpp>
-#include <silicium/memory_source.hpp>
+#include <silicium/source/filter_source.hpp>
+#include <silicium/source/generator_source.hpp>
+#include <silicium/source/memory_source.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(filter_source_true)

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_FILTER_SOURCE_HPP
 #define SILICIUM_FILTER_SOURCE_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
 
 namespace Si

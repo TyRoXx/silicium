@@ -1,7 +1,7 @@
 #ifndef SILICIUM_BUFFERING_SOURCE_HPP
 #define SILICIUM_BUFFERING_SOURCE_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 

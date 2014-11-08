@@ -1,5 +1,5 @@
 #include <silicium/http/http.hpp>
-#include <silicium/memory_source.hpp>
+#include <silicium/source/memory_source.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <boost/test/unit_test.hpp>

@@ -1,6 +1,6 @@
 #include <silicium/copy.hpp>
 #include <silicium/sink/iterator_sink.hpp>
-#include <silicium/memory_source.hpp>
+#include <silicium/source/memory_source.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si

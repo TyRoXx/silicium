@@ -1,7 +1,7 @@
 #ifndef SILICIUM_DETAIL_LINE_SOURCE_HPP
 #define SILICIUM_DETAIL_LINE_SOURCE_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 
 namespace Si
 {

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_MEMORY_SOURCE_HPP
 #define SILICIUM_MEMORY_SOURCE_HPP
 
-#include <silicium/source.hpp>
+#include <silicium/source/source.hpp>
 #include <vector>
 #include <string>
 

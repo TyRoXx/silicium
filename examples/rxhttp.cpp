@@ -1,13 +1,13 @@
-#include <silicium/received_from_socket_source.hpp>
+#include <silicium/source/received_from_socket_source.hpp>
 #include <silicium/asio/sending_observable.hpp>
 #include <silicium/flatten.hpp>
-#include <silicium/observable_source.hpp>
+#include <silicium/source/observable_source.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/coroutine.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/http/http.hpp>
 #include <silicium/virtualized_observable.hpp>
-#include <silicium/virtualized_source.hpp>
+#include <silicium/source/virtualized_source.hpp>
 #include <silicium/total_consumer.hpp>
 #include <silicium/coroutine_generator.hpp>
 #include <boost/format.hpp>
