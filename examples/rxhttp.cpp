@@ -1,6 +1,6 @@
 #include <silicium/source/received_from_socket_source.hpp>
-#include <silicium/asio/sending_observable.hpp>
 #include <silicium/observable/flatten.hpp>
+#include <silicium/asio/writing_observable.hpp>
 #include <silicium/source/observable_source.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/observable/coroutine.hpp>
@@ -71,7 +71,7 @@ namespace
 			assert(socket);
 			assert(yield);
 
-			auto sending = Si::virtualize_observable(Si::sending_observable(*socket, data));
+			auto sending = Si::virtualize_observable(Si::make_writing_observable(*socket, data));
 
 			//ignore error
 			yield->get_one(sending);

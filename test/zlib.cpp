@@ -1,4 +1,4 @@
-#include <silicium/container_buffer.hpp>
+#include <silicium/sink/container_buffer.hpp>
 #include <silicium/zlib/deflating_sink.hpp>
 #include <silicium/zlib/inflating_sink.hpp>
 #include <boost/test/unit_test.hpp>

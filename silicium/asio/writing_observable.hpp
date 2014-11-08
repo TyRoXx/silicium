@@ -14,6 +14,11 @@ namespace Si
 	{
 		typedef boost::system::error_code element_type;
 
+		writing_observable()
+			: stream(nullptr)
+		{
+		}
+
 		explicit writing_observable(AsyncStream &stream, boost::iterator_range<char const *> buffer)
 			: stream(&stream)
 		{

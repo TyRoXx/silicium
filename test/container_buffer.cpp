@@ -1,4 +1,4 @@
-#include <silicium/container_buffer.hpp>
+#include <silicium/sink/container_buffer.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(container_buffer_make)
