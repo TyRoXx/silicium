@@ -189,8 +189,9 @@ namespace
 						break;
 					}
 					++visitor_count;
-					auto context = Si::visit<events>(*result,
-						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client) -> events
+					std::shared_ptr<boost::asio::ip::tcp::socket> client = result->get();
+					auto context =
+						[visitor_count, client]() -> events
 					{
 						auto visitor_number_ = visitor_count;
 						auto client_handler = Si::erase_shared(Si::make_coroutine_generator<Si::nothing>([client, visitor_number_](Si::push_context<Si::nothing> &yield) -> void
@@ -199,11 +200,7 @@ namespace
 							return serve_client(coro_socket, visitor_number_);
 						}));
 						return client_handler;
-					},
-						[](boost::system::error_code) -> events
-					{
-						throw std::logic_error("not implemented");
-					});
+					}();
 					if (!context.empty())
 					{
 						yield(std::move(context));
@@ -241,20 +238,12 @@ namespace
 						break;
 					}
 					++visitor_count;
-					Si::visit<void>(*result,
-						[visitor_count](std::shared_ptr<boost::asio::ip::tcp::socket> client)
+					std::shared_ptr<boost::asio::ip::tcp::socket> client = result->get();
+					std::thread([client, visitor_count]
 					{
-						auto visitor_number_ = visitor_count;
-						std::thread([client, visitor_number_]
-						{
-							thread_socket threaded_socket(*client);
-							serve_client(threaded_socket, visitor_number_);
-						}).detach();
-					},
-						[](boost::system::error_code)
-					{
-						throw std::logic_error("not implemented");
-					});
+						thread_socket threaded_socket(*client);
+						serve_client(threaded_socket, visitor_count);
+					}).detach();
 				}
 			})))))
 		{

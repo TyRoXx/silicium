@@ -4,15 +4,12 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
-#include <silicium/fast_variant.hpp>
+#include <silicium/error_or.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace Si
 {
-	typedef Si::fast_variant<
-		std::shared_ptr<boost::asio::ip::tcp::socket>, //until socket itself is noexcept-movable
-		boost::system::error_code
-	> tcp_acceptor_result;
+	typedef error_or<std::shared_ptr<boost::asio::ip::tcp::socket>> tcp_acceptor_result; //until socket itself is noexcept-movable
 
 	struct tcp_acceptor : private boost::noncopyable
 	{
