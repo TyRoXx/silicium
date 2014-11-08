@@ -41,14 +41,6 @@ namespace Si
 	};
 
 	template <class Element, class Error>
-	struct flushable_sink : sink<Element, Error>
-	{
-		typedef Element element_type;
-
-		virtual Error flush() = 0;
-	};
-
-	template <class Element, class Error>
 	Error commit(buffer<Element, Error> &destination, std::size_t count)
 	{
 		destination.make_append_space(count);
@@ -123,8 +115,8 @@ namespace Si
 
 	template <class Next, class Error = typename Next::error_type, class Buffer = std::array<typename Next::element_type, ((1U << 13U) / sizeof(typename Next::element_type))>>
 	struct buffering_sink SILICIUM_FINAL
-		: flushable_sink<typename Next::element_type, typename Next::error_type>
-		, buffer        <typename Next::element_type, typename Next::error_type>
+		: sink  <typename Next::element_type, typename Next::error_type>
+		, buffer<typename Next::element_type, typename Next::error_type>
 	{
 		typedef typename Next::element_type element_type;
 		typedef typename Next::error_type error_type;
@@ -173,7 +165,7 @@ namespace Si
 			);
 		}
 
-		Error flush() SILICIUM_OVERRIDE
+		Error flush()
 		{
 			return then(
 				[this] { return m_destination.append(boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used)); },
@@ -237,7 +229,7 @@ namespace Si
 		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
 	}
 
-	struct ostream_ref_sink SILICIUM_FINAL : flushable_sink<char, void>
+	struct ostream_ref_sink SILICIUM_FINAL : sink<char, void>
 	{
 		ostream_ref_sink()
 			: m_file(nullptr)
@@ -255,18 +247,12 @@ namespace Si
 			m_file->write(data.begin(), data.size());
 		}
 
-		virtual void flush() SILICIUM_OVERRIDE
-		{
-			assert(m_file);
-			m_file->flush();
-		}
-
 	private:
 
 		std::ostream *m_file;
 	};
 
-	struct ostream_sink SILICIUM_FINAL : flushable_sink<char, boost::system::error_code>
+	struct ostream_sink SILICIUM_FINAL : sink<char, boost::system::error_code>
 	{
 		//unique_ptr to make ostreams movable
 		explicit ostream_sink(std::unique_ptr<std::ostream> file)
@@ -281,25 +267,19 @@ namespace Si
 			return {};
 		}
 
-		virtual boost::system::error_code flush() SILICIUM_OVERRIDE
-		{
-			m_file->flush();
-			return {};
-		}
-
 	private:
 
 		std::unique_ptr<std::ostream> m_file;
 	};
 
-	inline std::unique_ptr<flushable_sink<char, boost::system::error_code>> make_file_sink(boost::filesystem::path const &name)
+	inline std::unique_ptr<sink<char, boost::system::error_code>> make_file_sink(boost::filesystem::path const &name)
 	{
 		std::unique_ptr<std::ostream> file(new std::ofstream(name.string(), std::ios::binary));
 		if (!*file)
 		{
 			throw std::runtime_error("Cannot open file for writing: " + name.string());
 		}
-		return std::unique_ptr<flushable_sink<char, boost::system::error_code>>(new ostream_sink(std::move(file)));
+		return std::unique_ptr<sink<char, boost::system::error_code>>(new ostream_sink(std::move(file)));
 	}
 
 	template <class Element, class Error>
