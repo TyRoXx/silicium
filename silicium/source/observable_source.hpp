@@ -1,7 +1,7 @@
 #ifndef SILICIUM_OBSERVABLE_SOURCE_HPP
 #define SILICIUM_OBSERVABLE_SOURCE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observable/observable.hpp>
 #include <silicium/source/source.hpp>
 #include <silicium/config.hpp>
 

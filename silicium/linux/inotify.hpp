@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_LINUX_INOTIFY_HPP
 #define SILICIUM_REACTIVE_LINUX_INOTIFY_HPP
 
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/override.hpp>
 #include <boost/filesystem/path.hpp>

@@ -1,5 +1,5 @@
-#include <silicium/function_observable.hpp>
-#include <silicium/consume.hpp>
+#include <silicium/observable/function_observable.hpp>
+#include <silicium/observable/consume.hpp>
 #include <boost/optional.hpp>
 #include <boost/test/unit_test.hpp>
 

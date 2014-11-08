@@ -1,6 +1,6 @@
-#include <silicium/thread.hpp>
+#include <silicium/observable/thread.hpp>
 #include <silicium/std_threading.hpp>
-#include <silicium/consume.hpp>
+#include <silicium/observable/consume.hpp>
 #include <silicium/config.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/to_unique.hpp>

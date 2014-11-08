@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/optional.hpp>
-#include <silicium/transform_if_initialized.hpp>
-#include <silicium/empty.hpp>
-#include <silicium/coroutine_generator.hpp>
+#include <silicium/observable/transform_if_initialized.hpp>
+#include <silicium/observable/empty.hpp>
+#include <silicium/observable/coroutine_generator.hpp>
 #include <silicium/source/memory_source.hpp>
 #include <silicium/source/transforming_source.hpp>
-#include <silicium/for_each.hpp>
+#include <silicium/observable/for_each.hpp>
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
 

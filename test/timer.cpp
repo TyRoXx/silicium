@@ -1,7 +1,7 @@
 #include <silicium/asio/timer.hpp>
-#include <silicium/constant_observable.hpp>
-#include <silicium/total_consumer.hpp>
-#include <silicium/coroutine.hpp>
+#include <silicium/observable/constant_observable.hpp>
+#include <silicium/observable/total_consumer.hpp>
+#include <silicium/observable/coroutine.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(asio_timer)

@@ -1,6 +1,6 @@
-#include <silicium/source_observable.hpp>
+#include <silicium/observable/source_observable.hpp>
 #include <silicium/source/memory_source.hpp>
-#include <silicium/consume.hpp>
+#include <silicium/observable/consume.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace

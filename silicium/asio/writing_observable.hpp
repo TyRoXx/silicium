@@ -3,7 +3,7 @@
 
 #include <silicium/error_or.hpp>
 #include <silicium/config.hpp>
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/asio/write.hpp>
 

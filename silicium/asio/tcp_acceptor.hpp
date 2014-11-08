@@ -1,7 +1,7 @@
 #ifndef SILICIUM_ASIO_TCP_ACCEPTOR_HPP
 #define SILICIUM_ASIO_TCP_ACCEPTOR_HPP
 
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
 #include <silicium/fast_variant.hpp>

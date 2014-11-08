@@ -1,8 +1,8 @@
 #include <boost/asio.hpp>
-#include <silicium/coroutine.hpp>
+#include <silicium/observable/coroutine.hpp>
 #include <silicium/asio/timer.hpp>
-#include <silicium/total_consumer.hpp>
-#include <silicium/constant_observable.hpp>
+#include <silicium/observable/total_consumer.hpp>
+#include <silicium/observable/constant_observable.hpp>
 #include <iostream>
 //TODO: fewer includes for such a simple example?
 

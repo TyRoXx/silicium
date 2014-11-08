@@ -1,5 +1,5 @@
-#include <silicium/bridge.hpp>
-#include <silicium/consume.hpp>
+#include <silicium/observable/bridge.hpp>
+#include <silicium/observable/consume.hpp>
 #include <silicium/config.hpp>
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>

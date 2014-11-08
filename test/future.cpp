@@ -1,6 +1,6 @@
-#include <silicium/consume.hpp>
-#include <silicium/virtualized_observable.hpp>
-#include <silicium/ready_future.hpp>
+#include <silicium/observable/consume.hpp>
+#include <silicium/observable/virtualized_observable.hpp>
+#include <silicium/observable/ready_future.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(ready_future)

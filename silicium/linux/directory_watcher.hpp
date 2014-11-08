@@ -3,9 +3,9 @@
 
 #include <silicium/linux/inotify.hpp>
 #include <silicium/file_notification.hpp>
-#include <silicium/transform_if_initialized.hpp>
-#include <silicium/enumerate.hpp>
-#include <silicium/ref.hpp>
+#include <silicium/observable/transform_if_initialized.hpp>
+#include <silicium/observable/enumerate.hpp>
+#include <silicium/observable/ref.hpp>
 #include <boost/optional.hpp>
 
 namespace Si

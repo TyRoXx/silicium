@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_BUFFER_HPP
 
 #include <silicium/override.hpp>
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <boost/circular_buffer.hpp>
 #include <cassert>

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_TRANSFORM_HPP
 #define SILICIUM_REACTIVE_TRANSFORM_HPP
 
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/override.hpp>
 #include <silicium/detail/proper_value_function.hpp>

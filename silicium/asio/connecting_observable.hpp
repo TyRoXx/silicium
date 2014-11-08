@@ -2,7 +2,7 @@
 #define SILICIUM_CONNECTING_OBSERVABLE_HPP
 
 #include <silicium/exchange.hpp>
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace Si

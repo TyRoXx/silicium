@@ -1,7 +1,7 @@
 #ifndef SILICIUM_REACTIVE_TIMER_HPP
 #define SILICIUM_REACTIVE_TIMER_HPP
 
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>

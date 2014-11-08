@@ -1,5 +1,5 @@
-#include <silicium/generator_observable.hpp>
-#include <silicium/consume.hpp>
+#include <silicium/observable/generator_observable.hpp>
+#include <silicium/observable/consume.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(generator_observable_optional)

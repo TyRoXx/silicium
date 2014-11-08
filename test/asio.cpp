@@ -1,6 +1,6 @@
-#include <silicium/bridge.hpp>
-#include <silicium/for_each.hpp>
-#include <silicium/ref.hpp>
+#include <silicium/observable/bridge.hpp>
+#include <silicium/observable/for_each.hpp>
+#include <silicium/observable/ref.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/test/unit_test.hpp>
 

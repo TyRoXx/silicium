@@ -3,7 +3,7 @@
 
 #include <silicium/error_or.hpp>
 #include <silicium/override.hpp>
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <boost/config.hpp>
 #include <boost/asio/ip/tcp.hpp>

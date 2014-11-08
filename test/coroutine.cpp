@@ -1,7 +1,7 @@
-#include <silicium/coroutine.hpp>
-#include <silicium/consume.hpp>
-#include <silicium/bridge.hpp>
-#include <silicium/total_consumer.hpp>
+#include <silicium/observable/coroutine.hpp>
+#include <silicium/observable/consume.hpp>
+#include <silicium/observable/bridge.hpp>
+#include <silicium/observable/total_consumer.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(coroutine_trivial)

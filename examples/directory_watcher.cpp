@@ -1,5 +1,5 @@
 #include <silicium/directory_watcher.hpp>
-#include <silicium/for_each.hpp>
+#include <silicium/observable/for_each.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <iostream>
 

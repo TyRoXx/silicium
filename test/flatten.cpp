@@ -1,8 +1,8 @@
-#include <silicium/flatten.hpp>
-#include <silicium/bridge.hpp>
-#include <silicium/ref.hpp>
-#include <silicium/for_each.hpp>
-#include <silicium/coroutine_generator.hpp>
+#include <silicium/observable/flatten.hpp>
+#include <silicium/observable/bridge.hpp>
+#include <silicium/observable/ref.hpp>
+#include <silicium/observable/for_each.hpp>
+#include <silicium/observable/coroutine_generator.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/interprocess/sync/null_mutex.hpp>
 

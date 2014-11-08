@@ -1,5 +1,5 @@
-#include <silicium/coroutine_generator.hpp>
-#include <silicium/consume.hpp>
+#include <silicium/observable/coroutine_generator.hpp>
+#include <silicium/observable/consume.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread/future.hpp>
 #include <boost/asio/io_service.hpp>

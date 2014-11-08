@@ -1,5 +1,5 @@
 #include <silicium/directory_watcher.hpp>
-#include <silicium/consume.hpp>
+#include <silicium/observable/consume.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/asio/steady_timer.hpp>
