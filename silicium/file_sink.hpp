@@ -23,8 +23,7 @@ namespace Si
 		boost::int64_t from_current;
 	};
 
-	typedef fast_variant<seek_set, seek_add> seek_request;
-	typedef fast_variant<flush, memory_range, seek_request> file_sink_element;
+	typedef fast_variant<flush, memory_range, seek_set, seek_add> file_sink_element;
 
 	struct file_sink : sink<file_sink_element>
 	{
@@ -116,9 +115,21 @@ namespace Si
 				{
 					return write_piece(content);
 				},
-				[this](seek_request const &request) -> error_type
+				[this](seek_set const request) -> error_type
 				{
-					return seek(request);
+					if (lseek64(m_destination, request.from_beginning, SEEK_SET) == static_cast<off_t>(-1))
+					{
+						return error_type(errno, boost::system::system_category());
+					}
+					return error_type();
+				},
+				[this](seek_add const request) -> error_type
+				{
+					if (lseek64(m_destination, request.from_current, SEEK_CUR) == static_cast<off_t>(-1))
+					{
+						return error_type(errno, boost::system::system_category());
+					}
+					return error_type();
 				}
 			);
 		}
@@ -136,29 +147,6 @@ namespace Si
 				written += static_cast<size_t>(rc);
 			}
 			return error_type();
-		}
-
-		error_type seek(seek_request const &request)
-		{
-			return visit<error_type>(
-				request,
-				[this](seek_set set)
-				{
-					if (lseek64(m_destination, set.from_beginning, SEEK_SET) == static_cast<off_t>(-1))
-					{
-						return error_type(errno, boost::system::system_category());
-					}
-					return error_type();
-				},
-				[this](seek_add add)
-				{
-					if (lseek64(m_destination, add.from_current, SEEK_CUR) == static_cast<off_t>(-1))
-					{
-						return error_type(errno, boost::system::system_category());
-					}
-					return error_type();
-				}
-			);
 		}
 
 		error_type write_vector(element_type const *begin, element_type const *end)
