@@ -35,3 +35,6 @@ target_link_libraries(trivialhttp ${Boost_LIBRARIES})
 
 add_executable(directory_watcher "directory_watcher.cpp")
 target_link_libraries(directory_watcher silicium ${Boost_LIBRARIES})
+
+add_executable(sleep "sleep.cpp")
+target_link_libraries(sleep silicium ${Boost_LIBRARIES})
