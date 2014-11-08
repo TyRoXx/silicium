@@ -27,8 +27,9 @@ namespace Si
 	}
 
 	template <class ContiguousRange>
-	auto make_memory_range(ContiguousRange &range)
+	auto make_memory_range(ContiguousRange &&range)
 	{
+		BOOST_STATIC_ASSERT(std::is_lvalue_reference<ContiguousRange>::value);
 		using std::begin;
 		using std::end;
 		auto begin_ = begin(range);
