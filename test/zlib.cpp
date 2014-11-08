@@ -1,6 +1,7 @@
 #include <silicium/sink.hpp>
 #include <silicium/source.hpp>
 #include <silicium/fast_variant.hpp>
+#include <silicium/container_buffer.hpp>
 #include <boost/test/unit_test.hpp>
 #include <zlib.h>
 
@@ -280,7 +281,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(zlib_sink)
 	{
 		std::vector<char> compressed;
-		auto compressor = make_deflating_sink(make_buffering_sink(make_container_sink(compressed)), zlib_deflate_stream(Z_DEFAULT_COMPRESSION));
+		auto compressor = make_deflating_sink(make_container_buffer(compressed), zlib_deflate_stream(Z_DEFAULT_COMPRESSION));
 		append(compressor, zlib_sink_element{make_c_str_range("Hello")});
 		append(compressor, zlib_sink_element{flush{}});
 		BOOST_CHECK_GE(compressed.size(), 1);
