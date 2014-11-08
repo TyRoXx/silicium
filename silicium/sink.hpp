@@ -23,9 +23,21 @@ namespace Si
 		{
 		}
 
+		virtual error_type append(boost::iterator_range<element_type const *> data) = 0;
+	};
+
+	template <class Element, class Error = boost::system::error_code>
+	struct buffer
+	{
+		typedef Element element_type;
+		typedef Error error_type;
+
+		virtual ~buffer()
+		{
+		}
+
 		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) = 0;
 		virtual error_type flush_append_space() = 0;
-		virtual error_type append(boost::iterator_range<element_type const *> data) = 0;
 	};
 
 	template <class Element, class Error>
@@ -37,7 +49,7 @@ namespace Si
 	};
 
 	template <class Element, class Error>
-	Error commit(sink<Element, Error> &destination, std::size_t count)
+	Error commit(buffer<Element, Error> &destination, std::size_t count)
 	{
 		destination.make_append_space(count);
 		return destination.flush_append_space();
@@ -110,7 +122,9 @@ namespace Si
 	}
 
 	template <class Next, class Error = typename Next::error_type, class Buffer = std::array<typename Next::element_type, ((1U << 13U) / sizeof(typename Next::element_type))>>
-	struct buffering_sink SILICIUM_FINAL : flushable_sink<typename Next::element_type, typename Next::error_type>
+	struct buffering_sink SILICIUM_FINAL
+		: flushable_sink<typename Next::element_type, typename Next::error_type>
+		, buffer        <typename Next::element_type, typename Next::error_type>
 	{
 		typedef typename Next::element_type element_type;
 		typedef typename Next::error_type error_type;
@@ -128,14 +142,6 @@ namespace Si
 
 		boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
 		{
-			auto first_try = m_destination.make_append_space(size);
-			if (!first_try.empty())
-			{
-				auto const copied = (std::min<std::ptrdiff_t>)(static_cast<std::ptrdiff_t>(m_buffer_used), first_try.size());
-				std::copy(m_fallback_buffer.begin(), m_fallback_buffer.begin() + copied, first_try.begin());
-				m_buffer_used = 0;
-				return first_try;
-			}
 			m_buffer_used = (std::min)(size, m_fallback_buffer.size());
 			return boost::make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used);
 		}
@@ -148,7 +154,7 @@ namespace Si
 			}
 			else
 			{
-				return m_destination.flush_append_space();
+				return Error();
 			}
 		}
 
@@ -207,15 +213,6 @@ namespace Si
 		{
 		}))
 
-		virtual boost::iterator_range<Element *> make_append_space(std::size_t) SILICIUM_OVERRIDE
-		{
-			return {};
-		}
-
-		virtual void flush_append_space() SILICIUM_OVERRIDE
-		{
-		}
-
 		virtual void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
 			boost::range::copy(data, m_out);
@@ -252,15 +249,6 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<char *> make_append_space(std::size_t) SILICIUM_OVERRIDE
-		{
-		   return {};
-		}
-
-		virtual void flush_append_space() SILICIUM_OVERRIDE
-		{
-		}
-
 		virtual void append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
 		{
 			assert(m_file);
@@ -285,16 +273,6 @@ namespace Si
 			: m_file(std::move(file))
 		{
 			m_file->exceptions(std::ios::failbit | std::ios::badbit);
-		}
-
-		virtual boost::iterator_range<char *> make_append_space(std::size_t) SILICIUM_OVERRIDE
-		{
-			return {};
-		}
-
-		virtual boost::system::error_code flush_append_space() SILICIUM_OVERRIDE
-		{
-			return {};
 		}
 
 		virtual boost::system::error_code append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
@@ -335,20 +313,6 @@ namespace Si
 		explicit auto_flush_sink(sink<Element, Error> &next)
 			: m_next(&next)
 		{
-		}
-
-		virtual boost::iterator_range<char *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
-		{
-			assert(m_next);
-			return m_next->make_append_space(size);
-		}
-
-		virtual Error flush_append_space() SILICIUM_OVERRIDE
-		{
-			assert(m_next);
-			return then(
-				[this] { return m_next->flush_append_space(); }
-			);
 		}
 
 		virtual Error append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE

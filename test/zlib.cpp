@@ -227,17 +227,6 @@ namespace Si
 		{
 		})
 
-		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
-		{
-			boost::ignore_unused_variable_warning(size);
-			return {};
-		}
-
-		virtual boost::system::error_code flush_append_space() SILICIUM_OVERRIDE
-		{
-			return {};
-		}
-
 		virtual boost::system::error_code append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			for (element_type const &piece : data)

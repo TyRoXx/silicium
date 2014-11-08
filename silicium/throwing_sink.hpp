@@ -21,20 +21,6 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
-		{
-			return next.make_append_space(size);
-		}
-
-		virtual error_type flush_append_space() SILICIUM_OVERRIDE
-		{
-			auto error = next.flush_append_space();
-			if (error)
-			{
-				throw boost::system::system_error(error);
-			}
-		}
-
 		virtual error_type append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			auto error = next.append(data);
