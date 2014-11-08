@@ -1,5 +1,6 @@
 #include <silicium/process.hpp>
 #include <silicium/to_unique.hpp>
+#include <silicium/iterator_sink.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 

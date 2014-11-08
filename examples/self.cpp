@@ -1,5 +1,6 @@
 #include <silicium/process.hpp>
 #include <silicium/build_result.hpp>
+#include <silicium/iterator_sink.hpp>
 #include <silicium/directory_allocator.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>

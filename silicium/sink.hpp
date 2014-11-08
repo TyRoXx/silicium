@@ -186,49 +186,6 @@ namespace Si
 		return buffering_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
 	}
 
-	template <class Element, class OutputIterator>
-	struct iterator_sink SILICIUM_FINAL : sink<Element, void>
-	{
-		typedef Element element_type;
-
-		iterator_sink()
-		{
-		}
-
-		explicit iterator_sink(OutputIterator out)
-			: m_out(std::move(out))
-		{
-		}
-
-		BOOST_DEFAULTED_FUNCTION(iterator_sink(iterator_sink &&other),
-			: m_out(std::move(other.m_out)
-		{
-		}))
-
-		virtual void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
-		{
-			boost::range::copy(data, m_out);
-		}
-
-	private:
-
-		OutputIterator m_out;
-	};
-
-	template <class Element, class OutputIterator>
-	auto make_iterator_sink(OutputIterator out)
-		-> iterator_sink<Element, typename std::decay<OutputIterator>::type>
-	{
-		return iterator_sink<Element, typename std::decay<OutputIterator>::type>(std::move(out));
-	}
-
-	template <class Container>
-	auto make_container_sink(Container &destination)
-		-> iterator_sink<typename Container::value_type, std::back_insert_iterator<Container>>
-	{
-		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
-	}
-
 	struct ostream_ref_sink SILICIUM_FINAL : sink<char, void>
 	{
 		ostream_ref_sink()
