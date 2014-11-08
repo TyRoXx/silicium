@@ -17,6 +17,7 @@ namespace Si
 	template <class Byte>
 	auto make_memory_range(Byte *begin, Byte *end)
 	{
+		BOOST_STATIC_ASSERT(sizeof(*begin) == 1);
 		typedef typename copy_const<char, Byte>::type dest_type;
 		return boost::make_iterator_range(
 			reinterpret_cast<dest_type *>(begin),
