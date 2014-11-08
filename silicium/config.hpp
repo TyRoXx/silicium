@@ -86,6 +86,12 @@
 #	define SILICIUM_DELETED_FUNCTION(f) private: f;
 #endif
 
+#ifdef _MSC_VER
+#	define SILICIUM_DEPRECATED __declspec(deprecated)
+#else
+#	define SILICIUM_DEPRECATED __attribute__((deprecated))
+#endif
+
 namespace Si
 {
 	struct nothing
