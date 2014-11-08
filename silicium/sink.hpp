@@ -303,38 +303,6 @@ namespace Si
 	}
 
 	template <class Element, class Error>
-	struct auto_flush_sink SILICIUM_FINAL : sink<Element, Error>
-	{
-		auto_flush_sink()
-			: m_next(nullptr)
-		{
-		}
-
-		explicit auto_flush_sink(sink<Element, Error> &next)
-			: m_next(&next)
-		{
-		}
-
-		virtual Error append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE
-		{
-			assert(m_next);
-			return then(
-				[this, &data] { return m_next->append(data); }
-			);
-		}
-
-	private:
-
-		sink<Element, Error> *m_next;
-	};
-
-	template <class Element, class Error>
-	auto_flush_sink<Element, Error> make_auto_flush_sink(sink<Element, Error> &next)
-	{
-		return auto_flush_sink<Element, Error>(next);
-	}
-
-	template <class Element, class Error>
 	Error append(Si::sink<Element, Error> &out, std::basic_string<Element> const &str)
 	{
 		return out.append(boost::make_iterator_range(str.data(), str.data() + str.size()));

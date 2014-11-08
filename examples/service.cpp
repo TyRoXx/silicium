@@ -197,8 +197,7 @@ namespace
 	{
 		auto log = artifacts.begin_artifact(log_name);
 		auto throwing_log = Si::make_throwing_sink(Si::ref_sink(*log));
-		auto flushing_log = Si::make_auto_flush_sink(throwing_log);
-		return Si::run_process(executable, arguments, build_dir, flushing_log) == 0;
+		return Si::run_process(executable, arguments, build_dir, throwing_log) == 0;
 	}
 
 	Si::build_result run_tests(
