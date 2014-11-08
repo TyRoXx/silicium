@@ -1,4 +1,4 @@
-#include <silicium/iterator_sink.hpp>
+#include <silicium/sink/iterator_sink.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(buffering_sink_append)

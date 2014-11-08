@@ -4,7 +4,7 @@
 #include <silicium/observable_source.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/coroutine.hpp>
-#include <silicium/iterator_sink.hpp>
+#include <silicium/sink/iterator_sink.hpp>
 #include <silicium/http/http.hpp>
 #include <silicium/virtualized_observable.hpp>
 #include <silicium/virtualized_source.hpp>

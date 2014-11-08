@@ -1,7 +1,7 @@
 #ifndef SILICIUM_FILE_SINK_HPP
 #define SILICIUM_FILE_SINK_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/file_descriptor.hpp>
 #include <silicium/memory_range.hpp>

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_LINUX_PROCESS_HPP
 #define SILICIUM_LINUX_PROCESS_HPP
 
-#include <silicium/ptr_sink.hpp>
+#include <silicium/sink/ptr_sink.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/file_descriptor.hpp>
 #include <boost/filesystem/operations.hpp>

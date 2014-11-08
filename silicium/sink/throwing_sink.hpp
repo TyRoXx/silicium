@@ -1,7 +1,7 @@
 #ifndef SILICIUM_THROWING_SINK_HPP
 #define SILICIUM_THROWING_SINK_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 #include <silicium/config.hpp>
 
 namespace Si

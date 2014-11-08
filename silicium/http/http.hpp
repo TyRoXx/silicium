@@ -1,7 +1,7 @@
 #ifndef SILICIUM_HTTP_HTTP_HPP
 #define SILICIUM_HTTP_HTTP_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 #include <silicium/source.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/detail/line_source.hpp>

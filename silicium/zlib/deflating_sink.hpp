@@ -2,7 +2,7 @@
 #define SILICIUM_ZLIB_DEFLATING_SINK_HPP
 
 #include <silicium/fast_variant.hpp>
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/optional.hpp>

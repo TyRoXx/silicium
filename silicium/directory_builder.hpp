@@ -2,7 +2,7 @@
 #define SILICIUM_DIRECTORY_BUILDER_HPP
 
 #include <boost/filesystem/path.hpp>
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 
 namespace Si
 {

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_PTR_SINK_HPP
 #define SILICIUM_PTR_SINK_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 
 namespace Si
 {

@@ -3,7 +3,7 @@
 #include <silicium/write_file.hpp>
 #include <silicium/process.hpp>
 #include <silicium/git/repository.hpp>
-#include <silicium/iterator_sink.hpp>
+#include <silicium/sink/iterator_sink.hpp>
 #include <boost/optional.hpp>
 #include <boost/filesystem/operations.hpp>
 

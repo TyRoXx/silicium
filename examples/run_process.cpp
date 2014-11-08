@@ -2,7 +2,7 @@
 #include <silicium/build_result.hpp>
 #include <silicium/directory_allocator.hpp>
 #include <silicium/to_unique.hpp>
-#include <silicium/iterator_sink.hpp>
+#include <silicium/sink/iterator_sink.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/variant.hpp>

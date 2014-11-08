@@ -1,7 +1,7 @@
 #ifndef SILICIUM_ZLIB_INFLATING_SINK_HPP
 #define SILICIUM_ZLIB_INFLATING_SINK_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
 
 namespace Si

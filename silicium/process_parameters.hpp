@@ -2,7 +2,7 @@
 #define SILICIUM_PROCESS_PARAMETERS_HPP
 
 #include <silicium/source.hpp>
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 #include <vector>
 #include <string>
 #include <boost/filesystem/path.hpp>

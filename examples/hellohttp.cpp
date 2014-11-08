@@ -4,7 +4,7 @@
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/buffering_source.hpp>
 #include <silicium/config.hpp>
-#include <silicium/ptr_sink.hpp>
+#include <silicium/sink/ptr_sink.hpp>
 #include <boost/format.hpp>
 
 namespace

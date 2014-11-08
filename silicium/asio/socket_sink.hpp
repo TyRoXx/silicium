@@ -1,7 +1,7 @@
 #ifndef SILICIUM_ASIO_SOCKET_SINK_HPP
 #define SILICIUM_ASIO_SOCKET_SINK_HPP
 
-#include <silicium/sink.hpp>
+#include <silicium/sink/sink.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/write.hpp>
 
