@@ -5,12 +5,13 @@
 
 namespace
 {
-	template <class PathPredicate>
+	template <class PathPredicate, class PathHandler>
 	void generate_sources_recursively(
 		boost::filesystem::path const &sources,
 		boost::filesystem::path const &headers,
 		boost::filesystem::path const &relative_include_path,
-		PathPredicate const &is_relevant_directory
+		PathPredicate const &is_relevant_directory,
+		PathHandler const &on_include
 		)
 	{
 		for (boost::filesystem::directory_iterator i(headers); i != boost::filesystem::directory_iterator(); ++i)
@@ -20,7 +21,7 @@ namespace
 			case boost::filesystem::directory_file:
 				if (is_relevant_directory(i->path()))
 				{
-					generate_sources_recursively(sources / i->path().leaf(), i->path(), relative_include_path / i->path().leaf(), is_relevant_directory);
+					generate_sources_recursively(sources / i->path().leaf(), i->path(), relative_include_path / i->path().leaf(), is_relevant_directory, on_include);
 				}
 				break;
 
@@ -41,7 +42,9 @@ namespace
 					{
 						throw std::runtime_error("Cannot open file " + source.string());
 					}
-					source_file << "#include <silicium/" << boost::algorithm::replace_all_copy((relative_include_path / header_leaf).string(), "\\", "/") << ">\n";
+					std::string header_name = "<silicium/" + boost::algorithm::replace_all_copy((relative_include_path / header_leaf).string(), "\\", "/") + ">";
+					source_file << "#include " << header_name << "\n";
+					on_include(header_name);
 					if (!source_file)
 					{
 						throw std::runtime_error("Could not write to " + source.string());
@@ -75,5 +78,16 @@ int main()
 		};
 		return blacklist.count(dir.leaf().string()) == 0;
 	};
-	generate_sources_recursively(sources_root, headers_root, "", is_relevant_directory);
+
+	auto const all_headers_file_name = sources_root / "_all_headers.cpp";
+	std::ofstream all_headers(all_headers_file_name.string());
+	if (!all_headers)
+	{
+		throw std::runtime_error("Cannot open file " + all_headers_file_name.string());
+	}
+	auto const write_header = [&all_headers](std::string const &header_name)
+	{
+		all_headers << "#include " << header_name << '\n';
+	};
+	generate_sources_recursively(sources_root, headers_root, "", is_relevant_directory, write_header);
 }

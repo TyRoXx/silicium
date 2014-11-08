@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_BUFFER_HPP
-#define SILICIUM_REACTIVE_BUFFER_HPP
+#ifndef SILICIUM_BUFFER_HPP
+#define SILICIUM_BUFFER_HPP
 
 #include <silicium/override.hpp>
 #include <silicium/observable/observer.hpp>
@@ -11,18 +11,18 @@
 namespace Si
 {
 	template <class Element, class Original>
-	struct buffer
+	struct buffer_observable
 		: private observer<Element>
 	{
 		typedef Element element_type;
 
-		buffer()
+		buffer_observable()
 			: receiver(nullptr)
 			, fetching(false)
 		{
 		}
 
-		explicit buffer(Original from, std::size_t size)
+		explicit buffer_observable(Original from, std::size_t size)
 			: from(std::move(from))
 			, elements(size)
 			, receiver(nullptr)
@@ -31,7 +31,7 @@ namespace Si
 		}
 
 #if defined(_MSC_VER) || (BOOST_VERSION <= 105400)
-		buffer(buffer &&other)
+		buffer_observable(buffer_observable &&other)
 			: from(std::move(other.from))
 			, elements(std::move(other.elements))
 			, receiver(nullptr)
@@ -39,7 +39,7 @@ namespace Si
 		{
 		}
 
-		buffer &operator = (buffer &&other)
+		buffer_observable &operator = (buffer_observable &&other)
 		{
 			//TODO: exception safety
 			from = std::move(other.from);
@@ -49,8 +49,8 @@ namespace Si
 			return *this;
 		}
 #else
-		buffer(buffer &&) = default;
-		buffer &operator = (buffer &&) = default;
+		buffer_observable(buffer_observable &&) = default;
+		buffer_observable &operator = (buffer_observable &&) = default;
 #endif
 
 		void async_get_one(observer<element_type> &receiver)
@@ -127,16 +127,16 @@ namespace Si
 			from.async_get_one(*this);
 		}
 
-		SILICIUM_DELETED_FUNCTION(buffer(buffer const &))
-		SILICIUM_DELETED_FUNCTION(buffer &operator = (buffer const &))
+		SILICIUM_DELETED_FUNCTION(buffer_observable(buffer_observable const &))
+		SILICIUM_DELETED_FUNCTION(buffer_observable &operator = (buffer_observable const &))
 	};
 
 	template <class Original>
-	auto make_buffer(Original &&from, std::size_t size) -> buffer<typename std::decay<Original>::type::element_type, typename std::decay<Original>::type>
+	auto make_buffer_observable(Original &&from, std::size_t size) -> buffer_observable<typename std::decay<Original>::type::element_type, typename std::decay<Original>::type>
 	{
 		typedef typename std::decay<Original>::type clean_original;
 		typedef typename clean_original::element_type element;
-		return buffer<element, clean_original>(std::forward<Original>(from), size);
+		return buffer_observable<element, clean_original>(std::forward<Original>(from), size);
 	}
 }
 

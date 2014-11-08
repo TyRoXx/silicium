@@ -5,14 +5,11 @@
 #include <silicium/fast_variant.hpp>
 #include <silicium/file_descriptor.hpp>
 #include <silicium/memory_range.hpp>
+#include <silicium/flush.hpp>
 #include <sys/uio.h>
 
 namespace Si
 {
-	struct flush
-	{
-	};
-
 	struct seek_set
 	{
 		boost::uint64_t from_beginning;

@@ -95,7 +95,7 @@ namespace Si
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
 		Si::ptr_observable<int, std::shared_ptr<Si::observable<int>>> first{bridge};
-		auto buf = Si::make_buffer(first, 2);
+		auto buf = Si::make_buffer_observable(first, 2);
 		buf.prefetch();
 
 		std::vector<int> generated;

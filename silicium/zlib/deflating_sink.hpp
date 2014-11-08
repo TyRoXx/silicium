@@ -4,6 +4,7 @@
 #include <silicium/fast_variant.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
+#include <silicium/flush.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/optional.hpp>
 
@@ -69,10 +70,6 @@ namespace Si
 
 		SILICIUM_DELETED_FUNCTION(zlib_deflate_stream(zlib_deflate_stream const &))
 		SILICIUM_DELETED_FUNCTION(zlib_deflate_stream &operator = (zlib_deflate_stream const &))
-	};
-
-	struct flush
-	{
 	};
 
 	typedef fast_variant<flush, memory_range> zlib_sink_element;

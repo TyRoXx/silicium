@@ -1,7 +1,7 @@
 #ifndef SILICIUM_END_OBSERVABLE_HPP
 #define SILICIUM_END_OBSERVABLE_HPP
 
-#include <silicium/observable.hpp>
+#include <silicium/observable/observable.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/config.hpp>
 #include <silicium/override.hpp>

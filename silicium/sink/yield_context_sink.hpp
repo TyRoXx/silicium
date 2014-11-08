@@ -1,8 +1,8 @@
 #ifndef SILICIUM_YIELD_CONTEXT_SINK_HPP
 #define SILICIUM_YIELD_CONTEXT_SINK_HPP
 
-#include <silicium/sink.hpp>
-#include <silicium/yield_context.hpp>
+#include <silicium/sink/sink.hpp>
+#include <silicium/observable/yield_context.hpp>
 
 namespace Si
 {
