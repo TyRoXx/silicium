@@ -1,7 +1,8 @@
 file(GLOB sources
 	"*.hpp" "*.cpp"
-	"http/*.hpp" "http/*.cpp"
-	"zlib/*.hpp")
+	"http/*"
+	"sink/*" "source/*"
+	"zlib/*")
 
 file(GLOB asioSources "asio/*.hpp" "asio/*cpp")
 
