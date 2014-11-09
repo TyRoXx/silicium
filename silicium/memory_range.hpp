@@ -14,20 +14,25 @@ namespace Si
 		typedef typename boost::mpl::if_<boost::is_const<From>, boost::add_const<To>, boost::remove_const<To>>::type::type type;
 	};
 
-	template <class Byte>
+	template <class Byte, class DestType = typename copy_const<char, Byte>::type>
 	auto make_memory_range(Byte *begin, Byte *end)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> boost::iterator_range<DestType *>
+#endif
 	{
 		BOOST_STATIC_ASSERT(sizeof(Byte) == 1);
 		BOOST_STATIC_ASSERT(std::is_pod<Byte>::value);
-		typedef typename copy_const<char, Byte>::type dest_type;
 		return boost::make_iterator_range(
-			reinterpret_cast<dest_type *>(begin),
-			reinterpret_cast<dest_type *>(end)
+			reinterpret_cast<DestType *>(begin),
+			reinterpret_cast<DestType *>(end)
 		);
 	}
-
+	
 	template <class ContiguousRange>
 	auto make_memory_range(ContiguousRange &&range)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(make_memory_range(boost::addressof(*std::begin(range)), boost::addressof(*std::end(range))))
+#endif
 	{
 		BOOST_STATIC_ASSERT(std::is_lvalue_reference<ContiguousRange>::value);
 		using std::begin;
@@ -40,6 +45,9 @@ namespace Si
 
 	template <class C>
 	auto make_c_str_range(C const *str)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> boost::iterator_range<C const *>
+#endif
 	{
 		return make_memory_range(str, str + std::char_traits<C>::length(str));
 	}

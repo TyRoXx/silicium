@@ -58,8 +58,13 @@ namespace Si
 
 		error_or(Value &&value) BOOST_NOEXCEPT
 			: code(0)
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
 			, value(std::move(value))
+#endif
 		{
+#if !SILICIUM_COMPILER_HAS_CXX11_UNION
+			new (reinterpret_cast<Value *>(this->value.data())) Value(std::move(value));
+#endif
 		}
 
 		error_or(Value const &value)
@@ -169,7 +174,11 @@ namespace Si
 		{
 			if (!is_error())
 			{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
 				value.~Value();
+#else
+				reinterpret_cast<Value *>(value.data())->~Value();
+#endif
 			}
 		}
 
@@ -300,7 +309,11 @@ namespace Si
 		int code;
 		union
 		{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
 			Value value;
+#else
+			std::array<char, sizeof(Value)> value;
+#endif
 			category_type const *category;
 		};
 	};

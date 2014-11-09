@@ -113,7 +113,11 @@ namespace Si
 		return detail::then_impl<result_type>()(std::forward<First>(first), std::forward<Sequence>(actions)...);
 	}
 
-	template <class Next, class Error = typename Next::error_type, class Buffer = std::array<typename Next::element_type, ((1U << 13U) / sizeof(typename Next::element_type))>>
+	template <
+		class Next,
+		class Error = typename Next::error_type,
+		class Buffer = std::array<typename Next::element_type, ((1U << 13U) / sizeof(typename Next::element_type))>
+	>
 	struct buffering_sink SILICIUM_FINAL
 		: sink  <typename Next::element_type, typename Next::error_type>
 		, buffer<typename Next::element_type, typename Next::error_type>
@@ -182,6 +186,9 @@ namespace Si
 
 	template <class Next>
 	auto make_buffering_sink(Next &&next)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> buffering_sink<typename std::decay<Next>::type>
+#endif
 	{
 		return buffering_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
 	}

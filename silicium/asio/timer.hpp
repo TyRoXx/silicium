@@ -67,6 +67,9 @@ namespace Si
 
 		template <class AsioTimer = boost::asio::steady_timer, class DurationObservable>
 		auto make_timer(boost::asio::io_service &io, DurationObservable &&delays)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> timer<AsioTimer, typename std::decay<DurationObservable>::type>
+#endif
 		{
 			return timer<AsioTimer, typename std::decay<DurationObservable>::type>(io, std::forward<DurationObservable>(delays));
 		}

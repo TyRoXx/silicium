@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_DIRECTORY_CHANGES_HPP
 
 #include <boost/asio/io_service.hpp>
-#include <silicium/observer.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/override.hpp>
 #include <boost/filesystem/path.hpp>

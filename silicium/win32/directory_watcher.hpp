@@ -3,9 +3,9 @@
 
 #include <silicium/win32/directory_changes.hpp>
 #include <silicium/file_notification.hpp>
-#include <silicium/enumerate.hpp>
-#include <silicium/ref.hpp>
-#include <silicium/transform_if_initialized.hpp>
+#include <silicium/observable/enumerate.hpp>
+#include <silicium/observable/ref.hpp>
+#include <silicium/observable/transform_if_initialized.hpp>
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
 
