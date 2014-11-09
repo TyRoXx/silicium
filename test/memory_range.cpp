@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/array.hpp>
+#include <array>
 
 BOOST_AUTO_TEST_CASE(make_memory_range_c_str_literal)
 {

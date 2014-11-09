@@ -89,11 +89,15 @@ namespace Si
 		{
 		}
 
-		BOOST_DEFAULTED_FUNCTION(zlib_deflating_sink(zlib_deflating_sink &&other),
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		zlib_deflating_sink(zlib_deflating_sink &&other) = default;
+#else
+		zlib_deflating_sink(zlib_deflating_sink &&other)
 			: m_next(std::move(other.m_next))
-			BOOST_PP_COMMA() m_stream(std::move(other.m_stream))
+			, m_stream(std::move(other.m_stream))
 		{
-		})
+		}
+#endif
 
 		virtual boost::system::error_code append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
@@ -135,6 +139,9 @@ namespace Si
 
 	template <class Next>
 	auto make_deflating_sink(Next &&next, zlib_deflate_stream stream)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> zlib_deflating_sink<typename std::decay<Next>::type>
+#endif
 	{
 		return zlib_deflating_sink<typename std::decay<Next>::type>(std::forward<Next>(next), std::move(stream));
 	}

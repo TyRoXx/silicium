@@ -2,6 +2,7 @@
 #define SILICIUM_ITERATOR_SINK_HPP
 
 #include <silicium/sink/sink.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -19,10 +20,14 @@ namespace Si
 		{
 		}
 
-		BOOST_DEFAULTED_FUNCTION(iterator_sink(iterator_sink &&other),
-			: m_out(std::move(other.m_out)
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		iterator_sink(iterator_sink &&other) = default;
+#else
+		iterator_sink(iterator_sink &&other)
+			: m_out(std::move(other.m_out))
 		{
-		}))
+		}
+#endif
 
 		virtual void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{

@@ -4,6 +4,7 @@
 #include <silicium/process_parameters.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/error_code.hpp>
+#include <silicium/sink/ptr_sink.hpp>
 #include <cassert>
 #include <stdexcept>
 
@@ -121,7 +122,7 @@ namespace Si
 		output.write.reset();
 		if (parameters.out)
 		{
-			Si::buffering_sink<char, void> buffered_out(*parameters.out);
+			auto buffered_out  = make_buffering_sink(ref_sink(*parameters.out));
 			for (;;)
 			{
 				auto buffer = buffered_out.make_append_space((std::numeric_limits<DWORD>::max)());

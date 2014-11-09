@@ -48,6 +48,9 @@ namespace Si
 
 	template <class ContiguousContainer>
 	auto make_container_buffer(ContiguousContainer &destination)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> container_buffer<ContiguousContainer>
+#endif
 	{
 		return container_buffer<ContiguousContainer>(destination);
 	}

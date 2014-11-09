@@ -45,32 +45,47 @@ namespace Si
 	{
 		error_or() BOOST_NOEXCEPT
 			: code(0)
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
 			, value(Value()) //initialize so that reading the value does not have undefined behaviour
+#endif
 		{
+#if !SILICIUM_COMPILER_HAS_CXX11_UNION
+			new (value_ptr()) Value();
+#endif
 		}
 
 		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
 		error_or(ConvertibleToValue &&value) BOOST_NOEXCEPT
 			: code(0)
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
 			, value(std::forward<ConvertibleToValue>(value))
+#endif
 		{
+#if !SILICIUM_COMPILER_HAS_CXX11_UNION
+			new (value_ptr()) Value(std::forward<ConvertibleToValue>(value));
+#endif
 		}
 
 		error_or(Value &&value) BOOST_NOEXCEPT
 			: code(0)
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-			, value(std::move(value))
+			, value_(std::move(value))
 #endif
 		{
 #if !SILICIUM_COMPILER_HAS_CXX11_UNION
-			new (reinterpret_cast<Value *>(this->value.data())) Value(std::move(value));
+			new (value_ptr()) Value(std::move(value));
 #endif
 		}
 
 		error_or(Value const &value)
 			: code(0)
-			, value(value)
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+			, value_(value)
+#endif
 		{
+#if !SILICIUM_COMPILER_HAS_CXX11_UNION
+			new (value_ptr()) Value(value);
+#endif
 		}
 
 		error_or(Error error) BOOST_NOEXCEPT
@@ -88,7 +103,7 @@ namespace Si
 			}
 			else
 			{
-				new (&value) Value(other.value);
+				new (value_ptr()) Value(*other.value_ptr());
 			}
 		}
 
@@ -101,7 +116,7 @@ namespace Si
 			}
 			else
 			{
-				new (&value) Value(std::move(other.value));
+				new (value_ptr()) Value(std::move(*other.value_ptr()));
 			}
 		}
 
@@ -161,11 +176,11 @@ namespace Si
 			if (is_error())
 			{
 				code = 0;
-				new (&value) Value(other);
+				new (value_ptr()) Value(other);
 			}
 			else
 			{
-				value = other;
+				*value_ptr() = other;
 			}
 			return *this;
 		}
@@ -174,11 +189,7 @@ namespace Si
 		{
 			if (!is_error())
 			{
-#if SILICIUM_COMPILER_HAS_CXX11_UNION
-				value.~Value();
-#else
-				reinterpret_cast<Value *>(value.data())->~Value();
-#endif
+				value_ptr()->~Value();
 			}
 		}
 
@@ -202,7 +213,7 @@ namespace Si
 			{
 				throw_error(error());
 			}
-			return value;
+			return *value_ptr();
 		}
 
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
@@ -225,7 +236,7 @@ namespace Si
 			{
 				throw_error(error());
 			}
-			return value;
+			return *value_ptr();
 		}
 
 		Value *get_ptr() BOOST_NOEXCEPT
@@ -234,7 +245,7 @@ namespace Si
 			{
 				return nullptr;
 			}
-			return &value;
+			return value_ptr();
 		}
 
 		Value const *get_ptr() const BOOST_NOEXCEPT
@@ -243,7 +254,7 @@ namespace Si
 			{
 				return nullptr;
 			}
-			return &value;
+			return value_ptr();
 		}
 
 		Value *operator -> ()
@@ -310,12 +321,30 @@ namespace Si
 		union
 		{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-			Value value;
+			Value value_;
 #else
-			std::array<char, sizeof(Value)> value;
+			std::array<char, sizeof(Value)> value_;
 #endif
 			category_type const *category;
 		};
+
+		Value *value_ptr()
+		{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+			return &value_;
+#else
+			return reinterpret_cast<Value *>(value_.data());
+#endif
+		}
+
+		Value const *value_ptr() const
+		{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+			return &value_;
+#else
+			return reinterpret_cast<Value const *>(value_.data());
+#endif
+		}
 	};
 
 	template <class T>

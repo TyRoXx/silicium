@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(asio_timer)
 	auto t = Si::asio::make_timer(io, Si::make_constant_observable(std::chrono::microseconds(1)));
 	std::size_t elapsed_count = 0;
 	std::size_t const loop_count = 10;
-	auto coro = Si::make_total_consumer(Si::make_coroutine([&t, &elapsed_count](Si::yield_context yield)
+	auto coro = Si::make_total_consumer(Si::make_coroutine([&t, &elapsed_count, loop_count](Si::yield_context yield)
 	{
 		BOOST_REQUIRE_EQUAL(0U, elapsed_count);
 		for (std::size_t i = 0; i < loop_count; ++i)

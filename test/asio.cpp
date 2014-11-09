@@ -4,6 +4,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 namespace Si
 {
 	namespace asio
@@ -24,9 +25,11 @@ namespace Si
 		}
 	}
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(asio_post)
 {
+#if SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	boost::asio::io_service io;
 	Si::bridge<int> b;
 	bool got_element = false;
@@ -43,4 +46,7 @@ BOOST_AUTO_TEST_CASE(asio_post)
 	BOOST_CHECK(!got_element);
 	io.run();
 	BOOST_CHECK(got_element);
+#else
+	BOOST_FAIL("TODO");
+#endif
 }

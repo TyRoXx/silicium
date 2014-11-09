@@ -14,9 +14,9 @@ namespace Si
 		struct coroutine_yield_context : basic_yield_context
 		{
 #if BOOST_VERSION >= 105500
-			typedef typename boost::coroutines::coroutine<observable<nothing> *>::push_type consumer_type;
+			typedef boost::coroutines::coroutine<observable<nothing> *>::push_type consumer_type;
 #else
-			typedef typename boost::coroutines::coroutine<observable<nothing> *()>::caller_type consumer_type;
+			typedef boost::coroutines::coroutine<observable<nothing> *()>::caller_type consumer_type;
 #endif
 
 			explicit coroutine_yield_context(consumer_type &consumer)
