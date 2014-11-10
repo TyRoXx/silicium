@@ -123,6 +123,7 @@ namespace Si
 			std::unique_ptr<arguments_table> arguments;
 
 			response_header() BOOST_NOEXCEPT
+				: status(0)
 			{
 			}
 
