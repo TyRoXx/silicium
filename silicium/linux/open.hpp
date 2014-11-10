@@ -33,7 +33,7 @@ namespace Si
 
 	inline error_or<file_descriptor> overwrite_file(boost::filesystem::path const &name)
 	{
-		native_file_handle const fd = ::open(name.c_str(), O_WRONLY | O_EXCL | O_TRUNC, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+		native_file_handle const fd = ::open(name.c_str(), O_RDWR | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
 		if (fd < 0)
 		{
 			return boost::system::error_code(errno, boost::system::system_category());
