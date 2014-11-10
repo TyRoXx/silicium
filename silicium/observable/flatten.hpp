@@ -13,6 +13,17 @@
 
 namespace Si
 {
+	struct null_mutex
+	{
+		void lock()
+		{
+		}
+
+		void unlock()
+		{
+		}
+	};
+
 	template <class ObservableObservable, class Mutex>
 	struct flattener
 		: private observer<typename ObservableObservable::element_type>
@@ -150,7 +161,7 @@ namespace Si
 		}
 	};
 
-	template <class Mutex, class ObservableObservable>
+	template <class Mutex = null_mutex, class ObservableObservable>
 	auto flatten(ObservableObservable &&input) -> flattener<typename std::decay<ObservableObservable>::type, Mutex>
 	{
 		return flattener<typename std::decay<ObservableObservable>::type, Mutex>(std::forward<ObservableObservable>(input));
