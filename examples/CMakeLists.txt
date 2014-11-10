@@ -38,3 +38,6 @@ target_link_libraries(directory_watcher silicium ${Boost_LIBRARIES})
 
 add_executable(sleep "sleep.cpp")
 target_link_libraries(sleep silicium ${Boost_LIBRARIES})
+
+add_executable(http_hello "http_hello.cpp")
+target_link_libraries(http_hello silicium ${Boost_LIBRARIES})
