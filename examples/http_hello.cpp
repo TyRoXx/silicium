@@ -24,13 +24,14 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 	{
 		return;
 	}
-	std::cerr << request_header->method << " " << request_header->path << '\n';
-	std::string content = "Hello";
 	std::vector<char> response;
-	auto response_writer = Si::make_container_sink(response);
-	Si::http::write_status_line(response_writer, "HTTP/1.0", "200", "OK");
-	Si::http::write_argument(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
-	Si::append(response_writer, content);
+	{
+		auto response_writer = Si::make_container_sink(response);
+		Si::http::write_status_line(response_writer, "HTTP/1.0", "200", "OK");
+		std::string const content = "Hello";
+		Si::http::write_argument(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
+		Si::append(response_writer, content);
+	}
 	auto sender = Si::make_writing_observable(client, Si::make_constant_observable(Si::make_memory_range(response)));
 	yield.get_one(sender);
 	client.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
