@@ -47,15 +47,17 @@ namespace Si
 		}
 
 		coroutine_observable(coroutine_observable &&other)
-			: receiver_(nullptr)
+			: coro_(std::move(other.coro_))
+			, action(std::move(other.action))
+			, receiver_(nullptr)
 			, has_finished(false)
 		{
-			*this = std::move(other);
 		}
 
 		template <class Action>
 		explicit coroutine_observable(Action &&action)
-			: action(std::forward<Action>(action))
+			: coro_()
+			, action(std::forward<Action>(action))
 			, receiver_(nullptr)
 			, has_finished(false)
 		{
@@ -86,13 +88,7 @@ namespace Si
 			boost::coroutines::coroutine<command_type ()>
 #endif
 		coroutine_type;
-		typedef
-#ifdef _MSC_VER
-			std::shared_ptr<coroutine_type>
-#else
-			coroutine_type
-#endif
-			coroutine_holder;
+		typedef std::shared_ptr<coroutine_type> coroutine_holder;
 
 		coroutine_holder coro_;
 		std::function<Element (yield_context)> action;
@@ -101,11 +97,7 @@ namespace Si
 
 		coroutine_type &coro()
 		{
-			return
-#ifdef _MSC_VER
-				*
-#endif
-				coro_;
+			return *coro_;
 		}
 
 		virtual void got_element(nothing) SILICIUM_OVERRIDE
@@ -120,19 +112,16 @@ namespace Si
 
 		void next()
 		{
+			auto keep_coro_alive = coro_;
 			if (has_finished)
 			{
 				return Si::exchange(receiver_, nullptr)->ended();
 			}
 			if (action)
 			{
-				auto bound_action = action;
+				auto bound_action = Si::exchange(action, decltype(action)());
 				coro_ =
-#ifdef _MSC_VER
 					std::make_shared<coroutine_type>
-#else
-					coroutine_type
-#endif
 						([bound_action, this](
 #if BOOST_VERSION >= 105500
 							typename boost::coroutines::coroutine<command_type>::push_type
@@ -148,7 +137,6 @@ namespace Si
 							has_finished = true;
 							Si::exchange(receiver_, nullptr)->got_element(std::move(result));
 						});
-				action = nullptr;
 			}
 			else if (coro())
 			{
