@@ -46,7 +46,7 @@ namespace Si
 		error_or() BOOST_NOEXCEPT
 			: code(0)
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-			, value(Value()) //initialize so that reading the value does not have undefined behaviour
+			, value_(Value()) //initialize so that reading the value does not have undefined behaviour
 #endif
 		{
 #if !SILICIUM_COMPILER_HAS_CXX11_UNION
@@ -58,7 +58,7 @@ namespace Si
 		error_or(ConvertibleToValue &&value) BOOST_NOEXCEPT
 			: code(0)
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-			, value(std::forward<ConvertibleToValue>(value))
+			, value_(std::forward<ConvertibleToValue>(value))
 #endif
 		{
 #if !SILICIUM_COMPILER_HAS_CXX11_UNION
@@ -131,20 +131,20 @@ namespace Si
 				}
 				else
 				{
-					new (&value) Value(std::move(other.value));
+					new (value_ptr()) Value(std::move(*other.value_ptr()));
 				}
 			}
 			else
 			{
 				if (other.is_error())
 				{
-					value.~Value();
+					value_ptr()->~Value();
 					code = other.code;
 					category = other.category;
 				}
 				else
 				{
-					value = std::move(other.value);
+					*value_ptr() = std::move(*other.value_ptr());
 				}
 			}
 			return *this;
@@ -162,11 +162,11 @@ namespace Si
 			if (is_error())
 			{
 				code = 0;
-				new (&value) Value(std::move(other));
+				new (value_ptr()) Value(std::move(other));
 			}
 			else
 			{
-				value = std::move(other);
+				*value_ptr() = std::move(other);
 			}
 			return *this;
 		}
@@ -223,7 +223,7 @@ namespace Si
 			{
 				throw_error(error());
 			}
-			return std::move(value);
+			return std::move(*value_ptr());
 		}
 #endif
 
@@ -291,7 +291,7 @@ namespace Si
 			{
 				return error() == other.error();
 			}
-			return value == other.get();
+			return get() == other.get();
 		}
 
 		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
