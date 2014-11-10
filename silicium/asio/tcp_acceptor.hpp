@@ -11,7 +11,7 @@ namespace Si
 {
 	typedef error_or<std::shared_ptr<boost::asio::ip::tcp::socket>> tcp_acceptor_result; //until socket itself is noexcept-movable
 
-	struct tcp_acceptor : private boost::noncopyable
+	struct tcp_acceptor
 	{
 		typedef tcp_acceptor_result element_type;
 
@@ -25,6 +25,21 @@ namespace Si
 			: underlying(&underlying)
 			, receiver_(nullptr)
 		{
+		}
+
+		tcp_acceptor(tcp_acceptor &&other) BOOST_NOEXCEPT
+			: underlying(other.underlying)
+			, next_client(std::move(other.next_client))
+			, receiver_(other.receiver_)
+		{
+		}
+
+		tcp_acceptor &operator = (tcp_acceptor &&other) BOOST_NOEXCEPT
+		{
+			underlying = other.underlying;
+			next_client = std::move(other.next_client);
+			receiver_ = other.receiver_;
+			return *this;
 		}
 
 		~tcp_acceptor()
@@ -70,6 +85,9 @@ namespace Si
 		boost::asio::ip::tcp::acceptor *underlying;
 		std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
 		observer<element_type> *receiver_;
+
+		SILICIUM_DELETED_FUNCTION(tcp_acceptor(tcp_acceptor const &))
+		SILICIUM_DELETED_FUNCTION(tcp_acceptor &operator = (tcp_acceptor const &))
 	};
 }
 
