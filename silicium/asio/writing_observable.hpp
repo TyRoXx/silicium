@@ -5,6 +5,8 @@
 #include <silicium/memory_range.hpp>
 #include <silicium/override.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/observable/yield_context.hpp>
+#include <silicium/observable/constant.hpp>
 #include <silicium/observable/observer.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/asio/write.hpp>
@@ -69,6 +71,13 @@ namespace Si
 #endif
 	{
 		return writing_observable<AsyncStream, typename std::decay<BufferObservable>::type>(stream, std::forward<BufferObservable>(buffers));
+	}
+
+	template <class AsyncStream>
+	boost::system::error_code write(AsyncStream &stream, memory_range data, yield_context yield)
+	{
+		auto writer = make_writing_observable(stream, make_constant_observable(data));
+		return *yield.get_one(writer);
 	}
 }
 

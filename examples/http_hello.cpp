@@ -24,6 +24,7 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 	{
 		return;
 	}
+
 	std::vector<char> response;
 	{
 		auto response_writer = Si::make_container_sink(response);
@@ -33,8 +34,11 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 		Si::append(response_writer, "\r\n");
 		Si::append(response_writer, content);
 	}
-	auto sender = Si::make_writing_observable(client, Si::make_constant_observable(Si::make_memory_range(response)));
-	yield.get_one(sender);
+
+	//you can handle the error if you want
+	boost::system::error_code error = Si::write(client, Si::make_memory_range(response), yield);
+	boost::ignore_unused_variable_warning(error);
+
 	client.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 }
 
