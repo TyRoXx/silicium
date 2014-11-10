@@ -30,6 +30,7 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 		Si::http::write_status_line(response_writer, "HTTP/1.0", "200", "OK");
 		std::string const content = "Hello";
 		Si::http::write_argument(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
+		Si::append(response_writer, "\r\n");
 		Si::append(response_writer, content);
 	}
 	auto sender = Si::make_writing_observable(client, Si::make_constant_observable(Si::make_memory_range(response)));
