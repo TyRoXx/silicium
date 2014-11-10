@@ -115,10 +115,12 @@ namespace Si
 
 		struct response_header
 		{
+			typedef std::map<noexcept_string, noexcept_string> arguments_table;
+
 			noexcept_string http_version;
 			int status;
 			noexcept_string status_text;
-			std::unique_ptr<std::map<noexcept_string, noexcept_string>> arguments;
+			std::unique_ptr<arguments_table> arguments;
 
 			response_header() BOOST_NOEXCEPT
 			{
