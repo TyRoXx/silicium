@@ -42,9 +42,9 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 
 	//you can handle the error if you want
 	boost::system::error_code error = Si::write(client, Si::make_memory_range(response), yield);
-	boost::ignore_unused_variable_warning(error);
 
-	client.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+	//ignore shutdown failures, they do not matter here
+	client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 }
 
 int main()
