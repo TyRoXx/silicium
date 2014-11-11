@@ -6,22 +6,27 @@
 #include <silicium/observable/flatten.hpp>
 #include <silicium/observable/coroutine.hpp>
 #include <silicium/observable/constant.hpp>
-#include <silicium/source/virtualized_source.hpp>
 #include <silicium/observable/total_consumer.hpp>
-#include <silicium/memory_range.hpp>
-#include <silicium/source/received_from_socket_source.hpp>
+#include <silicium/source/error_extracting_source.hpp>
+#include <silicium/source/enumerating_source.hpp>
+#include <silicium/source/ref.hpp>
 #include <silicium/source/observable_source.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/memory_range.hpp>
 
 void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 {
 	std::array<char, 4096> incoming_buffer;
 	auto receiver = Si::socket_observable(client, Si::make_memory_range(incoming_buffer));
-	auto incoming_chunks = Si::virtualize_source(Si::make_observable_source(std::move(receiver), yield));
-	Si::received_from_socket_source incoming_bytes(incoming_chunks);
-	auto request_header = Si::http::parse_header(incoming_bytes);
+	auto without_errors = Si::make_error_extracting_source(Si::make_observable_source(std::move(receiver), yield));
+	auto enumerated = Si::make_enumerating_source(Si::ref_source(without_errors));
+	auto request_header = Si::http::parse_header(enumerated);
 	if (!request_header)
 	{
+		//The header was incomplete, maybe the connecting was closed.
+		//If we want to know the reason, the error_extracting_source remembered it:
+		boost::system::error_code error = without_errors.get_last_error();
+		boost::ignore_unused_variable_warning(error);
 		return;
 	}
 
