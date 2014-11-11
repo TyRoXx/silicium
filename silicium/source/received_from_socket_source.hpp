@@ -32,7 +32,7 @@ namespace Si
 		virtual boost::iterator_range<char const *> map_next(std::size_t) SILICIUM_OVERRIDE
 		{
 			assert(original);
-			if (rest.begin == rest.end)
+			if (rest.begin() == rest.end())
 			{
 				auto next = Si::get(*original);
 				if (!next)
@@ -46,7 +46,7 @@ namespace Si
 				}
 				rest = *bytes;
 			}
-			return boost::iterator_range<char const *>(rest.begin, rest.end);
+			return boost::iterator_range<char const *>(rest.begin(), rest.end());
 		}
 
 		virtual char *copy_next(boost::iterator_range<char *> destination) SILICIUM_OVERRIDE
@@ -74,9 +74,9 @@ namespace Si
 		std::size_t skip(std::size_t count)
 		{
 			std::size_t skipped = 0;
-			auto const rest_size = std::distance(rest.begin, rest.end);
+			auto const rest_size = rest.size();
 			auto const rest_skipped = std::min<ptrdiff_t>(count, rest_size);
-			rest.begin += rest_skipped;
+			rest.pop_front(rest_skipped);
 			count -= rest_skipped;
 			skipped += rest_skipped;
 			if (count > 0)

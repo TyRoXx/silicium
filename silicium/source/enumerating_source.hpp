@@ -11,7 +11,11 @@ namespace Si
 		template <class Range>
 		struct value_type
 		{
-			typedef typename std::iterator_traits<decltype(std::declval<Range>().begin())>::value_type type;
+			typedef typename std::iterator_traits<
+				typename std::decay<
+					decltype(std::declval<Range>().begin())
+				>::type
+			>::value_type type;
 		};
 	}
 
@@ -34,7 +38,9 @@ namespace Si
 		{
 			if (!m_rest.empty())
 			{
-				return Si::exchange(m_rest, range_type{});
+				boost::iterator_range<element_type const *> result(m_rest.begin(), m_rest.end());
+				m_rest = range_type();
+				return result;
 			}
 			boost::ignore_unused_variable_warning(size);
 			auto element = Si::get(m_input);
@@ -42,7 +48,7 @@ namespace Si
 			{
 				return {};
 			}
-			return *element;
+			return boost::iterator_range<element_type const *>(element->begin(), element->end());
 		}
 
 		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE

@@ -5,34 +5,14 @@
 #include <silicium/override.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/iterator_range.hpp>
 #include <boost/config.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/range/iterator_range.hpp>
 
 namespace Si
 {
-	struct incoming_bytes
-	{
-		char const *begin, *end;
-
-		incoming_bytes() BOOST_NOEXCEPT
-			: begin(nullptr)
-			, end(nullptr)
-		{
-		}
-
-		incoming_bytes(char const *begin, char const *end) BOOST_NOEXCEPT
-			: begin(begin)
-			, end(end)
-		{
-		}
-
-		std::size_t size() const BOOST_NOEXCEPT
-		{
-			return static_cast<std::size_t>(end - begin);
-		}
-	};
-
+	typedef iterator_range<char const *> incoming_bytes;
 	typedef error_or<incoming_bytes> received_from_socket;
 
 	struct socket_observable

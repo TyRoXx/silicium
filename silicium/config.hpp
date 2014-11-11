@@ -98,6 +98,9 @@
 #	define SILICIUM_DEPRECATED __attribute__((deprecated))
 #endif
 
+//TODO
+#define SILICIUM_CXX14_CONSTEXPR
+
 namespace Si
 {
 	struct nothing
