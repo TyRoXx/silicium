@@ -18,6 +18,7 @@
 #include <silicium/detail/proper_value_function.hpp>
 #include <silicium/detail/transform.hpp>
 #include <silicium/to_shared.hpp>
+#include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/observable/for_each.hpp>
 #include <silicium/observable/deref_optional.hpp>
@@ -73,6 +74,7 @@
 #include <silicium/override.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/source/observable_source.hpp>
+#include <silicium/source/ref.hpp>
 #include <silicium/source/single_source.hpp>
 #include <silicium/source/filter_source.hpp>
 #include <silicium/source/buffering_source.hpp>
@@ -81,7 +83,9 @@
 #include <silicium/source/memory_source.hpp>
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/source/generator_source.hpp>
+#include <silicium/source/enumerating_source.hpp>
 #include <silicium/source/transforming_source.hpp>
+#include <silicium/source/error_extracting_source.hpp>
 #include <silicium/source/file_source.hpp>
 #include <silicium/git/repository.hpp>
 #include <silicium/git/oxid.hpp>
