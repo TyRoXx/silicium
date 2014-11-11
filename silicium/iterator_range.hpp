@@ -12,6 +12,8 @@ namespace Si
 		typedef typename std::iterator_traits<Iterator>::value_type value_type;
 
 		BOOST_CONSTEXPR iterator_range() BOOST_NOEXCEPT
+			: m_begin(Iterator())
+			, m_end(Iterator())
 		{
 		}
 
