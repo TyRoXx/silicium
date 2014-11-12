@@ -107,7 +107,7 @@ namespace Si
 				{
 					break;
 				}
-				auto value = detail::split_value_line(*value_line);
+				auto value = Si::detail::split_value_line(*value_line);
 				(*header.arguments)[value.first] = std::move(value.second);
 			}
 			return std::move(header);

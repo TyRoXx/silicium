@@ -2,7 +2,10 @@
 #include <silicium/build_result.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/http/http.hpp>
+#include <silicium/http/generate_header.hpp>
+#include <silicium/http/generate_request.hpp>
 #include <silicium/http/parse_response.hpp>
+#include <silicium/http/generate_response.hpp>
 #include <silicium/http/parse_request.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/flush.hpp>
