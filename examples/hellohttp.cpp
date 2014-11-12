@@ -26,7 +26,7 @@ namespace
 				response.status = 400;
 				response.status_text = "Bad Request";
 				response.http_version = "HTTP/1.0";
-				Si::http::generate_header(buffered_sender, response);
+				Si::http::generate_response(buffered_sender, response);
 				buffered_sender.flush();
 				return;
 			}
@@ -43,7 +43,7 @@ namespace
 			(*response.arguments)["Content-Length"] = boost::lexical_cast<Si::noexcept_string>(content.size());
 			(*response.arguments)["Connection"] = "close";
 			(*response.arguments)["Content-Type"] = "text/html";
-			Si::http::generate_header(buffered_sender, response);
+			Si::http::generate_response(buffered_sender, response);
 			Si::append(buffered_sender, content);
 			buffered_sender.flush();
 		}

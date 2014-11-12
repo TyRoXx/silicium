@@ -35,7 +35,7 @@ namespace Si
 		header.method = "POST";
 		header.path = "/p";
 		header.arguments["Content-Length"] = "13";
-		http::generate_header(sink, header);
+		http::generate_request(sink, header);
 		BOOST_CHECK_EQUAL(
 			"POST /p HTTP/1.1\r\n"
 			"Content-Length: 13\r\n"

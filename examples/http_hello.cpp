@@ -35,7 +35,7 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 		auto response_writer = Si::make_container_sink(response);
 		Si::http::generate_status_line(response_writer, "HTTP/1.0", "200", "OK");
 		std::string const content = "Hello";
-		Si::http::write_argument(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
+		Si::http::generate_header(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
 		Si::append(response_writer, "\r\n");
 		Si::append(response_writer, content);
 	}

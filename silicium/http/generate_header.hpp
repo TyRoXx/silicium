@@ -10,7 +10,7 @@ namespace Si
 	namespace http
 	{
 		template <class CharSink, class Key, class Value>
-		void write_argument(CharSink &&out, Key const &key, Value const &value)
+		void generate_header(CharSink &&out, Key const &key, Value const &value)
 		{
 			append(out, key);
 			append(out, ": ");
@@ -21,11 +21,11 @@ namespace Si
 		namespace detail
 		{
 			template <class CharSink>
-			void write_arguments_map(CharSink &&out, std::map<noexcept_string, noexcept_string> const &arguments)
+			void generate_header_map(CharSink &&out, std::map<noexcept_string, noexcept_string> const &arguments)
 			{
 				for (auto const &argument : arguments)
 				{
-					write_argument(out, argument.first, argument.second);
+					generate_header(out, argument.first, argument.second);
 				}
 			}
 		}

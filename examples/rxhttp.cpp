@@ -40,7 +40,7 @@ namespace
 			std::string const body = boost::str(boost::format("Hello, visitor %1%") % visitor_number);
 			(*response.arguments)["Content-Length"] = boost::lexical_cast<Si::noexcept_string>(body.size());
 			(*response.arguments)["Connection"] = "close";
-			Si::http::generate_header(response_sink, response);
+			Si::http::generate_response(response_sink, response);
 			Si::append(response_sink, body);
 		}
 		client.send(Si::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));

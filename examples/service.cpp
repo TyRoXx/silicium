@@ -367,7 +367,7 @@ int main(int argc, char **argv)
 		(*response.arguments)["Connection"] = "close";
 
 		auto buffered_out = make_buffering_sink(ref_sink(out));
-		generate_header(buffered_out, response);
+		generate_response(buffered_out, response);
 		append(buffered_out, body);
 		buffered_out.flush();
 	};

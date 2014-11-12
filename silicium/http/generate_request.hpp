@@ -20,10 +20,10 @@ namespace Si
 		}
 
 		template <class CharSink>
-		void generate_header(CharSink &&out, request const &header)
+		void generate_request(CharSink &&out, request const &header)
 		{
 			generate_request_line(out, header.method, header.path, header.http_version);
-			detail::write_arguments_map(out, header.arguments);
+			detail::generate_header_map(out, header.arguments);
 			append(out, "\r\n");
 		}
 	}
