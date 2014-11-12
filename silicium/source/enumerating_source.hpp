@@ -34,11 +34,11 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (!m_rest.empty())
 			{
-				boost::iterator_range<element_type const *> result(m_rest.begin(), m_rest.end());
+				iterator_range<element_type const *> result(m_rest.begin(), m_rest.end());
 				m_rest = range_type();
 				return result;
 			}
@@ -48,10 +48,10 @@ namespace Si
 			{
 				return {};
 			}
-			return boost::iterator_range<element_type const *>(element->begin(), element->end());
+			return iterator_range<element_type const *>(element->begin(), element->end());
 		}
 
-		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
 		{
 			element_type *copied = destination.begin();
 			for (;;)

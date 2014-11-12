@@ -5,6 +5,7 @@
 #include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
 #include <silicium/flush.hpp>
+#include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/optional.hpp>
 
@@ -45,8 +46,8 @@ namespace Si
 		}
 
 		std::pair<std::size_t, std::size_t> deflate(
-			boost::iterator_range<char const *> original,
-			boost::iterator_range<char *> deflated,
+			iterator_range<char const *> original,
+			iterator_range<char *> deflated,
 			int flush
 			) BOOST_NOEXCEPT
 		{
@@ -100,17 +101,17 @@ namespace Si
 		}
 #endif
 
-		virtual boost::system::error_code append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		virtual boost::system::error_code append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			for (element_type const &piece : data)
 			{
-				auto piece_content_and_flag = visit<std::pair<boost::iterator_range<char const *>, int>>(
+				auto piece_content_and_flag = visit<std::pair<iterator_range<char const *>, int>>(
 					piece,
 					[](flush)
 					{
-						return std::make_pair(boost::iterator_range<char const *>(), Z_FULL_FLUSH /* ?? */);
+						return std::make_pair(iterator_range<char const *>(), Z_FULL_FLUSH /* ?? */);
 					},
-					[](boost::iterator_range<char const *> content)
+					[](iterator_range<char const *> content)
 					{
 						return std::make_pair(content, Z_NO_FLUSH);
 					}
@@ -118,8 +119,8 @@ namespace Si
 				char const *next_in = piece_content_and_flag.first.begin();
 				do
 				{
-					auto rest = boost::make_iterator_range(next_in, piece_content_and_flag.first.end());
-					boost::iterator_range<char *> buffer = m_next.make_append_space(std::max<size_t>(rest.size(), 4096));
+					auto rest = make_iterator_range(next_in, piece_content_and_flag.first.end());
+					Si::iterator_range<char *> buffer = m_next.make_append_space(std::max<size_t>(rest.size(), 4096));
 					assert(!buffer.empty());
 					auto result = m_stream.deflate(rest, buffer, piece_content_and_flag.second);
 					std::size_t written = buffer.size() - result.second;

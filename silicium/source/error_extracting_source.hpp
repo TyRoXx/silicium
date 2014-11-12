@@ -33,7 +33,7 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			boost::ignore_unused_variable_warning(size);
 			if (m_last_error)
@@ -53,10 +53,10 @@ namespace Si
 			}
 			BOOST_STATIC_ASSERT(std::is_reference<decltype(front.get())>::value);
 			element_type const &value = front.get();
-			return boost::make_iterator_range(&value, &value + 1);
+			return make_iterator_range(&value, &value + 1);
 		}
 
-		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
 		{
 			element_type *copied = destination.begin();
 			if (m_last_error)

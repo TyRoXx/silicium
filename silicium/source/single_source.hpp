@@ -2,7 +2,7 @@
 #define SILICIUM_SINGLE_SOURCE_HPP
 
 #include <silicium/config.hpp>
-#include <boost/range/iterator_range.hpp>
+#include <silicium/iterator_range.hpp>
 
 namespace Si
 {
@@ -20,7 +20,7 @@ namespace Si
 		{
 		}
 
-		boost::iterator_range<element_type const *> map_next(std::size_t size)
+		iterator_range<element_type const *> map_next(std::size_t size)
 		{
 			boost::ignore_unused_variable_warning(size);
 			if (used)
@@ -28,10 +28,10 @@ namespace Si
 				return {};
 			}
 			used = true;
-			return boost::make_iterator_range(&element, &element + 1);
+			return make_iterator_range(&element, &element + 1);
 		}
 
-		element_type *copy_next(boost::iterator_range<element_type *> destination)
+		element_type *copy_next(iterator_range<element_type *> destination)
 		{
 			if (used || destination.empty())
 			{

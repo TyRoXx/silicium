@@ -21,7 +21,7 @@ namespace Si
 		{
 		}
 
-		virtual error_type append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			auto error = next.append(data);
 			if (error)

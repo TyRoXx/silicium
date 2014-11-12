@@ -21,8 +21,8 @@ namespace Si
 			typedef connecting_source_element_type element_type;
 
 			explicit connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield, boost::asio::ip::tcp::endpoint remote_endpoint);
-			virtual boost::iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE;
-			virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE;
+			virtual iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE;
+			virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE;
 
 		private:
 
@@ -38,14 +38,14 @@ namespace Si
 		{
 		}
 
-		inline boost::iterator_range<connecting_source::element_type const *> connecting_source::map_next(std::size_t)
+		inline iterator_range<connecting_source::element_type const *> connecting_source::map_next(std::size_t)
 		{
 			assert(io);
 			assert(yield);
 			return {};
 		}
 
-		inline connecting_source::element_type *connecting_source::copy_next(boost::iterator_range<element_type *> destination)
+		inline connecting_source::element_type *connecting_source::copy_next(iterator_range<element_type *> destination)
 		{
 			assert(io);
 			assert(yield);

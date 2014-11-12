@@ -1,12 +1,18 @@
 #ifndef SILICIUM_MEMORY_RANGE_HPP
 #define SILICIUM_MEMORY_RANGE_HPP
 
-#include <boost/range/iterator_range.hpp>
+#include <silicium/iterator_range.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits/add_const.hpp>
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/is_const.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/utility/addressof.hpp>
 
 namespace Si
 {
-	typedef boost::iterator_range<char const *> memory_range;
-	typedef boost::iterator_range<char *> mutable_memory_range;
+	typedef iterator_range<char const *> memory_range;
+	typedef iterator_range<char *> mutable_memory_range;
 
 	template <class To, class From>
 	struct copy_const
@@ -17,12 +23,12 @@ namespace Si
 	template <class Byte, class DestType = typename copy_const<char, Byte>::type>
 	auto make_memory_range(Byte *begin, Byte *end)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> boost::iterator_range<DestType *>
+		-> iterator_range<DestType *>
 #endif
 	{
 		BOOST_STATIC_ASSERT(sizeof(Byte) == 1);
 		BOOST_STATIC_ASSERT(std::is_pod<Byte>::value);
-		return boost::make_iterator_range(
+		return make_iterator_range(
 			reinterpret_cast<DestType *>(begin),
 			reinterpret_cast<DestType *>(end)
 		);
@@ -46,7 +52,7 @@ namespace Si
 	template <class C>
 	auto make_c_str_range(C const *str)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> boost::iterator_range<C const *>
+		-> iterator_range<C const *>
 #endif
 	{
 		return make_memory_range(str, str + std::char_traits<C>::length(str));

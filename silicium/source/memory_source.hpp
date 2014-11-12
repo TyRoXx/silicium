@@ -14,18 +14,18 @@ namespace Si
 		{
 		}
 
-		explicit memory_source(boost::iterator_range<Element const *> elements)
+		explicit memory_source(iterator_range<Element const *> elements)
 			: m_elements(std::move(elements))
 		{
 		}
 
-		virtual boost::iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			(void)size;
 			return m_elements;
 		}
 
-		virtual Element *copy_next(boost::iterator_range<Element *> destination) SILICIUM_OVERRIDE
+		virtual Element *copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
 		{
 			while (!m_elements.empty() && !destination.empty())
 			{
@@ -38,7 +38,7 @@ namespace Si
 
 	private:
 
-		boost::iterator_range<Element const *> m_elements;
+		iterator_range<Element const *> m_elements;
 	};
 
 	template <class Element>
@@ -56,7 +56,7 @@ namespace Si
 	template <class Element>
 	memory_source<Element> make_c_str_source(Element const *c_str)
 	{
-		return memory_source<Element>(boost::make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
+		return memory_source<Element>(make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
 	}
 }
 

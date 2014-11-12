@@ -21,12 +21,12 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			return original.map_next(size);
 		}
 
-		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
 		{
 			return original.copy_next(destination);
 		}

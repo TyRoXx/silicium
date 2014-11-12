@@ -29,7 +29,7 @@ namespace Si
 		}
 #endif
 
-		virtual void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
+		virtual void append(iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
 			boost::range::copy(data, m_out);
 		}

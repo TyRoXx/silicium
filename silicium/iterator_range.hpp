@@ -2,14 +2,27 @@
 #define SILICIUM_ITERATOR_RANGE_HPP
 
 #include <silicium/config.hpp>
+#include <boost/static_assert.hpp>
+#include <cassert>
 
 namespace Si
 {
+	namespace detail
+	{
+		template <class Iterator>
+		struct actual_value_type
+		{
+			typedef decltype(*std::declval<Iterator>()) type;
+		};
+	}
+
 	template <class Iterator>
 	struct iterator_range
 	{
 		typedef typename std::iterator_traits<Iterator>::difference_type difference_type;
-		typedef typename std::iterator_traits<Iterator>::value_type value_type;
+		typedef typename detail::actual_value_type<Iterator>::type value_type;
+		typedef Iterator iterator;
+		typedef Iterator const_iterator;
 
 		BOOST_CONSTEXPR iterator_range() BOOST_NOEXCEPT
 			: m_begin(Iterator())
@@ -21,6 +34,13 @@ namespace Si
 		BOOST_CONSTEXPR iterator_range(It1 &&begin, It2 &&end) BOOST_NOEXCEPT
 			: m_begin(std::forward<It1>(begin))
 			, m_end(std::forward<It2>(end))
+		{
+		}
+
+		template <class OtherIterator>
+		iterator_range(iterator_range<OtherIterator> const &other) BOOST_NOEXCEPT
+			: m_begin(other.begin())
+			, m_end(other.end())
 		{
 		}
 
@@ -50,6 +70,24 @@ namespace Si
 			std::advance(m_begin, n);
 		}
 
+		SILICIUM_CXX14_CONSTEXPR void pop_front() BOOST_NOEXCEPT
+		{
+			assert(!empty());
+			pop_front(1);
+		}
+
+		value_type &front() const BOOST_NOEXCEPT
+		{
+			assert(!empty());
+			return (*this)[0];
+		}
+
+		value_type &operator[](difference_type index) const BOOST_NOEXCEPT
+		{
+			assert(index < size());
+			return begin()[index];
+		}
+
 	private:
 
 		Iterator m_begin, m_end;
@@ -57,6 +95,13 @@ namespace Si
 
 	template <class Iterator>
 	BOOST_CONSTEXPR Iterator const &begin(iterator_range<Iterator> const &range)
+	{
+		return range.begin();
+	}
+
+	//for Boost.Range compatibility
+	template <class Iterator>
+	BOOST_CONSTEXPR Iterator const &range_begin(iterator_range<Iterator> const &range)
 	{
 		return range.begin();
 	}

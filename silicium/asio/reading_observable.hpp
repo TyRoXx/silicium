@@ -4,7 +4,7 @@
 #include <silicium/config.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/asio/socket_observable.hpp>
-#include <boost/range/iterator_range.hpp>
+#include <silicium/iterator_range.hpp>
 
 namespace Si
 {
@@ -13,7 +13,7 @@ namespace Si
 	{
 		typedef error_or<incoming_bytes> element_type;
 
-		explicit reading_observable(AsyncStream &stream, boost::iterator_range<char *> buffer)
+		explicit reading_observable(AsyncStream &stream, iterator_range<char *> buffer)
 			: stream(&stream)
 		{
 			assert(buffer.size() >= 1);
@@ -40,11 +40,11 @@ namespace Si
 	private:
 
 		AsyncStream *stream;
-		boost::iterator_range<char *> buffer;
+		iterator_range<char *> buffer;
 	};
 
 	template <class AsyncStream>
-	auto make_reading_observable(AsyncStream &stream, boost::iterator_range<char *> buffer)
+	auto make_reading_observable(AsyncStream &stream, iterator_range<char *> buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> reading_observable<AsyncStream>
 #endif

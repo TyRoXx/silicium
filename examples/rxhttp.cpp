@@ -43,7 +43,7 @@ namespace
 			Si::http::generate_header(response_sink, response);
 			Si::append(response_sink, body);
 		}
-		client.send(boost::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
+		client.send(Si::make_iterator_range(send_buffer.data(), send_buffer.data() + send_buffer.size()));
 		client.shutdown();
 
 		while (Si::get(bytes_receiver))
@@ -57,7 +57,7 @@ namespace
 			: socket(&socket)
 			, yield(&yield)
 			, received(4096)
-			, receiver(socket, boost::make_iterator_range(received.data(), received.data() + received.size()))
+			, receiver(socket, Si::make_iterator_range(received.data(), received.data() + received.size()))
 			, receiving_(Si::observable_source<Si::socket_observable, Si::push_context<Si::nothing>>(receiver, yield))
 		{
 		}
@@ -67,7 +67,7 @@ namespace
 			return receiving_;
 		}
 
-		void send(boost::iterator_range<char const *> data)
+		void send(Si::iterator_range<char const *> data)
 		{
 			assert(socket);
 			assert(yield);
@@ -108,13 +108,13 @@ namespace
 			return socket;
 		}
 
-		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual Si::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			(void)size;
 			return {};
 		}
 
-		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		virtual element_type *copy_next(Si::iterator_range<element_type *> destination) SILICIUM_OVERRIDE
 		{
 			assert(socket);
 			auto *i = destination.begin();
@@ -153,7 +153,7 @@ namespace
 			return receiving_;
 		}
 
-		void send(boost::iterator_range<char const *> data)
+		void send(Si::iterator_range<char const *> data)
 		{
 			assert(receiving_.get_socket());
 			boost::asio::write(*receiving_.get_socket(), boost::asio::buffer(data.begin(), data.size()));

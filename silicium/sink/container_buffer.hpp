@@ -23,7 +23,7 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
 		{
 			assert(m_destination);
 			auto remaining_capacity = m_destination->max_size() - m_committed;
@@ -31,7 +31,7 @@ namespace Si
 			auto new_size = m_committed + growth;
 			m_destination->resize(new_size);
 			auto begin = m_destination->data() + m_committed;
-			return boost::make_iterator_range(begin, begin + growth);
+			return make_iterator_range(begin, begin + growth);
 		}
 
 		virtual error_type flush_append_space() SILICIUM_OVERRIDE

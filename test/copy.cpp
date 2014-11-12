@@ -17,7 +17,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(copy_non_empty)
 	{
 		std::string const message = "hello";
-		Si::memory_source<char> source_(boost::make_iterator_range(message.data(), message.data() + message.size()));
+		Si::memory_source<char> source_(make_iterator_range(message.data(), message.data() + message.size()));
 		std::string copied;
 		auto sink_ = Si::make_container_sink(copied);
 		Si::copy(static_cast<Si::source<char> &>(source_), static_cast<Si::sink<char, void> &>(sink_));

@@ -14,7 +14,7 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<Element *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<Element *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
 		{
 			boost::ignore_unused_variable_warning(size);
 			return {};
@@ -24,7 +24,7 @@ namespace Si
 		{
 		}
 
-		virtual void append(boost::iterator_range<Element const *> data) SILICIUM_OVERRIDE
+		virtual void append(iterator_range<Element const *> data) SILICIUM_OVERRIDE
 		{
 			for (auto const &element : data)
 			{

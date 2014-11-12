@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 			Si::make_c_str_range("bbbb"),
 			Si::make_c_str_range("ccccc")
 		}};
-		BOOST_CHECK_EQUAL(boost::system::error_code(), sink.append(boost::make_iterator_range(write_vector.data(), write_vector.data() + write_vector.size())));
+		BOOST_CHECK_EQUAL(boost::system::error_code(), sink.append(make_iterator_range(write_vector.data(), write_vector.data() + write_vector.size())));
 	}
 	std::vector<char> content = Si::read_file(file_name);
 	std::string const expected = "tesaaabbbbccccc";

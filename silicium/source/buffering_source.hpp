@@ -10,7 +10,7 @@ namespace Si
 	template <class Element>
 	struct mutable_source : source<Element>
 	{
-		virtual boost::iterator_range<Element *> map_next_mutable(std::size_t size) = 0;
+		virtual iterator_range<Element *> map_next_mutable(std::size_t size) = 0;
 		virtual std::size_t skip(std::size_t count) = 0;
 	};
 
@@ -25,17 +25,17 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty())
 			{
 				pull();
 			}
 			auto one = m_buffer.array_one();
-			return boost::make_iterator_range(one.first, one.first + std::min(size, one.second));
+			return make_iterator_range(one.first, one.first + std::min(size, one.second));
 		}
 
-		virtual Element *copy_next(boost::iterator_range<Element *> destination) SILICIUM_OVERRIDE
+		virtual Element *copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty() && (static_cast<size_t>(destination.size()) < m_buffer.capacity()))
 			{
@@ -51,7 +51,7 @@ namespace Si
 			}
 
 			assert(m_next);
-			Element * const result = m_next->copy_next(boost::make_iterator_range(next, destination.end()));
+			Element * const result = m_next->copy_next(make_iterator_range(next, destination.end()));
 			m_buffer.erase_begin(taken_from_buffer);
 			return result;
 		}
@@ -64,14 +64,14 @@ namespace Si
 			return skipped_buffer;
 		}
 
-		virtual boost::iterator_range<Element *> map_next_mutable(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<Element *> map_next_mutable(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty())
 			{
 				pull();
 			}
 			auto one = m_buffer.array_one();
-			return boost::make_iterator_range(one.first, one.first + std::min(size, one.second));
+			return make_iterator_range(one.first, one.first + std::min(size, one.second));
 		}
 
 	private:
@@ -84,13 +84,13 @@ namespace Si
 			m_buffer.resize(m_buffer.capacity());
 			auto one = m_buffer.array_one();
 			assert(m_next);
-			auto copied = m_next->copy_next(boost::make_iterator_range(one.first, one.first + one.second));
+			auto copied = m_next->copy_next(make_iterator_range(one.first, one.first + one.second));
 			std::size_t new_buffer_size = std::distance(one.first, copied);
 			if ((one.first + one.second) == copied)
 			{
 				auto two = m_buffer.array_two();
 				assert(m_next);
-				auto copied = m_next->copy_next(boost::make_iterator_range(two.first, two.first + two.second));
+				auto copied = m_next->copy_next(make_iterator_range(two.first, two.first + two.second));
 				new_buffer_size += std::distance(two.first, copied);
 			}
 			m_buffer.resize(new_buffer_size);

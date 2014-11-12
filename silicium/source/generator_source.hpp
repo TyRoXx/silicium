@@ -22,13 +22,13 @@ namespace Si
 		{
 		}
 
-		boost::iterator_range<Element const *> map_next(std::size_t size)
+		iterator_range<Element const *> map_next(std::size_t size)
 		{
 			(void)size;
-			return boost::iterator_range<Element const *>();
+			return iterator_range<Element const *>();
 		}
 
-		Element *copy_next(boost::iterator_range<Element *> destination)
+		Element *copy_next(iterator_range<Element *> destination)
 		{
 			auto copied = destination.begin();
 			for (; copied != destination.end(); ++copied)

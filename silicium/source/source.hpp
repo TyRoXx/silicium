@@ -2,7 +2,7 @@
 #define SILICIUM_SOURCE_HPP
 
 #include <silicium/override.hpp>
-#include <boost/range/iterator_range.hpp>
+#include <silicium/iterator_range.hpp>
 #include <boost/optional.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/cstdint.hpp>
@@ -19,8 +19,8 @@ namespace Si
 		{
 		}
 
-		virtual boost::iterator_range<element_type const *> map_next(std::size_t size) = 0;
-		virtual element_type *copy_next(boost::iterator_range<element_type *> destination) = 0;
+		virtual iterator_range<element_type const *> map_next(std::size_t size) = 0;
+		virtual element_type *copy_next(iterator_range<element_type *> destination) = 0;
 	};
 
 	template <class X>
@@ -35,9 +35,9 @@ namespace Si
 			source = std::move(move_constructed);
 			X default_constructible;
 			boost::ignore_unused_variable_warning(default_constructible);
-			boost::iterator_range<element_type const *> mapped = source.map_next(std::size_t(0));
+			iterator_range<element_type const *> mapped = source.map_next(std::size_t(0));
 			boost::ignore_unused_variable_warning(mapped);
-			element_type * const copied = source.copy_next(boost::iterator_range<element_type *>());
+			element_type * const copied = source.copy_next(iterator_range<element_type *>());
 			boost::ignore_unused_variable_warning(copied);
 		}
 
@@ -53,8 +53,8 @@ namespace Si
 		struct minimum_source
 		{
 			typedef int element_type;
-			boost::iterator_range<element_type const *> map_next(std::size_t size);
-			element_type *copy_next(boost::iterator_range<element_type *> destination);
+			iterator_range<element_type const *> map_next(std::size_t size);
+			element_type *copy_next(iterator_range<element_type *> destination);
 			boost::uintmax_t minimum_size();
 			boost::optional<boost::uintmax_t> maximum_size();
 			std::size_t skip(std::size_t count);
@@ -67,7 +67,7 @@ namespace Si
 	boost::optional<typename Source::element_type> get(Source &from)
 	{
 		typename Source::element_type result;
-		if (&result == from.copy_next(boost::make_iterator_range(&result, &result + 1)))
+		if (&result == from.copy_next(Si::make_iterator_range(&result, &result + 1)))
 		{
 			return boost::none;
 		}
@@ -85,7 +85,7 @@ namespace Si
 	{
 		Sequence taken;
 		taken.resize(count);
-		auto end = from.copy_next(boost::make_iterator_range(data(taken), data(taken) + taken.size()));
+		auto end = from.copy_next(make_iterator_range(data(taken), data(taken) + taken.size()));
 		taken.resize(std::distance(data(taken), end));
 		return taken;
 	}

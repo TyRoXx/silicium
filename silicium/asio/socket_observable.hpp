@@ -8,7 +8,6 @@
 #include <silicium/iterator_range.hpp>
 #include <boost/config.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/range/iterator_range.hpp>
 
 namespace Si
 {
@@ -18,7 +17,7 @@ namespace Si
 	struct socket_observable
 	{
 		typedef received_from_socket element_type;
-		typedef boost::iterator_range<char *> buffer_type;
+		typedef iterator_range<char *> buffer_type;
 
 		socket_observable()
 			: receiver_(nullptr)

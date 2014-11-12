@@ -21,13 +21,13 @@ namespace Si
 		{
 		}
 
-		boost::iterator_range<element_type const *> map_next(std::size_t size)
+		iterator_range<element_type const *> map_next(std::size_t size)
 		{
 			boost::ignore_unused_variable_warning(size);
 			throw std::logic_error("todo");
 		}
 
-		element_type *copy_next(boost::iterator_range<element_type *> destination)
+		element_type *copy_next(iterator_range<element_type *> destination)
 		{
 			element_type *copied = destination.begin();
 			for (; copied != destination.end(); )

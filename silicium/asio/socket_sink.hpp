@@ -15,7 +15,7 @@ namespace Si
 		struct socket_sink : Si::sink<char, boost::system::error_code>
 		{
 			explicit socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
-			virtual boost::system::error_code append(boost::iterator_range<char const *> data) SILICIUM_OVERRIDE;
+			virtual boost::system::error_code append(iterator_range<char const *> data) SILICIUM_OVERRIDE;
 
 		private:
 
@@ -29,7 +29,7 @@ namespace Si
 		{
 		}
 
-		inline boost::system::error_code socket_sink::append(boost::iterator_range<char const *> data)
+		inline boost::system::error_code socket_sink::append(iterator_range<char const *> data)
 		{
 			assert(m_socket);
 			assert(m_yield);

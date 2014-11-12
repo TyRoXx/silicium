@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(bf_empty)
 {
 	Si::empty<boost::uint8_t> input;
 	std::array<boost::uint8_t, 1> memory{ {} };
-	auto interpreter = bf::execute(input, boost::iterator_range<bf::command const *>(), memory, 0);
+	auto interpreter = bf::execute(input, Si::iterator_range<bf::command const *>(), memory, 0);
 	auto done = Si::for_each(std::move(interpreter), [](boost::uint8_t output)
 	{
 		boost::ignore_unused_variable_warning(output);

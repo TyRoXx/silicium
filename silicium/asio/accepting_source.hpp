@@ -17,8 +17,8 @@ namespace Si
 			typedef std::shared_ptr<boost::asio::ip::tcp::socket> element_type;
 
 			explicit accepting_source(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context &yield);
-			virtual boost::iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE;
-			virtual element_type *copy_next(boost::iterator_range<element_type *> destination) SILICIUM_OVERRIDE;
+			virtual iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE;
+			virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE;
 
 		private:
 
@@ -32,12 +32,12 @@ namespace Si
 		{
 		}
 
-		inline boost::iterator_range<accepting_source::element_type const *> accepting_source::map_next(std::size_t)
+		inline iterator_range<accepting_source::element_type const *> accepting_source::map_next(std::size_t)
 		{
-			return boost::iterator_range<element_type const *>();
+			return iterator_range<element_type const *>();
 		}
 
-		inline accepting_source::element_type *accepting_source::copy_next(boost::iterator_range<element_type *> destination)
+		inline accepting_source::element_type *accepting_source::copy_next(iterator_range<element_type *> destination)
 		{
 			assert(m_acceptor);
 			assert(m_yield);

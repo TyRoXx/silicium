@@ -3,6 +3,7 @@
 
 #include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
+#include <silicium/iterator_range.hpp>
 
 namespace Si
 {
@@ -33,8 +34,8 @@ namespace Si
 		}
 
 		std::pair<std::size_t, std::size_t> inflate(
-			boost::iterator_range<char const *> deflated,
-			boost::iterator_range<char *> original,
+			iterator_range<char const *> deflated,
+			iterator_range<char *> original,
 			int flush) BOOST_NOEXCEPT
 		{
 			assert(m_stream);

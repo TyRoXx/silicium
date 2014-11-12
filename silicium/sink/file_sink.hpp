@@ -33,10 +33,10 @@ namespace Si
 		{
 		}
 
-		virtual error_type append(boost::iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			boost::optional<size_t> write_streak_length;
-			size_t i = 0;
+			ptrdiff_t i = 0;
 			auto flush_writes = [&, this]() -> error_type
 			{
 				if (!write_streak_length)
@@ -133,7 +133,7 @@ namespace Si
 
 		error_type write_piece(memory_range const &content)
 		{
-			size_t written = 0;
+			ptrdiff_t written = 0;
 			while (written < content.size())
 			{
 				ssize_t rc = ::write(m_destination, content.begin() + written, content.size() - written);
@@ -141,7 +141,7 @@ namespace Si
 				{
 					return error_type(errno, boost::system::system_category());
 				}
-				written += static_cast<size_t>(rc);
+				written += static_cast<ptrdiff_t>(rc);
 			}
 			return error_type();
 		}

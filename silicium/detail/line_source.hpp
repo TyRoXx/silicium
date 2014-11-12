@@ -9,7 +9,7 @@ namespace Si
 {
 	namespace detail
 	{
-		struct line_source SILICIUM_FINAL : Si::source<std::vector<char>>
+		struct line_source SILICIUM_FINAL : source<std::vector<char>>
 		{
 			line_source()
 				: m_next(nullptr)
@@ -21,12 +21,12 @@ namespace Si
 			{
 			}
 
-			virtual boost::iterator_range<std::vector<char> const *> map_next(std::size_t) SILICIUM_OVERRIDE
+			virtual iterator_range<std::vector<char> const *> map_next(std::size_t) SILICIUM_OVERRIDE
 			{
-				return boost::iterator_range<std::vector<char> const *>();
+				return iterator_range<std::vector<char> const *>();
 			}
 
-			virtual std::vector<char> *copy_next(boost::iterator_range<std::vector<char> *> destination) SILICIUM_OVERRIDE
+			virtual std::vector<char> *copy_next(iterator_range<std::vector<char> *> destination) SILICIUM_OVERRIDE
 			{
 				assert(m_next);
 				auto i = begin(destination);

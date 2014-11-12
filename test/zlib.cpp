@@ -9,8 +9,8 @@ BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 	std::string const original = "Hello";
 	std::array<char, 4096> compressed;
 	std::pair<std::size_t, std::size_t> compress_result = deflator.deflate(
-		boost::make_iterator_range(original.data(), original.data() + original.size()),
-		boost::make_iterator_range(compressed.data(), compressed.data() + compressed.size()),
+		Si::make_iterator_range(original.data(), original.data() + original.size()),
+		Si::make_iterator_range(compressed.data(), compressed.data() + compressed.size()),
 		Z_FULL_FLUSH
 	);
 	BOOST_CHECK_EQUAL(0, compress_result.first);
@@ -18,8 +18,8 @@ BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 	std::array<char, 4096> decompressed;
 	Si::zlib_inflate_stream inflator = Si::zlib_inflate_stream::initialize();
 	std::pair<std::size_t, std::size_t> decompress_result = inflator.inflate(
-		boost::make_iterator_range(compressed.data(), compressed.data() + compressed.size() - compress_result.second),
-		boost::make_iterator_range(decompressed.data(), decompressed.data() + decompressed.size()),
+		Si::make_iterator_range(compressed.data(), compressed.data() + compressed.size() - compress_result.second),
+		Si::make_iterator_range(decompressed.data(), decompressed.data() + decompressed.size()),
 		Z_SYNC_FLUSH
 	);
 	auto const decompressed_length = decompressed.size() - decompress_result.second;
