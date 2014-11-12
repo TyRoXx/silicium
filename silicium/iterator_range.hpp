@@ -9,10 +9,12 @@ namespace Si
 {
 	namespace detail
 	{
+		//std::iterator_traits<T const *>::value_type seems to be T (GCC 4.8), but that
+		//is not useful at all because the const is missing.
 		template <class Iterator>
 		struct actual_value_type
 		{
-			typedef decltype(*std::declval<Iterator>()) type;
+			typedef typename std::remove_reference<decltype(*std::declval<Iterator>())>::type type;
 		};
 	}
 
