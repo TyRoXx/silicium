@@ -2,6 +2,8 @@
 #include <silicium/build_result.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/http/http.hpp>
+#include <silicium/http/parse_response.hpp>
+#include <silicium/http/parse_request.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/read_file.hpp>
