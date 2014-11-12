@@ -16,7 +16,7 @@ namespace Si
 {
 	namespace http
 	{
-		struct request_header
+		struct request
 		{
 			noexcept_string method;
 			noexcept_string path;
@@ -40,7 +40,7 @@ namespace Si
 		}
 
 		template <class CharSource>
-		boost::optional<request_header> parse_header(CharSource &&in)
+		boost::optional<request> parse_request(CharSource &&in)
 		{
 			Si::detail::line_source lines(in);
 			auto first_line = get(lines);
@@ -48,7 +48,7 @@ namespace Si
 			{
 				return boost::none;
 			}
-			request_header header;
+			request header;
 			{
 				auto const method_end = std::find(first_line->begin(), first_line->end(), ' ');
 				if (method_end == first_line->end())
@@ -118,14 +118,14 @@ namespace Si
 		}
 
 		template <class CharSink>
-		void write_header(CharSink &&out, request_header const &header)
+		void write_header(CharSink &&out, request const &header)
 		{
 			write_request_line(out, header.method, header.path, header.http_version);
 			detail::write_arguments_map(out, header.arguments);
 			append(out, "\r\n");
 		}
 
-		struct response_header
+		struct response
 		{
 			typedef std::map<noexcept_string, noexcept_string> arguments_table;
 
@@ -134,12 +134,12 @@ namespace Si
 			noexcept_string status_text;
 			std::unique_ptr<arguments_table> arguments;
 
-			response_header() BOOST_NOEXCEPT
+			response() BOOST_NOEXCEPT
 				: status(0)
 			{
 			}
 
-			response_header(response_header &&other) BOOST_NOEXCEPT
+			response(response &&other) BOOST_NOEXCEPT
 				: http_version(std::move(other.http_version))
 				, status(other.status)
 				, status_text(std::move(other.status_text))
@@ -147,7 +147,7 @@ namespace Si
 			{
 			}
 
-			response_header(response_header const &other)
+			response(response const &other)
 				: http_version(other.http_version)
 				, status(other.status)
 				, status_text(other.status_text)
@@ -155,7 +155,7 @@ namespace Si
 			{
 			}
 
-			response_header &operator = (response_header &&other) BOOST_NOEXCEPT
+			response &operator = (response &&other) BOOST_NOEXCEPT
 			{
 				http_version = std::move(other.http_version);
 				status = std::move(other.status);
@@ -164,7 +164,7 @@ namespace Si
 				return *this;
 			}
 
-			response_header &operator = (response_header const &other)
+			response &operator = (response const &other)
 			{
 				http_version = other.http_version;
 				status = other.status;
@@ -175,7 +175,7 @@ namespace Si
 		};
 
 		template <class CharSource>
-		boost::optional<response_header> parse_response_header(CharSource &&in)
+		boost::optional<response> parse_response(CharSource &&in)
 		{
 			Si::detail::line_source lines(in);
 			auto first_line = get(lines);
@@ -183,7 +183,7 @@ namespace Si
 			{
 				return boost::none;
 			}
-			response_header header;
+			response header;
 			header.arguments = Si::make_unique<std::map<noexcept_string, noexcept_string>>();
 			{
 				auto const version_end = std::find(first_line->begin(), first_line->end(), ' ');
@@ -239,7 +239,7 @@ namespace Si
 		}
 
 		template <class CharSink>
-		void write_header(CharSink &&out, response_header const &header)
+		void write_header(CharSink &&out, response const &header)
 		{
 			write_status_line(out, header.http_version, boost::lexical_cast<std::string>(header.status), header.status_text);
 			detail::write_arguments_map(out, *header.arguments);

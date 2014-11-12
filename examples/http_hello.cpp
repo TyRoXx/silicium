@@ -20,8 +20,8 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 	auto receiver = Si::socket_observable(client, Si::make_memory_range(incoming_buffer));
 	auto without_errors = Si::make_error_extracting_source(Si::make_observable_source(std::move(receiver), yield));
 	auto enumerated = Si::make_enumerating_source(Si::ref_source(without_errors));
-	auto request_header = Si::http::parse_header(enumerated);
-	if (!request_header)
+	auto request = Si::http::parse_request(enumerated);
+	if (!request)
 	{
 		//The header was incomplete, maybe the connecting was closed.
 		//If we want to know the reason, the error_extracting_source remembered it:

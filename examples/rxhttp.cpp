@@ -24,7 +24,7 @@ namespace
 		boost::uintmax_t visitor_number)
 	{
 		Si::received_from_socket_source bytes_receiver(client.receiving());
-		boost::optional<Si::http::request_header> request = Si::http::parse_header(bytes_receiver);
+		boost::optional<Si::http::request> request = Si::http::parse_request(bytes_receiver);
 		if (!request)
 		{
 			return;
@@ -32,7 +32,7 @@ namespace
 		std::vector<char> send_buffer;
 		{
 			auto response_sink = Si::make_container_sink(send_buffer);
-			Si::http::response_header response;
+			Si::http::response response;
 			response.arguments = Si::make_unique<std::map<Si::noexcept_string, Si::noexcept_string>>();
 			response.http_version = "HTTP/1.0";
 			response.status = 200;

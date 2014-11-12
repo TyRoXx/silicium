@@ -316,7 +316,7 @@ int main(int argc, char **argv)
 	auto const respond_web_request = [&current_build](Si::source<char> &in, Si::sink<char> &out, boost::asio::yield_context &)
 	{
 		Si::buffering_source<char> buffered_in(in, 1U << 14U);
-		auto request = Si::http::parse_header(buffered_in);
+		auto request = Si::http::parse_request(buffered_in);
 		if (!request)
 		{
 			//TODO
@@ -357,7 +357,7 @@ int main(int argc, char **argv)
 			});
 		}
 
-		Si::http::response_header response;
+		Si::http::response response;
 		response.arguments = Si::make_unique<std::map<Si::noexcept_string, Si::noexcept_string>>();
 		response.status = 200;
 		response.status_text = "OK";

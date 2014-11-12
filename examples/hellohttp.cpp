@@ -19,10 +19,10 @@ namespace
 			Si::asio::socket_sink sender(*client, yield);
 			auto buffered_sender = Si::make_buffering_sink(Si::ref_sink(sender));
 			auto buffered_receiver = receiver | Si::buffered(4096);
-			boost::optional<Si::http::request_header> const header = Si::http::parse_header(buffered_receiver);
+			boost::optional<Si::http::request> const header = Si::http::parse_request(buffered_receiver);
 			if (!header)
 			{
-				Si::http::response_header response;
+				Si::http::response response;
 				response.status = 400;
 				response.status_text = "Bad Request";
 				response.http_version = "HTTP/1.0";
@@ -35,7 +35,7 @@ namespace
 			auto const client_name = boost::str(boost::format("%1%:%2%") % client_endpoint.address() % client_endpoint.port());
 			std::string const content = "Hello, " + client_name + "!";
 
-			Si::http::response_header response;
+			Si::http::response response;
 			response.arguments = Si::make_unique<std::map<Si::noexcept_string, Si::noexcept_string>>();
 			response.status = 200;
 			response.status_text = "OK";

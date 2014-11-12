@@ -14,7 +14,7 @@ namespace Si
 				"\r\n"
 				;
 		auto source = Si::make_container_source(incoming);
-		boost::optional<Si::http::request_header> const parsed = Si::http::parse_header(source);
+		boost::optional<Si::http::request> const parsed = Si::http::parse_request(source);
 		BOOST_REQUIRE(parsed);
 		BOOST_CHECK_EQUAL("GET", parsed->method);
 		BOOST_CHECK_EQUAL("/", parsed->path);
@@ -30,7 +30,7 @@ namespace Si
 	{
 		std::string generated;
 		auto sink = Si::make_container_sink(generated);
-		http::request_header header;
+		http::request header;
 		header.http_version = "HTTP/1.1";
 		header.method = "POST";
 		header.path = "/p";
@@ -45,21 +45,21 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(response_header_move)
 	{
-		http::response_header a;
-		http::response_header b(std::move(a));
+		http::response a;
+		http::response b(std::move(a));
 		a = std::move(b);
 	}
 
 	BOOST_AUTO_TEST_CASE(response_header_copy)
 	{
-		http::response_header a;
-		http::response_header b(a);
+		http::response a;
+		http::response b(a);
 		a = b;
 	}
 
 	BOOST_AUTO_TEST_CASE(response_header_compatible_with_fast_variant)
 	{
-		fast_variant<http::response_header> v;
+		fast_variant<http::response> v;
 		auto w = v;
 		w = std::move(v);
 		auto u = std::move(w);
