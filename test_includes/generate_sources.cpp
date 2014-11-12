@@ -32,19 +32,23 @@ namespace
 					boost::filesystem::path const header_extension = header_leaf.extension();
 					if (header_extension != ".hpp")
 					{
-						continue;
+						break;
 					}
 					boost::filesystem::path const header_no_extension = header_leaf.stem();
 					boost::filesystem::create_directories(sources);
 					boost::filesystem::path const source = sources / (header_no_extension.string() + ".cpp");
+					std::string header_name = "<silicium/" + boost::algorithm::replace_all_copy((relative_include_path / header_leaf).string(), "\\", "/") + ">";
+					on_include(header_name);
+					if (boost::filesystem::exists(source))
+					{
+						break;
+					}
 					std::ofstream source_file(source.string());
 					if (!source_file)
 					{
 						throw std::runtime_error("Cannot open file " + source.string());
 					}
-					std::string header_name = "<silicium/" + boost::algorithm::replace_all_copy((relative_include_path / header_leaf).string(), "\\", "/") + ">";
 					source_file << "#include " << header_name << "\n";
-					on_include(header_name);
 					if (!source_file)
 					{
 						throw std::runtime_error("Could not write to " + source.string());
