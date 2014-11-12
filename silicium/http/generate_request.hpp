@@ -9,7 +9,7 @@ namespace Si
 	namespace http
 	{
 		template <class CharSink, class Method, class Path, class Version>
-		void write_request_line(CharSink &&out, Method const &method, Path const &path, Version const &version)
+		void generate_request_line(CharSink &&out, Method const &method, Path const &path, Version const &version)
 		{
 			append(out, method);
 			append(out, " ");
@@ -20,9 +20,9 @@ namespace Si
 		}
 
 		template <class CharSink>
-		void write_header(CharSink &&out, request const &header)
+		void generate_header(CharSink &&out, request const &header)
 		{
-			write_request_line(out, header.method, header.path, header.http_version);
+			generate_request_line(out, header.method, header.path, header.http_version);
 			detail::write_arguments_map(out, header.arguments);
 			append(out, "\r\n");
 		}

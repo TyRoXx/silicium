@@ -9,7 +9,7 @@ namespace Si
 	namespace http
 	{
 		template <class CharSink, class Version, class Status, class StatusText>
-		void write_status_line(CharSink &&out, Version const &version, Status const &status, StatusText const &status_text)
+		void generate_status_line(CharSink &&out, Version const &version, Status const &status, StatusText const &status_text)
 		{
 			append(out, version);
 			append(out, " ");
@@ -20,9 +20,9 @@ namespace Si
 		}
 
 		template <class CharSink>
-		void write_header(CharSink &&out, response const &header)
+		void generate_header(CharSink &&out, response const &header)
 		{
-			write_status_line(out, header.http_version, boost::lexical_cast<std::string>(header.status), header.status_text);
+			generate_status_line(out, header.http_version, boost::lexical_cast<std::string>(header.status), header.status_text);
 			detail::write_arguments_map(out, *header.arguments);
 			append(out, "\r\n");
 		}
