@@ -87,6 +87,8 @@ if(ZLIB_FOUND)
 	include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
 endif()
 
+find_package(UriParser REQUIRED)
+
 include_directories(".")
 add_subdirectory("silicium")
 add_subdirectory("test")
