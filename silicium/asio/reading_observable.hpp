@@ -14,7 +14,7 @@ namespace Si
 	{
 		typedef error_or<memory_range> element_type;
 
-		explicit reading_observable(AsyncStream &stream, iterator_range<char *> buffer)
+		explicit reading_observable(AsyncStream &stream, mutable_memory_range buffer)
 			: stream(&stream)
 			, buffer(buffer)
 		{
@@ -42,11 +42,11 @@ namespace Si
 	private:
 
 		AsyncStream *stream;
-		iterator_range<char *> buffer;
+		mutable_memory_range buffer;
 	};
 
 	template <class AsyncStream>
-	auto make_reading_observable(AsyncStream &stream, iterator_range<char *> buffer)
+	auto make_reading_observable(AsyncStream &stream, mutable_memory_range buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> reading_observable<AsyncStream>
 #endif
