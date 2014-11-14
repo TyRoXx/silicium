@@ -239,7 +239,7 @@ namespace
 	std::vector<bf::command> scan_all(CharSource code)
 	{
 		std::vector<bf::command> result;
-		auto decoded = Si::make_transforming_source<boost::optional<bf::command>>(code, bf::detect_command);
+		auto decoded = Si::make_transforming_source(code, bf::detect_command);
 		for (;;)
 		{
 			auto cmd = Si::get(decoded);
