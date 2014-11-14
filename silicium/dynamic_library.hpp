@@ -3,21 +3,19 @@
 
 #include <silicium/detail/basic_dynamic_library.hpp>
 
-#ifdef __linux__
-#	include <silicium/linux/dynamic_library_impl.hpp>
-#endif
-
 #ifdef _WIN32
 #	include <silicium/win32/dynamic_library_impl.hpp>
+#else
+#	include <silicium/linux/dynamic_library_impl.hpp>
 #endif
 
 namespace Si
 {
 	typedef detail::basic_dynamic_library<
-#ifdef __linux__
-		linux::dynamic_library_impl
-#else
+#ifdef _WIN32
 		win32::dynamic_library_impl
+#else
+		linux::dynamic_library_impl
 #endif
 	> dynamic_library;
 

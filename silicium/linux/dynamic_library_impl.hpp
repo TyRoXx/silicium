@@ -6,7 +6,6 @@
 
 namespace Si
 {
-#ifdef __linux__
 	namespace linux
 	{
 		struct dynamic_library_impl
@@ -36,7 +35,6 @@ namespace Si
 			}
 		};
 	}
-#endif
 }
 
 #endif

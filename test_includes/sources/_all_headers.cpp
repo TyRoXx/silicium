@@ -44,9 +44,6 @@
 #include <silicium/linux/directory_watcher.hpp>
 #include <silicium/linux/dynamic_library_impl.hpp>
 #include <silicium/linux/inotify.hpp>
-#include <silicium/linux/native_file_descriptor.hpp>
-#include <silicium/linux/open.hpp>
-#include <silicium/linux/process.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
@@ -83,6 +80,9 @@
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/override.hpp>
+#include <silicium/posix/native_file_descriptor.hpp>
+#include <silicium/posix/open.hpp>
+#include <silicium/posix/process.hpp>
 #include <silicium/process.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/read_file.hpp>

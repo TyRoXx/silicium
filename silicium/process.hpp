@@ -3,10 +3,8 @@
 
 #ifdef _WIN32
 #	include <silicium/win32/process.hpp>
-#endif
-
-#ifdef __linux__
-#	include <silicium/linux/process.hpp>
+#else
+#	include <silicium/posix/process.hpp>
 #endif
 
 namespace Si

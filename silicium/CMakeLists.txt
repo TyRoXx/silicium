@@ -4,12 +4,14 @@ file(GLOB sources
 	"sink/*"
 	"source/*"
 	"observable/*"
-	"zlib/*")
+	"zlib/*"
+	"posix/*"
+)
 
-file(GLOB asioSources "asio/*.hpp" "asio/*cpp")
+file(GLOB asioSources "asio/*.hpp" "asio/*.cpp")
 
 if(LIBGIT2_FOUND)
-	file(GLOB gitSources "git/*.hpp" "git/*cpp")
+	file(GLOB gitSources "git/*.hpp" "git/*.cpp")
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
