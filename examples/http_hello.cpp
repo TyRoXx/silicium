@@ -17,7 +17,7 @@
 void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 {
 	std::array<char, 4096> incoming_buffer;
-	auto receiver = Si::make_reading_observable(client, Si::make_memory_range(incoming_buffer));
+	auto receiver = Si::asio::make_reading_observable(client, Si::make_memory_range(incoming_buffer));
 	auto without_errors = Si::make_error_extracting_source(Si::make_observable_source(std::move(receiver), yield));
 	auto enumerated = Si::make_enumerating_source(Si::ref_source(without_errors));
 	auto request = Si::http::parse_request(enumerated);
@@ -41,7 +41,7 @@ void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 	}
 
 	//you can handle the error if you want
-	boost::system::error_code error = Si::write(client, Si::make_memory_range(response), yield);
+	boost::system::error_code error = Si::asio::write(client, Si::make_memory_range(response), yield);
 
 	//ignore shutdown failures, they do not matter here
 	client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
@@ -51,7 +51,7 @@ int main()
 {
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
-	auto accept_loop = Si::make_total_consumer(Si::flatten(Si::transform(Si::tcp_acceptor(acceptor), [](Si::tcp_acceptor_result maybe_client)
+	auto accept_loop = Si::make_total_consumer(Si::flatten(Si::transform(Si::asio::tcp_acceptor(acceptor), [](Si::asio::tcp_acceptor_result maybe_client)
 	{
 		auto client = maybe_client.get();
 		auto client_handler = Si::make_coroutine([client](Si::yield_context yield) -> Si::nothing

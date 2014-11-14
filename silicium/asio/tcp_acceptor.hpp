@@ -9,86 +9,89 @@
 
 namespace Si
 {
-	typedef error_or<std::shared_ptr<boost::asio::ip::tcp::socket>> tcp_acceptor_result; //until socket itself is noexcept-movable
-
-	struct tcp_acceptor
+	namespace asio
 	{
-		typedef tcp_acceptor_result element_type;
+		typedef error_or<std::shared_ptr<boost::asio::ip::tcp::socket>> tcp_acceptor_result; //until socket itself is noexcept-movable
 
-		tcp_acceptor()
-			: underlying(nullptr)
-			, receiver_(nullptr)
+		struct tcp_acceptor
 		{
-		}
+			typedef tcp_acceptor_result element_type;
 
-		explicit tcp_acceptor(boost::asio::ip::tcp::acceptor &underlying)
-			: underlying(&underlying)
-			, receiver_(nullptr)
-		{
-		}
-
-		tcp_acceptor(tcp_acceptor &&other) BOOST_NOEXCEPT
-			: underlying(other.underlying)
-			, next_client(std::move(other.next_client))
-			, receiver_(other.receiver_)
-		{
-		}
-
-		tcp_acceptor &operator = (tcp_acceptor &&other) BOOST_NOEXCEPT
-		{
-			underlying = other.underlying;
-			next_client = std::move(other.next_client);
-			receiver_ = other.receiver_;
-			return *this;
-		}
-
-		~tcp_acceptor()
-		{
-			if (!receiver_ || !underlying)
+			tcp_acceptor()
+				: underlying(nullptr)
+				, receiver_(nullptr)
 			{
-				return;
 			}
-			underlying->cancel();
-		}
 
-		void async_get_one(observer<element_type> &receiver)
-		{
-			assert(!receiver_);
-			assert(underlying);
-			next_client = std::make_shared<boost::asio::ip::tcp::socket>(underlying->get_io_service());
-			receiver_ = &receiver;
-			underlying->async_accept(*next_client, [this](boost::system::error_code error)
+			explicit tcp_acceptor(boost::asio::ip::tcp::acceptor &underlying)
+				: underlying(&underlying)
+				, receiver_(nullptr)
 			{
-				if (!this->receiver_)
+			}
+
+			tcp_acceptor(tcp_acceptor &&other) BOOST_NOEXCEPT
+				: underlying(other.underlying)
+				, next_client(std::move(other.next_client))
+				, receiver_(other.receiver_)
+			{
+			}
+
+			tcp_acceptor &operator = (tcp_acceptor &&other) BOOST_NOEXCEPT
+			{
+				underlying = other.underlying;
+				next_client = std::move(other.next_client);
+				receiver_ = other.receiver_;
+				return *this;
+			}
+
+			~tcp_acceptor()
+			{
+				if (!receiver_ || !underlying)
 				{
-					//can happen when cancel has been called on the observable when the callback was
-					//already posted to the io_service
 					return;
 				}
-				if (error)
+				underlying->cancel();
+			}
+
+			void async_get_one(observer<element_type> &receiver)
+			{
+				assert(!receiver_);
+				assert(underlying);
+				next_client = std::make_shared<boost::asio::ip::tcp::socket>(underlying->get_io_service());
+				receiver_ = &receiver;
+				underlying->async_accept(*next_client, [this](boost::system::error_code error)
 				{
-					if (error == boost::asio::error::operation_aborted)
+					if (!this->receiver_)
 					{
+						//can happen when cancel has been called on the observable when the callback was
+						//already posted to the io_service
 						return;
 					}
-					Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{error});
-				}
-				else
-				{
-					Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
-				}
-			});
-		}
+					if (error)
+					{
+						if (error == boost::asio::error::operation_aborted)
+						{
+							return;
+						}
+						Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{error});
+					}
+					else
+					{
+						Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
+					}
+				});
+			}
 
-	private:
+		private:
 
-		boost::asio::ip::tcp::acceptor *underlying;
-		std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
-		observer<element_type> *receiver_;
+			boost::asio::ip::tcp::acceptor *underlying;
+			std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
+			observer<element_type> *receiver_;
 
-		SILICIUM_DELETED_FUNCTION(tcp_acceptor(tcp_acceptor const &))
-		SILICIUM_DELETED_FUNCTION(tcp_acceptor &operator = (tcp_acceptor const &))
-	};
+			SILICIUM_DELETED_FUNCTION(tcp_acceptor(tcp_acceptor const &))
+			SILICIUM_DELETED_FUNCTION(tcp_acceptor &operator = (tcp_acceptor const &))
+		};
+	}
 }
 
 #endif

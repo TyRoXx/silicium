@@ -9,49 +9,52 @@
 
 namespace Si
 {
-	template <class AsyncStream>
-	struct reading_observable
+	namespace asio
 	{
-		typedef error_or<memory_range> element_type;
-
-		explicit reading_observable(AsyncStream &stream, mutable_memory_range buffer)
-			: stream(&stream)
-			, buffer(buffer)
+		template <class AsyncStream>
+		struct reading_observable
 		{
-			assert(this->buffer.size() >= 1);
-		}
+			typedef error_or<memory_range> element_type;
 
-		void async_get_one(observer<element_type> &receiver)
-		{
-			stream->async_read_some(
-				boost::asio::buffer(buffer.begin(), buffer.size()),
-				[this, &receiver](boost::system::error_code ec, std::size_t bytes_received)
+			explicit reading_observable(AsyncStream &stream, mutable_memory_range buffer)
+				: stream(&stream)
+				, buffer(buffer)
 			{
-				if (ec)
+				assert(this->buffer.size() >= 1);
+			}
+
+			void async_get_one(observer<element_type> &receiver)
+			{
+				stream->async_read_some(
+					boost::asio::buffer(buffer.begin(), buffer.size()),
+					[this, &receiver](boost::system::error_code ec, std::size_t bytes_received)
 				{
-					receiver.got_element(ec);
-				}
-				else
-				{
-					assert(bytes_received <= buffer.size());
-					receiver.got_element(make_memory_range(buffer.begin(), buffer.begin() + bytes_received));
-				}
-			});
-		}
+					if (ec)
+					{
+						receiver.got_element(ec);
+					}
+					else
+					{
+						assert(bytes_received <= buffer.size());
+						receiver.got_element(make_memory_range(buffer.begin(), buffer.begin() + bytes_received));
+					}
+				});
+			}
 
-	private:
+		private:
 
-		AsyncStream *stream;
-		mutable_memory_range buffer;
-	};
+			AsyncStream *stream;
+			mutable_memory_range buffer;
+		};
 
-	template <class AsyncStream>
-	auto make_reading_observable(AsyncStream &stream, mutable_memory_range buffer)
+		template <class AsyncStream>
+		auto make_reading_observable(AsyncStream &stream, mutable_memory_range buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> reading_observable<AsyncStream>
+			-> reading_observable<AsyncStream>
 #endif
-	{
-		return reading_observable<AsyncStream>(stream, buffer);
+		{
+			return reading_observable<AsyncStream>(stream, buffer);
+		}
 	}
 }
 

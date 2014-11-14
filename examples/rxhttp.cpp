@@ -52,7 +52,7 @@ namespace
 		}
 	}
 
-	typedef Si::reading_observable<boost::asio::ip::tcp::socket> socket_observable;
+	typedef Si::asio::reading_observable<boost::asio::ip::tcp::socket> socket_observable;
 
 	struct coroutine_socket
 	{
@@ -75,7 +75,7 @@ namespace
 			assert(socket);
 			assert(yield);
 
-			auto sending = Si::virtualize_observable(Si::make_writing_observable(*socket, Si::make_constant_observable(data)));
+			auto sending = Si::virtualize_observable(Si::asio::make_writing_observable(*socket, Si::make_constant_observable(data)));
 
 			//ignore error
 			yield->get_one(sending);
@@ -221,7 +221,7 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::acceptor acceptor;
-		Si::tcp_acceptor clients;
+		Si::asio::tcp_acceptor clients;
 		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
 	};
 
@@ -260,7 +260,7 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::acceptor acceptor;
-		Si::tcp_acceptor clients;
+		Si::asio::tcp_acceptor clients;
 		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
 	};
 }
