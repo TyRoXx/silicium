@@ -86,6 +86,7 @@
 #include <silicium/process.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/read_file.hpp>
+#include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>

@@ -2,6 +2,7 @@
 #define SILICIUM_LINUX_PROCESS_HPP
 
 #include <silicium/sink/ptr_sink.hpp>
+#include <silicium/sink/buffering_sink.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/file_handle.hpp>
 #include <boost/filesystem/operations.hpp>

@@ -2,6 +2,7 @@
 #define SILICIUM_COPY_HPP
 
 #include <silicium/sink/ptr_sink.hpp>
+#include <silicium/sink/buffering_sink.hpp>
 #include <silicium/source/source.hpp>
 
 namespace Si

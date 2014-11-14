@@ -5,6 +5,7 @@
 #include <silicium/source/buffering_source.hpp>
 #include <silicium/config.hpp>
 #include <silicium/sink/ptr_sink.hpp>
+#include <silicium/sink/buffering_sink.hpp>
 #include <boost/format.hpp>
 
 namespace
