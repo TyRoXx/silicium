@@ -19,6 +19,9 @@ if(UNIX)
 
 	add_definitions("-Wall -Wextra -Wconversion -Wvla")
 
+	#warn when using undefined macros
+	add_definitions("-Wundef")
+
 	option(SILICIUM_PEDANTIC "pass -pedantic to the compiler (may generate useless warnings)" OFF)
 	if(SILICIUM_PEDANTIC)
 		add_definitions("-Wpedantic")
