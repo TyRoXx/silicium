@@ -8,11 +8,11 @@
 
 namespace Si
 {
-	typedef int native_file_handle;
+	typedef int native_file_descriptor;
 
-	native_file_handle const no_file_handle = -1;
+	native_file_descriptor const no_file_handle = -1;
 
-	inline void terminating_close(native_file_handle file) BOOST_NOEXCEPT
+	inline void terminating_close(native_file_descriptor file) BOOST_NOEXCEPT
 	{
 		if (close(file) < 0)
 		{

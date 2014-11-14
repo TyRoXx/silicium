@@ -16,7 +16,7 @@ namespace Si
 {
 	struct file_descriptor
 	{
-		native_file_handle handle;
+		native_file_descriptor handle;
 
 		file_descriptor() BOOST_NOEXCEPT
 			: handle(no_file_handle)
@@ -29,7 +29,7 @@ namespace Si
 			swap(other);
 		}
 
-		explicit file_descriptor(native_file_handle handle) BOOST_NOEXCEPT
+		explicit file_descriptor(native_file_descriptor handle) BOOST_NOEXCEPT
 			: handle(handle)
 		{
 		}
@@ -51,7 +51,7 @@ namespace Si
 			file_descriptor().swap(*this);
 		}
 
-		native_file_handle release() BOOST_NOEXCEPT
+		native_file_descriptor release() BOOST_NOEXCEPT
 		{
 			return Si::exchange(handle, no_file_handle);
 		}

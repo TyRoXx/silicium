@@ -15,7 +15,7 @@ namespace Si
 {
 	typedef Si::error_or<std::size_t> file_read_result;
 
-	inline auto make_file_source(native_file_handle file, iterator_range<char *> read_buffer)
+	inline auto make_file_source(native_file_descriptor file, iterator_range<char *> read_buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> generator_source<std::function<boost::optional<file_read_result>()>>
 #endif

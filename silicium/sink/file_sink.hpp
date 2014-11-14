@@ -28,7 +28,7 @@ namespace Si
 		{
 		}
 
-		explicit file_sink(native_file_handle destination)
+		explicit file_sink(native_file_descriptor destination)
 			: m_destination(destination)
 		{
 		}
@@ -94,7 +94,7 @@ namespace Si
 
 	private:
 
-		native_file_handle m_destination;
+		native_file_descriptor m_destination;
 
 		error_type append_one(element_type const &element)
 		{
