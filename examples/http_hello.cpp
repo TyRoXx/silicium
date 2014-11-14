@@ -1,6 +1,6 @@
 #include <silicium/http/http.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
-#include <silicium/asio/socket_observable.hpp>
+#include <silicium/asio/reading_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/observable/transform.hpp>
 #include <silicium/observable/flatten.hpp>
@@ -17,7 +17,7 @@
 void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 {
 	std::array<char, 4096> incoming_buffer;
-	auto receiver = Si::socket_observable(client, Si::make_memory_range(incoming_buffer));
+	auto receiver = Si::make_reading_observable(client, Si::make_memory_range(incoming_buffer));
 	auto without_errors = Si::make_error_extracting_source(Si::make_observable_source(std::move(receiver), yield));
 	auto enumerated = Si::make_enumerating_source(Si::ref_source(without_errors));
 	auto request = Si::http::parse_request(enumerated);
