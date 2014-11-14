@@ -7,7 +7,7 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 {
 	boost::filesystem::path const file_name = "/tmp/silicium_file_sink_success.txt";
 	{
-		Si::file_descriptor file = Si::overwrite_file(file_name).get();
+		Si::file_handle file = Si::overwrite_file(file_name).get();
 		Si::file_sink sink(file.handle);
 		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::make_c_str_range("test")}));
 		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::flush{}}));

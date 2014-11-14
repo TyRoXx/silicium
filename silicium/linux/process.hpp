@@ -3,7 +3,7 @@
 
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/process_parameters.hpp>
-#include <silicium/file_descriptor.hpp>
+#include <silicium/file_handle.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <fcntl.h>
 #include <sys/wait.h>
@@ -40,7 +40,7 @@ namespace Si
 
 		struct pipe
 		{
-			file_descriptor write, read;
+			file_handle write, read;
 
 			void close() BOOST_NOEXCEPT
 			{
@@ -62,8 +62,8 @@ namespace Si
 				throw boost::system::system_error(errno, boost::system::system_category());
 			}
 			pipe result;
-			result.read  = file_descriptor(fds[0]);
-			result.write = file_descriptor(fds[1]);
+			result.read  = file_handle(fds[0]);
+			result.write = file_handle(fds[1]);
 			return result;
 		}
 	}

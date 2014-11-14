@@ -1,5 +1,5 @@
-#ifndef SILICIUM_LINUX_FILE_DESCRIPTOR_HPP
-#define SILICIUM_LINUX_FILE_DESCRIPTOR_HPP
+#ifndef SILICIUM_LINUX_NATIVE_FILE_DESCRIPTOR_HPP
+#define SILICIUM_LINUX_NATIVE_FILE_DESCRIPTOR_HPP
 
 #include <boost/config.hpp>
 #include <boost/system/system_error.hpp>
