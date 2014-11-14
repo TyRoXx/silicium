@@ -2,6 +2,7 @@
 #define SILICIUM_BUFFERING_SINK_HPP
 
 #include <silicium/sink/sink.hpp>
+#include <silicium/then.hpp>
 
 namespace Si
 {

@@ -109,6 +109,7 @@
 #include <silicium/source/transforming_source.hpp>
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/std_threading.hpp>
+#include <silicium/then.hpp>
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/version.hpp>
