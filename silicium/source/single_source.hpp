@@ -3,6 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
+#include <boost/concept_check.hpp>
 
 namespace Si
 {

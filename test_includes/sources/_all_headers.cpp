@@ -2,6 +2,7 @@
 #include <silicium/build_result.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/http/http.hpp>
+#include <silicium/http/uri.hpp>
 #include <silicium/http/generate_header.hpp>
 #include <silicium/http/generate_request.hpp>
 #include <silicium/http/parse_response.hpp>
@@ -25,6 +26,7 @@
 #include <silicium/to_shared.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
+#include <silicium/html.hpp>
 #include <silicium/observable/for_each.hpp>
 #include <silicium/observable/deref_optional.hpp>
 #include <silicium/observable/constant.hpp>
