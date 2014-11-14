@@ -29,7 +29,8 @@ namespace Si
 				{
 					throw boost::system::system_error(errno, boost::system::system_category());
 				}
-				commit(buffer_helper, static_cast<std::size_t>(rc));
+				buffer_helper.make_append_space(static_cast<std::size_t>(rc));
+				buffer_helper.flush_append_space();
 			}
 		}
 

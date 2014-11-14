@@ -42,13 +42,6 @@ namespace Si
 		virtual error_type flush_append_space() = 0;
 	};
 
-	template <class Element, class Error>
-	Error commit(buffer<Element, Error> &destination, std::size_t count)
-	{
-		destination.make_append_space(count);
-		return destination.flush_append_space();
-	}
-
 	namespace detail
 	{
 		template <class>
