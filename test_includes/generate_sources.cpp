@@ -1,6 +1,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <fstream>
+#include <set>
 #include <unordered_set>
 
 namespace
@@ -83,15 +84,22 @@ int main()
 		return blacklist.count(dir.leaf().string()) == 0;
 	};
 
+	std::set<std::string> all_headers;
+	auto const add_header = [&all_headers](std::string const &header_name)
+	{
+		//sort the headers by name for a deterministic ordering
+		all_headers.insert(header_name);
+	};
+	generate_sources_recursively(sources_root, headers_root, "", is_relevant_directory, add_header);
+
 	auto const all_headers_file_name = sources_root / "_all_headers.cpp";
-	std::ofstream all_headers(all_headers_file_name.string());
-	if (!all_headers)
+	std::ofstream all_headers_file(all_headers_file_name.string());
+	if (!all_headers_file)
 	{
 		throw std::runtime_error("Cannot open file " + all_headers_file_name.string());
 	}
-	auto const write_header = [&all_headers](std::string const &header_name)
+	for (std::string const &header_name : all_headers)
 	{
-		all_headers << "#include " << header_name << '\n';
-	};
-	generate_sources_recursively(sources_root, headers_root, "", is_relevant_directory, write_header);
+		all_headers_file << "#include " << header_name << '\n';
+	}
 }
