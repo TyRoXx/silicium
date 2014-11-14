@@ -15,8 +15,9 @@ namespace Si
 
 		explicit reading_observable(AsyncStream &stream, iterator_range<char *> buffer)
 			: stream(&stream)
+			, buffer(buffer)
 		{
-			assert(buffer.size() >= 1);
+			assert(this->buffer.size() >= 1);
 		}
 
 		void async_get_one(observer<element_type> &receiver)
