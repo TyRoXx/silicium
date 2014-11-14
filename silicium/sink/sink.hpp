@@ -4,8 +4,10 @@
 #include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
+#include <silicium/memory_range.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/utility/string_ref.hpp>
 #include <boost/container/string.hpp>
 #include <fstream>
 #include <array>
@@ -256,6 +258,12 @@ namespace Si
 	Error append(Si::sink<Element, Error> &out, boost::container::basic_string<Element> const &str)
 	{
 		return out.append(make_iterator_range(str.data(), str.data() + str.size()));
+	}
+
+	template <class Element, class Error>
+	Error append(Si::sink<Element, Error> &out, boost::basic_string_ref<Element> const &str)
+	{
+		return out.append(make_memory_range(str));
 	}
 
 	template <class Element, class Error>

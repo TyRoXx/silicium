@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/array.hpp>
+#include <boost/utility/string_ref.hpp>
 #include <array>
 
 BOOST_AUTO_TEST_CASE(make_memory_range_c_str_literal)
@@ -89,6 +90,20 @@ BOOST_AUTO_TEST_CASE(make_memory_range_std_string)
 BOOST_AUTO_TEST_CASE(make_memory_range_const_std_string)
 {
 	std::string const expected = "123";
+	Si::iterator_range<char const *> r = Si::make_memory_range(expected);
+	BOOST_CHECK_EQUAL_COLLECTIONS(begin(expected), end(expected), r.begin(), r.end());
+}
+
+BOOST_AUTO_TEST_CASE(make_memory_range_string_ref)
+{
+	boost::string_ref expected = "123";
+	Si::iterator_range<char const *> r = Si::make_memory_range(expected);
+	BOOST_CHECK_EQUAL_COLLECTIONS(begin(expected), end(expected), r.begin(), r.end());
+}
+
+BOOST_AUTO_TEST_CASE(make_memory_range_const_string_ref)
+{
+	boost::string_ref const expected = "123";
 	Si::iterator_range<char const *> r = Si::make_memory_range(expected);
 	BOOST_CHECK_EQUAL_COLLECTIONS(begin(expected), end(expected), r.begin(), r.end());
 }
