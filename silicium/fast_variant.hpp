@@ -408,8 +408,8 @@ namespace Si
 				f[which](&destination, &source);
 			}
 
-			SILICIUM_DELETED_FUNCTION(fast_variant_base(fast_variant_base const &));
-			SILICIUM_DELETED_FUNCTION(fast_variant_base &operator = (fast_variant_base const &));
+			SILICIUM_DELETED_FUNCTION(fast_variant_base(fast_variant_base const &))
+			SILICIUM_DELETED_FUNCTION(fast_variant_base &operator = (fast_variant_base const &))
 		};
 
 		template <class ...T>
