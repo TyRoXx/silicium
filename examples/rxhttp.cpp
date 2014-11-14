@@ -11,6 +11,7 @@
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/coroutine_generator.hpp>
+#include <silicium/asio/reading_observable.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
 #include <thread>
@@ -51,6 +52,8 @@ namespace
 		}
 	}
 
+	typedef Si::reading_observable<boost::asio::ip::tcp::socket> socket_observable;
+
 	struct coroutine_socket
 	{
 		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, Si::push_context<Si::nothing> &yield)
@@ -58,11 +61,11 @@ namespace
 			, yield(&yield)
 			, received(4096)
 			, receiver(socket, Si::make_iterator_range(received.data(), received.data() + received.size()))
-			, receiving_(Si::observable_source<Si::socket_observable, Si::push_context<Si::nothing>>(receiver, yield))
+			, receiving_(Si::observable_source<socket_observable, Si::push_context<Si::nothing>>(receiver, yield))
 		{
 		}
 
-		Si::source<Si::received_from_socket> &receiving()
+		Si::source<Si::error_or<Si::memory_range>> &receiving()
 		{
 			return receiving_;
 		}
@@ -89,13 +92,13 @@ namespace
 		boost::asio::ip::tcp::socket *socket;
 		Si::push_context<Si::nothing> *yield;
 		std::vector<char> received;
-		Si::socket_observable receiver;
-		Si::virtualized_source<Si::observable_source<Si::socket_observable, Si::push_context<Si::nothing>>> receiving_;
+		socket_observable receiver;
+		Si::virtualized_source<Si::observable_source<socket_observable, Si::push_context<Si::nothing>>> receiving_;
 	};
 
-	struct thread_socket_source : Si::source<Si::received_from_socket>
+	struct thread_socket_source : Si::source<Si::error_or<Si::memory_range>>
 	{
-		typedef Si::received_from_socket element_type;
+		typedef Si::error_or<Si::memory_range> element_type;
 
 		explicit thread_socket_source(boost::asio::ip::tcp::socket &socket)
 			: socket(&socket)
@@ -128,7 +131,7 @@ namespace
 				}
 				else
 				{
-					*i = Si::incoming_bytes(received.data(), received.data() + bytes_received);
+					*i = Si::make_memory_range<char const>(received.data(), received.data() + bytes_received);
 				}
 				++i;
 			}
@@ -148,7 +151,7 @@ namespace
 		{
 		}
 
-		Si::source<Si::received_from_socket> &receiving()
+		Si::source<Si::error_or<Si::memory_range>> &receiving()
 		{
 			return receiving_;
 		}

@@ -3,15 +3,16 @@
 
 #include <silicium/config.hpp>
 #include <silicium/error_or.hpp>
-#include <silicium/asio/socket_observable.hpp>
-#include <silicium/iterator_range.hpp>
+#include <silicium/memory_range.hpp>
+#include <silicium/observable/observer.hpp>
+#include <boost/asio/buffer.hpp>
 
 namespace Si
 {
 	template <class AsyncStream>
 	struct reading_observable
 	{
-		typedef error_or<incoming_bytes> element_type;
+		typedef error_or<memory_range> element_type;
 
 		explicit reading_observable(AsyncStream &stream, iterator_range<char *> buffer)
 			: stream(&stream)
@@ -33,7 +34,7 @@ namespace Si
 				else
 				{
 					assert(bytes_received <= buffer.size());
-					receiver.got_element(incoming_bytes(buffer.begin(), buffer.begin() + bytes_received));
+					receiver.got_element(make_memory_range(buffer.begin(), buffer.begin() + bytes_received));
 				}
 			});
 		}

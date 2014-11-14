@@ -77,7 +77,6 @@
 #include <silicium/asio/timer.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/accepting_source.hpp>
-#include <silicium/asio/socket_observable.hpp>
 #include <silicium/override.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/source/observable_source.hpp>

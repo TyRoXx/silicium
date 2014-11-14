@@ -1,8 +1,9 @@
 #ifndef SILICIUM_REACTIVE_RECEIVED_FROM_SOCKET_SOURCE_HPP
 #define SILICIUM_REACTIVE_RECEIVED_FROM_SOCKET_SOURCE_HPP
 
-#include <silicium/asio/socket_observable.hpp>
 #include <silicium/source/source.hpp>
+#include <silicium/memory_range.hpp>
+#include <silicium/error_or.hpp>
 #include <boost/optional.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <cassert>
@@ -11,20 +12,20 @@ namespace Si
 {
 	namespace detail
 	{
-		inline boost::optional<Si::incoming_bytes> strip_error(Si::received_from_socket received)
+		inline boost::optional<memory_range> strip_error(error_or<memory_range> received)
 		{
-			return received.get_ptr() ? boost::optional<Si::incoming_bytes>(*received.get_ptr()) : boost::none;
+			return received.get_ptr() ? boost::optional<memory_range>(*received.get_ptr()) : boost::none;
 		}
 	}
 
-	struct received_from_socket_source : Si::source<char>
+	struct received_from_socket_source : source<char>
 	{
-		explicit received_from_socket_source(Si::source<Si::received_from_socket> &original)
+		explicit received_from_socket_source(source<error_or<memory_range>> &original)
 			: original(&original)
 		{
 		}
 
-		Si::incoming_bytes buffered() const
+		memory_range buffered() const
 		{
 			return rest;
 		}
@@ -68,8 +69,8 @@ namespace Si
 
 	private:
 
-		Si::source<Si::received_from_socket> *original;
-		Si::incoming_bytes rest;
+		Si::source<error_or<memory_range>> *original;
+		memory_range rest;
 
 		std::size_t skip(std::size_t count)
 		{
