@@ -3,9 +3,22 @@
 
 #include <silicium/source/source.hpp>
 #include <silicium/sink/sink.hpp>
+#include <boost/utility/string_ref.hpp>
 
 namespace Si
 {
+	template <class CharRange>
+	auto make_range_from_string_like(CharRange &&range)
+	{
+		return std::forward<CharRange>(range);
+	}
+
+	template <class Char>
+	auto make_range_from_string_like(Char const *c_str)
+	{
+		return make_c_str_range(c_str);
+	}
+
 	namespace html
 	{
 		template <class CharSink, class Char>
@@ -25,21 +38,21 @@ namespace Si
 			}
 		}
 
-		template <class CharSink>
+		template <class CharSink, class StringLike>
 		void write_string(
 			CharSink &&sink,
-			std::string const &text)
+			StringLike const &text)
 		{
-			for (auto c : text)
+			for (auto c : make_range_from_string_like(text))
 			{
 				write_char(sink, c);
 			}
 		}
 
-		template <class CharSink>
+		template <class CharSink, class StringLike>
 		void open_attributed_element(
 			CharSink &&sink,
-			std::string const &name)
+			StringLike const &name)
 		{
 			append(sink, '<');
 			write_string(sink, name);
@@ -52,11 +65,11 @@ namespace Si
 			append(sink, '>');
 		}
 
-		template <class CharSink>
+		template <class CharSink, class KeyStringLike, class ValueStringLike>
 		void add_attribute(
 			CharSink &&sink,
-			std::string const &key,
-			std::string const &value)
+			KeyStringLike const &key,
+			ValueStringLike const &value)
 		{
 			append(sink, key);
 			append(sink, "=\"");
@@ -64,19 +77,19 @@ namespace Si
 			append(sink, '"');
 		}
 
-		template <class CharSink>
+		template <class CharSink, class StringLike>
 		void open_element(
 			CharSink &&sink,
-			std::string const &name)
+			StringLike const &name)
 		{
 			open_attributed_element(sink, name);
 			finish_attributes(sink);
 		}
 
-		template <class CharSink>
+		template <class CharSink, class StringLike>
 		void close_element(
 			CharSink &&sink,
-			std::string const &name)
+			StringLike const &name)
 		{
 			using Si::append;
 			append(sink, '<');
@@ -98,14 +111,15 @@ namespace Si
 			}
 
 			template <class ContentMaker>
-			void element(std::string const &name, ContentMaker make_content)
+			void element(boost::string_ref const &name, ContentMaker make_content)
 			{
 				open_element(m_out, name);
 				make_content();
 				close_element(m_out, name);
 			}
 
-			void write(std::string const &text)
+			template <class StringLike>
+			void write(StringLike const &text)
 			{
 				write_string(m_out, text);
 			}
