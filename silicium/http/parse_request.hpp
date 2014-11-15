@@ -6,6 +6,7 @@
 #include <silicium/detail/line_source.hpp>
 #include <silicium/to_unique.hpp>
 #include <boost/lexical_cast.hpp>
+#include <map>
 
 namespace Si
 {

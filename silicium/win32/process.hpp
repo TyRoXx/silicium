@@ -5,6 +5,7 @@
 #include <silicium/win32/win32.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/sink/ptr_sink.hpp>
+#include <silicium/sink/buffering_sink.hpp>
 #include <cassert>
 #include <stdexcept>
 
