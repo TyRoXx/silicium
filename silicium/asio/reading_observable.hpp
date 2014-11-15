@@ -16,7 +16,12 @@ namespace Si
 		{
 			typedef error_or<memory_range> element_type;
 
-			explicit reading_observable(AsyncStream &stream, mutable_memory_range buffer)
+			reading_observable() BOOST_NOEXCEPT
+				: stream(nullptr)
+			{
+			}
+
+			explicit reading_observable(AsyncStream &stream, mutable_memory_range buffer) BOOST_NOEXCEPT
 				: stream(&stream)
 				, buffer(buffer)
 			{
