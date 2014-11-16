@@ -4,6 +4,7 @@
 #include <silicium/iterator_range.hpp>
 #include <boost/optional.hpp>
 #include <uriparser/Uri.h>
+#include <vector>
 
 namespace Si
 {

@@ -1,7 +1,6 @@
 #include <silicium/win32/directory_changes.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/config.hpp>
-#include <Windows.h>
 #include <array>
 
 namespace Si
