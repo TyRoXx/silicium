@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 		Si::make_iterator_range(compressed.data(), compressed.data() + compressed.size()),
 		Z_FULL_FLUSH
 	);
-	BOOST_CHECK_EQUAL(0, compress_result.first);
+	BOOST_CHECK_EQUAL(0u, compress_result.first);
 	BOOST_CHECK_LT(compress_result.second, compressed.size());
 	std::array<char, 4096> decompressed;
 	Si::zlib_inflate_stream inflator = Si::zlib_inflate_stream::initialize();
@@ -33,5 +33,5 @@ BOOST_AUTO_TEST_CASE(zlib_deflating_sink_test)
 	auto compressor = Si::make_deflating_sink(Si::make_container_buffer(compressed), Si::zlib_deflate_stream(Z_DEFAULT_COMPRESSION));
 	Si::append(compressor, Si::zlib_sink_element{Si::make_c_str_range("Hello")});
 	Si::append(compressor, Si::zlib_sink_element{Si::flush{}});
-	BOOST_CHECK_GE(compressed.size(), 1);
+	BOOST_CHECK_GE(compressed.size(), 1u);
 }

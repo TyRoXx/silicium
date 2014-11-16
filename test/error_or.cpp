@@ -355,20 +355,20 @@ namespace
 		{
 			std::pair<Si::error_or<int>, long> entry(Si::error_or<int>(i), i);
 			tree.insert(entry);
-			BOOST_CHECK_EQUAL(1, tree.count(entry.first));
+			BOOST_CHECK_EQUAL(1u, tree.count(entry.first));
 			hash.insert(entry);
-			BOOST_CHECK_EQUAL(1, hash.count(entry.first));
+			BOOST_CHECK_EQUAL(1u, hash.count(entry.first));
 		}
 		for (int i = 1000; i < 2000; ++i)
 		{
 			std::pair<Si::error_or<int>, long> entry(Si::error_or<int>(boost::system::error_code(i, boost::system::system_category())), 1000 + i);
 			tree.insert(entry);
-			BOOST_CHECK_EQUAL(1, tree.count(entry.first));
+			BOOST_CHECK_EQUAL(1u, tree.count(entry.first));
 			hash.insert(entry);
-			BOOST_CHECK_EQUAL(1, hash.count(entry.first));
+			BOOST_CHECK_EQUAL(1u, hash.count(entry.first));
 		}
-		BOOST_CHECK_EQUAL(2000, tree.size());
-		BOOST_CHECK_EQUAL(2000, hash.size());
+		BOOST_CHECK_EQUAL(2000u, tree.size());
+		BOOST_CHECK_EQUAL(2000u, hash.size());
 		boost::container::map<Si::error_or<int>, long> tree_from_hash(hash.begin(), hash.end());
 		BOOST_CHECK_EQUAL_COLLECTIONS(tree.begin(), tree.end(), tree_from_hash.begin(), tree_from_hash.end());
 	}

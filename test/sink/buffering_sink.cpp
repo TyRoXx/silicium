@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(buffering_sink_make_append_space)
 	auto buffer = Si::make_buffering_sink(Si::make_container_sink(v));
 	BOOST_CHECK(v.empty());
 	Si::iterator_range<int *> space = buffer.make_append_space(1);
-	BOOST_REQUIRE_GE(space.size(), 1u);
+	BOOST_REQUIRE_GE(space.size(), 1);
 	space[0] = 3;
 	BOOST_CHECK(v.empty());
 	buffer.flush_append_space();
