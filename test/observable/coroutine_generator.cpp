@@ -81,9 +81,9 @@ BOOST_AUTO_TEST_CASE(coroutine_generator_self_destruct)
 		//destroying the coroutine itself now should not crash or anything, it just works.
 		coro.reset();
 	});
-	BOOST_REQUIRE_EQUAL(0, steps_done);
+	BOOST_REQUIRE_EQUAL(0u, steps_done);
 	++steps_done;
 	handler.start();
-	BOOST_CHECK_EQUAL(3, steps_done);
+	BOOST_CHECK_EQUAL(3u, steps_done);
 	BOOST_CHECK(!coro);
 }
