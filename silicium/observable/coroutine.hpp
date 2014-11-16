@@ -94,12 +94,7 @@ namespace Si
 		std::function<Element (yield_context)> action;
 		Si::observer<Element> *receiver_;
 		bool has_finished;
-
-		coroutine_type &coro()
-		{
-			return *coro_;
-		}
-
+		
 		virtual void got_element(nothing) SILICIUM_OVERRIDE
 		{
 			next();
@@ -138,17 +133,17 @@ namespace Si
 							Si::exchange(receiver_, nullptr)->got_element(std::move(result));
 						});
 			}
-			else if (coro())
+			else if (*coro_)
 			{
-				coro()();
+				(*coro_)();
 			}
 			if (!receiver_)
 			{
 				return;
 			}
-			if (coro())
+			if (*coro_)
 			{
-				command_type command = coro().get();
+				command_type command = coro_->get();
 				command->async_get_one(*this);
 			}
 			else
