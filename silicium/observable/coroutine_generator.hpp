@@ -4,6 +4,11 @@
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/fast_variant.hpp>
+#ifdef _WIN32
+//win32.hpp will include Asio before coroutine will include Windows stuff
+//because Asio wants to be first.
+#	include <silicium/win32/win32.hpp>
+#endif
 #include <boost/coroutine/all.hpp>
 
 namespace Si
