@@ -230,6 +230,9 @@ namespace Si
 	template <class Element, class Action>
 	auto make_coroutine_generator(Action &&action) -> coroutine_generator_observable<Element>
 	{
+		BOOST_STATIC_ASSERT_MSG(
+			std::is_same<void, decltype(action(std::declval<push_context<Element>&>()))>::value,
+			"The return type of the action has to be void because we do not want to accidentally ignore a non-void result.");
 		return coroutine_generator_observable<Element>(std::forward<Action>(action));
 	}
 }

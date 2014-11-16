@@ -66,18 +66,17 @@ namespace Si
 BOOST_AUTO_TEST_CASE(coroutine_generator_self_destruct)
 {
 	std::size_t steps_done = 0;
-	auto coro = Si::to_unique(Si::make_coroutine_generator<Si::nothing>([&steps_done](Si::push_context<Si::nothing> push) -> Si::nothing
+	auto coro = Si::to_unique(Si::make_coroutine_generator<Si::nothing>([&steps_done](Si::push_context<Si::nothing> push)
 	{
-		BOOST_REQUIRE_EQUAL(1, steps_done);
+		BOOST_REQUIRE_EQUAL(1u, steps_done);
 		++steps_done;
 		push({});
-		return {};
 	}));
 	BOOST_REQUIRE_EQUAL(0, steps_done);
 	auto handler = Si::for_each(Si::ref(*coro), [&coro, &steps_done](Si::nothing)
 	{
 		//this function is called in the coroutine
-		BOOST_REQUIRE_EQUAL(2, steps_done);
+		BOOST_REQUIRE_EQUAL(2u, steps_done);
 		++steps_done;
 		//destroying the coroutine itself now should not crash or anything, it just works.
 		coro.reset();
