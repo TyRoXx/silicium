@@ -33,6 +33,15 @@ namespace Si
 			{
 				return uri::string(parsed.first, parsed.afterLast);
 			}
+
+			struct uri_deleter
+			{
+				void operator()(UriUriA *uri) const BOOST_NOEXCEPT
+				{
+					assert(uri);
+					uriFreeUriMembersA(uri);
+				}
+			};
 		}
 
 		inline boost::optional<uri> parse_uri(iterator_range<char const *> encoded)
@@ -40,6 +49,7 @@ namespace Si
 			UriParserStateA parser;
 			UriUriA parsed;
 			parser.uri = &parsed;
+			std::unique_ptr<UriUriA, detail::uri_deleter> const parsed_clean_up(&parsed);
 			int const rc = uriParseUriExA(&parser, encoded.begin(), encoded.end());
 			if (rc != URI_SUCCESS)
 			{
