@@ -46,7 +46,8 @@ namespace Si
 		auto begin_ = begin(range);
 		auto end_ = end(range);
 		BOOST_STATIC_ASSERT(std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<decltype(begin_)>::iterator_category>::value);
-		return make_memory_range(boost::addressof(*begin_), boost::addressof(*end_));
+		auto data = boost::addressof(*begin_);
+		return make_memory_range(data, data + std::distance(begin_, end_));
 	}
 
 	template <class C>
