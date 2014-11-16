@@ -70,17 +70,26 @@ int main()
 	boost::filesystem::path const test_includes_root = this_source_file.parent_path();
 	boost::filesystem::path const sources_root = test_includes_root / "sources";
 	boost::filesystem::path const headers_root = test_includes_root.parent_path() / "silicium";
-	auto const is_relevant_directory = [](boost::filesystem::path const &dir)
+	std::string const linux_system_name = "linux";
+	std::string const windows_system_name = "win32";
+	std::string const current_system_name =
+#ifdef _WIN32
+		windows_system_name
+#else
+		linux_system_name
+#endif
+		;
+	std::unordered_set<std::string> blacklist
 	{
-		static std::unordered_set<std::string> const blacklist
-		{
-#ifndef _WIN32
-			"win32",
+		windows_system_name,
+		linux_system_name,
+#ifdef _WIN32
+		"posix",
 #endif
-#ifndef __linux__
-			"linux",
-#endif
-		};
+	};
+	blacklist.erase(current_system_name);
+	auto const is_relevant_directory = [&blacklist](boost::filesystem::path const &dir)
+	{
 		return blacklist.count(dir.leaf().string()) == 0;
 	};
 
@@ -92,7 +101,7 @@ int main()
 	};
 	generate_sources_recursively(sources_root, headers_root, "", is_relevant_directory, add_header);
 
-	auto const all_headers_file_name = sources_root / "_all_headers.cpp";
+	auto const all_headers_file_name = sources_root / current_system_name / "_all_headers_.cpp";
 	std::ofstream all_headers_file(all_headers_file_name.string());
 	if (!all_headers_file)
 	{

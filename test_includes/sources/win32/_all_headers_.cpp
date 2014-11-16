@@ -41,9 +41,6 @@
 #include <silicium/http/parse_response.hpp>
 #include <silicium/http/uri.hpp>
 #include <silicium/iterator_range.hpp>
-#include <silicium/linux/directory_watcher.hpp>
-#include <silicium/linux/dynamic_library_impl.hpp>
-#include <silicium/linux/inotify.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
@@ -80,9 +77,6 @@
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/override.hpp>
-#include <silicium/posix/native_file_descriptor.hpp>
-#include <silicium/posix/open.hpp>
-#include <silicium/posix/process.hpp>
 #include <silicium/process.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/read_file.hpp>
@@ -113,6 +107,13 @@
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/version.hpp>
+#include <silicium/win32/directory_changes.hpp>
+#include <silicium/win32/directory_watcher.hpp>
+#include <silicium/win32/dynamic_library_impl.hpp>
+#include <silicium/win32/native_file_descriptor.hpp>
+#include <silicium/win32/open.hpp>
+#include <silicium/win32/process.hpp>
+#include <silicium/win32/win32.hpp>
 #include <silicium/write_file.hpp>
 #include <silicium/zlib/deflating_sink.hpp>
 #include <silicium/zlib/inflating_sink.hpp>
