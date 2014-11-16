@@ -55,7 +55,6 @@ BOOST_AUTO_TEST_CASE(coroutine_total_consumer)
 	BOOST_CHECK(executed);
 }
 
-#if 0 //TODO: make this one not crash on Windows
 BOOST_AUTO_TEST_CASE(coroutine_self_destruct)
 {
 	std::size_t steps_done = 0;
@@ -81,4 +80,3 @@ BOOST_AUTO_TEST_CASE(coroutine_self_destruct)
 	BOOST_CHECK_EQUAL(3u, steps_done);
 	BOOST_CHECK(!coro);
 }
-#endif

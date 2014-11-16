@@ -42,33 +42,29 @@ namespace Si
 
 		coroutine_observable()
 			: receiver_(nullptr)
-			, has_finished(false)
 		{
 		}
 
 		coroutine_observable(coroutine_observable &&other)
-			: coro_(std::move(other.coro_))
+			: state(std::move(other.state))
 			, action(std::move(other.action))
 			, receiver_(nullptr)
-			, has_finished(false)
 		{
 		}
 
 		template <class Action>
 		explicit coroutine_observable(Action &&action)
-			: coro_()
+			: state()
 			, action(std::forward<Action>(action))
 			, receiver_(nullptr)
-			, has_finished(false)
 		{
 		}
 
 		coroutine_observable &operator = (coroutine_observable &&other)
 		{
-			coro_ = std::move(other.coro_);
+			state = std::move(other.state);
 			action = std::move(other.action);
 			receiver_ = std::move(other.receiver_);
-			has_finished = other.has_finished;
 			return *this;
 		}
 
@@ -90,10 +86,20 @@ namespace Si
 		coroutine_type;
 		typedef std::shared_ptr<coroutine_type> coroutine_holder;
 
-		coroutine_holder coro_;
+		struct async_state
+		{
+			coroutine_holder coro_;
+			bool has_finished;
+
+			async_state()
+				: has_finished(false)
+			{
+			}
+		};
+
+		std::shared_ptr<async_state> state;
 		std::function<Element (yield_context)> action;
 		Si::observer<Element> *receiver_;
-		bool has_finished;
 		
 		virtual void got_element(nothing) SILICIUM_OVERRIDE
 		{
@@ -107,15 +113,18 @@ namespace Si
 
 		void next()
 		{
-			auto keep_coro_alive = coro_;
-			if (has_finished)
+			auto keep_coro_alive = state;
+			if (keep_coro_alive && keep_coro_alive->has_finished)
 			{
 				return Si::exchange(receiver_, nullptr)->ended();
 			}
 			if (action)
 			{
 				auto bound_action = Si::exchange(action, decltype(action)());
-				coro_ =
+				auto new_state = std::make_shared<async_state>();
+				state = new_state;
+				keep_coro_alive = new_state;
+				new_state->coro_ =
 					std::make_shared<coroutine_type>
 						([bound_action, this](
 #if BOOST_VERSION >= 105500
@@ -128,22 +137,26 @@ namespace Si
 							detail::coroutine_yield_context yield_impl(push);
 							yield_context yield(yield_impl); //TODO: save this indirection
 							auto result = bound_action(yield);
-							assert(!has_finished);
-							has_finished = true;
+							assert(!state->has_finished);
+							state->has_finished = true;
 							Si::exchange(receiver_, nullptr)->got_element(std::move(result));
 						});
 			}
-			else if (*coro_)
+			else if (*state->coro_)
 			{
-				(*coro_)();
+				(*state->coro_)();
+			}
+			if (keep_coro_alive->has_finished)
+			{
+				return;
 			}
 			if (!receiver_)
 			{
 				return;
 			}
-			if (*coro_)
+			if (*state->coro_)
 			{
-				command_type command = coro_->get();
+				command_type command = state->coro_->get();
 				command->async_get_one(*this);
 			}
 			else
