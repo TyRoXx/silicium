@@ -14,7 +14,7 @@ namespace Si
 #ifdef _WIN32
 	namespace win32
 	{
-		boost::optional<file_notification_type> to_portable_file_notification_type(DWORD action)
+		inline boost::optional<file_notification_type> to_portable_file_notification_type(DWORD action)
 		{
 			switch (action)
 			{
@@ -26,7 +26,7 @@ namespace Si
 			}
 		}
 
-		boost::optional<Si::file_notification> to_portable_file_notification(win32::file_notification &&original)
+		inline boost::optional<Si::file_notification> to_portable_file_notification(win32::file_notification &&original)
 		{
 			auto const type = to_portable_file_notification_type(original.action);
 			if (!type)
