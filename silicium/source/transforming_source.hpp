@@ -2,12 +2,13 @@
 #define SILICIUM_TRANSFORMING_SOURCE_HPP
 
 #include <silicium/source/source.hpp>
+#include <silicium/config.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 
 namespace Si
 {
-	template <class From, class Transformation, class To = decltype(std::declval<Transformation>()(std::declval<typename From::element_type>()))>
+	template <class From, class Transformation, class To>
 	struct transforming_source SILICIUM_FINAL : source<To>
 	{
 		template <class Transformation2>
@@ -46,9 +47,14 @@ namespace Si
 
 	template <class From, class Transformation>
 	auto make_transforming_source(From &&original, Transformation &&transform)
-		-> transforming_source<typename std::decay<From>::type, typename std::decay<Transformation>::type>
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> transforming_source<typename std::decay<From>::type, typename std::decay<Transformation>::type, decltype(transform(std::declval<typename std::decay<From>::type::element_type>()))>
+#endif
 	{
-		return transforming_source<typename std::decay<From>::type, typename std::decay<Transformation>::type>(std::forward<From>(original), std::forward<Transformation>(transform));
+		return transforming_source<typename std::decay<From>::type, typename std::decay<Transformation>::type, decltype(transform(std::declval<typename std::decay<From>::type::element_type>()))>(
+			std::forward<From>(original),
+			std::forward<Transformation>(transform)
+		);
 	}
 }
 
