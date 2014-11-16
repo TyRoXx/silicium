@@ -97,6 +97,7 @@ endif()
 
 include_directories(".")
 add_subdirectory("silicium")
+add_subdirectory("c_binding")
 add_subdirectory("test")
 add_subdirectory("test_includes")
 add_subdirectory("examples")
