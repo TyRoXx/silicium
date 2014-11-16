@@ -1,6 +1,7 @@
 #include <silicium/http/uri.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/optional/optional_io.hpp>
 
 namespace
 {
@@ -32,4 +33,27 @@ BOOST_AUTO_TEST_CASE(uri_parse_http)
 	};
 	std::vector<std::string> const parsed_path = map(parsed->path, to_string);
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected_path.begin(), expected_path.end(), parsed_path.begin(), parsed_path.end());
+}
+
+namespace boost
+{
+	template <class Key, class Value>
+	wrap_stringstream &operator << (wrap_stringstream &out, std::pair<Key, Value> const &pair)
+	{
+		return out << "{" << pair.first << "," << pair.second << "}";
+	}
+}
+
+BOOST_AUTO_TEST_CASE(uri_parse_html_query)
+{
+	boost::optional<std::vector<Si::http::html_query_pair>> const parsed = Si::http::parse_html_query(Si::make_c_str_range("a=2&b=3&c=&d"));
+	BOOST_REQUIRE(parsed);
+	std::vector<Si::http::html_query_pair> const expected
+	{
+		std::make_pair("a", boost::optional<std::string>("2")),
+		std::make_pair("b", boost::optional<std::string>("3")),
+		std::make_pair("c", boost::optional<std::string>("")),
+		std::make_pair("d", boost::optional<std::string>()),
+	};
+	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), parsed->begin(), parsed->end());
 }
