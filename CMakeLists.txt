@@ -91,6 +91,9 @@ if(ZLIB_FOUND)
 endif()
 
 find_package(UriParser REQUIRED)
+if(URIPARSER_FOUND)
+	include_directories(SYSTEM ${URIPARSER_INCLUDE_DIR})
+endif()
 
 include_directories(".")
 add_subdirectory("silicium")
