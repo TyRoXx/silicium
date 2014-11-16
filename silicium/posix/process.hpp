@@ -75,7 +75,7 @@ namespace Si
 		auto executable = parameters.executable.string();
 		auto arguments = parameters.arguments;
 		std::vector<char *> argument_pointers;
-		argument_pointers.emplace_back(&executable[0]);
+		argument_pointers.emplace_back(const_cast<char *>(executable.c_str()));
 		std::transform(begin(arguments), end(arguments), std::back_inserter(argument_pointers), [](std::string &arg)
 		{
 			return &arg[0];
