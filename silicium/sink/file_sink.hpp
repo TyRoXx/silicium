@@ -6,7 +6,12 @@
 #include <silicium/file_handle.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/flush.hpp>
-#include <sys/uio.h>
+
+#ifdef _WIN32
+#	include <silicium/win32/win32.hpp>
+#else
+#	include <sys/uio.h>
+#endif
 
 namespace Si
 {
@@ -34,6 +39,81 @@ namespace Si
 		}
 
 		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		{
+			return append_impl(data);
+		}
+
+	private:
+
+		native_file_descriptor m_destination;
+
+#ifdef _WIN32
+		error_type append_impl(iterator_range<element_type const *> data)
+		{
+			for (auto const &element : data)
+			{
+				error_type error = append_one(element);
+				if (error)
+				{
+					return error;
+				}
+			}
+			return error_type();
+		}
+
+		error_type append_one(element_type const &element)
+		{
+			return visit<error_type>(
+				element,
+				[this](flush) -> error_type
+			{
+				if (FlushFileBuffers(m_destination))
+				{
+					return error_type();
+				}
+				return error_type(GetLastError(), boost::system::system_category());
+			},
+				[this](memory_range const &content) -> error_type
+			{
+				ptrdiff_t written = 0;
+				while (written < content.size())
+				{
+					auto const remaining = content.size() - written;
+					DWORD const write_now = std::min<ptrdiff_t>(remaining, static_cast<ptrdiff_t>((std::numeric_limits<DWORD>::max)()));
+					DWORD written_now = 0;
+					if (!WriteFile(m_destination, content.begin(), write_now, &written_now, nullptr))
+					{
+						return error_type(GetLastError(), boost::system::system_category());
+					}
+					assert(written_now > 0);
+					written += static_cast<ptrdiff_t>(written_now);
+				}
+				return error_type();
+			},
+				[this](seek_set const request) -> error_type
+			{
+				LARGE_INTEGER distance;
+				distance.QuadPart = request.from_beginning;
+				if (SetFilePointerEx(m_destination, distance, NULL, FILE_BEGIN))
+				{
+					return error_type();
+				}
+				return error_type(GetLastError(), boost::system::system_category());
+			},
+				[this](seek_add const request) -> error_type
+			{
+				LARGE_INTEGER distance;
+				distance.QuadPart = request.from_current;
+				if (SetFilePointerEx(m_destination, distance, NULL, FILE_CURRENT))
+				{
+					return error_type();
+				}
+				return error_type(GetLastError(), boost::system::system_category());
+			}
+			);
+		}
+#else
+		error_type append_impl(iterator_range<element_type const *> data)
 		{
 			boost::optional<size_t> write_streak_length;
 			ptrdiff_t i = 0;
@@ -91,10 +171,6 @@ namespace Si
 			}
 			return flush_writes();
 		}
-
-	private:
-
-		native_file_descriptor m_destination;
 
 		error_type append_one(element_type const &element)
 		{
@@ -164,6 +240,7 @@ namespace Si
 			//assume that everything has been written
 			return error_type();
 		}
+#endif
 	};
 }
 
