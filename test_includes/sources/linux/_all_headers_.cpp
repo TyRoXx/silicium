@@ -64,6 +64,7 @@
 #include <silicium/observable/generator.hpp>
 #include <silicium/observable/observable.hpp>
 #include <silicium/observable/observer.hpp>
+#include <silicium/observable/on_first.hpp>
 #include <silicium/observable/ptr.hpp>
 #include <silicium/observable/ready_future.hpp>
 #include <silicium/observable/ref.hpp>
