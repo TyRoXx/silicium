@@ -36,7 +36,7 @@ namespace Si
 	}
 
 	template <class Element>
-	struct coroutine_observable : observer<nothing>
+	struct coroutine_observable : private observer<nothing>
 	{
 		typedef Element element_type;
 
