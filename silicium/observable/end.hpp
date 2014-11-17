@@ -16,14 +16,18 @@ namespace Si
 	template <class Input>
 	struct end_observable : private observer<typename Input::element_type>
 	{
-		using element_type = Si::ended;
+		typedef ended element_type;
 
 		end_observable()
+			: receiver_(nullptr)
+			, has_ended(false)
 		{
 		}
 
 		explicit end_observable(Input input)
 			: input(std::move(input))
+			, receiver_(nullptr)
+			, has_ended(false)
 		{
 		}
 
@@ -41,8 +45,8 @@ namespace Si
 	private:
 
 		Input input;
-		observer<element_type> *receiver_ = nullptr;
-		bool has_ended = false;
+		observer<element_type> *receiver_;
+		bool has_ended;
 
 		void next()
 		{

@@ -57,7 +57,7 @@ namespace Si
 			}
 
 			return then(
-				[this] { return flush(); },
+				[this] { return this->flush(); },
 				[this, &data] { return m_destination.append(data); }
 			);
 		}

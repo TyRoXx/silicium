@@ -5,7 +5,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/test/unit_test.hpp>
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 
 namespace Si
 {

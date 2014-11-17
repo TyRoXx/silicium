@@ -13,6 +13,9 @@
 #ifndef RANGES_V3_UTILITY_INTEGER_SEQUENCE_HPP
 #define RANGES_V3_UTILITY_INTEGER_SEQUENCE_HPP
 
+#include <silicium/config.hpp>
+#if SILICIUM_COMPILER_HAS_USING
+
 #include <cstddef>
 #include <type_traits>
 //#include <range/v3/range_fwd.hpp>
@@ -73,5 +76,7 @@ namespace ranges
         using integer_sequence_t = typename make_integer_sequence<N>::type;
     }
 }
+
+#endif
 
 #endif

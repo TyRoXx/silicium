@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/version.hpp>
 
 #ifdef _MSC_VER
@@ -171,6 +172,9 @@ namespace Si
 {
 	using std::is_default_constructible;
 	using std::is_move_assignable;
+	using std::is_nothrow_default_constructible;
+	using std::is_nothrow_move_constructible;
+	using std::is_nothrow_move_assignable;
 #else
 	template <class T>
 	struct is_default_constructible : std::false_type
@@ -180,6 +184,25 @@ namespace Si
 	struct is_move_assignable : std::false_type
 	{
 	};
+	template <class T>
+	struct is_nothrow_default_constructible : std::true_type
+	{
+	};
+	template <class T>
+	struct is_nothrow_move_constructible : std::true_type
+	{
+	};
+	template <class T>
+	struct is_nothrow_move_assignable : std::true_type
+	{
+	};
+#endif
+
+#if BOOST_VERSION == 105400
+	//uintptr_t is somehow missing from Boost 1.54
+	typedef std::uintptr_t uintptr_t;
+#else
+	typedef boost::uintptr_t uintptr_t;
 #endif
 }
 

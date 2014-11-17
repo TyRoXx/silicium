@@ -50,9 +50,10 @@ struct expected_exception : std::exception
 
 struct throws_on_copy_construction
 {
-	bool active = true;
+	bool active;
 
 	throws_on_copy_construction()
+		: active(true)
 	{
 	}
 
@@ -204,9 +205,9 @@ BOOST_AUTO_TEST_CASE(error_or_map_error)
 template <class T>
 struct move_only_comparable
 {
-	BOOST_STATIC_ASSERT(std::is_nothrow_default_constructible<T>::value);
-	BOOST_STATIC_ASSERT(std::is_nothrow_move_constructible<T>::value);
-	BOOST_STATIC_ASSERT(std::is_nothrow_move_assignable<T>::value);
+	BOOST_STATIC_ASSERT(Si::is_nothrow_default_constructible<T>::value);
+	BOOST_STATIC_ASSERT(Si::is_nothrow_move_constructible<T>::value);
+	BOOST_STATIC_ASSERT(Si::is_nothrow_move_assignable<T>::value);
 
 	T value;
 

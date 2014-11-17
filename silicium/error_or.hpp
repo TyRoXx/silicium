@@ -443,6 +443,12 @@ namespace Si
 		}
 		return std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get());
 	}
+
+	template <class Value, class Error>
+	Value get(error_or<Value, Error> &&value)
+	{
+		return std::move(value.get());
+	}
 }
 
 namespace std
