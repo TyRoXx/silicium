@@ -85,7 +85,7 @@ if(LUA51_FOUND)
 	include_directories(SYSTEM ${LUA_INCLUDE_DIR})
 endif()
 
-find_package(ZLIB)
+find_package(ZLIB REQUIRED)
 if(ZLIB_FOUND)
 	include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
 endif()
