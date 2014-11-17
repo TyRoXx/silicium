@@ -25,6 +25,8 @@ void silicium_async_get_one(silicium_observable *observable, silicium_observer_f
 
 void silicium_free_observable(silicium_observable *observable);
 
+void *silicium_yield_get_one(silicium_yield_context *yield, silicium_observable *from);
+
 #ifdef __cplusplus
 }
 #endif

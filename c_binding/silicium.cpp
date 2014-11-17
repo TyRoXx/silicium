@@ -55,9 +55,12 @@ private:
 	Si::coroutine_observable<void *> m_coroutine;
 };
 
-struct silicium_yield_context
+struct silicium_yield_context : Si::yield_context
 {
-
+	explicit silicium_yield_context(Si::yield_context yield)
+		: Si::yield_context(yield)
+	{
+	}
 };
 
 extern "C"
@@ -68,7 +71,7 @@ silicium_observable *silicium_make_coroutine(silicium_coroutine_function action,
 	{
 		auto result = Si::make_unique<silicium_coroutine>([action, user_data](Si::yield_context yield) -> void *
 		{
-			silicium_yield_context wrapped_yield;
+			silicium_yield_context wrapped_yield(yield);
 			return action(user_data, &wrapped_yield);
 		});
 		return result.release();
@@ -92,4 +95,9 @@ extern "C"
 void silicium_free_observable(silicium_observable *observable)
 {
 	std::unique_ptr<silicium_observable>{observable};
+}
+
+void *silicium_yield_get_one(silicium_yield_context *yield, silicium_observable *from)
+{
+	return yield->get_one(Si::ref(*from)).get_value_or(nullptr);
 }
