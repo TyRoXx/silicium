@@ -18,7 +18,6 @@
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
-#include <silicium/detail/transform.hpp>
 #include <silicium/directory_allocator.hpp>
 #include <silicium/directory_builder.hpp>
 #include <silicium/directory_watcher.hpp>
