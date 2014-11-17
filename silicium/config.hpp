@@ -50,7 +50,7 @@
 #	define SILICIUM_NORETURN __attribute__ ((__noreturn__))
 #endif
 
-#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__) || (_MSC_VER >= 1900)
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
 #	define SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER 1
 #else
 #	define SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER 0
