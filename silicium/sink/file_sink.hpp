@@ -139,7 +139,7 @@ namespace Si
 			for (; i < data.size(); ++i)
 			{
 				auto &element = data[i];
-				int const max_streak_length = 1024;
+				size_t const max_streak_length = 1024;
 				if (try_get_ptr<memory_range>(element))
 				{
 					if (write_streak_length)
@@ -231,7 +231,7 @@ namespace Si
 				vector[i].iov_base = const_cast<void *>(static_cast<void const *>(piece.begin()));
 				vector[i].iov_len = piece.size();
 			}
-			assert(vector.size() <= std::numeric_limits<int>::max());
+			assert(vector.size() <= static_cast<size_t>(std::numeric_limits<int>::max()));
 			ssize_t rc = ::writev(m_destination, vector.data(), static_cast<int>(vector.size()));
 			if (rc < 0)
 			{

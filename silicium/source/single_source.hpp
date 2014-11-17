@@ -10,14 +10,16 @@ namespace Si
 	template <class Element>
 	struct single_source
 	{
-		using element_type = Element;
+		typedef Element element_type;
 
 		single_source()
+			: used(false)
 		{
 		}
 
 		explicit single_source(Element element)
 			: element(std::move(element))
+			, used(false)
 		{
 		}
 
@@ -46,7 +48,7 @@ namespace Si
 	private:
 
 		Element element;
-		bool used = false;
+		bool used;
 	};
 
 	template <class Element>
