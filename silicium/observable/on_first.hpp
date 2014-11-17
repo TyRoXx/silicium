@@ -2,6 +2,7 @@
 #define SILICIUM_OBSERVABLE_ON_FIRST_HPP
 
 #include <silicium/observable/observer.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -41,6 +42,9 @@ namespace Si
 
 	template <class Input, class Handler>
 	auto on_first(Input &&input, Handler &&handle_element)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>
+#endif
 	{
 		return on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>(
 			std::forward<Input>(input),
