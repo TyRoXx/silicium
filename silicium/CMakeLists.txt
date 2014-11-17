@@ -2,6 +2,7 @@ file(GLOB sources
 	"*.hpp" "*.cpp"
 	"http/*"
 	"sink/*"
+	"detail/*"
 	"source/*"
 	"observable/*"
 	"zlib/*"
