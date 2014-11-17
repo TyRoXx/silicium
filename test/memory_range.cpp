@@ -8,11 +8,11 @@ BOOST_AUTO_TEST_CASE(make_memory_range_c_str_literal)
 {
 	Si::iterator_range<char const *> r = Si::make_memory_range("hello");
 	std::array<char, 6> const expected
-	{
+	{{
 		'h', 'e', 'l', 'l', 'o',
 		//the terminating zero is expected because std::end("hello") points after \0, not at it
 		'\0'
-	};
+	}};
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), r.begin(), r.end());
 }
 
