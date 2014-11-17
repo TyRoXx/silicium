@@ -16,7 +16,7 @@ namespace Si
 	template <class Input>
 	struct end_observable : private observer<typename Input::element_type>
 	{
-		typedef ended element_type;
+		typedef Si::ended element_type;
 
 		end_observable()
 			: receiver_(nullptr)
