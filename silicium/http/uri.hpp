@@ -14,16 +14,17 @@ namespace Si
 		{
 			typedef iterator_range<char const *> string;
 
-			//"http"
+			//     ---              - - --   -   skipped by the parser
+			//https://localhost:8080/p/a/?a=2#hh
+			//=====   ============== = =  === ==
+			//scheme                 |_|   |  |
+			//                   path      |  |
+			//                         query  |
+			//                             fragment
+
 			string scheme;
-
-			//"/"
 			std::vector<string> path;
-
-			//"?a=1&b=2"
 			string query;
-
-			//"#heading"
 			string fragment;
 		};
 
