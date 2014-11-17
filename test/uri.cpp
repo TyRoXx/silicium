@@ -12,6 +12,9 @@ namespace
 
 	template <class T, class F>
 	auto map(std::vector<T> const &in, F const &transform)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> std::vector<decltype(transform(in.front()))>
+#endif
 	{
 		std::vector<decltype(transform(in.front()))> result;
 		result.reserve(in.size());
