@@ -90,6 +90,9 @@ namespace Si
 
 	template <class RangeSource>
 	auto make_enumerating_source(RangeSource &&input)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> enumerating_source<typename std::decay<RangeSource>::type>
+#endif
 	{
 		return enumerating_source<typename std::decay<RangeSource>::type>(std::forward<RangeSource>(input));
 	}

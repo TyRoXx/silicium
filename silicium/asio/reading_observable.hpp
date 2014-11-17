@@ -40,8 +40,8 @@ namespace Si
 					}
 					else
 					{
-						assert(bytes_received <= static_cast<std::size_t>(buffer.size()));
-						receiver.got_element(make_memory_range(buffer.begin(), buffer.begin() + bytes_received));
+						assert(bytes_received <= static_cast<std::size_t>(this->buffer.size()));
+						receiver.got_element(make_memory_range(this->buffer.begin(), this->buffer.begin() + bytes_received));
 					}
 				});
 			}

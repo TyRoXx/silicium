@@ -94,6 +94,9 @@ namespace Si
 
 	template <class ErrorOrSource>
 	auto make_error_extracting_source(ErrorOrSource &&input)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> error_extracting_source<typename std::decay<ErrorOrSource>::type>
+#endif
 	{
 		return error_extracting_source<typename std::decay<ErrorOrSource>::type>(std::forward<ErrorOrSource>(input));
 	}

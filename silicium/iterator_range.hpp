@@ -116,6 +116,9 @@ namespace Si
 
 	template <class Iterator1, class Iterator2>
 	BOOST_CONSTEXPR auto make_iterator_range(Iterator1 &&begin, Iterator2 &&end)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> iterator_range<typename std::decay<Iterator1>::type>
+#endif
 	{
 		typedef typename std::decay<Iterator1>::type iterator_type;
 		BOOST_STATIC_ASSERT(std::is_same<iterator_type, typename std::decay<Iterator2>::type>::value);

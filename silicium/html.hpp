@@ -3,18 +3,25 @@
 
 #include <silicium/source/source.hpp>
 #include <silicium/sink/sink.hpp>
+#include <silicium/config.hpp>
 #include <boost/utility/string_ref.hpp>
 
 namespace Si
 {
 	template <class CharRange>
 	auto make_range_from_string_like(CharRange &&range)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> CharRange
+#endif
 	{
 		return std::forward<CharRange>(range);
 	}
 
 	template <class Char>
 	auto make_range_from_string_like(Char const *c_str)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(make_c_str_range(c_str))
+#endif
 	{
 		return make_c_str_range(c_str);
 	}

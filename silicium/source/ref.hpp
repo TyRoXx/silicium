@@ -39,6 +39,9 @@ namespace Si
 
 	template <class Pointee>
 	auto ref_source(Pointee &next)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> ptr_source<Pointee>
+#endif
 	{
 		return ptr_source<Pointee>(next);
 	}
