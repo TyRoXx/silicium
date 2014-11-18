@@ -11,14 +11,41 @@ compilers
 dependencies
 ============
 
-Boost 1.55
-----------
+This installs the dependencies on Ubuntu 14.04:
+
+```
+sudo apt-get install libboost-all-dev liburiparser-dev zlib1g-dev liblua5.1-0-dev libsdl2-dev libgit2-dev
+```
+
+On ancient operating systems, you may have to install some of the
+libraries from a recent source release.
+
+Boost 1.54+ (required)
+---------------------
+
+http://www.boost.org/users/download/
+
+UriParser 0.7+ (required)
+-------------------------
+
+http://uriparser.sourceforge.net/#download
+
+zlib (required)
+---------------
+
+http://zlib.net/
 
 Lua 5.1 (optional)
 ------------------
 
+http://www.lua.org/versions.html
+
 SDL2 (optional)
 ---------------
 
-libgit2 (optional)
-------------------
+https://www.libsdl.org/download-2.0.php
+
+libgit2 v0.21+ (optional)
+-------------------------
+
+https://github.com/libgit2/libgit2/releases
