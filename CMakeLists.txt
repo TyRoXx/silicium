@@ -70,7 +70,7 @@ if(WIN32)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-find_package(Libgit2)
+find_package(Libgit2 REQUIRED)
 if(LIBGIT2_FOUND)
 	include_directories(SYSTEM ${LIBGIT2_INCLUDE_DIR})
 endif()
