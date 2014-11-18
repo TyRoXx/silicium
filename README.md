@@ -30,6 +30,11 @@ UriParser 0.7+ (required)
 
 http://uriparser.sourceforge.net/#download
 
+libgit2 v0.21+ (required)
+-------------------------
+
+https://github.com/libgit2/libgit2/releases
+
 zlib (required)
 ---------------
 
@@ -44,8 +49,3 @@ SDL2 (optional)
 ---------------
 
 https://www.libsdl.org/download-2.0.php
-
-libgit2 v0.21+ (optional)
--------------------------
-
-https://github.com/libgit2/libgit2/releases
