@@ -4,6 +4,7 @@
 #include <silicium/source/source.hpp>
 #include <vector>
 #include <string>
+#include <array>
 
 namespace Si
 {
@@ -43,6 +44,12 @@ namespace Si
 
 	template <class Element>
 	memory_source<Element> make_container_source(std::vector<Element> const &container)
+	{
+		return memory_source<Element>({container.data(), container.data() + container.size()});
+	}
+
+	template <class Element, std::size_t N>
+	memory_source<Element> make_container_source(std::array<Element, N> const &container)
 	{
 		return memory_source<Element>({container.data(), container.data() + container.size()});
 	}
