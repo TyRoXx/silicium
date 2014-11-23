@@ -29,6 +29,19 @@ namespace Si
 	};
 
 	template <class Element, class Error = boost::system::error_code>
+	struct null_sink : sink<Element, Error>
+	{
+		typedef Element element_type;
+		typedef Error error_type;
+
+		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		{
+			boost::ignore_unused_variable_warning(data);
+			return error_type();
+		}
+	};
+
+	template <class Element, class Error = boost::system::error_code>
 	struct buffer
 	{
 		typedef Element element_type;
