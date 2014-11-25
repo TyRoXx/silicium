@@ -47,7 +47,7 @@ namespace Si
 			winapi_string command_line;
 			for (auto a = begin(arguments); a != end(arguments); ++a)
 			{
-				if ((a + 1) != end(arguments))
+				if (a != begin(arguments))
 				{
 					command_line += L" ";
 				}
