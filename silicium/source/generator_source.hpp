@@ -81,6 +81,21 @@ namespace Si
 	{
 		return generator_source<typename std::decay<Generator>::type>{std::forward<Generator>(generate_next)};
 	}
+
+	template <class OneShotGenerator>
+	auto make_oneshot_generator_source(OneShotGenerator &&generate_one)
+	{
+		bool has_generated = false;
+		return make_generator_source([has_generated, generate_one = std::forward<OneShotGenerator>(generate_one)]() mutable -> boost::optional<decltype(generate_one())>
+		{
+			if (has_generated)
+			{
+				return boost::none;
+			}
+			has_generated = true;
+			return std::forward<OneShotGenerator>(generate_one)();
+		});
+	}
 }
 
 #endif

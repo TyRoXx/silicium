@@ -111,6 +111,13 @@ namespace Si
 		}
 	}
 
+	BOOST_AUTO_TEST_CASE(one_shot_generator)
+	{
+		auto s = Si::make_oneshot_generator_source([]() { return 2; });
+		BOOST_CHECK_EQUAL(2, Si::get(s));
+		BOOST_CHECK_EQUAL(boost::none, Si::get(s));
+	}
+
 	BOOST_AUTO_TEST_CASE(virtualized_source_test)
 	{
 		auto v = Si::virtualize_source(Si::make_generator_source([]() -> boost::optional<int> { return 0; }));
