@@ -16,19 +16,30 @@ namespace Si
 		}
 
 		explicit constant_observable(Element value)
-			: value(std::move(value))
+			: m_value(std::move(value))
+		{
+		}
+
+		template <class OtherElement>
+		constant_observable(constant_observable<OtherElement> &&other)
+			: m_value(other.constant())
 		{
 		}
 
 		template <class ElementObserver>
 		void async_get_one(ElementObserver &receiver) const
 		{
-			receiver.got_element(value);
+			receiver.got_element(m_value);
+		}
+
+		Element const &constant() const BOOST_NOEXCEPT
+		{
+			return m_value;
 		}
 
 	private:
 
-		Element value;
+		Element m_value;
 	};
 
 	template <class Element>
