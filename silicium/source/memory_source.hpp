@@ -43,6 +43,40 @@ namespace Si
 	};
 
 	template <class Element>
+	struct mutable_memory_source SILICIUM_FINAL : source<Element>
+	{
+		mutable_memory_source()
+		{
+		}
+
+		explicit mutable_memory_source(iterator_range<Element *> elements)
+			: m_elements(std::move(elements))
+		{
+		}
+
+		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		{
+			boost::ignore_unused_variable_warning(size);
+			return {};
+		}
+
+		virtual Element *copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
+		{
+			while (!m_elements.empty() && !destination.empty())
+			{
+				destination.front() = std::move(m_elements.front());
+				destination.pop_front();
+				m_elements.pop_front();
+			}
+			return destination.begin();
+		}
+
+	private:
+
+		iterator_range<Element *> m_elements;
+	};
+
+	template <class Element>
 	memory_source<Element> make_container_source(std::vector<Element> const &container)
 	{
 		return memory_source<Element>({container.data(), container.data() + container.size()});
@@ -52,6 +86,12 @@ namespace Si
 	memory_source<Element> make_container_source(std::array<Element, N> const &container)
 	{
 		return memory_source<Element>({container.data(), container.data() + container.size()});
+	}
+
+	template <class Element, std::size_t N>
+	mutable_memory_source<Element> make_container_source(std::array<Element, N> &&container)
+	{
+		return mutable_memory_source<Element>({container.data(), container.data() + container.size()});
 	}
 
 	template <class Element>
