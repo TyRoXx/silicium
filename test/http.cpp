@@ -1,4 +1,5 @@
 #include <silicium/http/http.hpp>
+#include <silicium/http/request_parser_sink.hpp>
 #include <silicium/source/memory_source.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/sink/iterator_sink.hpp>
@@ -64,5 +65,23 @@ namespace Si
 		w = std::move(v);
 		auto u = std::move(w);
 		u = v;
+	}
+
+	BOOST_AUTO_TEST_CASE(http_request_parser_sink)
+	{
+		std::vector<Si::http::request> results;
+		auto parser = Si::http::make_request_parser_sink(Si::make_container_sink(results));
+		Si::append(parser, "GET / HTTP/1.1\r\n");
+		BOOST_CHECK(results.empty());
+		Si::append(parser, "Host: host\r\n");
+		BOOST_CHECK(results.empty());
+		Si::append(parser, "\r\n");
+		BOOST_REQUIRE_EQUAL(1, results.size());
+		Si::http::request &result = results[0];
+		BOOST_CHECK_EQUAL("GET", result.method);
+		BOOST_CHECK_EQUAL("/", result.path);
+		BOOST_CHECK_EQUAL("HTTP/1.1", result.http_version);
+		BOOST_CHECK_EQUAL(1, result.arguments.size());
+		BOOST_CHECK((std::map<Si::noexcept_string, Si::noexcept_string>{{"Host", "host"}}) == result.arguments);
 	}
 }
