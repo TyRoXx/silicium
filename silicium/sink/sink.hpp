@@ -8,6 +8,7 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/utility/string_ref.hpp>
+#include <boost/utility/explicit_operator_bool.hpp>
 #include <boost/container/string.hpp>
 #include <fstream>
 #include <array>
@@ -137,6 +138,16 @@ namespace Si
 	{
 		return out.append(make_iterator_range(&single, &single + 1));
 	}
+
+	struct success
+	{
+		bool operator !() const BOOST_NOEXCEPT
+		{
+			return true;
+		}
+
+		BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
+	};
 }
 
 #endif

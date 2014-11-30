@@ -7,10 +7,10 @@
 namespace Si
 {
 	template <class Next>
-	struct throwing_sink : sink<typename Next::element_type, void>
+	struct throwing_sink : sink<typename Next::element_type, success>
 	{
 		typedef typename Next::element_type element_type;
-		typedef void error_type;
+		typedef success error_type;
 
 		throwing_sink()
 		{
@@ -28,6 +28,7 @@ namespace Si
 			{
 				throw boost::system::system_error(error);
 			}
+			return {};
 		}
 
 	private:

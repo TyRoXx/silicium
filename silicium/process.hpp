@@ -13,7 +13,7 @@ namespace Si
 		boost::filesystem::path executable,
 		std::vector<std::string> arguments,
 		boost::filesystem::path current_path,
-		Si::sink<char, void> &output)
+		Si::sink<char, success> &output)
 	{
 		Si::process_parameters parameters;
 		parameters.executable = std::move(executable);

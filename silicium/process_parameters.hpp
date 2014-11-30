@@ -20,10 +20,10 @@ namespace Si
 		boost::filesystem::path current_path;
 
 		/// stdout of the child process will be written to this sink. When nullptr, output is discarded.
-		sink<char, void> *out;
+		sink<char, success> *out;
 
 		/// stderr of the child process will be written to this sink. When nullptr, output is discarded.
-		sink<char, void> *err;
+		sink<char, success> *err;
 
 		/// provides stdin to the child process. When nullptr, the input will be empty.
 		source<char> *in;

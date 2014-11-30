@@ -73,12 +73,15 @@ namespace Si
 							{
 								data.pop_front();
 								m_state = state::end_of_headers_lf;
-								//TODO: handle error
-								m_output.append(Si::make_iterator_range(&m_result, &m_result + 1));
+								error_type error = m_output.append(Si::make_iterator_range(&m_result, &m_result + 1));
 								m_result.path.clear();
 								m_result.method.clear();
 								m_result.http_version.clear();
 								m_result.arguments.clear();
+								if (error)
+								{
+									return error;
+								}
 								break;
 							}
 							auto colon = std::find(data.begin(), data.end(), ':');
