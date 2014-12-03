@@ -1,4 +1,5 @@
 #include <silicium/sink/file_sink.hpp>
+#include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/open.hpp>
 #include <silicium/read_file.hpp>
 #include <boost/test/unit_test.hpp>

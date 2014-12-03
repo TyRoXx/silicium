@@ -56,32 +56,38 @@ namespace Si
 		virtual error_type flush_append_space() = 0;
 	};
 
-	template <class Element, class Error>
-	Error append(Si::sink<Element, Error> &out, std::basic_string<Element> const &str)
+	template <class Stream>
+	struct error_type
+	{
+		typedef typename std::decay<Stream>::type::error_type type;
+	};
+
+	template <class Sink, class Element>
+	typename error_type<Sink>::type append(Sink &&out, std::basic_string<Element> const &str)
 	{
 		return out.append(make_iterator_range(str.data(), str.data() + str.size()));
 	}
 
-	template <class Element, class Error>
-	Error append(Si::sink<Element, Error> &out, boost::container::basic_string<Element> const &str)
+	template <class Sink, class Element>
+	typename error_type<Sink>::type append(Sink &&out, boost::container::basic_string<Element> const &str)
 	{
 		return out.append(make_iterator_range(str.data(), str.data() + str.size()));
 	}
 
-	template <class Element, class Error>
-	Error append(Si::sink<Element, Error> &out, boost::basic_string_ref<Element> const &str)
+	template <class Sink, class Element>
+	typename error_type<Sink>::type append(Sink &&out, boost::basic_string_ref<Element> const &str)
 	{
 		return out.append(make_memory_range(str));
 	}
 
-	template <class Element, class Error>
-	Error append(Si::sink<Element, Error> &out, Element const *c_str)
+	template <class Sink, class Element>
+	typename error_type<Sink>::type append(Sink &&out, Element const *c_str)
 	{
 		return out.append(make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
 	}
 
-	template <class Element, class Error>
-	Error append(Si::sink<Element, Error> &out, Element const &single)
+	template <class Sink, class Element>
+	typename error_type<Sink>::type append(Sink &&out, Element const &single)
 	{
 		return out.append(make_iterator_range(&single, &single + 1));
 	}

@@ -27,8 +27,11 @@ namespace Si
 
 	typedef fast_variant<flush, memory_range, seek_set, seek_add> file_sink_element;
 
-	struct file_sink : sink<file_sink_element>
+	struct file_sink
 	{
+		typedef file_sink_element element_type;
+		typedef boost::system::error_code error_type;
+
 		file_sink()
 		{
 		}
@@ -38,7 +41,7 @@ namespace Si
 		{
 		}
 
-		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		error_type append(iterator_range<element_type const *> data)
 		{
 			return append_impl(data);
 		}
