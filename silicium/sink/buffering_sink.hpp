@@ -12,8 +12,7 @@ namespace Si
 		class Buffer = std::array<typename Next::element_type, ((1U << 13U) / sizeof(typename Next::element_type))>
 	>
 	struct buffering_sink SILICIUM_FINAL
-		: sink  <typename Next::element_type, typename Next::error_type>
-		, buffer<typename Next::element_type, typename Next::error_type>
+		: buffer<typename Next::element_type, typename Next::error_type>
 	{
 		typedef typename Next::element_type element_type;
 		typedef typename Next::error_type error_type;
@@ -47,7 +46,7 @@ namespace Si
 			}
 		}
 
-		Error append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		Error append(iterator_range<element_type const *> data)
 		{
 			if (static_cast<size_t>(data.size()) <= (m_fallback_buffer.size() - m_buffer_used))
 			{
