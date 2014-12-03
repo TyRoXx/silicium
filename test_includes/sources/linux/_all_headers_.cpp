@@ -95,7 +95,6 @@
 #include <silicium/sink/sink.hpp>
 #include <silicium/sink/throwing_sink.hpp>
 #include <silicium/sink/virtualized_sink.hpp>
-#include <silicium/sink/yield_context_sink.hpp>
 #include <silicium/source/buffering_source.hpp>
 #include <silicium/source/empty.hpp>
 #include <silicium/source/enumerating_source.hpp>
