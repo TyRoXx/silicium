@@ -7,7 +7,7 @@
 namespace Si
 {
 	template <class Next>
-	struct throwing_sink : sink<typename Next::element_type, success>
+	struct throwing_sink
 	{
 		typedef typename Next::element_type element_type;
 		typedef success error_type;
@@ -21,7 +21,7 @@ namespace Si
 		{
 		}
 
-		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		error_type append(iterator_range<element_type const *> data)
 		{
 			auto error = next.append(data);
 			if (error)

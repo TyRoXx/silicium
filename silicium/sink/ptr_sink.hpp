@@ -6,7 +6,7 @@
 namespace Si
 {
 	template <class Pointee, class Pointer>
-	struct ptr_sink : sink<typename Pointee::element_type, typename Pointee::error_type>
+	struct ptr_sink
 	{
 		typedef typename Pointee::element_type element_type;
 		typedef typename Pointee::error_type error_type;
@@ -21,7 +21,7 @@ namespace Si
 		{
 		}
 
-		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		error_type append(iterator_range<element_type const *> data)
 		{
 			return next->append(data);
 		}

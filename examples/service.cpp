@@ -1,6 +1,7 @@
 #include <silicium/git/oxid.hpp>
 #include <silicium/process.hpp>
 #include <silicium/sink/throwing_sink.hpp>
+#include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/asio/tcp_trigger.hpp>
 #include <silicium/http/http.hpp>
 #include <silicium/asio/socket_sink.hpp>
@@ -196,7 +197,7 @@ namespace
 			std::string const &log_name)
 	{
 		auto log = artifacts.begin_artifact(log_name);
-		auto throwing_log = Si::make_throwing_sink(Si::ref_sink(*log));
+		auto throwing_log = Si::virtualize_sink(Si::make_throwing_sink(Si::ref_sink(*log)));
 		return Si::run_process(executable, arguments, build_dir, throwing_log) == 0;
 	}
 
