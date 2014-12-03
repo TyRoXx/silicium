@@ -3,7 +3,6 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
-#include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <cassert>
 #include <stdexcept>

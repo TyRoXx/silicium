@@ -1,7 +1,7 @@
 #ifndef SILICIUM_DIRECTORY_ALLOCATOR_HPP
 #define SILICIUM_DIRECTORY_ALLOCATOR_HPP
 
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <functional>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>

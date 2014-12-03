@@ -1,7 +1,7 @@
 #ifndef SILICIUM_SOURCE_HPP
 #define SILICIUM_SOURCE_HPP
 
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
 #include <boost/optional.hpp>
 #include <boost/concept_check.hpp>

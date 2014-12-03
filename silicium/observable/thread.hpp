@@ -2,7 +2,6 @@
 #define SILICIUM_THREAD_HPP
 
 #include <silicium/observable/observer.hpp>
-#include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>

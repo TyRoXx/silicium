@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_OBSERVABLE_HPP
 
 #include <silicium/observable/observer.hpp>
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <boost/concept_check.hpp>
 
 namespace Si

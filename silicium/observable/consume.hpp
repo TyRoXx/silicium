@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_CONSUME_HPP
 
 #include <silicium/observable/observable.hpp>
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <utility>
 
 namespace Si

@@ -3,7 +3,6 @@
 
 #include <silicium/config.hpp>
 #include <silicium/observable/observable.hpp>
-#include <silicium/override.hpp>
 #include <utility>
 #include <boost/concept/requires.hpp>
 

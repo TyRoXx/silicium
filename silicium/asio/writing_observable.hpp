@@ -3,7 +3,6 @@
 
 #include <silicium/config.hpp>
 #include <silicium/memory_range.hpp>
-#include <silicium/override.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/observable/constant.hpp>

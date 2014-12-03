@@ -4,7 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/observable/observable.hpp>
 #include <silicium/exchange.hpp>
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <cassert>
 
 namespace Si

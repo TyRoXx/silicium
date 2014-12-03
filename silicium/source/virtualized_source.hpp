@@ -2,7 +2,7 @@
 #define SILICIUM_VIRTUALIZED_SOURCE_HPP
 
 #include <silicium/source/source.hpp>
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <boost/concept/requires.hpp>
 
 namespace Si

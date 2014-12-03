@@ -4,7 +4,6 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/exchange.hpp>
-#include <silicium/override.hpp>
 #include <memory>
 #include <unordered_map>
 #include <cassert>

@@ -3,7 +3,7 @@
 
 #include <silicium/observable/observable.hpp>
 #include <boost/optional.hpp>
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {

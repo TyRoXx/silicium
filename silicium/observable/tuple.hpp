@@ -3,7 +3,6 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
-#include <silicium/override.hpp>
 #include <bitset>
 
 #if defined(_MSC_VER) || !SILICIUM_COMPILER_HAS_USING

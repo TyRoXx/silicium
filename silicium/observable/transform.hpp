@@ -3,7 +3,6 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
-#include <silicium/override.hpp>
 #include <silicium/detail/proper_value_function.hpp>
 #include <type_traits>
 #include <utility>

@@ -1,7 +1,6 @@
 #ifndef SILICIUM_SINK_HPP
 #define SILICIUM_SINK_HPP
 
-#include <silicium/override.hpp>
 #include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>

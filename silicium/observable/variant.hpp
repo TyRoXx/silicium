@@ -5,7 +5,6 @@
 #include <silicium/exchange.hpp>
 #include <silicium/config.hpp>
 #include <silicium/fast_variant.hpp>
-#include <silicium/override.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #define SILICIUM_RX_VARIANT_AVAILABLE SILICIUM_COMPILER_HAS_USING

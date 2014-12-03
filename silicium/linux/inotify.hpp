@@ -3,7 +3,7 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/error_or.hpp>
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/swap.hpp>

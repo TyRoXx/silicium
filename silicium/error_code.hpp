@@ -2,7 +2,6 @@
 #define SILICIUM_ERROR_CODE_HPP
 
 #include <silicium/config.hpp>
-#include <silicium/override.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/static_assert.hpp>

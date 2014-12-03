@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_WHILE_HPP
 
 #include <silicium/observable/observer.hpp>
-#include <silicium/override.hpp>
+#include <silicium/config.hpp>
 #include <utility>
 
 namespace Si

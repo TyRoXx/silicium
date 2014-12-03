@@ -99,6 +99,14 @@
 #	define SILICIUM_DEPRECATED __attribute__((deprecated))
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ <= 4) && (__GNUC__ < 4 || __GNUC_MINOR__ <= 6)
+#	define SILICIUM_OVERRIDE
+#	define SILICIUM_FINAL
+#else
+#	define SILICIUM_OVERRIDE override
+#	define SILICIUM_FINAL final
+#endif
+
 //TODO
 #define SILICIUM_CXX14_CONSTEXPR
 

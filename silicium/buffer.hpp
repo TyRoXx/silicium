@@ -1,7 +1,6 @@
 #ifndef SILICIUM_BUFFER_HPP
 #define SILICIUM_BUFFER_HPP
 
-#include <silicium/override.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <boost/circular_buffer.hpp>
