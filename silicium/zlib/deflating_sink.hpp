@@ -77,9 +77,10 @@ namespace Si
 	typedef fast_variant<flush, memory_range> zlib_sink_element;
 
 	template <class Next>
-	struct zlib_deflating_sink : sink<zlib_sink_element>
+	struct zlib_deflating_sink
 	{
 		typedef zlib_sink_element element_type;
+		typedef boost::system::error_code error_type;
 
 		zlib_deflating_sink()
 		{
@@ -101,7 +102,7 @@ namespace Si
 		}
 #endif
 
-		virtual boost::system::error_code append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		boost::system::error_code append(iterator_range<element_type const *> data)
 		{
 			for (element_type const &piece : data)
 			{
