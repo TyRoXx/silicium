@@ -5,7 +5,7 @@
 
 namespace Si
 {
-	template <class Pointee>
+	template <class Pointee, class Pointer>
 	struct ptr_sink : sink<typename Pointee::element_type, typename Pointee::error_type>
 	{
 		typedef typename Pointee::element_type element_type;
@@ -16,8 +16,8 @@ namespace Si
 		{
 		}
 
-		explicit ptr_sink(Pointee &next)
-			: next(&next)
+		explicit ptr_sink(Pointer next)
+			: next(std::move(next))
 		{
 		}
 
@@ -28,16 +28,16 @@ namespace Si
 
 	private:
 
-		Pointee *next;
+		Pointer next;
 	};
 
 	template <class Pointee>
 	auto ref_sink(Pointee &next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> ptr_sink<Pointee>
+		-> ptr_sink<Pointee, Pointee *>
 #endif
 	{
-		return ptr_sink<Pointee>(next);
+		return ptr_sink<Pointee, Pointee *>(&next);
 	}
 }
 

@@ -1,7 +1,8 @@
 #ifndef SILICIUM_VIRTUALIZED_SINK_HPP
 #define SILICIUM_VIRTUALIZED_SINK_HPP
 
-#include <silicium/sink/sink.hpp>
+#include <silicium/sink/ptr_sink.hpp>
+#include <silicium/utility.hpp>
 
 namespace Si
 {
@@ -34,6 +35,13 @@ namespace Si
 	auto virtualize_sink(Next &&next)
 	{
 		return virtualized_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
+	}
+
+	template <class Next>
+	auto erase_sink(Next &&next)
+	{
+		typedef typename std::decay<Next>::type clean;
+		return ptr_sink<clean, std::unique_ptr<clean>>(to_unique(virtualize_sink(std::forward<Next>(next))));
 	}
 }
 

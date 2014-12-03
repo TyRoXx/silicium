@@ -1,4 +1,5 @@
 #include <silicium/directory_builder.hpp>
+#include <silicium/sink/ostream_sink.hpp>
 #include <boost/filesystem/operations.hpp>
 
 namespace Si

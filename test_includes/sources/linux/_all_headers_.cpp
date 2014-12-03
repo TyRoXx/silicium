@@ -90,6 +90,7 @@
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/ostream_sink.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/sink/throwing_sink.hpp>
