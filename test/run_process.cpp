@@ -1,6 +1,7 @@
 #include <silicium/process.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/virtualized_sink.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 
@@ -14,7 +15,7 @@ namespace Si
 		parameters.arguments.emplace_back("which");
 		parameters.current_path = boost::filesystem::current_path();
 		std::vector<char> out;
-		auto sink = make_iterator_sink<char>(std::back_inserter(out));
+		auto sink = Si::virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;
 		int result = run_process(parameters);
 		BOOST_CHECK_EQUAL(0, result);

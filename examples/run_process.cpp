@@ -2,6 +2,7 @@
 #include <silicium/build_result.hpp>
 #include <silicium/directory_allocator.hpp>
 #include <silicium/to_unique.hpp>
+#include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -43,7 +44,7 @@ namespace
 		Si::process_parameters parameters;
 		parameters.executable = executable_file.string();
 		parameters.current_path = build_dir;
-		auto stdout_sink = Si::make_iterator_sink<char>(std::back_inserter(out));
+		auto stdout_sink = Si::virtualize_sink(Si::make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &stdout_sink;
 		const auto testing_result = Si::run_process(parameters);
 		if (testing_result != 0)

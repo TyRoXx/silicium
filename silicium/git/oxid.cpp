@@ -2,6 +2,7 @@
 #include <silicium/read_file.hpp>
 #include <silicium/write_file.hpp>
 #include <silicium/process.hpp>
+#include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/git/repository.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <boost/optional.hpp>
@@ -45,7 +46,7 @@ namespace Si
 					boost::filesystem::path const &cloned_dir)
 			{
 				std::vector<char> output;
-				auto output_sink = make_container_sink(output);
+				auto output_sink = virtualize_sink(make_container_sink(output));
 				if (0 != run_process(git_executable, {"clone", "-b", branch, "--depth", "1", source_location, cloned_dir.string()}, boost::filesystem::current_path(), output_sink))
 				{
 					std::string what = "git clone failed";
@@ -61,7 +62,7 @@ namespace Si
 					std::string message)
 			{
 				std::vector<char> output;
-				auto output_sink = make_container_sink(output);
+				auto output_sink = virtualize_sink(make_container_sink(output));
 				auto const fail = [&output](std::string const &description)
 				{
 					std::string what = description;

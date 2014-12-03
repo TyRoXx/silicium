@@ -1,6 +1,7 @@
 #include <silicium/process.hpp>
 #include <silicium/build_result.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/directory_allocator.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -31,7 +32,7 @@ namespace
 	{
 		{
 			std::vector<char> output;
-			auto out = Si::make_container_sink(output);
+			auto out = Si::virtualize_sink(Si::make_container_sink(output));
 			const auto cmake_result = Si::run_process("/usr/bin/cmake", { source.string(), ("-DCMAKE_BUILD_TYPE=" + build_type) }, build_directory, out);
 			result.add_artifact("cmake.log", output);
 			if (cmake_result != 0)
@@ -42,7 +43,7 @@ namespace
 
 		{
 			std::vector<char> output;
-			auto out = Si::make_container_sink(output);
+			auto out = Si::virtualize_sink(Si::make_container_sink(output));
 			const auto make_result = Si::run_process("/usr/bin/make", {}, build_directory, out);
 			result.add_artifact("make.log", output);
 			if (make_result != 0)
@@ -53,7 +54,7 @@ namespace
 
 		{
 			std::vector<char> output;
-			auto out = Si::make_container_sink(output);
+			auto out = Si::virtualize_sink(Si::make_container_sink(output));
 			const auto test_result = Si::run_process((build_directory / "test/test").string(), {}, build_directory, out);
 			result.add_artifact("test.log", output);
 			if (test_result != 0)

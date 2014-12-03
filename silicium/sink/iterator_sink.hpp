@@ -7,9 +7,10 @@
 namespace Si
 {
 	template <class Element, class OutputIterator>
-	struct iterator_sink SILICIUM_FINAL : sink<Element, success>
+	struct iterator_sink
 	{
 		typedef Element element_type;
+		typedef success error_type;
 
 		iterator_sink()
 		{
@@ -29,7 +30,7 @@ namespace Si
 		}
 #endif
 
-		virtual success append(iterator_range<Element const *> data) SILICIUM_OVERRIDE
+		success append(iterator_range<Element const *> data)
 		{
 			boost::range::copy(data, m_out);
 			return {};
