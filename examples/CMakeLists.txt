@@ -41,3 +41,6 @@ target_link_libraries(sleep silicium ${Boost_LIBRARIES})
 
 add_executable(http_hello "http_hello.cpp")
 target_link_libraries(http_hello silicium ${Boost_LIBRARIES})
+
+add_executable(variant "variant.cpp")
+target_link_libraries(variant silicium ${Boost_LIBRARIES})
