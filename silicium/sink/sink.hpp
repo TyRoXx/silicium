@@ -92,6 +92,12 @@ namespace Si
 		return out.append(make_iterator_range(&single, &single + 1));
 	}
 
+	template <class Sink>
+	typename error_type<Sink>::type append(Sink &&out, iterator_range<typename std::decay<Sink>::type::element_type const *> const &elements)
+	{
+		return out.append(elements);
+	}
+
 	struct success
 	{
 		bool operator !() const BOOST_NOEXCEPT
