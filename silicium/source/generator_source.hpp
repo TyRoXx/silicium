@@ -69,7 +69,7 @@ namespace Si
 
 	private:
 
-		typedef typename detail::proper_value_function<Generator, boost::optional<Element>>::type proper_generator;
+		typedef typename detail::proper_value_function<Generator, Si::optional<Element>>::type proper_generator;
 
 		proper_generator m_generate_next;
 	};

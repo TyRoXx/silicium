@@ -46,9 +46,27 @@ namespace Si
 			return {};
 		}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		ostream_sink(ostream_sink &&other) BOOST_NOEXCEPT
+			: m_file(std::move(other.m_file))
+		{
+		}
+		
+		ostream_sink &operator = (ostream_sink &&other) BOOST_NOEXCEPT
+		{
+			m_file = std::move(other.m_file);
+			return *this;
+		}
+#endif
+
 	private:
 
 		std::unique_ptr<std::ostream> m_file;
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		SILICIUM_DELETED_FUNCTION(ostream_sink(ostream_sink const &))
+		SILICIUM_DELETED_FUNCTION(ostream_sink &operator = (ostream_sink const &))
+#endif
 	};
 
 	inline std::unique_ptr<sink<char, boost::system::error_code>> make_file_sink(boost::filesystem::path const &name)

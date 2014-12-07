@@ -163,6 +163,18 @@ namespace Si
 	}
 
 	template <class T>
+	bool operator == (none_t const &, optional<T> const &right)
+	{
+		return !right;
+	}
+
+	template <class T>
+	bool operator == (optional<T> const &left, none_t const &)
+	{
+		return !left;
+	}
+
+	template <class T>
 	bool operator != (optional<T> const &left, optional<T> const &right)
 	{
 		return !(left == right);

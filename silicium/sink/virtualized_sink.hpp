@@ -26,6 +26,19 @@ namespace Si
 			return m_next.append(data);
 		}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		virtualized_sink(virtualized_sink &&other)
+			: m_next(std::move(other.m_next))
+		{
+		}
+
+		virtualized_sink &operator = (virtualized_sink &&other)
+		{
+			m_next = std::move(other.m_next);
+			return *this;
+		}
+#endif
+
 	private:
 
 		Next m_next;
