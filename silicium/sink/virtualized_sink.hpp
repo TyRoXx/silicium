@@ -33,12 +33,18 @@ namespace Si
 
 	template <class Next>
 	auto virtualize_sink(Next &&next)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> virtualized_sink<typename std::decay<Next>::type>
+#endif
 	{
 		return virtualized_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
 	}
 
 	template <class Next>
 	auto erase_sink(Next &&next)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> ptr_sink<typename std::decay<Next>::type, std::unique_ptr<typename std::decay<Next>::type>>
+#endif
 	{
 		typedef typename std::decay<Next>::type clean;
 		return ptr_sink<clean, std::unique_ptr<clean>>(to_unique(virtualize_sink(std::forward<Next>(next))));

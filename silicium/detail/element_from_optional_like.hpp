@@ -2,6 +2,7 @@
 #define SILICIUM_ELEMENT_FROM_OPTIONAL_LIKE_HPP
 
 #include <boost/optional.hpp>
+#include <silicium/optional.hpp>
 
 namespace Si
 {
@@ -15,6 +16,12 @@ namespace Si
 
 		template <class Element>
 		struct element_from_optional_like<boost::optional<Element>>
+		{
+			typedef Element type;
+		};
+
+		template <class Element>
+		struct element_from_optional_like<optional<Element>>
 		{
 			typedef Element type;
 		};

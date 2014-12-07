@@ -12,7 +12,6 @@
 #include <silicium/buffer.hpp>
 #include <silicium/build_result.hpp>
 #include <silicium/config.hpp>
-#include <silicium/copy.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
 #include <silicium/detail/element_from_optional_like.hpp>
 #include <silicium/detail/integer_sequence.hpp>
@@ -75,7 +74,6 @@
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
-#include <silicium/override.hpp>
 #include <silicium/process.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/read_file.hpp>
@@ -86,7 +84,6 @@
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/sink/throwing_sink.hpp>
-#include <silicium/sink/yield_context_sink.hpp>
 #include <silicium/source/buffering_source.hpp>
 #include <silicium/source/enumerating_source.hpp>
 #include <silicium/source/error_extracting_source.hpp>

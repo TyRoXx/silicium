@@ -24,7 +24,7 @@ namespace Si
 
 		void async_get_one(observer<Element> &receiver)
 		{
-			boost::optional<Element> value = Si::get(source);
+			Si::optional<Element> value = Si::get(source);
 			if (value)
 			{
 				receiver.got_element(std::move(*value));

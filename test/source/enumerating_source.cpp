@@ -27,14 +27,14 @@ namespace Si
 BOOST_AUTO_TEST_CASE(enumerating_source_directly_empty)
 {
 	auto s = Si::make_enumerating_source(Si::empty_source<Si::iterator_range<int *>>());
-	boost::optional<int> e = Si::get(s);
+	Si::optional<int> e = Si::get(s);
 	BOOST_CHECK(!e);
 }
 
 BOOST_AUTO_TEST_CASE(enumerating_source_indirectly_empty)
 {
 	auto s = Si::make_enumerating_source(Si::make_single_source(Si::iterator_range<int *>{}));
-	boost::optional<int> e = Si::get(s);
+	Si::optional<int> e = Si::get(s);
 	BOOST_CHECK(!e);
 }
 
@@ -42,9 +42,9 @@ BOOST_AUTO_TEST_CASE(enumerating_source_non_empty)
 {
 	int const element = 3;
 	auto s = Si::make_enumerating_source(Si::make_single_source(Si::iterator_range<int const *>{&element, &element + 1}));
-	boost::optional<int> e = Si::get(s);
+	Si::optional<int> e = Si::get(s);
 	BOOST_REQUIRE(e);
-	BOOST_CHECK_EQUAL(boost::make_optional(3), e);
+	BOOST_CHECK_EQUAL(3, e);
 }
 
 BOOST_AUTO_TEST_CASE(enumerating_source_map_next_at_the_end)

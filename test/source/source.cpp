@@ -86,9 +86,9 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(generator_source_limited)
 	{
 		bool first = true;
-		auto source = Si::make_generator_source([&first]() -> boost::optional<int>
+		auto source = Si::make_generator_source([&first]() -> Si::optional<int>
 		{
-			auto result = first ? boost::make_optional(12) : boost::none;
+			auto result = first ? Si::make_optional(12) : Si::none;
 			first = false;
 			return result;
 		});
@@ -115,7 +115,7 @@ namespace Si
 	{
 		auto s = Si::make_oneshot_generator_source([]() { return 2; });
 		BOOST_CHECK_EQUAL(2, Si::get(s));
-		BOOST_CHECK_EQUAL(boost::none, Si::get(s));
+		BOOST_CHECK_EQUAL(Si::none, Si::get(s));
 	}
 
 	BOOST_AUTO_TEST_CASE(virtualized_source_test)

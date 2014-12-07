@@ -169,6 +169,9 @@ namespace Si
 
 		template <class Output>
 		auto make_request_parser_sink(Output &&output)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> request_parser_sink<typename std::remove_reference<Output>::type>
+#endif
 		{
 			return request_parser_sink<typename std::remove_reference<Output>::type>(std::forward<Output>(output));
 		}

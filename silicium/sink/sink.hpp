@@ -59,7 +59,8 @@ namespace Si
 	template <class Stream>
 	struct error_type
 	{
-		typedef typename std::decay<Stream>::type::error_type type;
+		typedef typename std::decay<Stream>::type clean;
+		typedef typename clean::error_type type;
 	};
 
 	template <class Sink, class Element>
@@ -105,7 +106,14 @@ namespace Si
 			return true;
 		}
 
+#ifdef BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT
 		BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
+#else
+		operator bool() const BOOST_NOEXCEPT
+		{
+			return !!*this;
+		}
+#endif
 	};
 }
 

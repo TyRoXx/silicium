@@ -31,7 +31,7 @@ namespace Si
 		parameters.executable = "C:\\Windows\\System32\\where.exe";
 		parameters.current_path = boost::filesystem::current_path();
 		std::vector<char> out;
-		auto sink = make_iterator_sink<char>(std::back_inserter(out));
+		auto sink = virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;
 		int result = run_process(parameters);
 		BOOST_CHECK_EQUAL(2, result);

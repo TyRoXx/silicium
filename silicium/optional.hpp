@@ -26,6 +26,9 @@ namespace Si
 		{
 		}
 
+#ifdef _MSC_VER
+		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+#endif
 		optional(optional const &other)
 			: content(other.content)
 		{
@@ -36,6 +39,9 @@ namespace Si
 		{
 		}
 
+#ifdef _MSC_VER
+		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+#endif
 		optional(T const &value)
 			: content(value)
 		{
@@ -47,12 +53,18 @@ namespace Si
 			return *this;
 		}
 
+#ifdef _MSC_VER
+		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+#endif
 		optional &operator = (optional const &other)
 		{
 			content = other.content;
 			return *this;
 		}
 
+#ifdef _MSC_VER
+		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+#endif
 		optional &operator = (T const &value)
 		{
 			content = value;
@@ -135,9 +147,37 @@ namespace Si
 	}
 
 	template <class T>
+	bool operator == (optional<T> const &left, T const &right)
+	{
+		if (left)
+		{
+			return (*left == right);
+		}
+		return false;
+	}
+
+	template <class T>
+	bool operator == (T const &left, optional<T> const &right)
+	{
+		return (right == left);
+	}
+
+	template <class T>
 	bool operator != (optional<T> const &left, optional<T> const &right)
 	{
 		return !(left == right);
+	}
+
+	template <class T>
+	Si::optional<typename std::decay<T>::type> make_optional(T &&value)
+	{
+		return Si::optional<typename std::decay<T>::type>(std::forward<T>(value));
+	}
+
+	inline std::ostream &operator << (std::ostream &out, none_t const &)
+	{
+		out << "none";
+		return out;
 	}
 
 	template <class T>

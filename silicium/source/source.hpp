@@ -3,7 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
-#include <boost/optional.hpp>
+#include <silicium/optional.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/cstdint.hpp>
 #include <vector>
@@ -64,12 +64,12 @@ namespace Si
 	}
 
 	template <class Source>
-	boost::optional<typename Source::element_type> get(Source &from)
+	Si::optional<typename Source::element_type> get(Source &from)
 	{
 		typename Source::element_type result;
 		if (&result == from.copy_next(Si::make_iterator_range(&result, &result + 1)))
 		{
-			return boost::none;
+			return Si::none;
 		}
 		return std::move(result);
 	}

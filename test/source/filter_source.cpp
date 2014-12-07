@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(filter_source_true)
 		BOOST_REQUIRE_EQUAL(2, element);
 		return true;
 	});
-	boost::optional<int> element = Si::get(f);
+	Si::optional<int> element = Si::get(f);
 	BOOST_CHECK_EQUAL(2, element);
 }
 
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(filter_source_false)
 	{
 		return element >= 3;
 	});
-	boost::optional<int> element = Si::get(f);
+	Si::optional<int> element = Si::get(f);
 	BOOST_CHECK_EQUAL(3, element);
 	auto finish = Si::get(f);
 	BOOST_CHECK(!finish);
