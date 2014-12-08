@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_EXCHANGE_HPP
 
 #include <utility>
+#include <boost/config.hpp>
 
 namespace Si
 {

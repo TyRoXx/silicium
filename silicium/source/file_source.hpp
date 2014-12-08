@@ -3,6 +3,7 @@
 
 #include <silicium/source/generator_source.hpp>
 #include <silicium/error_or.hpp>
+#include <silicium/config.hpp>
 #include <silicium/file_handle.hpp>
 #include <boost/system/error_code.hpp>
 #include <functional>
@@ -17,14 +18,14 @@ namespace Si
 
 	inline auto make_file_source(native_file_descriptor file, iterator_range<char *> read_buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> generator_source<std::function<boost::optional<file_read_result>()>>
+		-> generator_source<std::function<Si::optional<file_read_result>()>>
 #endif
 	{
 		return make_generator_source(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			std::function<boost::optional<file_read_result>()>
+			std::function<Si::optional<file_read_result>()>
 #endif
-			([file, read_buffer]() -> boost::optional<file_read_result>
+			([file, read_buffer]() -> Si::optional<file_read_result>
 		{
 #ifdef _WIN32
 			DWORD read_bytes = 0;
@@ -43,7 +44,7 @@ namespace Si
 			if (read_bytes == 0)
 			{
 				//end of file
-				return boost::none;
+				return Si::none;
 			}
 			return file_read_result{static_cast<std::size_t>(read_bytes)};
 		}));

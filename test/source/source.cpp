@@ -76,9 +76,9 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(generator_source_empty)
 	{
-		auto source = Si::make_generator_source([]() -> boost::optional<element>
+		auto source = Si::make_generator_source([]() -> Si::optional<element>
 		{
-			return boost::none;
+			return Si::none;
 		});
 		BOOST_CHECK(!Si::get(source));
 	}
