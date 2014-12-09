@@ -76,7 +76,7 @@ namespace Si
 		Si::append(parser, "Host: host\r\n");
 		BOOST_CHECK(results.empty());
 		Si::append(parser, "\r\n");
-		BOOST_REQUIRE_EQUAL(1, results.size());
+		BOOST_REQUIRE_EQUAL(1u, results.size());
 		Si::http::request &result = results[0];
 		BOOST_CHECK_EQUAL("GET", result.method);
 		BOOST_CHECK_EQUAL("/", result.path);
