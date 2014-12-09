@@ -24,8 +24,9 @@ namespace Si
 		{
 		}
 
-		explicit transformation(Transform transform, Original original)
-			: transform(std::move(transform))
+		template <class Transform2>
+		explicit transformation(Transform2 &&transform, Original original)
+			: transform(std::forward<Transform2>(transform))
 			, original(std::move(original))
 			, receiver(nullptr)
 		{
