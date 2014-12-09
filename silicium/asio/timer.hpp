@@ -29,6 +29,23 @@ namespace Si
 			{
 			}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+			timer(timer &&other) BOOST_NOEXCEPT
+				: impl(std::move(other.impl))
+				, delays(std::move(other.delays))
+				, receiver_(std::move(other.receiver_))
+			{
+			}
+
+			timer &operator = (timer &&other) BOOST_NOEXCEPT
+			{
+				impl = std::move(other.impl);
+				delays = std::move(other.delays);
+				receiver_ = std::move(other.receiver_);
+				return *this;
+			}
+#endif
+
 			void async_get_one(observer<element_type> &receiver)
 			{
 				assert(!receiver_);
