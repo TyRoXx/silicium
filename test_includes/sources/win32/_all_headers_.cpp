@@ -37,6 +37,7 @@
 #include <silicium/http/http.hpp>
 #include <silicium/http/parse_request.hpp>
 #include <silicium/http/parse_response.hpp>
+#include <silicium/http/request_parser_sink.hpp>
 #include <silicium/http/uri.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
@@ -59,6 +60,7 @@
 #include <silicium/observable/generator.hpp>
 #include <silicium/observable/observable.hpp>
 #include <silicium/observable/observer.hpp>
+#include <silicium/observable/on_first.hpp>
 #include <silicium/observable/ptr.hpp>
 #include <silicium/observable/ready_future.hpp>
 #include <silicium/observable/ref.hpp>
@@ -81,10 +83,13 @@
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/ostream_sink.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/sink/throwing_sink.hpp>
+#include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/source/buffering_source.hpp>
+#include <silicium/source/empty.hpp>
 #include <silicium/source/enumerating_source.hpp>
 #include <silicium/source/error_extracting_source.hpp>
 #include <silicium/source/file_source.hpp>
@@ -102,6 +107,7 @@
 #include <silicium/then.hpp>
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
+#include <silicium/utility.hpp>
 #include <silicium/version.hpp>
 #include <silicium/win32/directory_changes.hpp>
 #include <silicium/win32/directory_watcher.hpp>
