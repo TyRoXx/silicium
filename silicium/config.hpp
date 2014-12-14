@@ -107,6 +107,12 @@
 #	define SILICIUM_FINAL final
 #endif
 
+#ifdef _MSC_VER
+#	define SILICIUM_USE_RESULT _Check_return_
+#else
+#	define SILICIUM_USE_RESULT __attribute__((warn_unused_result))
+#endif
+
 //TODO
 #define SILICIUM_CXX14_CONSTEXPR
 
