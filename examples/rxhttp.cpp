@@ -180,7 +180,7 @@ namespace
 	{
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
-			, clients(acceptor)
+			, clients(&acceptor)
 			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine_generator<events>([this](Si::push_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
@@ -221,7 +221,7 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::acceptor acceptor;
-		Si::asio::tcp_acceptor clients;
+		Si::asio::tcp_acceptor<boost::asio::ip::tcp::acceptor *> clients;
 		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
 	};
 
@@ -229,7 +229,7 @@ namespace
 	{
 		explicit thread_web_server(boost::asio::io_service &io, boost::uint16_t port)
 			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
-			, clients(acceptor)
+			, clients(&acceptor)
 			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine_generator<events>([this](Si::push_context<events> &yield) -> void
 			{
 				boost::uintmax_t visitor_count = 0;
@@ -260,7 +260,7 @@ namespace
 	private:
 
 		boost::asio::ip::tcp::acceptor acceptor;
-		Si::asio::tcp_acceptor clients;
+		Si::asio::tcp_acceptor<boost::asio::ip::tcp::acceptor *> clients;
 		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
 	};
 }

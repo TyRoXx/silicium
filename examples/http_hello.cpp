@@ -49,7 +49,7 @@ int main()
 {
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
-	auto accept_loop = Si::make_total_consumer(Si::flatten(Si::transform(Si::asio::tcp_acceptor(acceptor), [](Si::asio::tcp_acceptor_result maybe_client)
+	auto accept_loop = Si::make_total_consumer(Si::flatten(Si::transform(Si::asio::make_tcp_acceptor(&acceptor), [](Si::asio::tcp_acceptor_result maybe_client)
 	{
 		auto client = maybe_client.get();
 		auto client_handler = Si::make_coroutine([client](Si::yield_context yield) -> Si::nothing
