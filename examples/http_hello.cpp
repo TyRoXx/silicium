@@ -1,32 +1,30 @@
 #include <silicium/http/http.hpp>
+#include <silicium/http/receive_request.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
-#include <silicium/asio/reading_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/observable/transform.hpp>
 #include <silicium/observable/flatten.hpp>
 #include <silicium/observable/coroutine.hpp>
 #include <silicium/observable/constant.hpp>
 #include <silicium/observable/total_consumer.hpp>
-#include <silicium/source/error_extracting_source.hpp>
-#include <silicium/source/enumerating_source.hpp>
-#include <silicium/source/ref.hpp>
-#include <silicium/source/observable_source.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/memory_range.hpp>
 
 void serve_client(boost::asio::ip::tcp::socket &client, Si::yield_context yield)
 {
-	std::array<char, 4096> incoming_buffer;
-	auto receiver = Si::asio::make_reading_observable(client, Si::make_memory_range(incoming_buffer));
-	auto without_errors = Si::make_error_extracting_source(Si::make_observable_source(std::move(receiver), yield));
-	auto enumerated = Si::make_enumerating_source(Si::ref_source(without_errors));
-	auto request = Si::http::parse_request(enumerated);
-	if (!request)
+	auto request = Si::http::receive_request(client, yield);
+	if (request.is_error())
 	{
 		//The header was incomplete, maybe the connecting was closed.
 		//If we want to know the reason, the error_extracting_source remembered it:
-		boost::system::error_code error = without_errors.get_last_error();
+		boost::system::error_code error = request.error();
 		boost::ignore_unused_variable_warning(error);
+		return;
+	}
+
+	if (!request.get())
+	{
+		//syntax error in the request
 		return;
 	}
 

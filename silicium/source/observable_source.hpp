@@ -4,6 +4,8 @@
 #include <silicium/observable/observable.hpp>
 #include <silicium/source/source.hpp>
 #include <silicium/config.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
 
 namespace Si
 {

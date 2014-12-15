@@ -57,7 +57,7 @@ namespace Si
 		{
 			assert(!this->receiver);
 			this->receiver = &receiver;
-			original.async_get_one(*this);
+			original.async_get_one(static_cast<observer<typename Original::element_type> &>(*this));
 		}
 
 	private:

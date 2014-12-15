@@ -39,6 +39,33 @@ namespace Si
 	{
 		return ptr_sink<Pointee, Pointee *>(&next);
 	}
+
+	template <class Error, class Class, class Element, Error (Class::*Append)(iterator_range<Element const *>)>
+	struct method_sink
+	{
+		typedef Error error_type;
+		typedef Element element_type;
+
+		method_sink()
+			: m_next(nullptr)
+		{
+		}
+
+		explicit method_sink(Class &next)
+			: m_next(&next)
+		{
+		}
+
+		error_type append(iterator_range<element_type const *> data)
+		{
+			assert(m_next);
+			return m_next->*Append(data);
+		}
+
+	private:
+
+		Class *m_next;
+	};
 }
 
 #endif
