@@ -75,10 +75,12 @@ namespace
 			assert(socket);
 			assert(yield);
 
-			auto sending = Si::virtualize_observable(Si::asio::make_writing_observable(*socket, Si::make_constant_observable(data)));
+			auto sending = Si::asio::make_writing_observable(*socket);
+			sending.set_buffer(data);
+			auto virtualized = Si::virtualize_observable(sending);
 
 			//ignore error
-			yield->get_one(sending);
+			yield->get_one(virtualized);
 		}
 
 		void shutdown()

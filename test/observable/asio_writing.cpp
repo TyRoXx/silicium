@@ -6,7 +6,7 @@
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/array.hpp>
 
-BOOST_AUTO_TEST_CASE(asio_reading_observable)
+BOOST_AUTO_TEST_CASE(asio_writing_observable)
 {
 	boost::asio::io_service io;
 	Si::detail::pipe p = Si::detail::make_pipe();
@@ -22,13 +22,15 @@ BOOST_AUTO_TEST_CASE(asio_reading_observable)
 		BOOST_REQUIRE_EQUAL(5, element.get().size());
 		received.assign(element.get().begin(), element.get().end());
 	}));
+	auto writing_observable = Si::asio::make_writing_observable(writer);
+	writing_observable.set_buffer(Si::make_c_str_range("Hello"));
 	bool sent = false;
-	writer.async_write_some(boost::asio::buffer("Hello", 5), [&](boost::system::error_code ec, std::size_t written)
+	writing_observable.async_get_one(Si::make_function_observer([&sent](boost::system::error_code ec)
 	{
-		BOOST_CHECK(!ec);
-		BOOST_CHECK_EQUAL(5, written);
+		BOOST_REQUIRE(!sent);
+		BOOST_REQUIRE(!ec);
 		sent = true;
-	});
+	}));
 	io.run();
 	BOOST_CHECK(sent);
 	BOOST_CHECK_EQUAL("Hello", received);

@@ -14,70 +14,60 @@ namespace Si
 {
 	namespace asio
 	{
-		template <class AsyncStream, class BufferObservable>
-		struct writing_observable : private observer<memory_range>
+		template <class AsyncStream>
+		struct writing_observable
 		{
 			typedef boost::system::error_code element_type;
 
 			writing_observable()
 				: stream(nullptr)
-				, receiver_(nullptr)
 			{
 			}
 
-			explicit writing_observable(AsyncStream &stream, BufferObservable buffers)
+			explicit writing_observable(AsyncStream &stream)
 				: stream(&stream)
-				, buffers(std::move(buffers))
-				, receiver_(nullptr)
 			{
 			}
 
-			void async_get_one(ptr_observer<observer<element_type>> receiver)
+			void set_buffer(memory_range buffer)
 			{
-				assert(!receiver_);
+				m_buffer = buffer;
+			}
+
+			template <class Observer>
+			void async_get_one(Observer &&receiver)
+			{
 				assert(stream);
-				receiver_ = receiver.get();
-				buffers.async_get_one(static_cast<observer<memory_range> &>(*this));
+				boost::asio::async_write(
+					*stream,
+					boost::asio::buffer(m_buffer.begin(), m_buffer.size()),
+					[receiver = std::forward<Observer>(receiver)](boost::system::error_code ec, std::size_t bytes_sent) mutable
+				{
+					(void)bytes_sent;
+					std::forward<Observer>(receiver).got_element(ec);
+				});
 			}
 
 		private:
 
 			AsyncStream *stream;
-			BufferObservable buffers;
-			observer<element_type> *receiver_;
-
-			virtual void got_element(memory_range value) SILICIUM_OVERRIDE
-			{
-				assert(stream);
-				boost::asio::async_write(
-					*stream,
-					boost::asio::buffer(value.begin(), value.size()),
-					[this](boost::system::error_code ec, std::size_t bytes_sent)
-				{
-					(void)bytes_sent;
-					Si::exchange(receiver_, nullptr)->got_element(ec);
-				});
-			}
-
-			virtual void ended() SILICIUM_OVERRIDE
-			{
-				Si::exchange(receiver_, nullptr)->ended();
-			}
+			memory_range m_buffer;
 		};
 
-		template <class AsyncStream, class BufferObservable>
-		auto make_writing_observable(AsyncStream &stream, BufferObservable &&buffers)
+		template <class AsyncStream>
+		auto make_writing_observable(AsyncStream &stream)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> writing_observable<AsyncStream, typename std::decay<BufferObservable>::type>
+			-> writing_observable<AsyncStream>
 #endif
 		{
-			return writing_observable<AsyncStream, typename std::decay<BufferObservable>::type>(stream, std::forward<BufferObservable>(buffers));
+			return writing_observable<AsyncStream>(stream);
 		}
 
 		template <class AsyncStream>
 		boost::system::error_code write(AsyncStream &stream, memory_range data, yield_context yield)
 		{
-			auto writer = make_writing_observable(stream, make_constant_observable(data));
+			auto writer = make_writing_observable(stream);
+			writer.set_buffer(data);
 			return *yield.get_one(writer);
 		}
 	}
