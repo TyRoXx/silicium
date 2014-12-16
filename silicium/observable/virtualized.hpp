@@ -35,7 +35,7 @@ namespace Si
 		}
 #endif
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
 			return next.async_get_one(receiver);
 		}

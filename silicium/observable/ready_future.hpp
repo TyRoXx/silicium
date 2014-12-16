@@ -49,10 +49,10 @@ namespace Si
 		}
 
 		template <class ElementObserver>
-		void async_get_one(ElementObserver &receiver)
+		void async_get_one(ElementObserver &&receiver)
 		{
 			CheckPolicy::begin_get(value);
-			receiver.got_element(std::move(value));
+			std::forward<ElementObserver>(receiver).got_element(std::move(value));
 		}
 
 	private:

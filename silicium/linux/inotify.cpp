@@ -42,7 +42,7 @@ namespace Si
 			return watch_descriptor(notifier->native_handle(), wd);
 		}
 
-		void inotify_observable::async_get_one(observer<element_type> &receiver)
+		void inotify_observable::async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!receiver_);
 			std::size_t const min_buffer_size = sizeof(inotify_event) + NAME_MAX + 1;
@@ -72,7 +72,7 @@ namespace Si
 					Si::exchange(this->receiver_, nullptr)->got_element(std::move(changes));
 				}
 			});
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 		}
 	}
 }

@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(virtualize)
 	});
 
 	//the get request is forwarded as expected
-	v.async_get_one(observer);
+	v.async_get_one(Si::observe_by_ref(observer));
 
 	BOOST_CHECK(got_value);
 }

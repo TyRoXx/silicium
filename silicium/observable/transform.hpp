@@ -53,11 +53,11 @@ namespace Si
 		transformation &operator = (transformation &&other) = default;
 #endif
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!this->receiver);
-			this->receiver = &receiver;
-			original.async_get_one(static_cast<observer<typename Original::element_type> &>(*this));
+			this->receiver = receiver.get();
+			original.async_get_one(observe_by_ref(static_cast<observer<typename Original::element_type> &>(*this)));
 		}
 
 	private:

@@ -96,7 +96,7 @@ namespace Si
 	}
 
 	template <class Element>
-	struct coroutine_generator_observable : private Si::observer<nothing>
+	struct coroutine_generator_observable : private observer<nothing>
 	{
 		typedef Element element_type;
 
@@ -126,9 +126,9 @@ namespace Si
 		{
 		}
 
-		void async_get_one(Si::observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			next();
 		}
 
@@ -213,7 +213,7 @@ namespace Si
 					},
 					[this](detail::yield command)
 					{
-						command.target->async_get_one(*this);
+						command.target->async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
 					}
 				);
 			}

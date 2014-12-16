@@ -68,9 +68,9 @@ namespace Si
 			return *this;
 		}
 
-		void async_get_one(Si::observer<element_type> &receiver)
+		void async_get_one(Si::ptr_observer<Si::observer<element_type>> receiver)
 		{
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			next();
 		}
 
@@ -157,7 +157,7 @@ namespace Si
 			if (*state->coro_)
 			{
 				command_type command = state->coro_->get();
-				command->async_get_one(*this);
+				command->async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
 			}
 			else
 			{

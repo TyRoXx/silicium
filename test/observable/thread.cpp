@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(make_thread_empty)
 		boost::ignore_unused_variable_warning(element);
 		BOOST_FAIL("No element expected here");
 	});
-	a.async_get_one(consumer);
+	a.async_get_one(Si::observe_by_ref(consumer));
 	a.wait();
 }
 
@@ -38,9 +38,9 @@ BOOST_AUTO_TEST_CASE(make_thread_non_empty)
 		{
 			return;
 		}
-		a.async_get_one(*pusher);
+		a.async_get_one(Si::observe_by_ref(*pusher));
 	}));
-	a.async_get_one(*pusher);
+	a.async_get_one(Si::observe_by_ref(*pusher));
 	a.wait();
 	BOOST_CHECK(expected == produced);
 }
@@ -76,9 +76,9 @@ BOOST_AUTO_TEST_CASE(make_thread_nesting)
 		{
 			return;
 		}
-		a.async_get_one(*pusher);
+		a.async_get_one(Si::observe_by_ref(*pusher));
 	}));
-	a.async_get_one(*pusher);
+	a.async_get_one(Si::observe_by_ref(*pusher));
 	a.wait();
 	BOOST_CHECK(expected == produced);
 }

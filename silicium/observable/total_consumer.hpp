@@ -7,7 +7,7 @@
 namespace Si
 {
 	template <class Input>
-	struct total_consumer : private Si::observer<typename Input::element_type>
+	struct total_consumer : private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 
@@ -35,7 +35,7 @@ namespace Si
 
 		void start()
 		{
-			input.async_get_one(*this);
+			input.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
 	private:

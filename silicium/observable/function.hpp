@@ -21,14 +21,14 @@ namespace Si
 		{
 		}
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			return get(receiver);
 		}
 
 	private:
 
-		typedef typename detail::proper_value_function<AsyncGetOne, void, observer<element_type> &>::type proper_get;
+		typedef typename detail::proper_value_function<AsyncGetOne, void, ptr_observer<observer<element_type>>>::type proper_get;
 
 		proper_get get;
 	};

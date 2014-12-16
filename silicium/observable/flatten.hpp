@@ -67,10 +67,10 @@ namespace Si
 		{
 		}
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			if (!is_fetching)
 			{
 				is_fetching = true;
@@ -95,7 +95,7 @@ namespace Si
 
 			void start()
 			{
-				observed.async_get_one(*this);
+				observed.async_get_one(observe_by_ref(static_cast<observer<element_type> &>(*this)));
 			}
 
 			virtual void got_element(element_type value) SILICIUM_OVERRIDE
@@ -121,7 +121,7 @@ namespace Si
 		void fetch()
 		{
 			assert(is_fetching);
-			return input.async_get_one(*this);
+			return input.async_get_one(observe_by_ref(static_cast<observer<typename ObservableObservable::element_type> &>(*this)));
 		}
 
 		void remove_child(child &removing)

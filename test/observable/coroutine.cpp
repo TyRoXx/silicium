@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(coroutine_trivial)
 		BOOST_CHECK_EQUAL(2, i);
 		got_element = true;
 	});
-	coro.async_get_one(consumer_);
+	coro.async_get_one(Si::observe_by_ref(consumer_));
 	BOOST_CHECK(got_element);
 }
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(coroutine_yield)
 		BOOST_CHECK_EQUAL(5, i);
 		got_element = true;
 	});
-	coro.async_get_one(consumer_);
+	coro.async_get_one(Si::observe_by_ref(consumer_));
 	BOOST_CHECK(!got_element);
 	e.got_element(4);
 	BOOST_CHECK(got_element);

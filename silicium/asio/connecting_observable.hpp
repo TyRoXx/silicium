@@ -20,11 +20,11 @@ namespace Si
 			{
 			}
 
-			void async_get_one(observer<element_type> &receiver)
+			void async_get_one(ptr_observer<observer<element_type>> receiver)
 			{
 				assert(socket);
 				assert(!receiver_);
-				receiver_ = &receiver;
+				receiver_ = receiver.get();
 				socket->async_connect(destination, [this](boost::system::error_code ec)
 				{
 					Si::exchange(receiver_, nullptr)->got_element(ec);

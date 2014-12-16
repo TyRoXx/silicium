@@ -48,10 +48,10 @@ namespace Si
 		}
 #endif
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			fetch();
 		}
 
@@ -66,7 +66,7 @@ namespace Si
 
 		void fetch()
 		{
-			original.async_get_one(*this);
+			original.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
 		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE

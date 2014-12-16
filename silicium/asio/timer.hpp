@@ -46,10 +46,10 @@ namespace Si
 			}
 #endif
 
-			void async_get_one(observer<element_type> &receiver)
+			void async_get_one(ptr_observer<observer<element_type>> receiver)
 			{
 				assert(!receiver_);
-				receiver_ = &receiver;
+				receiver_ = receiver.get();
 				return delays.async_get_one(static_cast<observer<typename DurationObservable::element_type> &>(*this));
 			}
 

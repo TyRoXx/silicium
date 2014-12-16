@@ -32,7 +32,7 @@ namespace Si
 				on_event(event);
 				got_event = true;
 			});
-			watcher.async_get_one(consumer);
+			watcher.async_get_one(Si::observe_by_ref(consumer));
 
 #ifdef _WIN32
 			//currently the implementation for Windows needs some time for the background thread to set everything up

@@ -28,20 +28,21 @@ namespace Si
 				assert(this->buffer.size() >= 1);
 			}
 
-			void async_get_one(observer<element_type> &receiver)
+			template <class Observer>
+			void async_get_one(Observer &&receiver)
 			{
 				stream->async_read_some(
 					boost::asio::buffer(buffer.begin(), buffer.size()),
-					[this, &receiver](boost::system::error_code ec, std::size_t bytes_received)
+					[this, receiver = std::forward<Observer>(receiver)](boost::system::error_code ec, std::size_t bytes_received) mutable
 				{
 					if (ec)
 					{
-						receiver.got_element(ec);
+						std::forward<Observer>(receiver).got_element(ec);
 					}
 					else
 					{
 						assert(bytes_received <= static_cast<std::size_t>(this->buffer.size()));
-						receiver.got_element(make_memory_range(this->buffer.begin(), this->buffer.begin() + bytes_received));
+						std::forward<Observer>(receiver).got_element(make_memory_range(this->buffer.begin(), this->buffer.begin() + bytes_received));
 					}
 				});
 			}

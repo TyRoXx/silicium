@@ -56,11 +56,11 @@ namespace Si
 		finite_state_machine &operator = (finite_state_machine &&) = default;
 #endif
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
-			in.async_get_one(*this);
+			receiver_ = receiver.get();
+			in.async_get_one(Si::observe_by_ref(static_cast<observer<typename In::element_type> &>(*this)));
 		}
 
 	private:

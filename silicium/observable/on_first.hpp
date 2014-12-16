@@ -21,7 +21,7 @@ namespace Si
 
 		void start()
 		{
-			m_input.async_get_one(*this);
+			m_input.async_get_one(observe_by_ref(*this));
 		}
 
 	private:

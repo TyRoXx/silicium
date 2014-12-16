@@ -10,9 +10,10 @@ namespace Si
 	{
 		typedef Element element_type;
 
-		void async_get_one(observer<Element> &receiver)
+		template <class Observer>
+		void async_get_one(Observer &&receiver)
 		{
-			return receiver.ended();
+			return std::forward<Observer>(receiver).ended();
 		}
 	};
 }

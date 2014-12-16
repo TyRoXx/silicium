@@ -36,10 +36,10 @@ namespace Si
 			Si::exchange(receiver, nullptr)->ended();
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
 			assert(!this->receiver);
-			this->receiver = &receiver;
+			this->receiver = receiver.get();
 		}
 
 	private:

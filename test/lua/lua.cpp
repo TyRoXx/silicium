@@ -59,7 +59,7 @@ namespace Si
 		});
 
 		{
-			yielded.async_get_one(consumer);
+			yielded.async_get_one(Si::observe_by_ref(consumer));
 			int rc = lua_resume(coro, 1);
 			if (LUA_YIELD != rc)
 			{
@@ -69,7 +69,7 @@ namespace Si
 		}
 
 		{
-			yielded.async_get_one(consumer);
+			yielded.async_get_one(Si::observe_by_ref(consumer));
 			int rc = lua_resume(coro, 1);
 			if (LUA_YIELD != rc)
 			{

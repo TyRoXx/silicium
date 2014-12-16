@@ -32,11 +32,11 @@ namespace Si
 			{
 			}
 
-			void async_get_one(observer<element_type> &receiver)
+			void async_get_one(ptr_observer<observer<element_type>> receiver)
 			{
 				assert(!receiver_);
 				assert(stream);
-				receiver_ = &receiver;
+				receiver_ = receiver.get();
 				buffers.async_get_one(static_cast<observer<memory_range> &>(*this));
 			}
 

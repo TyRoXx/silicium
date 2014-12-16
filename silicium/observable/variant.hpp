@@ -49,11 +49,11 @@ namespace Si
 		}
 #endif
 
-		void async_get_one(Si::observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			boost::unique_lock<Lockable> lock(*mutex);
 			assert(!receiver_);
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			return async_get_one_impl<0, Parts...>();
 		}
 
@@ -122,7 +122,7 @@ namespace Si
 				}
 				observer.combinator = this;
 				auto &part = std::get<Index>(parts);
-				part.async_get_one(observer);
+				part.async_get_one(observe_by_ref(observer));
 			}
 			return async_get_one_impl<Index + 1, Tail...>();
 		}

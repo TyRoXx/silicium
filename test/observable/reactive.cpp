@@ -44,7 +44,7 @@ namespace Si
 		{
 			generated.emplace_back(element);
 		});
-		added.async_get_one(consumer);
+		added.async_get_one(Si::observe_by_ref(consumer));
 		std::vector<int> const expected(1, 3);
 		BOOST_CHECK(expected == generated);
 	}
@@ -82,7 +82,7 @@ namespace Si
 		});
 		BOOST_CHECK(generated.empty());
 
-		added.async_get_one(consumer);
+		added.async_get_one(Si::observe_by_ref(consumer));
 		BOOST_CHECK(generated.empty());
 
 		bridge->got_element(2);
@@ -113,15 +113,15 @@ namespace Si
 		BOOST_CHECK(!bridge->is_waiting());
 		BOOST_CHECK(generated.empty());
 
-		buf.async_get_one(consumer);
+		buf.async_get_one(Si::observe_by_ref(consumer));
 		std::vector<int> expected(1, 7);
 		BOOST_CHECK(expected == generated);
 
-		buf.async_get_one(consumer);
+		buf.async_get_one(Si::observe_by_ref(consumer));
 		expected.emplace_back(7);
 		BOOST_CHECK(expected == generated);
 
-		buf.async_get_one(consumer);
+		buf.async_get_one(Si::observe_by_ref(consumer));
 		BOOST_CHECK(expected == generated);
 	}
 
@@ -146,11 +146,11 @@ namespace Si
 			produced.emplace_back(std::move(element));
 		});
 
-		variants.async_get_one(consumer);
+		variants.async_get_one(Si::observe_by_ref(consumer));
 		BOOST_CHECK(produced.empty());
 		first.got_element(4);
 
-		variants.async_get_one(consumer);
+		variants.async_get_one(Si::observe_by_ref(consumer));
 		BOOST_CHECK_EQUAL(1U, produced.size());
 		second.got_element("Hi");
 
@@ -269,17 +269,17 @@ namespace Si
 			connections->erase(receiver_);
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
 			auto * const old_receiver = receiver_;
-			connections->insert(std::make_pair(&receiver, true)).first->second = true;
-			if (old_receiver && (old_receiver != &receiver))
+			connections->insert(std::make_pair(receiver.get(), true)).first->second = true;
+			if (old_receiver && (old_receiver != receiver.get()))
 			{
 				auto i = connections->find(receiver_);
 				assert(i->second);
 				connections->erase(i);
 			}
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 		}
 
 	private:
@@ -332,10 +332,10 @@ namespace
 			BOOST_REQUIRE(value);
 			generated.emplace_back(*value);
 		});
-		con1.async_get_one(consumer);
+		con1.async_get_one(Si::observe_by_ref(consumer));
 		s.emit_one(2);
 		con2 = std::move(con1);
-		con2.async_get_one(consumer);
+		con2.async_get_one(Si::observe_by_ref(consumer));
 		s.emit_one(3);
 		s.emit_one(4);
 		std::vector<int> const expected{2, 3};

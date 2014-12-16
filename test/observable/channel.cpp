@@ -41,7 +41,7 @@ namespace Si
 			{
 			}
 
-			void async_get_one(observer<element_type> &receiver)
+			void async_get_one(ptr_observer<observer<element_type>> receiver)
 			{
 				boost::unique_lock<Lockable> lock(state->access);
 				assert(!state->receiver);
@@ -55,7 +55,7 @@ namespace Si
 				}
 				else
 				{
-					state->receiver = &receiver;
+					state->receiver = receiver.get();
 				}
 			}
 
@@ -74,7 +74,7 @@ namespace Si
 			{
 			}
 			
-			void async_get_one(observer<element_type> &receiver, Message &message)
+			void async_get_one(ptr_observer<observer<element_type>> receiver, Message &message)
 			{
 				boost::unique_lock<Lockable> lock(state->access);
 				assert(!state->message);
@@ -89,7 +89,7 @@ namespace Si
 				else
 				{
 					state->message = &message;
-					state->delivery = &receiver;
+					state->delivery = receiver.get();
 				}
 			}
 
@@ -114,7 +114,7 @@ namespace Si
 		template <class YieldContext>
 		void send(Message message, YieldContext &yield)
 		{
-			auto message_bound = make_function_observable<detail::delivered>([this, &message](observer<detail::delivered> &receiver)
+			auto message_bound = make_function_observable<detail::delivered>([this, &message](ptr_observer<observer<detail::delivered>> receiver)
 			{
 				return sending.async_get_one(receiver, message);
 			});
@@ -161,8 +161,8 @@ BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 		got = true;
 		BOOST_CHECK_EQUAL(5, result);
 	});
-	t.async_get_one(consumer);
-	s.async_get_one(consumer);
+	t.async_get_one(Si::observe_by_ref(consumer));
+	s.async_get_one(Si::observe_by_ref(consumer));
 	BOOST_CHECK(got);
 }
 
@@ -193,8 +193,8 @@ BOOST_AUTO_TEST_CASE(channel_with_thread)
 		got = true;
 		BOOST_CHECK_EQUAL(5, result);
 	});
-	t.async_get_one(consumer);
-	s.async_get_one(consumer);
+	t.async_get_one(Si::observe_by_ref(consumer));
+	s.async_get_one(Si::observe_by_ref(consumer));
 	t.wait();
 	s.wait();
 	BOOST_CHECK(got);
@@ -237,8 +237,8 @@ BOOST_AUTO_TEST_CASE(channel_select)
 		got = true;
 		BOOST_CHECK_EQUAL(5, result);
 	});
-	t.async_get_one(consumer);
-	s.async_get_one(consumer);
+	t.async_get_one(Si::observe_by_ref(consumer));
+	s.async_get_one(Si::observe_by_ref(consumer));
 	t.wait();
 	s.wait();
 	BOOST_CHECK(got);

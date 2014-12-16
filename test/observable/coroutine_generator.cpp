@@ -23,7 +23,7 @@ namespace Si
 		for (;;)
 		{
 			auto old_size = generated.size();
-			co.async_get_one(collector);
+			co.async_get_one(Si::observe_by_ref(collector));
 			if (generated.size() == old_size)
 			{
 				break;
@@ -50,13 +50,13 @@ namespace Si
 		{
 			generated.emplace_back(element);
 		});
-		co.async_get_one(collector);
+		co.async_get_one(Si::observe_by_ref(collector));
 		BOOST_REQUIRE(generated.empty());
 		asyncs.got_element(4);
 
 		//TODO: reading past the end should not be the required way to avoid a force unwind of the coroutine
 		//      because the unwinding is done by throwing an exception.
-		co.async_get_one(collector);
+		co.async_get_one(Si::observe_by_ref(collector));
 		BOOST_CHECK(exited_cleanly);
 
 		std::vector<int> const expected{3};

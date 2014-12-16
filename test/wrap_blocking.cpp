@@ -36,9 +36,9 @@ namespace Si
 		}
 #endif
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
-			done = boost::async(boost::launch::async, [this, &receiver]()
+			done = boost::async(boost::launch::async, [this, receiver]()
 			{
 				element_type result = act();
 				receiver.got_element(std::move(result));
@@ -92,6 +92,6 @@ BOOST_AUTO_TEST_CASE(wrap_blocking_coroutine)
 		BOOST_CHECK_EQUAL(5, element);
 		work.reset();
 	});
-	coro.async_get_one(consumer);
+	coro.async_get_one(Si::observe_by_ref(consumer));
 	io.run();
 }

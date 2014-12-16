@@ -55,13 +55,13 @@ namespace Si
 		enumerator &operator = (enumerator &&) = default;
 #endif
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			if (buffered.empty())
 			{
-				input.async_get_one(*this);
+				input.async_get_one(Si::observe_by_ref(static_cast<observer<typename RangeObservable::element_type> &>(*this)));
 			}
 			else
 			{

@@ -53,12 +53,12 @@ namespace Si
 				underlying->cancel();
 			}
 
-			void async_get_one(observer<element_type> &receiver)
+			void async_get_one(ptr_observer<observer<element_type>> receiver)
 			{
 				assert(!receiver_);
 				assert(underlying);
 				next_client = std::make_shared<boost::asio::ip::tcp::socket>(underlying->get_io_service());
-				receiver_ = &receiver;
+				receiver_ = receiver.get();
 				underlying->async_accept(*next_client, [this](boost::system::error_code error)
 				{
 					if (!this->receiver_)

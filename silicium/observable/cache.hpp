@@ -42,10 +42,10 @@ namespace Si
 		}
 #endif
 
-		virtual void async_get_one(observer<element_type> &receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			if (cached)
 			{
 				exchange(receiver_, nullptr)->got_element(*cached);
@@ -56,7 +56,7 @@ namespace Si
 			}
 
 			is_fetching = true;
-			input.async_get_one(*this);
+			input.async_get_one(Si::observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
 	private:
@@ -73,7 +73,7 @@ namespace Si
 			{
 				exchange(receiver_, nullptr)->got_element(*cached);
 			}
-			input.async_get_one(*this);
+			input.async_get_one(observe_by_ref(*this));
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE

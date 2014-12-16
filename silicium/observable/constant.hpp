@@ -27,9 +27,9 @@ namespace Si
 		}
 
 		template <class ElementObserver>
-		void async_get_one(ElementObserver &receiver) const
+		void async_get_one(ElementObserver &&receiver) const
 		{
-			receiver.got_element(m_value);
+			std::forward<ElementObserver>(receiver).got_element(m_value);
 		}
 
 		Element const &constant() const BOOST_NOEXCEPT

@@ -35,16 +35,17 @@ namespace Si
 		}
 #endif
 
-		void async_get_one(observer<Element> &receiver)
+		template <class Observer>
+		void async_get_one(Observer &&receiver)
 		{
 			boost::optional<Element> element = generate();
 			if (element)
 			{
-				receiver.got_element(std::move(*element));
+				std::forward<Observer>(receiver).got_element(std::move(*element));
 			}
 			else
 			{
-				receiver.ended();
+				std::forward<Observer>(receiver).ended();
 			}
 		}
 

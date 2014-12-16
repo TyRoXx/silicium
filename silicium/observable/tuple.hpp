@@ -52,10 +52,10 @@ namespace Si
 		}
 #endif
 
-		void async_get_one(observer<buffer_tuple> &receiver)
+		void async_get_one(ptr_observer<observer<buffer_tuple>> receiver)
 		{
 			assert(!this->receiver);
-			this->receiver = &receiver;
+			this->receiver = receiver.get();
 			this->elements_received.reset();
 			return async_get_one_impl<0, Parts...>();
 		}
@@ -105,7 +105,7 @@ namespace Si
 			auto &observer = std::get<Index>(observers);
 			observer.combinator = this;
 			auto &part = std::get<Index>(parts);
-			part.async_get_one(observer);
+			part.async_get_one(observe_by_ref(observer));
 			return async_get_one_impl<Index + 1, Tail...>();
 		}
 

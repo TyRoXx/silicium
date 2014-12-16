@@ -42,10 +42,11 @@ namespace Si
 			return !content;
 		}
 
-		void async_get_one(observer<element_type> &receiver)
+		template <class Observer>
+		void async_get_one(Observer &&observer)
 		{
 			assert(content);
-			return content->async_get_one(receiver);
+			return content->async_get_one(std::forward<Observer>(observer));
 		}
 
 	private:

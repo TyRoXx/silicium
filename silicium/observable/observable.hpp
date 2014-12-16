@@ -16,7 +16,7 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(observer<element_type> &receiver) = 0;
+		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) = 0;
 	};
 
 	template <class X>
@@ -28,7 +28,7 @@ namespace Si
 		{
 			X moved = std::move(observable);
 			moved = std::move(observable);
-			observable.async_get_one(observer);
+			observable.async_get_one(observe_by_ref(observer_));
 			X default_constructible;
 			boost::ignore_unused_variable_warning(default_constructible);
 		}
@@ -47,7 +47,7 @@ namespace Si
 		};
 
 		X observable;
-		test_observer observer;
+		test_observer observer_;
 		element_type element;
 	};
 
@@ -57,7 +57,9 @@ namespace Si
 		struct minimum_observable
 		{
 			typedef int element_type;
-			void async_get_one(observer<element_type> &)
+
+			template <class Observer>
+			void async_get_one(Observer &&)
 			{
 			}
 		};

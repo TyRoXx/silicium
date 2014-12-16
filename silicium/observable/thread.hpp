@@ -26,7 +26,7 @@ namespace Si
 			void block(NothingObservable &&blocked_on)
 			{
 				assert(!got_something);
-				blocked_on.async_get_one(*this);
+				blocked_on.async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
 				typename ThreadingAPI::unique_lock lock(got_something_mutex);
 				while (!got_something)
 				{
@@ -93,7 +93,7 @@ namespace Si
 			return state->wait();
 		}
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			return state->async_get_one(receiver);
 		}
@@ -126,7 +126,7 @@ namespace Si
 				});
 			}
 
-			void async_get_one(observer<Element> &new_receiver)
+			void async_get_one(ptr_observer<observer<element_type>> new_receiver)
 			{
 				typename ThreadingAPI::unique_lock lock(receiver_mutex);
 				assert(!receiver);
@@ -136,15 +136,15 @@ namespace Si
 					ready_result = boost::none;
 					receiver_ready.notify_one();
 					lock.unlock();
-					new_receiver.got_element(std::move(result));
+					new_receiver.get()->got_element(std::move(result));
 				}
 				else
 				{
 					if (has_ended)
 					{
-						return new_receiver.ended();
+						return new_receiver.get()->ended();
 					}
-					receiver = &new_receiver;
+					receiver = new_receiver.get();
 					receiver_ready.notify_one();
 				}
 			}

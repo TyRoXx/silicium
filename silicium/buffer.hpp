@@ -52,10 +52,10 @@ namespace Si
 		buffer_observable &operator = (buffer_observable &&) = default;
 #endif
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!this->receiver);
-			this->receiver = &receiver;
+			this->receiver = receiver.get();
 			if (elements.empty())
 			{
 				return check_fetch();
@@ -123,7 +123,7 @@ namespace Si
 				return;
 			}
 			fetching = true;
-			from.async_get_one(*this);
+			from.async_get_one(observe_by_ref(static_cast<observer<Element> &>(*this)));
 		}
 
 		SILICIUM_DELETED_FUNCTION(buffer_observable(buffer_observable const &))

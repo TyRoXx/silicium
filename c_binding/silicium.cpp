@@ -45,7 +45,7 @@ struct silicium_coroutine : silicium_observable
 	{
 	}
 
-	virtual void async_get_one(Si::observer<void *> &receiver) SILICIUM_OVERRIDE
+	virtual void async_get_one(Si::ptr_observer<Si::observer<void *>> receiver) SILICIUM_OVERRIDE
 	{
 		m_coroutine.async_get_one(receiver);
 	}
@@ -88,7 +88,7 @@ void silicium_async_get_one(silicium_observable *observable, silicium_observer_f
 	assert(observable);
 	assert(callback);
 	observable->receiver = silicium_receiver(callback, user_data);
-	return observable->async_get_one(observable->receiver);
+	return observable->async_get_one(Si::observe_by_ref(static_cast<Si::observer<void *> &>(observable->receiver)));
 }
 
 extern "C"

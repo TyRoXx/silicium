@@ -22,16 +22,17 @@ namespace Si
 		{
 		}
 
-		void async_get_one(observer<Element> &receiver)
+		template <class Observer>
+		void async_get_one(Observer &&receiver)
 		{
 			Si::optional<Element> value = Si::get(source);
 			if (value)
 			{
-				receiver.got_element(std::move(*value));
+				std::forward<Observer>(receiver).got_element(std::move(*value));
 			}
 			else
 			{
-				receiver.ended();
+				std::forward<Observer>(receiver).ended();
 			}
 		}
 

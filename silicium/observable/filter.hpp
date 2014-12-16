@@ -26,11 +26,11 @@ namespace Si
 		{
 		}
 
-		void async_get_one(observer<element_type> &receiver)
+		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
-			input.async_get_one(*this);
+			receiver_ = receiver.get();
+			input.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
 	private:
@@ -46,7 +46,7 @@ namespace Si
 			assert(receiver_);
 			if (!is_propagated(static_cast<typename std::add_const<element_type>::type &>(value)))
 			{
-				input.async_get_one(*this);
+				input.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
 				return;
 			}
 			exchange(receiver_, nullptr)->got_element(std::move(value));
