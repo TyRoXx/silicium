@@ -25,3 +25,38 @@ BOOST_AUTO_TEST_CASE(asio_timer)
 	io.run();
 	BOOST_CHECK_EQUAL(loop_count, elapsed_count);
 }
+
+namespace
+{
+	struct test_observer
+	{
+		typedef Si::asio::timer_elapsed element_type;
+
+		bool is_element = false;
+
+		void got_element(Si::asio::timer_elapsed)
+		{
+			BOOST_REQUIRE(!is_element);
+			is_element = true;
+		}
+
+		void ended()
+		{
+			BOOST_FAIL("unexpected end");
+		}
+	};
+}
+
+BOOST_AUTO_TEST_CASE(asio_owning_timer)
+{
+	boost::asio::io_service io;
+	auto t = Si::asio::make_timer2(io);
+	t.expires_from_now(std::chrono::microseconds(1));
+	auto observer = std::make_shared<test_observer>();
+	t.async_get_one(Si::any_ptr_observer<std::shared_ptr<test_observer>>(observer));
+	BOOST_CHECK(!observer->is_element);
+	BOOST_CHECK_EQUAL(2, observer.use_count());
+	io.run();
+	BOOST_CHECK(observer->is_element);
+	BOOST_CHECK_EQUAL(1, observer.use_count());
+}

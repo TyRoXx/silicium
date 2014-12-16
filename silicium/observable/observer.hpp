@@ -19,25 +19,27 @@ namespace Si
 		virtual void ended() = 0;
 	};
 
-	template <class Observer>
-	struct ptr_observer
+	template <class ObserverPtr>
+	struct any_ptr_observer
 	{
-		ptr_observer()
-			: m_impl(nullptr)
+		typedef typename std::decay<decltype(*std::declval<ObserverPtr>())>::type observer_type;
+
+		any_ptr_observer()
+			: m_impl(ObserverPtr())
 		{
 		}
 
-		explicit ptr_observer(Observer &impl)
-			: m_impl(&impl)
+		explicit any_ptr_observer(ObserverPtr impl)
+			: m_impl(std::move(impl))
 		{
 		}
 
-		Observer *get() const
+		ObserverPtr const &get() const
 		{
 			return m_impl;
 		}
 
-		void got_element(typename Observer::element_type element) const
+		void got_element(typename observer_type::element_type element) const
 		{
 			assert(m_impl);
 			m_impl->got_element(std::move(element));
@@ -51,13 +53,16 @@ namespace Si
 
 	private:
 
-		Observer *m_impl;
+		ObserverPtr m_impl;
 	};
+
+	template <class Element>
+	using ptr_observer = any_ptr_observer<Element *>;
 
 	template <class Element>
 	ptr_observer<observer<Element>> observe_by_ref(observer<Element> &ref)
 	{
-		return ptr_observer<observer<Element>>(ref);
+		return ptr_observer<observer<Element>>(&ref);
 	}
 }
 

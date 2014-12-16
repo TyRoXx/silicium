@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_TIMER_HPP
-#define SILICIUM_REACTIVE_TIMER_HPP
+#ifndef SILICIUM_ASIO_TIMER_HPP
+#define SILICIUM_ASIO_TIMER_HPP
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
@@ -88,6 +88,68 @@ namespace Si
 #endif
 		{
 			return timer<AsioTimer, typename std::decay<DurationObservable>::type>(io, std::forward<DurationObservable>(delays));
+		}
+
+
+		template <class AsioTimer>
+		struct timer2
+		{
+			typedef timer_elapsed element_type;
+			typedef AsioTimer timer_impl;
+			typedef typename timer_impl::duration duration;
+
+			explicit timer2(boost::asio::io_service &io)
+				: impl(make_unique<timer_impl>(io))
+			{
+			}
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+			timer2(timer2 &&other) BOOST_NOEXCEPT
+				: impl(std::move(other.impl))
+			{
+			}
+
+			timer2 &operator = (timer2 &&other) BOOST_NOEXCEPT
+			{
+				impl = std::move(other.impl);
+				return *this;
+			}
+#endif
+
+			template <class Duration>
+			void expires_from_now(Duration &&delay)
+			{
+				assert(impl);
+				impl->expires_from_now(delay);
+			}
+
+			template <class Observer>
+			void async_get_one(Observer &&receiver)
+			{
+				assert(impl);
+				impl->async_wait([this, receiver](boost::system::error_code error) mutable
+				{
+					if (error)
+					{
+						assert(error == boost::asio::error::operation_aborted); //TODO: remove this assumption
+						return;
+					}
+					std::forward<Observer>(receiver).got_element(timer_elapsed{});
+				});
+			}
+
+		private:
+
+			std::unique_ptr<timer_impl> impl;
+		};
+
+		template <class AsioTimer = boost::asio::steady_timer>
+		auto make_timer2(boost::asio::io_service &io)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> timer2<AsioTimer>
+#endif
+		{
+			return timer2<AsioTimer>(io);
 		}
 	}
 }
