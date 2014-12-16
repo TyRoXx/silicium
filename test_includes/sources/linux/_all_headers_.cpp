@@ -61,6 +61,7 @@
 #include <silicium/observable/flatten.hpp>
 #include <silicium/observable/for_each.hpp>
 #include <silicium/observable/function.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <silicium/observable/generator.hpp>
 #include <silicium/observable/observable.hpp>
 #include <silicium/observable/observer.hpp>
