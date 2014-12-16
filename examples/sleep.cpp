@@ -9,8 +9,8 @@
 template <class Duration>
 void sleep(boost::asio::io_service &io, Si::yield_context yield, Duration duration)
 {
-	//TODO: the duration should not have to be wrapped in an observable
-	auto timer = Si::asio::make_timer(io, Si::make_constant_observable(duration));
+	auto timer = Si::asio::make_timer(io);
+	timer.expires_from_now(duration);
 	//TODO: use the call operator instead of a get_one method?
 	boost::optional<Si::asio::timer_elapsed> result = yield.get_one(timer);
 	//TODO: this should work without the optional wrapper
