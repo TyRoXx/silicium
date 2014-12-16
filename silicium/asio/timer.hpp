@@ -27,7 +27,10 @@ namespace Si
 			{
 			}
 
-#if !SILICIUM_COMPILER_GENERATES_MOVES
+#if SILICIUM_COMPILER_GENERATES_MOVES
+			timer(timer &&other) BOOST_NOEXCEPT = default;
+			timer &operator = (timer &&other) BOOST_NOEXCEPT = default;
+#else
 			timer(timer &&other) BOOST_NOEXCEPT
 				: impl(std::move(other.impl))
 			{
