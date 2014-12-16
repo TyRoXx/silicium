@@ -1,41 +1,10 @@
 #include <silicium/asio/reading_observable.hpp>
+#include <silicium/asio/writing_observable.hpp>
 #include <silicium/posix/process.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/array.hpp>
-
-namespace Si
-{
-	template <class Function>
-	struct function_observer
-	{
-		explicit function_observer(Function function)
-			: m_function(std::move(function))
-		{
-		}
-
-		template <class Element>
-		void got_element(Element &&element)
-		{
-			m_function(std::forward<Element>(element));
-		}
-
-		void ended()
-		{
-			m_function(boost::none);
-		}
-
-	private:
-
-		Function m_function;
-	};
-
-	template <class Function>
-	auto make_function_observer(Function &&function)
-	{
-		return function_observer<typename std::decay<Function>::type>(std::forward<Function>(function));
-	}
-}
 
 BOOST_AUTO_TEST_CASE(asio_reading_observable)
 {
@@ -53,10 +22,12 @@ BOOST_AUTO_TEST_CASE(asio_reading_observable)
 		BOOST_REQUIRE_EQUAL(5, element.get().size());
 		received.assign(element.get().begin(), element.get().end());
 	}));
+	bool sent = false;
 	writer.async_write_some(boost::asio::buffer("Hello", 5), [&](boost::system::error_code ec, std::size_t written)
 	{
 		BOOST_CHECK(!ec);
 		BOOST_CHECK_EQUAL(5, written);
+		sent = true;
 	});
 	io.run();
 	BOOST_CHECK_EQUAL("Hello", received);
