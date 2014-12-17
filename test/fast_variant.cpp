@@ -405,96 +405,10 @@ namespace Si
 	}
 #endif
 
-	namespace detail
-	{
-		template <class Method>
-		struct argument_of_method;
-
-		template <class Result, class Class, class Argument>
-		struct argument_of_method<Result(Class::*)(Argument) const>
-		{
-			typedef Argument type;
-		};
-
-		template <class Result, class Class, class Argument>
-		struct argument_of_method<Result(Class::*)(Argument)>
-		{
-			typedef Argument type;
-		};
-
-		template <class Function>
-		struct argument_of : argument_of_method<decltype(&Function::operator())>
-		{
-		};
-
-		template <class Result, class Argument>
-		struct argument_of<Result(*)(Argument)>
-		{
-			typedef Argument type;
-		};
-
-		BOOST_STATIC_ASSERT(std::is_same<int, argument_of<void(*)(int)>::type>::value);
-
-		template <class Result, class ...Functions>
-		struct overloader;
-
-		template <class Result, class Head>
-		struct overloader<Result, Head>
-		{
-			//for apply_visitor
-			typedef Result result_type;
-
-			explicit overloader(Head &head)
-				: m_head(&head)
-			{
-			}
-
-			Result operator()(typename argument_of<Head>::type argument) const
-			{
-				return (*m_head)(std::forward<typename argument_of<Head>::type>(argument));
-			}
-
-		private:
-
-			Head *m_head;
-		};
-
-		template <class Result, class Head, class ...Tail>
-		struct overloader<Result, Head, Tail...> : overloader<Result, Tail...>
-		{
-			using overloader<Result, Tail...>::operator();
-
-			//for apply_visitor
-			typedef Result result_type;
-
-			explicit overloader(Head &head, Tail &...tail)
-				: overloader<Result, Tail...>(tail...)
-				, m_head(&head)
-			{
-			}
-
-			Result operator()(typename argument_of<Head>::type argument) const
-			{
-				return (*m_head)(std::forward<typename argument_of<Head>::type>(argument));
-			}
-
-		private:
-
-			Head *m_head;
-		};
-	}
-
-	template <class Result, class ...T, class ...Visitors>
-	Result overloaded_visit(fast_variant<T...> &variant, Visitors &&...visitors)
-	{
-		detail::overloader<Result, Visitors...> ov(visitors...);
-		return Si::apply_visitor(ov, variant);
-	}
-
-	BOOST_AUTO_TEST_CASE(fast_variant_overloaded_visit_const_visitors)
+	BOOST_AUTO_TEST_CASE(fast_variant_overloaded_visit_unordered_with_const_visitors)
 	{
 		fast_variant<int, nothing, std::unique_ptr<long>> v(3);
-		int result = overloaded_visit<int>(
+		int result = visit<int>(
 			v,
 			[](nothing) -> int
 			{
@@ -514,10 +428,10 @@ namespace Si
 		BOOST_CHECK_EQUAL(3, result);
 	}
 
-	BOOST_AUTO_TEST_CASE(fast_variant_overloaded_visit_mutable_visitors)
+	BOOST_AUTO_TEST_CASE(fast_variant_visit_unordered_with_mutable_visitors)
 	{
 		fast_variant<int, nothing, std::unique_ptr<long>> v(3);
-		int result = overloaded_visit<int>(
+		int result = visit<int>(
 			v,
 			[](nothing) mutable -> int
 			{

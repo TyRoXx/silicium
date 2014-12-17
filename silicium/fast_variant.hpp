@@ -683,77 +683,95 @@ namespace Si
 
 	namespace detail
 	{
-#if SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION
-		template <std::size_t Index, class First, class ...T>
-		struct at : at<Index - 1, T...>
-		{
-		};
-#else
-		template <std::size_t Index, class ...T>
-		struct at;
+		template <class Method>
+		struct argument_of_method;
 
-		template <std::size_t Index, class First, class ...T>
-		struct at<Index, First, T...> : at<Index - 1, T...>
+		template <class Result, class Class, class Argument>
+		struct argument_of_method<Result(Class::*)(Argument) const>
 		{
-		};
-#endif
-		template <class First, class ...T>
-		struct at<0, First, T...>
-		{
-			typedef First type;
+			typedef Argument type;
 		};
 
-		template <class Result, std::size_t Index, class ...T>
-		Result visit_impl(fast_variant<T...> &)
+		template <class Result, class Class, class Argument>
+		struct argument_of_method<Result(Class::*)(Argument)>
 		{
-			BOOST_STATIC_ASSERT_MSG(Index == sizeof...(T), "You did not provide the required number of handlers to Si::visit");
-			SILICIUM_UNREACHABLE();
-		}
+			typedef Argument type;
+		};
 
-		template <class Result, std::size_t Index, class ...T>
-		Result visit_impl(fast_variant<T...> const &)
+		template <class Function>
+		struct argument_of : argument_of_method<decltype(&Function::operator())>
 		{
-			BOOST_STATIC_ASSERT_MSG(Index == sizeof...(T), "You did not provide the required number of handlers to Si::visit");
-			SILICIUM_UNREACHABLE();
-		}
+		};
 
-		template <class Result, std::size_t Index, class ...T, class FirstVisitor, class ...Visitors>
-		Result visit_impl(fast_variant<T...> &var, FirstVisitor const &first_visitor, Visitors const & ...visitors)
+		template <class Result, class Argument>
+		struct argument_of<Result(*)(Argument)>
 		{
-			typedef typename at<Index, T...>::type element_type;
-			if (var.which() == Index)
+			typedef Argument type;
+		};
+
+		BOOST_STATIC_ASSERT(std::is_same<int, argument_of<void(*)(int)>::type>::value);
+
+		template <class Result, class ...Functions>
+		struct overloader;
+
+		template <class Result, class Head>
+		struct overloader<Result, Head>
+		{
+			//for apply_visitor
+			typedef Result result_type;
+
+			explicit overloader(Head &head)
+				: m_head(&head)
 			{
-				auto * const element = try_get_ptr<element_type>(var);
-				assert(element);
-				return first_visitor(*element);
 			}
-			return visit_impl<Result, Index + 1>(var, visitors...);
-		}
 
-		template <class Result, std::size_t Index, class ...T, class FirstVisitor, class ...Visitors>
-		Result visit_impl(fast_variant<T...> const &var, FirstVisitor const &first_visitor, Visitors const & ...visitors)
-		{
-			typedef typename at<Index, T...>::type element_type;
-			if (var.which() == Index)
+			Result operator()(typename argument_of<Head>::type argument) const
 			{
-				auto * const element = try_get_ptr<element_type>(var);
-				assert(element);
-				return first_visitor(*element);
+				return (*m_head)(std::forward<typename argument_of<Head>::type>(argument));
 			}
-			return visit_impl<Result, Index + 1>(var, visitors...);
-		}
+
+		private:
+
+			Head *m_head;
+		};
+
+		template <class Result, class Head, class ...Tail>
+		struct overloader<Result, Head, Tail...> : overloader<Result, Tail...>
+		{
+			using overloader<Result, Tail...>::operator();
+
+			//for apply_visitor
+			typedef Result result_type;
+
+			explicit overloader(Head &head, Tail &...tail)
+				: overloader<Result, Tail...>(tail...)
+				, m_head(&head)
+			{
+			}
+
+			Result operator()(typename argument_of<Head>::type argument) const
+			{
+				return (*m_head)(std::forward<typename argument_of<Head>::type>(argument));
+			}
+
+		private:
+
+			Head *m_head;
+		};
 	}
 
 	template <class Result, class ...T, class ...Visitors>
-	Result visit(fast_variant<T...> &var, Visitors const & ...visitors)
+	Result visit(fast_variant<T...> &variant, Visitors &&...visitors)
 	{
-		return detail::visit_impl<Result, 0>(var, visitors...);
+		detail::overloader<Result, Visitors...> ov(visitors...);
+		return Si::apply_visitor(ov, variant);
 	}
 
 	template <class Result, class ...T, class ...Visitors>
-	Result visit(fast_variant<T...> const &var, Visitors const & ...visitors)
+	Result visit(fast_variant<T...> const &variant, Visitors &&...visitors)
 	{
-		return detail::visit_impl<Result, 0>(var, visitors...);
+		detail::overloader<Result, Visitors...> ov(visitors...);
+		return Si::apply_visitor(ov, variant);
 	}
 }
 
