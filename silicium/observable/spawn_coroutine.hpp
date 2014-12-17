@@ -2,6 +2,7 @@
 #define SILICIUM_SPAWN_COROUTINE_HPP
 
 #include <silicium/observable/observer.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <silicium/config.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/coroutine/all.hpp>
@@ -148,20 +149,19 @@ namespace Si
 					std::function<void(boost::optional<element_type>)>
 #endif
 					([previous_observer, async_state, &result](boost::optional<element_type> element)
-				{
-					if (element)
 					{
-						result = std::move(*element);
-						previous_observer.got_element(nothing());
-					}
-					else
-					{
-						previous_observer.ended();
-					}
-				}));
-			}
-				)
+						if (element)
+						{
+							result = std::move(*element);
+							previous_observer.got_element(nothing());
+						}
+						else
+						{
+							previous_observer.ended();
+						}
+					})
 				);
+			}));
 			m_wait(waiting_for);
 			return result;
 		}

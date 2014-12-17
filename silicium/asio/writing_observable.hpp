@@ -67,8 +67,8 @@ namespace Si
 			return writing_observable<AsyncStream>(stream);
 		}
 
-		template <class AsyncStream>
-		boost::system::error_code write(AsyncStream &stream, memory_range data, yield_context yield)
+		template <class AsyncStream, class YieldContext>
+		boost::system::error_code write(AsyncStream &stream, memory_range data, YieldContext &&yield)
 		{
 			auto writer = make_writing_observable(stream);
 			writer.set_buffer(data);
