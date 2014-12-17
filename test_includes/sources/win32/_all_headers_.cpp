@@ -37,6 +37,7 @@
 #include <silicium/http/http.hpp>
 #include <silicium/http/parse_request.hpp>
 #include <silicium/http/parse_response.hpp>
+#include <silicium/http/receive_request.hpp>
 #include <silicium/http/request_parser_sink.hpp>
 #include <silicium/http/uri.hpp>
 #include <silicium/iterator_range.hpp>
@@ -57,6 +58,7 @@
 #include <silicium/observable/flatten.hpp>
 #include <silicium/observable/for_each.hpp>
 #include <silicium/observable/function.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <silicium/observable/generator.hpp>
 #include <silicium/observable/observable.hpp>
 #include <silicium/observable/observer.hpp>
@@ -65,6 +67,7 @@
 #include <silicium/observable/ready_future.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/source.hpp>
+#include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/thread.hpp>
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/transform.hpp>
