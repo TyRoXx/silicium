@@ -31,6 +31,9 @@ namespace Si
 
 	template <class Function>
 	auto make_function_observer(Function &&function)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> function_observer<typename std::decay<Function>::type>
+#endif
 	{
 		return function_observer<typename std::decay<Function>::type>(std::forward<Function>(function));
 	}

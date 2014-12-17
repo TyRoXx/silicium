@@ -94,6 +94,9 @@ namespace Si
 
 		template <class AcceptorPtrLike>
 		auto make_tcp_acceptor(AcceptorPtrLike &&acceptor)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> tcp_acceptor<typename std::decay<AcceptorPtrLike>::type>
+#endif
 		{
 			return tcp_acceptor<typename std::decay<AcceptorPtrLike>::type>(std::forward<AcceptorPtrLike>(acceptor));
 		}

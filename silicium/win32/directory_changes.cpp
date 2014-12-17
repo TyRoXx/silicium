@@ -51,10 +51,10 @@ namespace Si
 			return *this;
 		}
 
-		void directory_changes::async_get_one(observer<element_type> &receiver)
+		void directory_changes::async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
+			receiver_ = receiver.get();
 			assert(immovable);
 			immovable->read_dispatcher.post([this]
 			{

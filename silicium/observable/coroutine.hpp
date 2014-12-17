@@ -5,6 +5,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/observable/yield_context.hpp>
+#include <boost/asio/io_service.hpp>
 #include <boost/coroutine/all.hpp>
 
 namespace Si

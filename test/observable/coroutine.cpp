@@ -91,18 +91,27 @@ namespace Si
 	{
 		template <class Function>
 		auto lambda_to_value_impl(Function &&function, std::true_type)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> Function
+#endif
 		{
 			return std::forward<Function>(function);
 		}
 
 		template <class Function, class Result, class Class, class ...Arguments>
-		auto lambda_to_value_impl_lambda_case(Function &&function, Result (Class::*)(Arguments...) const)
+		auto lambda_to_value_impl_lambda_case(Function &&function, Result(Class::*)(Arguments...) const)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> std::function<Result(Arguments...)>
+#endif
 		{
 			return std::function<Result (Arguments...)>(std::forward<Function>(function));
 		}
 
 		template <class Function>
 		auto lambda_to_value_impl(Function &&function, std::false_type)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> decltype(lambda_to_value_impl_lambda_case(std::forward<Function>(function), &typename std::decay<Function>::type::operator()))
+#endif
 		{
 			typedef typename std::decay<Function>::type clean;
 			return lambda_to_value_impl_lambda_case(std::forward<Function>(function), &clean::operator());
@@ -110,6 +119,14 @@ namespace Si
 
 		template <class Function>
 		auto lambda_to_value(Function &&function)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> decltype(lambda_to_value_impl(
+				std::forward<Function>(function),
+				std::integral_constant<bool,
+				std::is_move_assignable<typename std::decay<Function>::type>::value &&
+				std::is_move_constructible<typename std::decay<Function>::type>::value
+			>()))
+#endif
 		{
 			typedef typename std::decay<Function>::type clean;
 			return lambda_to_value_impl(
@@ -152,6 +169,13 @@ namespace Si
 	{
 		template <class Element, class Next, class Transformation>
 		auto transform_observer_impl(Next &&next, Transformation &&transform)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> observer_transforming<
+				Element,
+				typename std::decay<Next>::type,
+				typename std::decay<Transformation>::type
+			>
+#endif
 		{
 			return observer_transforming<
 				Element,
@@ -163,6 +187,9 @@ namespace Si
 
 	template <class Element, class Next, class Transformation>
 	auto transform_observer(Next &&next, Transformation &&transform)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(detail::transform_observer_impl<Element>(std::forward<Next>(next), detail::lambda_to_value(std::forward<Transformation>(transform))))
+#endif
 	{
 		return detail::transform_observer_impl<Element>(std::forward<Next>(next), detail::lambda_to_value(std::forward<Transformation>(transform)));
 	}
@@ -195,7 +222,11 @@ namespace Si
 							std::shared_ptr<void> async_state = this->m_async_state.lock();
 							assert(async_state);
 							assert(async_state.use_count() >= 2);
-							return make_function_observer([previous_observer, async_state, &result](boost::optional<element_type> element)
+							return make_function_observer(
+#ifdef _MSC_VER
+								std::function<void (boost::optional<element_type>)>
+#endif
+								([previous_observer, async_state, &result](boost::optional<element_type> element)
 							{
 								if (element)
 								{
@@ -206,7 +237,7 @@ namespace Si
 								{
 									previous_observer.ended();
 								}
-							});
+							}));
 						}
 					)
 				);

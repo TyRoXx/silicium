@@ -51,9 +51,10 @@ namespace Si
 		{
 		}
 
-		void async_get_one(observer<element_type> &receiver)
+		template <class Observer>
+		void async_get_one(Observer &&receiver)
 		{
-			return impl.async_get_one(receiver);
+			return impl.async_get_one(std::forward<Observer>(receiver));
 		}
 
 	private:

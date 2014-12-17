@@ -1,11 +1,14 @@
 #include <silicium/asio/reading_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
-#include <silicium/posix/process.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/array.hpp>
+#include <boost/asio/posix/stream_descriptor.hpp>
+#ifndef _WIN32
+#	include <silicium/posix/process.hpp>
+#endif
 
+#ifndef _WIN32
 BOOST_AUTO_TEST_CASE(asio_reading_observable)
 {
 	boost::asio::io_service io;
@@ -33,3 +36,4 @@ BOOST_AUTO_TEST_CASE(asio_reading_observable)
 	BOOST_CHECK(sent);
 	BOOST_CHECK_EQUAL("Hello", received);
 }
+#endif
