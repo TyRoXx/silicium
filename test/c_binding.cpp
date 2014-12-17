@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(c_binding_coroutine_trivial)
 	bool got_sth = false;
 	silicium_async_get_one(coro, [](void *user_data, void *element)
 	{
-		BOOST_CHECK_EQUAL(3, reinterpret_cast<Si::uintptr_t>(element));
+		BOOST_CHECK_EQUAL(3u, reinterpret_cast<Si::uintptr_t>(element));
 		*static_cast<bool *>(user_data) = true;
 	}, &got_sth);
 	BOOST_CHECK(got_sth);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(c_binding_coroutine_yield)
 	bool got_sth = false;
 	silicium_async_get_one(b, [](void *user_data, void *element)
 	{
-		BOOST_CHECK_EQUAL(16, reinterpret_cast<Si::uintptr_t>(element));
+		BOOST_CHECK_EQUAL(16u, reinterpret_cast<Si::uintptr_t>(element));
 		*static_cast<bool *>(user_data) = true;
 	}, &got_sth);
 	BOOST_CHECK(got_sth);

@@ -81,7 +81,7 @@ namespace Si
 		BOOST_CHECK_EQUAL("GET", result.method);
 		BOOST_CHECK_EQUAL("/", result.path);
 		BOOST_CHECK_EQUAL("HTTP/1.1", result.http_version);
-		BOOST_CHECK_EQUAL(1, result.arguments.size());
+		BOOST_CHECK_EQUAL(1u, result.arguments.size());
 		BOOST_CHECK((std::map<Si::noexcept_string, Si::noexcept_string>{{"Host", "host"}}) == result.arguments);
 	}
 }
