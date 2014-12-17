@@ -81,8 +81,12 @@ namespace Si
 				ptrdiff_t written = 0;
 				while (written < content.size())
 				{
-					auto const remaining = content.size() - written;
-					DWORD const write_now = std::min<ptrdiff_t>(remaining, static_cast<ptrdiff_t>((std::numeric_limits<DWORD>::max)()));
+					ptrdiff_t const remaining = content.size() - written;
+					DWORD const max_write_size = std::min<DWORD>(
+						(std::numeric_limits<DWORD>::max)(),
+						static_cast<DWORD>((std::numeric_limits<ptrdiff_t>::max)())
+						);
+					DWORD const write_now = std::min<ptrdiff_t>(remaining, static_cast<ptrdiff_t>(max_write_size));
 					DWORD written_now = 0;
 					if (!WriteFile(m_destination, content.begin(), write_now, &written_now, nullptr))
 					{

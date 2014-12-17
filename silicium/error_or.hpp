@@ -204,25 +204,27 @@ namespace Si
 			return Error(code, *category);
 		}
 
-		Value &get()
-#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-			&
-#endif
+		void throw_if_error() const
 		{
 			if (is_error())
 			{
 				throw_error(error());
 			}
+		}
+
+		Value &get()
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+			&
+#endif
+		{
+			throw_if_error();
 			return *value_ptr();
 		}
 
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 		Value &&get() &&
 		{
-			if (is_error())
-			{
-				throw_error(error());
-			}
+			throw_if_error();
 			return std::move(*value_ptr());
 		}
 #endif
@@ -232,10 +234,7 @@ namespace Si
 			&
 #endif
 		{
-			if (is_error())
-			{
-				throw_error(error());
-			}
+			throw_if_error();
 			return *value_ptr();
 		}
 
