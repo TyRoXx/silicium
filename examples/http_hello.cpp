@@ -1,14 +1,11 @@
-#include <silicium/http/http.hpp>
 #include <silicium/http/receive_request.hpp>
-#include <silicium/asio/tcp_acceptor.hpp>
+#include <silicium/http/generate_response.hpp>
 #include <silicium/asio/writing_observable.hpp>
+#include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/observable/transform.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
-#include <silicium/observable/coroutine.hpp>
-#include <silicium/observable/constant.hpp>
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
-#include <silicium/memory_range.hpp>
 
 template <class YieldContext>
 void serve_client(boost::asio::ip::tcp::socket &client, YieldContext &&yield)
