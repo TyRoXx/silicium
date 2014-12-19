@@ -1,7 +1,7 @@
 #ifndef SILICIUM_SPAWN_COROUTINE_HPP
 #define SILICIUM_SPAWN_COROUTINE_HPP
 
-#include <silicium/observable/observer.hpp>
+#include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/config.hpp>
 #include <boost/asio/io_service.hpp>
@@ -135,8 +135,7 @@ namespace Si
 		{
 			typedef typename std::decay<Observable>::type::element_type element_type;
 			boost::optional<element_type> result;
-			auto waiting_for =
-				virtualize_observable(
+			auto waiting_for = virtualize_observable(
 				transform_observer<nothing>(
 					std::forward<Observable>(from),
 					[this, &result](ptr_observer<observer<nothing>> previous_observer)

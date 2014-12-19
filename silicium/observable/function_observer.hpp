@@ -2,6 +2,7 @@
 #define SILICIUM_FUNCTION_OBSERVER_HPP
 
 #include <silicium/observable/observer.hpp>
+#include <boost/optional.hpp>
 
 namespace Si
 {
