@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <cassert>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -63,6 +64,47 @@ namespace Si
 	ptr_observer<observer<Element>> observe_by_ref(observer<Element> &ref)
 	{
 		return ptr_observer<observer<Element>>(&ref);
+	}
+
+	template <class Original>
+	struct virtualized_observer : observer<typename Original::element_type>
+	{
+		typedef typename Original::element_type element_type;
+
+		virtualized_observer()
+		{
+		}
+
+		explicit virtualized_observer(Original original)
+			: m_original(std::move(original))
+		{
+		}
+
+		virtual void got_element(element_type value) SILICIUM_OVERRIDE
+		{
+			return m_original.got_element(std::move(value));
+		}
+
+		virtual void ended() SILICIUM_OVERRIDE
+		{
+			return m_original.ended();
+		}
+
+	private:
+
+		Original m_original;
+	};
+
+	template <class Observer>
+	auto virtualize_observer(Observer &&original)
+	{
+		return virtualized_observer<typename std::decay<Observer>::type>(std::forward<Observer>(original));
+	}
+
+	template <class Observer, class OtherObserver>
+	auto extend(Observer &&, OtherObserver &&right)
+	{
+		return std::forward<OtherObserver>(right);
 	}
 }
 
