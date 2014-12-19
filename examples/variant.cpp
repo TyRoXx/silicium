@@ -7,15 +7,16 @@ int main()
 	return Si::visit<int>(
 		r,
 		[](int v)
-	{
-		return v;
-	},
+		{
+			return v;
+		},
 		[](std::time_t t)
-	{
-		return t != 0;
-	},
+		{
+			return t != 0;
+		},
 		[](double d)
-	{
-		return std::isnan(d);
-	});
+		{
+			return std::isnan(d);
+		}
+	);
 }
