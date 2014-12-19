@@ -1,7 +1,7 @@
 #ifndef SILICIUM_SPAWN_OBSERVABLE_HPP
 #define SILICIUM_SPAWN_OBSERVABLE_HPP
 
-#include <silicium/observable/observer.hpp>
+#include <silicium/observable/extensible_observer.hpp>
 
 namespace Si
 {

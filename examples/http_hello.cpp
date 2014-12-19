@@ -6,7 +6,7 @@
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/coroutine.hpp>
 #include <silicium/observable/constant.hpp>
-#include <silicium/observable/total_consumer.hpp>
+#include <silicium/observable/spawn_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/memory_range.hpp>
 
@@ -50,15 +50,19 @@ int main()
 {
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
-	auto accept_loop = Si::make_total_consumer(Si::transform(Si::asio::make_tcp_acceptor(&acceptor), [](Si::asio::tcp_acceptor_result maybe_client)
-	{
-		auto client = maybe_client.get();
-		Si::spawn_coroutine([client](Si::spawn_context yield)
-		{
-			serve_client(*client, yield);
-		});
-		return Si::nothing();
-	}));
-	accept_loop.start();
+	Si::spawn_observable(
+		Si::transform(
+			Si::asio::make_tcp_acceptor(&acceptor),
+			[](Si::asio::tcp_acceptor_result maybe_client)
+			{
+				auto client = maybe_client.get();
+				Si::spawn_coroutine([client](Si::spawn_context yield)
+				{
+					serve_client(*client, yield);
+				});
+				return Si::nothing();
+			}
+		)
+	);
 	io.run();
 }
