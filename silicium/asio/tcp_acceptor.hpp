@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/error_or.hpp>
+#include <silicium/ptr_adaptor.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace Si
@@ -82,6 +83,12 @@ namespace Si
 #endif
 		{
 			return tcp_acceptor<typename std::decay<AcceptorPtrLike>::type>(std::forward<AcceptorPtrLike>(acceptor));
+		}
+
+		template <class Protocol, class Service>
+		auto make_tcp_acceptor(boost::asio::basic_socket_acceptor<Protocol, Service> &&acceptor)
+		{
+			return make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor)));
 		}
 	}
 }
