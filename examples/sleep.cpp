@@ -1,18 +1,15 @@
-#include <boost/asio.hpp>
-#include <silicium/observable/coroutine.hpp>
 #include <silicium/asio/timer.hpp>
-#include <silicium/observable/total_consumer.hpp>
-#include <silicium/observable/constant.hpp>
+#include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/observable/ref.hpp>
 #include <iostream>
-//TODO: fewer includes for such a simple example?
 
-template <class Duration>
-void sleep(boost::asio::io_service &io, Si::yield_context yield, Duration duration)
+template <class YieldContext, class Duration>
+void sleep(boost::asio::io_service &io, YieldContext &&yield, Duration duration)
 {
 	auto timer = Si::asio::make_timer(io);
 	timer.expires_from_now(duration);
 	//TODO: use the call operator instead of a get_one method?
-	boost::optional<Si::asio::timer_elapsed> result = yield.get_one(timer);
+	boost::optional<Si::asio::timer_elapsed> result = yield.get_one(Si::ref(timer));
 	//TODO: this should work without the optional wrapper
 	assert(result);
 }
@@ -20,15 +17,11 @@ void sleep(boost::asio::io_service &io, Si::yield_context yield, Duration durati
 int main()
 {
 	boost::asio::io_service io;
-	//TODO: this has to work without total_consumer
-	auto coro = Si::make_total_consumer(Si::make_coroutine([&io](Si::yield_context yield) -> Si::nothing //TODO: the return type should be void
+	Si::spawn_coroutine([&io](Si::spawn_context yield)
 	{
 		std::cout << "Going to sleep" << std::endl;
 		sleep(io, yield, std::chrono::seconds(1));
 		std::cout << "Waking up\n";
-		return {};
-	}));
-	//TODO: should coroutines start immediately by default?
-	coro.start();
+	});
 	io.run();
 }
