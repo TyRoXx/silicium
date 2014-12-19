@@ -19,20 +19,17 @@ namespace Si
 
 			tcp_acceptor()
 				: underlying(nullptr)
-				, receiver_(nullptr)
 			{
 			}
 
 			explicit tcp_acceptor(AcceptorPtrLike underlying)
 				: underlying(std::move(underlying))
-				, receiver_(nullptr)
 			{
 			}
 
 			tcp_acceptor(tcp_acceptor &&other) BOOST_NOEXCEPT
 				: underlying(std::move(other.underlying))
 				, next_client(std::move(other.next_client))
-				, receiver_(other.receiver_)
 			{
 			}
 
@@ -40,44 +37,31 @@ namespace Si
 			{
 				underlying = std::move(other.underlying);
 				next_client = std::move(other.next_client);
-				receiver_ = other.receiver_;
 				return *this;
 			}
 
 			~tcp_acceptor()
 			{
-				if (!receiver_ || !underlying)
-				{
-					return;
-				}
-				underlying->cancel();
 			}
 
-			void async_get_one(ptr_observer<observer<element_type>> receiver)
+			template <class Observer>
+			void async_get_one(Observer &&receiver)
 			{
-				assert(!receiver_);
 				assert(underlying);
 				next_client = std::make_shared<boost::asio::ip::tcp::socket>(underlying->get_io_service());
-				receiver_ = receiver.get();
-				underlying->async_accept(*next_client, [this](boost::system::error_code error)
+				underlying->async_accept(*next_client, [this, receiver](boost::system::error_code error) mutable
 				{
-					if (!this->receiver_)
-					{
-						//can happen when cancel has been called on the observable when the callback was
-						//already posted to the io_service
-						return;
-					}
 					if (error)
 					{
 						if (error == boost::asio::error::operation_aborted)
 						{
 							return;
 						}
-						Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{error});
+						std::forward<Observer>(receiver).got_element(tcp_acceptor_result{error});
 					}
 					else
 					{
-						Si::exchange(this->receiver_, nullptr)->got_element(tcp_acceptor_result{std::move(next_client)});
+						std::forward<Observer>(receiver).got_element(tcp_acceptor_result{std::move(next_client)});
 					}
 				});
 			}
@@ -86,7 +70,6 @@ namespace Si
 
 			AcceptorPtrLike underlying;
 			std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
-			observer<element_type> *receiver_;
 
 			SILICIUM_DELETED_FUNCTION(tcp_acceptor(tcp_acceptor const &))
 			SILICIUM_DELETED_FUNCTION(tcp_acceptor &operator = (tcp_acceptor const &))
