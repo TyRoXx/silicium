@@ -3,14 +3,13 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/error_or.hpp>
-#include <silicium/config.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/linux/inotify_watch_descriptor.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/swap.hpp>
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
-#include <sys/inotify.h>
 #include <dirent.h>
 
 namespace Si
@@ -21,55 +20,6 @@ namespace Si
 		{
 			boost::uint32_t mask;
 			boost::filesystem::path name;
-		};
-
-		struct watch_descriptor
-		{
-			watch_descriptor() BOOST_NOEXCEPT
-				: notifier(-1)
-				, watch(-1)
-			{
-			}
-
-			watch_descriptor(int notifier, int watch) BOOST_NOEXCEPT
-				: notifier(notifier)
-				, watch(watch)
-			{
-			}
-
-			watch_descriptor(watch_descriptor &&other) BOOST_NOEXCEPT
-				: notifier(other.notifier)
-				, watch(other.watch)
-			{
-				other.notifier = -1;
-			}
-
-			~watch_descriptor() BOOST_NOEXCEPT
-			{
-				if (notifier == -1)
-				{
-					return;
-				}
-				inotify_rm_watch(notifier, watch);
-			}
-
-			watch_descriptor &operator = (watch_descriptor &&other) BOOST_NOEXCEPT
-			{
-				boost::swap(notifier, other.notifier);
-				boost::swap(watch, other.watch);
-				return *this;
-			}
-
-			void release() BOOST_NOEXCEPT
-			{
-				notifier = -1;
-				watch = -1;
-			}
-
-		private:
-
-			int notifier;
-			int watch;
 		};
 
 		struct inotify_observable : private boost::noncopyable

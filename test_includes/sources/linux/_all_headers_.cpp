@@ -44,6 +44,7 @@
 #include <silicium/linux/directory_watcher.hpp>
 #include <silicium/linux/dynamic_library_impl.hpp>
 #include <silicium/linux/inotify.hpp>
+#include <silicium/linux/inotify_watch_descriptor.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
@@ -90,6 +91,7 @@
 #include <silicium/posix/process.hpp>
 #include <silicium/process.hpp>
 #include <silicium/process_parameters.hpp>
+#include <silicium/ptr_adaptor.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
