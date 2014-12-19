@@ -33,7 +33,7 @@ namespace
 	boost::filesystem::path get_readonly_file()
 	{
 #ifdef __linux__
-		return "/proc/cpuinfo"
+		return "/proc/cpuinfo";
 #endif
 #ifdef _WIN32
 		boost::filesystem::path file_name = boost::filesystem::temp_directory_path() / "silicium_file_sink_readonly.txt";

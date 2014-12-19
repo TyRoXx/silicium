@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(coroutine_self_destruct)
 	BOOST_CHECK(!coro);
 }
 
-BOOST_AUTO_TEST_CASE(spawn_coroutine_keep_self_alive)
+BOOST_AUTO_TEST_CASE(spawn_coroutine_get_one)
 {
 	bool elapsed = false;
 	boost::asio::io_service io;
