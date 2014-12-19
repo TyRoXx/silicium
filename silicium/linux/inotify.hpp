@@ -77,13 +77,11 @@ namespace Si
 			typedef std::vector<file_notification> element_type;
 
 			inotify_observable()
-				: receiver_(nullptr)
 			{
 			}
 
 			inotify_observable(boost::asio::io_service &io)
 				: notifier(boost::in_place(boost::ref(io)))
-				, receiver_(nullptr)
 			{
 				int fd = inotify_init();
 				if (fd < 0)
@@ -112,14 +110,14 @@ namespace Si
 				return watch_descriptor(notifier->native_handle(), wd);
 			}
 
-			void async_get_one(ptr_observer<observer<element_type>> receiver)
+			template <class Observer>
+			void async_get_one(Observer &&receiver)
 			{
-				assert(!receiver_);
 				std::size_t const min_buffer_size = sizeof(inotify_event) + NAME_MAX + 1;
 				std::size_t const additional_buffer = 8192;
 				read_buffer.resize(min_buffer_size + additional_buffer);
 				assert(notifier);
-				notifier->async_read_some(boost::asio::buffer(read_buffer), [this](boost::system::error_code error, std::size_t bytes_read)
+				notifier->async_read_some(boost::asio::buffer(read_buffer), [this, receiver](boost::system::error_code error, std::size_t bytes_read) mutable
 				{
 					if (error)
 					{
@@ -139,17 +137,15 @@ namespace Si
 							i += sizeof(inotify_event);
 							i += event.len;
 						}
-						Si::exchange(this->receiver_, nullptr)->got_element(std::move(changes));
+						std::forward<Observer>(receiver).got_element(std::move(changes));
 					}
 				});
-				receiver_ = receiver.get();
 			}
 
 		private:
 
 			boost::optional<boost::asio::posix::stream_descriptor> notifier;
 			std::vector<char> read_buffer;
-			observer<element_type> *receiver_;
 		};
 	}
 }
