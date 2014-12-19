@@ -56,6 +56,7 @@
 #include <silicium/observable/empty.hpp>
 #include <silicium/observable/end.hpp>
 #include <silicium/observable/enumerate.hpp>
+#include <silicium/observable/extensible_observer.hpp>
 #include <silicium/observable/filter.hpp>
 #include <silicium/observable/finite_state_machine.hpp>
 #include <silicium/observable/flatten.hpp>
@@ -63,6 +64,7 @@
 #include <silicium/observable/function.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/observable/generator.hpp>
+#include <silicium/observable/limited.hpp>
 #include <silicium/observable/observable.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/observable/on_first.hpp>
@@ -70,6 +72,8 @@
 #include <silicium/observable/ready_future.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/source.hpp>
+#include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/observable/spawn_observable.hpp>
 #include <silicium/observable/thread.hpp>
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/transform.hpp>
