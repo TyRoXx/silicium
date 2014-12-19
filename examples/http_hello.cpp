@@ -7,40 +7,43 @@
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 
-template <class YieldContext>
-void serve_client(boost::asio::ip::tcp::socket &client, YieldContext &&yield)
+namespace
 {
-	auto request = Si::http::receive_request(client, yield);
-	if (request.is_error())
+	template <class YieldContext>
+	void serve_client(boost::asio::ip::tcp::socket &client, YieldContext &&yield)
 	{
-		//The header was incomplete, maybe the connecting was closed.
-		//If we want to know the reason, the error_extracting_source remembered it:
-		boost::system::error_code error = request.error();
-		boost::ignore_unused_variable_warning(error);
-		return;
+		auto request = Si::http::receive_request(client, yield);
+		if (request.is_error())
+		{
+			//The header was incomplete, maybe the connecting was closed.
+			//If we want to know the reason, the error_extracting_source remembered it:
+			boost::system::error_code error = request.error();
+			boost::ignore_unused_variable_warning(error);
+			return;
+		}
+
+		if (!request.get())
+		{
+			//syntax error in the request
+			return;
+		}
+
+		std::vector<char> response;
+		{
+			auto response_writer = Si::make_container_sink(response);
+			Si::http::generate_status_line(response_writer, "HTTP/1.0", "200", "OK");
+			std::string const content = "Hello";
+			Si::http::generate_header(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
+			Si::append(response_writer, "\r\n");
+			Si::append(response_writer, content);
+		}
+
+		//you can handle the error if you want
+		boost::system::error_code error = Si::asio::write(client, Si::make_memory_range(response), yield);
+
+		//ignore shutdown failures, they do not matter here
+		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 	}
-
-	if (!request.get())
-	{
-		//syntax error in the request
-		return;
-	}
-
-	std::vector<char> response;
-	{
-		auto response_writer = Si::make_container_sink(response);
-		Si::http::generate_status_line(response_writer, "HTTP/1.0", "200", "OK");
-		std::string const content = "Hello";
-		Si::http::generate_header(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
-		Si::append(response_writer, "\r\n");
-		Si::append(response_writer, content);
-	}
-
-	//you can handle the error if you want
-	boost::system::error_code error = Si::asio::write(client, Si::make_memory_range(response), yield);
-
-	//ignore shutdown failures, they do not matter here
-	client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 }
 
 int main()
