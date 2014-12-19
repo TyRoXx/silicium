@@ -5,7 +5,10 @@
 #include <silicium/observable/on_first.hpp>
 #include <silicium/observable/for_each.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/observable/limited.hpp>
 #include <silicium/observable/function_observer.hpp>
+#include <silicium/observable/extensible_observer.hpp>
+#include <silicium/observable/spawn_observable.hpp>
 #include <silicium/asio/timer.hpp>
 #include <silicium/to_unique.hpp>
 #include <boost/test/unit_test.hpp>
@@ -100,6 +103,31 @@ BOOST_AUTO_TEST_CASE(spawn_coroutine_get_one)
 		BOOST_REQUIRE(!elapsed);
 		elapsed = true;
 	});
+	BOOST_CHECK(!elapsed);
+	io.run();
+	BOOST_CHECK(elapsed);
+}
+
+BOOST_AUTO_TEST_CASE(spawn_observable)
+{
+	bool elapsed = false;
+	boost::asio::io_service io;
+	Si::spawn_observable(
+		Si::transform(
+			Si::make_limited_observable([&io]()
+			{
+				auto timer = Si::asio::make_timer(io);
+				timer.expires_from_now(std::chrono::microseconds(1));
+				return timer;
+			}(), 1ull),
+			[&elapsed](Si::asio::timer_elapsed)
+			{
+				BOOST_REQUIRE(!elapsed);
+				elapsed = true;
+				return Si::nothing();
+			}
+		)
+	);
 	BOOST_CHECK(!elapsed);
 	io.run();
 	BOOST_CHECK(elapsed);
