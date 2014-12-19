@@ -56,7 +56,7 @@ namespace Si
 				std::integral_constant<bool,
 				std::is_move_assignable<clean>::value &&
 				std::is_move_constructible<clean>::value
-				>());
+			>());
 		}
 }
 
@@ -138,30 +138,32 @@ namespace Si
 			auto waiting_for =
 				virtualize_observable(
 				transform_observer<nothing>(
-				std::forward<Observable>(from),
-				[this, &result](ptr_observer<observer<nothing>> previous_observer)
-			{
-				std::shared_ptr<void> async_state = this->m_async_state.lock();
-				assert(async_state);
-				assert(async_state.use_count() >= 2);
-				return make_function_observer(
-#ifdef _MSC_VER
-					std::function<void(boost::optional<element_type>)>
-#endif
-					([previous_observer, async_state, &result](boost::optional<element_type> element)
+					std::forward<Observable>(from),
+					[this, &result](ptr_observer<observer<nothing>> previous_observer)
 					{
-						if (element)
-						{
-							result = std::move(*element);
-							previous_observer.got_element(nothing());
-						}
-						else
-						{
-							previous_observer.ended();
-						}
-					})
-				);
-			}));
+						std::shared_ptr<void> async_state = this->m_async_state.lock();
+						assert(async_state);
+						assert(async_state.use_count() >= 2);
+						return make_function_observer(
+		#ifdef _MSC_VER
+							std::function<void(boost::optional<element_type>)>
+		#endif
+							([previous_observer, async_state, &result](boost::optional<element_type> element)
+							{
+								if (element)
+								{
+									result = std::move(*element);
+									previous_observer.got_element(nothing());
+								}
+								else
+								{
+									previous_observer.ended();
+								}
+							})
+						);
+					}
+				)
+			);
 			m_wait(waiting_for);
 			return result;
 		}
@@ -187,14 +189,14 @@ namespace Si
 				{
 					spawn_context context(
 						[this, &push](observable<nothing> &waiting_for)
-					{
-						wait_for(waiting_for);
-						if (m_is_still_waiting)
 						{
-							push(nothing());
-							assert(!m_is_still_waiting);
-						}
-					},
+							wait_for(waiting_for);
+							if (m_is_still_waiting)
+							{
+								push(nothing());
+								assert(!m_is_still_waiting);
+							}
+						},
 						std::weak_ptr<void>(this->shared_from_this())
 						);
 					function(context);
