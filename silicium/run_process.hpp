@@ -1,10 +1,10 @@
-#ifndef SILICIUM_PROCESS_HPP
-#define SILICIUM_PROCESS_HPP
+#ifndef SILICIUM_RUN_PROCESS_HPP
+#define SILICIUM_RUN_PROCESS_HPP
 
 #ifdef _WIN32
-#	include <silicium/win32/process.hpp>
+#	include <silicium/win32/run_process.hpp>
 #else
-#	include <silicium/posix/process.hpp>
+#	include <silicium/posix/run_process.hpp>
 #endif
 
 namespace Si

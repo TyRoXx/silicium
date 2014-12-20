@@ -4,9 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/array.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
-#ifndef _WIN32
-#	include <silicium/posix/process.hpp>
-#endif
+#include <silicium/run_process.hpp>
 
 #ifndef _WIN32
 BOOST_AUTO_TEST_CASE(asio_reading_observable)

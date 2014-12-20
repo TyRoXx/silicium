@@ -89,11 +89,11 @@
 #include <silicium/posix/native_file_descriptor.hpp>
 #include <silicium/posix/open.hpp>
 #include <silicium/posix/pipe.hpp>
-#include <silicium/posix/process.hpp>
-#include <silicium/process.hpp>
+#include <silicium/posix/run_process.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/read_file.hpp>
+#include <silicium/run_process.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>

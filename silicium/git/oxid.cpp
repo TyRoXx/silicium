@@ -1,7 +1,7 @@
 #include <silicium/git/oxid.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/write_file.hpp>
-#include <silicium/process.hpp>
+#include <silicium/run_process.hpp>
 #include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/git/repository.hpp>
 #include <silicium/sink/iterator_sink.hpp>
