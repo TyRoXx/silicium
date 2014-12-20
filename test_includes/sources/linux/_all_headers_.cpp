@@ -2,6 +2,7 @@
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
 #include <silicium/asio/post_forwarder.hpp>
+#include <silicium/asio/posting_observable.hpp>
 #include <silicium/asio/reading_observable.hpp>
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
