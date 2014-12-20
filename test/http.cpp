@@ -3,6 +3,12 @@
 #include <silicium/source/memory_source.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/ptr_sink.hpp>
+#include <silicium/observable/function_observer.hpp>
+#include <silicium/observable/ref.hpp>
+#include <silicium/observable/bridge.hpp>
+#include <silicium/observable/consume.hpp>
+#include <silicium/error_or.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
@@ -83,5 +89,117 @@ namespace Si
 		BOOST_CHECK_EQUAL("HTTP/1.1", result.http_version);
 		BOOST_CHECK_EQUAL(1u, result.arguments.size());
 		BOOST_CHECK((std::map<Si::noexcept_string, Si::noexcept_string>{{"Host", "host"}}) == result.arguments);
+	}
+}
+
+namespace Si
+{
+	namespace http
+	{
+		template <class ErrorOrMemoryRangeObservable>
+		struct request_parser_observable : private sink<request, success>, private observer<error_or<memory_range>>
+		{
+			typedef error_or<request> element_type;
+
+			explicit request_parser_observable(ErrorOrMemoryRangeObservable input)
+				: m_input(std::move(input))
+				, m_observer(nullptr)
+				, m_got_result(false)
+			{
+			}
+
+			void async_get_one(ptr_observer<observer<element_type>> observer_)
+			{
+				assert(!m_got_result);
+				assert(!m_observer);
+				m_observer = observer_.get();
+				fetch();
+			}
+
+		private:
+
+			ErrorOrMemoryRangeObservable m_input;
+			boost::optional<request_parser_sink<ptr_sink<sink<request, success>, sink<request, success> *>>> m_state;
+			observer<element_type> *m_observer;
+			bool m_got_result;
+
+			void fetch()
+			{
+				m_input.async_get_one(Si::observe_by_ref(static_cast<observer<error_or<memory_range>> &>(*this)));
+			}
+
+			virtual void got_element(error_or<memory_range> piece) SILICIUM_OVERRIDE
+			{
+				if (piece.is_error())
+				{
+					Si::exchange(m_observer, nullptr)->got_element(piece.error());
+					return;
+				}
+				if (!m_state)
+				{
+					m_state = boost::in_place(ref_sink(static_cast<sink<request, success> &>(*this)));
+				}
+				m_state->append(piece.get());
+				if (m_got_result)
+				{
+					m_got_result = false;
+					return;
+				}
+				fetch();
+			}
+
+			virtual void ended() SILICIUM_OVERRIDE
+			{
+				SILICIUM_UNREACHABLE();
+			}
+
+			virtual success append(iterator_range<request const *> data) SILICIUM_OVERRIDE
+			{
+				assert(data.size() == 1);
+				assert(!m_got_result);
+				Si::exchange(m_observer, nullptr)->got_element(data.front());
+				m_got_result = true;
+				return {};
+			}
+		};
+
+		template <class ErrorOrMemoryRangeObservable>
+		auto make_request_parser_observable(ErrorOrMemoryRangeObservable &&input)
+		{
+			return request_parser_observable<typename std::decay<ErrorOrMemoryRangeObservable>::type>(std::forward<ErrorOrMemoryRangeObservable>(input));
+		}
+	}
+}
+
+BOOST_AUTO_TEST_CASE(http_parser_observable)
+{
+	Si::bridge<Si::error_or<Si::memory_range>> input;
+	auto parser = Si::http::make_request_parser_observable(Si::ref(input));
+	bool got_result = false;
+	std::function<void ()> get;
+	auto consumer = Si::consume<Si::error_or<Si::http::request>>([&](Si::error_or<Si::http::request> const &result)
+	{
+		BOOST_REQUIRE(!got_result);
+		got_result = true;
+		get();
+	});
+	BOOST_REQUIRE(!got_result);
+	get = [&]()
+	{
+		parser.async_get_one(Si::observe_by_ref(consumer));
+	};
+	get();
+	for (size_t i = 0; i < 10; ++i)
+	{
+		std::string const request = "GET / HTTP/1.0\r\n\r";
+		for (char c : request)
+		{
+			BOOST_REQUIRE(!got_result);
+			input.got_element(Si::make_memory_range(&c, &c + 1));
+		}
+		BOOST_REQUIRE(got_result);
+		got_result = false;
+		input.got_element(Si::make_c_str_range("\n"));
+		BOOST_REQUIRE(!got_result);
 	}
 }
