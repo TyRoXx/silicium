@@ -88,6 +88,7 @@
 #include <silicium/optional.hpp>
 #include <silicium/posix/native_file_descriptor.hpp>
 #include <silicium/posix/open.hpp>
+#include <silicium/posix/pipe.hpp>
 #include <silicium/posix/process.hpp>
 #include <silicium/process.hpp>
 #include <silicium/process_parameters.hpp>
