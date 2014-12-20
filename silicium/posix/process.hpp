@@ -8,6 +8,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <sys/prctl.h>
 
 namespace Si
 {
@@ -127,10 +128,21 @@ namespace Si
 				}
 				stdout.close();
 			}
+			else
+			{
+				//drop output
+				dup2(open("/dev/null", O_RDWR), STDOUT_FILENO);
+				dup2(open("/dev/null", O_RDWR), STDERR_FILENO);
+			}
 
 			if (dup2(stdin.read.handle, STDIN_FILENO) < 0)
 			{
 				fail();
+			}
+			else
+			{
+				//provide empty input
+				dup2(open("/dev/null", O_RDWR), STDIN_FILENO);
 			}
 			stdin.close();
 
@@ -138,6 +150,16 @@ namespace Si
 			detail::set_close_on_exec(child_error.write.handle);
 
 			boost::filesystem::current_path(parameters.current_path);
+
+			//close inherited file descriptors
+			long max_fd = sysconf(_SC_OPEN_MAX);
+			for (int i = 3; i < max_fd; ++i)
+			{
+				close(i);
+			}
+
+			//kill the child when the parent exits
+			prctl(PR_SET_PDEATHSIG, SIGHUP);
 
 			execvp(parameters.executable.c_str(), argument_pointers.data());
 			fail();
