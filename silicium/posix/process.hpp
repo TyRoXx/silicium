@@ -155,6 +155,10 @@ namespace Si
 			long max_fd = sysconf(_SC_OPEN_MAX);
 			for (int i = 3; i < max_fd; ++i)
 			{
+				if (i == child_error.write.handle)
+				{
+					continue;
+				}
 				close(i);
 			}
 
