@@ -1,4 +1,4 @@
-#include <silicium/observable/thread.hpp>
+#include <silicium/observable/thread_generator.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/observable/consume.hpp>
 #include <silicium/config.hpp>
@@ -6,9 +6,9 @@
 #include <silicium/to_unique.hpp>
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(make_thread_empty)
+BOOST_AUTO_TEST_CASE(make_thread_generator_empty)
 {
-	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &)
+	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &)
 	{
 	});
 	auto consumer = Si::consume<int>([](int element)
@@ -20,9 +20,9 @@ BOOST_AUTO_TEST_CASE(make_thread_empty)
 	a.wait();
 }
 
-BOOST_AUTO_TEST_CASE(make_thread_non_empty)
+BOOST_AUTO_TEST_CASE(make_thread_generator_non_empty)
 {
-	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &yield)
+	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
 	{
 		yield(1);
 		yield(2);
@@ -45,11 +45,11 @@ BOOST_AUTO_TEST_CASE(make_thread_non_empty)
 	BOOST_CHECK(expected == produced);
 }
 
-BOOST_AUTO_TEST_CASE(make_thread_nesting)
+BOOST_AUTO_TEST_CASE(make_thread_generator_nesting)
 {
-	auto a = Si::make_thread<int, Si::std_threading>([](Si::push_context<int> &yield)
+	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
 	{
-		auto b = Si::make_thread<int, Si::boost_threading>([](Si::push_context<int> &yield)
+		auto b = Si::make_thread_generator<int, Si::boost_threading>([](Si::push_context<int> &yield)
 		{
 			yield(1);
 			yield(2);

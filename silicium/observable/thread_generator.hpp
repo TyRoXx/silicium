@@ -1,5 +1,5 @@
-#ifndef SILICIUM_THREAD_HPP
-#define SILICIUM_THREAD_HPP
+#ifndef SILICIUM_THREAD_GENERATOR_HPP
+#define SILICIUM_THREAD_GENERATOR_HPP
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
@@ -61,27 +61,27 @@ namespace Si
 	}
 
 	template <class Element, class ThreadingAPI>
-	struct thread_observable
+	struct thread_generator_observable
 	{
 		typedef Element element_type;
 
-		thread_observable()
+		thread_generator_observable()
 		{
 		}
 
 		template <class Action>
-		explicit thread_observable(Action &&action)
+		explicit thread_generator_observable(Action &&action)
 			: state(Si::make_unique<state_type>(std::forward<Action>(action)))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		thread_observable(thread_observable &&other) BOOST_NOEXCEPT
+		thread_generator_observable(thread_generator_observable &&other) BOOST_NOEXCEPT
 			: state(std::move(other.state))
 		{
 		}
 
-		thread_observable &operator = (thread_observable &&other) BOOST_NOEXCEPT
+		thread_generator_observable &operator = (thread_generator_observable &&other) BOOST_NOEXCEPT
 		{
 			state = std::move(other.state);
 			return *this;
@@ -194,9 +194,9 @@ namespace Si
 	};
 
 	template <class Element, class ThreadingAPI, class Action>
-	auto make_thread(Action &&action) -> thread_observable<Element, ThreadingAPI>
+	auto make_thread_generator(Action &&action) -> thread_generator_observable<Element, ThreadingAPI>
 	{
-		return thread_observable<Element, ThreadingAPI>(std::forward<Action>(action));
+		return thread_generator_observable<Element, ThreadingAPI>(std::forward<Action>(action));
 	}
 }
 

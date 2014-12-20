@@ -13,7 +13,7 @@
 #include <silicium/observable/constant.hpp>
 #include <silicium/observable/cache.hpp>
 #include <silicium/observable/empty.hpp>
-#include <silicium/observable/thread.hpp>
+#include <silicium/observable/thread_generator.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/observable/deref_optional.hpp>
