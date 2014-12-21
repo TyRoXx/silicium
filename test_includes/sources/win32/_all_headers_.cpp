@@ -1,6 +1,8 @@
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
+#include <silicium/asio/post_forwarder.hpp>
+#include <silicium/asio/posting_observable.hpp>
 #include <silicium/asio/reading_observable.hpp>
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
@@ -12,6 +14,7 @@
 #include <silicium/buffer.hpp>
 #include <silicium/build_result.hpp>
 #include <silicium/config.hpp>
+#include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
 #include <silicium/detail/element_from_optional_like.hpp>
 #include <silicium/detail/integer_sequence.hpp>
@@ -53,6 +56,8 @@
 #include <silicium/observable/empty.hpp>
 #include <silicium/observable/end.hpp>
 #include <silicium/observable/enumerate.hpp>
+#include <silicium/observable/erased_observer.hpp>
+#include <silicium/observable/extensible_observer.hpp>
 #include <silicium/observable/filter.hpp>
 #include <silicium/observable/finite_state_machine.hpp>
 #include <silicium/observable/flatten.hpp>
@@ -60,6 +65,7 @@
 #include <silicium/observable/function.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/observable/generator.hpp>
+#include <silicium/observable/limited.hpp>
 #include <silicium/observable/observable.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/observable/on_first.hpp>
@@ -68,7 +74,9 @@
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/source.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/observable/spawn_observable.hpp>
 #include <silicium/observable/thread.hpp>
+#include <silicium/observable/thread_generator.hpp>
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/transform.hpp>
 #include <silicium/observable/transform_if_initialized.hpp>
@@ -79,9 +87,10 @@
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
-#include <silicium/process.hpp>
 #include <silicium/process_parameters.hpp>
+#include <silicium/ptr_adaptor.hpp>
 #include <silicium/read_file.hpp>
+#include <silicium/run_process.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>
@@ -117,7 +126,7 @@
 #include <silicium/win32/dynamic_library_impl.hpp>
 #include <silicium/win32/native_file_descriptor.hpp>
 #include <silicium/win32/open.hpp>
-#include <silicium/win32/process.hpp>
+#include <silicium/win32/run_process.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/write_file.hpp>
 #include <silicium/zlib/deflating_sink.hpp>
