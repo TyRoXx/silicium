@@ -178,6 +178,7 @@ namespace Si
 		struct spawned : std::enable_shared_from_this<spawned>, private observer<nothing>
 		{
 			spawned()
+			    : m_suspended(false)
 			{
 			}
 
@@ -190,10 +191,10 @@ namespace Si
 						[this, &push](observable<nothing> &waiting_for)
 						{
 							wait_for(waiting_for);
-							if (m_is_still_waiting)
+							if (m_waiting)
 							{
+								m_suspended = true;
 								push(nothing());
-								assert(!m_is_still_waiting);
 							}
 						},
 						std::weak_ptr<void>(this->shared_from_this())
@@ -207,11 +208,12 @@ namespace Si
 			typedef boost::coroutines::asymmetric_coroutine<nothing> coroutine;
 
 			coroutine::pull_type m_coro;
-			bool m_is_still_waiting;
+			bool m_waiting;
+			bool m_suspended;
 
 			void wait_for(observable<nothing> &waiting_for)
 			{
-				m_is_still_waiting = true;
+				m_waiting = true;
 				waiting_for.async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
 			}
 
@@ -222,8 +224,12 @@ namespace Si
 
 			void ended() SILICIUM_OVERRIDE
 			{
-				m_is_still_waiting = false;
-				m_coro();
+				m_waiting = false;
+				if (m_suspended)
+				{
+					m_suspended = false;
+					m_coro();
+				}
 			}
 		};
 	}
