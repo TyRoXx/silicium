@@ -9,10 +9,6 @@ namespace Si
 	template <class Pointee>
 	struct ptr_adaptor
 	{
-		ptr_adaptor()
-		{
-		}
-
 		template <class ...Args>
 		explicit ptr_adaptor(Args &&...args)
 			: m_value(std::forward<Args>(args)...)
