@@ -3,6 +3,8 @@
 
 #include <silicium/config.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
 #include <cassert>
 
 namespace Si
@@ -123,6 +125,24 @@ namespace Si
 		typedef typename std::decay<Iterator1>::type iterator_type;
 		BOOST_STATIC_ASSERT(std::is_same<iterator_type, typename std::decay<Iterator2>::type>::value);
 		return iterator_range<iterator_type>(std::forward<Iterator1>(begin), std::forward<Iterator2>(end));
+	}
+
+	template <class Range>
+	auto make_iterator_range(Range &&range)
+	{
+		using std::begin;
+		using std::end;
+		return make_iterator_range(begin(range), end(range));
+	}
+
+	template <class ContiguousRange>
+	auto make_contiguous_range(ContiguousRange &&range)
+	{
+		using std::begin;
+		using std::end;
+		auto * const data_begin = &*begin(range);
+		auto * const data_end = &*end(range);
+		return make_iterator_range(data_begin, data_end);
 	}
 }
 
