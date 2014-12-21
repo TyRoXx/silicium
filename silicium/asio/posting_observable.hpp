@@ -14,6 +14,11 @@ namespace Si
 		{
 			typedef typename Next::element_type element_type;
 
+			posting_observable()
+			    : m_io(nullptr)
+			{
+			}
+
 			explicit posting_observable(boost::asio::io_service &io, Next next)
 				: m_io(&io)
 				, m_next(std::move(next))

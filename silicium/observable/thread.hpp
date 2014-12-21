@@ -11,6 +11,11 @@ namespace Si
 	{
 		typedef Element element_type;
 
+		thread_observable()
+		    : m_has_finished(false)
+		{
+		}
+
 		explicit thread_observable(std::function<element_type ()> action)
 			: m_action(std::move(action))
 			, m_has_finished(false)
