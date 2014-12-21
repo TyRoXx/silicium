@@ -14,6 +14,7 @@
 #include <silicium/buffer.hpp>
 #include <silicium/build_result.hpp>
 #include <silicium/config.hpp>
+#include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
 #include <silicium/detail/element_from_optional_like.hpp>
 #include <silicium/detail/integer_sequence.hpp>

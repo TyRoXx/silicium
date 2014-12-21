@@ -2,6 +2,7 @@
 #define SILICIUM_FAST_VARIANT_HPP
 
 #include <silicium/config.hpp>
+#include <silicium/detail/argument_of.hpp>
 #include <new>
 #include <array>
 #include <memory>
@@ -683,34 +684,6 @@ namespace Si
 
 	namespace detail
 	{
-		template <class Method>
-		struct argument_of_method;
-
-		template <class Result, class Class, class Argument>
-		struct argument_of_method<Result(Class::*)(Argument) const>
-		{
-			typedef Argument type;
-		};
-
-		template <class Result, class Class, class Argument>
-		struct argument_of_method<Result(Class::*)(Argument)>
-		{
-			typedef Argument type;
-		};
-
-		template <class Function>
-		struct argument_of : argument_of_method<decltype(&Function::operator())>
-		{
-		};
-
-		template <class Result, class Argument>
-		struct argument_of<Result(*)(Argument)>
-		{
-			typedef Argument type;
-		};
-
-		BOOST_STATIC_ASSERT(std::is_same<int, argument_of<void(*)(int)>::type>::value);
-
 		template <class Result, class ...Functions>
 		struct overloader;
 

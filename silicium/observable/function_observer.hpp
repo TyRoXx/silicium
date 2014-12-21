@@ -2,6 +2,8 @@
 #define SILICIUM_FUNCTION_OBSERVER_HPP
 
 #include <silicium/observable/observer.hpp>
+#include <silicium/detail/argument_of.hpp>
+#include <silicium/detail/element_from_optional_like.hpp>
 #include <boost/optional.hpp>
 
 namespace Si
@@ -24,6 +26,12 @@ namespace Si
 	template <class Function>
 	struct function_observer
 	{
+		typedef typename detail::element_from_optional_like<
+			typename std::decay<
+				typename detail::argument_of<Function>::type
+			>::type
+		>::type element_type;
+
 		explicit function_observer(Function function)
 			: m_function(std::move(function))
 		{
@@ -44,6 +52,8 @@ namespace Si
 
 		Function m_function;
 	};
+
+	BOOST_STATIC_ASSERT(std::is_same<int, function_observer<void (*)(boost::optional<int> const &)>::element_type>::value);
 
 	template <class Function>
 	auto make_function_observer(Function &&function)
