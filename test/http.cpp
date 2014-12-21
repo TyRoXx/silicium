@@ -180,6 +180,11 @@ BOOST_AUTO_TEST_CASE(http_parser_observable)
 	auto consumer = Si::consume<Si::error_or<Si::http::request>>([&](Si::error_or<Si::http::request> const &result)
 	{
 		BOOST_REQUIRE(!got_result);
+		BOOST_REQUIRE(!result.is_error());
+		BOOST_CHECK_EQUAL("GET", result.get().method);
+		BOOST_CHECK_EQUAL("/", result.get().path);
+		BOOST_CHECK_EQUAL("HTTP/1.0", result.get().http_version);
+		BOOST_CHECK(result.get().arguments.empty());
 		got_result = true;
 		get();
 	});
