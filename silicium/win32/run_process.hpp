@@ -102,7 +102,10 @@ namespace Si
 	inline int run_process(process_parameters const &parameters)
 	{
 		win32::winapi_string const executable = win32::utf8_to_winapi_string(parameters.executable.string());
-		win32::winapi_string command_line = win32::build_command_line(parameters.arguments);
+		std::vector<std::string> all_arguments;
+		all_arguments.emplace_back("\"" + parameters.executable.string() + "\"");
+		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
+		win32::winapi_string command_line = win32::build_command_line(all_arguments);
 		SECURITY_ATTRIBUTES security{};
 		security.nLength = sizeof(security);
 		security.bInheritHandle = TRUE;
@@ -110,9 +113,9 @@ namespace Si
 		STARTUPINFOW startup{};
 		startup.cb = sizeof(startup);
 		startup.dwFlags |= STARTF_USESTDHANDLES;
-		startup.hStdError = output.write.get();
+		startup.hStdError = parameters.out ? output.write.get() : INVALID_HANDLE_VALUE;
 		startup.hStdInput = INVALID_HANDLE_VALUE;
-		startup.hStdOutput = output.write.get();
+		startup.hStdOutput = parameters.out ? output.write.get() : INVALID_HANDLE_VALUE;
 		PROCESS_INFORMATION process{};
 		if (!CreateProcessW(executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, parameters.current_path.c_str(), &startup, &process))
 		{
