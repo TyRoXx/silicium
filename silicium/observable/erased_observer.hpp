@@ -20,8 +20,21 @@ namespace Si
 		{
 		}
 
+#if SILICIUM_COMPILER_GENERATES_MOVES
 		erased_observer(erased_observer &&) BOOST_NOEXCEPT = default;
 		erased_observer &operator = (erased_observer &&) BOOST_NOEXCEPT = default;
+#else
+		erased_observer(erased_observer &&other) BOOST_NOEXCEPT
+			: m_original(std::move(other.m_original))
+		{
+		}
+
+		erased_observer &operator = (erased_observer &&other)BOOST_NOEXCEPT
+		{
+			m_original = std::move(other.m_original);
+			return *this;
+		}
+#endif
 
 		void got_element(Element element)
 		{

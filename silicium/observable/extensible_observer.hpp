@@ -43,12 +43,18 @@ namespace Si
 
 	template <class Element, class State>
 	auto make_extensible_observer(observer<Element> &stable_observer, State &&state)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> extensible_observer<Element, typename std::decay<State>::type>
+#endif
 	{
 		return extensible_observer<Element, typename std::decay<State>::type>(stable_observer, std::forward<State>(state));
 	}
 
 	template <class Element, class State, class OtherElement>
 	auto extend(extensible_observer<Element, State> &&left, ptr_observer<observer<OtherElement>> right)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(make_extensible_observer(*right.get(), left.state()))
+#endif
 	{
 		return make_extensible_observer(*right.get(), left.state());
 	}

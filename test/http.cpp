@@ -165,6 +165,9 @@ namespace Si
 
 		template <class ErrorOrMemoryRangeObservable>
 		auto make_request_parser_observable(ErrorOrMemoryRangeObservable &&input)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> request_parser_observable<typename std::decay<ErrorOrMemoryRangeObservable>::type>
+#endif
 		{
 			return request_parser_observable<typename std::decay<ErrorOrMemoryRangeObservable>::type>(std::forward<ErrorOrMemoryRangeObservable>(input));
 		}

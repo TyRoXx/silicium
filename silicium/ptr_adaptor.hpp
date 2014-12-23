@@ -32,6 +32,19 @@ namespace Si
 
 		BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		ptr_adaptor(ptr_adaptor &&other)
+			: m_value(std::move(other.m_value))
+		{
+		}
+
+		ptr_adaptor &operator = (ptr_adaptor &&other)
+		{
+			m_value = std::move(other.m_value);
+			return *this;
+		}
+#endif
+
 	private:
 
 		Pointee m_value;
@@ -39,6 +52,9 @@ namespace Si
 
 	template <class Pointee>
 	auto make_ptr_adaptor(Pointee &&value)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		->ptr_adaptor<typename std::decay<Pointee>::type>
+#endif
 	{
 		return ptr_adaptor<typename std::decay<Pointee>::type>(std::forward<Pointee>(value));
 	}

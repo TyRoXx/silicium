@@ -54,6 +54,9 @@ namespace Si
 
 		template <class Next>
 		auto make_posting_observable(boost::asio::io_service &io, Next &&next)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> posting_observable<typename std::decay<Next>::type>
+#endif
 		{
 			return posting_observable<typename std::decay<Next>::type>(io, std::forward<Next>(next));
 		}

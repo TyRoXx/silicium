@@ -68,6 +68,9 @@ namespace Si
 		private:
 
 			std::unique_ptr<timer_impl> impl;
+
+			SILICIUM_DELETED_FUNCTION(timer(timer const &))
+			SILICIUM_DELETED_FUNCTION(timer &operator = (timer const &))
 		};
 
 		template <class AsioTimer = boost::asio::steady_timer>

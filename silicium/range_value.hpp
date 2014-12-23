@@ -31,6 +31,9 @@ namespace Si
 
 	template <class BidirectionalRange>
 	auto make_range_value(BidirectionalRange &&range)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> range_value<typename std::decay<BidirectionalRange>::type>
+#endif
 	{
 		return range_value<typename std::decay<BidirectionalRange>::type>(std::forward<BidirectionalRange>(range));
 	}

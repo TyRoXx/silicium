@@ -58,6 +58,9 @@ namespace Si
 
 	template <class ThreadingAPI, class Action>
 	auto make_thread_observable(Action &&action)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> thread_observable<decltype(action()), ThreadingAPI>
+#endif
 	{
 		return thread_observable<decltype(action()), ThreadingAPI>(std::forward<Action>(action));
 	}

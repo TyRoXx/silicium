@@ -97,12 +97,18 @@ namespace Si
 
 	template <class Observer>
 	auto virtualize_observer(Observer &&original)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> virtualized_observer<typename std::decay<Observer>::type>
+#endif
 	{
 		return virtualized_observer<typename std::decay<Observer>::type>(std::forward<Observer>(original));
 	}
 
 	template <class Observer, class OtherObserver>
 	auto extend(Observer &&, OtherObserver &&right)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> OtherObserver
+#endif
 	{
 		return std::forward<OtherObserver>(right);
 	}

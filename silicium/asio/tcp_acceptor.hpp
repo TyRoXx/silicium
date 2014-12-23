@@ -87,6 +87,9 @@ namespace Si
 
 		template <class Protocol, class Service>
 		auto make_tcp_acceptor(boost::asio::basic_socket_acceptor<Protocol, Service> &&acceptor)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> decltype(make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor))))
+#endif
 		{
 			return make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor)));
 		}

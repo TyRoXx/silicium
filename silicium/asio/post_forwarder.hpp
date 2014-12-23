@@ -9,6 +9,7 @@ namespace Si
 {
 	namespace asio
 	{
+#if SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		template <class Observable, class Callback>
 		auto make_post_forwarder(boost::asio::io_service &io, Observable &&from, Callback &&handler)
 		{
@@ -23,6 +24,7 @@ namespace Si
 				});
 			});
 		}
+#endif
 	}
 }
 

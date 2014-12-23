@@ -129,6 +129,9 @@ namespace Si
 
 	template <class Range>
 	auto make_iterator_range(Range &&range)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(make_iterator_range(std::begin(range), std::end(range)))
+#endif
 	{
 		using std::begin;
 		using std::end;
@@ -137,6 +140,9 @@ namespace Si
 
 	template <class ContiguousRange>
 	auto make_contiguous_range(ContiguousRange &&range)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(make_iterator_range(&*std::begin(range), &*std::end(range)))
+#endif
 	{
 		using std::begin;
 		using std::end;
