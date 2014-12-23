@@ -141,13 +141,20 @@ namespace Si
 	template <class ContiguousRange>
 	auto make_contiguous_range(ContiguousRange &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(make_iterator_range(&*std::begin(range), &*std::end(range)))
+		-> decltype(make_iterator_range(boost::addressof(*std::begin(range)), boost::addressof(*std::end(range))))
 #endif
 	{
 		using std::begin;
 		using std::end;
-		auto * const data_begin = &*begin(range);
-		auto * const data_end = &*end(range);
+		auto begin_ = begin(range);
+		auto end_ = end(range);
+		if (begin_ == end_)
+		{
+			typename std::remove_reference<decltype(*begin_)>::type *data = nullptr;
+			return make_iterator_range(data, data);
+		}
+		auto * const data_begin = boost::addressof(*begin_);
+		auto * const data_end = data_begin + std::distance(begin_, end_);
 		return make_iterator_range(data_begin, data_end);
 	}
 }
