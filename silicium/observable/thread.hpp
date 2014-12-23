@@ -49,11 +49,34 @@ namespace Si
 			});
 		}
 
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		thread_observable(thread_observable &&) = default;
+		thread_observable &operator = (thread_observable &&) = default;
+#else
+		thread_observable(thread_observable &&other)
+			: m_action(std::move(other.m_action))
+			, m_worker(std::move(other.m_worker))
+			, m_has_finished(std::move(other.m_has_finished))
+		{
+		}
+
+		thread_observable &operator = (thread_observable &&other)
+		{
+			m_action = std::move(other.m_action);
+			m_worker = std::move(other.m_worker);
+			m_has_finished = std::move(other.m_has_finished);
+			return *this;
+		}
+#endif
+
 	private:
 
 		std::function<element_type ()> m_action;
 		typename ThreadingAPI::template future<void>::type m_worker;
 		bool m_has_finished;
+
+		SILICIUM_DELETED_FUNCTION(thread_observable(thread_observable const &))
+		SILICIUM_DELETED_FUNCTION(thread_observable &operator = (thread_observable const &))
 	};
 
 	template <class ThreadingAPI, class Action>

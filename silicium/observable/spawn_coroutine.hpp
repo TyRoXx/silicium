@@ -81,6 +81,24 @@ namespace Si
 			return m_next.async_get_one(m_transform(std::forward<Observer>(observer)));
 		}
 
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		observer_transforming(observer_transforming &&) = default;
+		observer_transforming &operator = (observer_transforming &&) = default;
+#else
+		observer_transforming(observer_transforming &&other)
+			: m_next(std::move(other.m_next))
+			, m_transform(std::move(other.m_transform))
+		{
+		}
+		
+		observer_transforming &operator = (observer_transforming &&other)
+		{
+			m_next = std::move(other.m_next);
+			m_transform = std::move(other.m_transform);
+			return *this;
+		}
+#endif
+
 	private:
 
 		Next m_next;

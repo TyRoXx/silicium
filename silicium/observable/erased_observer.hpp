@@ -56,6 +56,9 @@ namespace Si
 	private:
 
 		std::unique_ptr<observer<Element>> m_original;
+
+		SILICIUM_DELETED_FUNCTION(erased_observer(erased_observer const &))
+		SILICIUM_DELETED_FUNCTION(erased_observer &operator = (erased_observer const &))
 	};
 }
 
