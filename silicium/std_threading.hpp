@@ -17,6 +17,11 @@ namespace Si
 		{
 			typedef std::promise<T> type;
 		};
+		template <class Result>
+		struct packaged_task
+		{
+			typedef std::packaged_task<Result ()> type;
+		};
 		typedef std::mutex mutex;
 		typedef std::condition_variable condition_variable;
 		typedef std::unique_lock<std::mutex> unique_lock;

@@ -6,17 +6,17 @@
 
 namespace Si
 {
-	template <class Element, class ThreadingAPI>
+	template <class SuccessElement, class ThreadingAPI>
 	struct thread_observable
 	{
-		typedef Element element_type;
+		typedef typename ThreadingAPI::template future<SuccessElement>::type element_type;
 
 		thread_observable()
 		    : m_has_finished(false)
 		{
 		}
 
-		explicit thread_observable(std::function<element_type ()> action)
+		explicit thread_observable(std::function<SuccessElement ()> action)
 			: m_action(std::move(action))
 			, m_has_finished(false)
 		{
@@ -45,7 +45,10 @@ namespace Si
 				]() mutable
 			{
 				m_has_finished = true;
-				std::forward<Observer>(observer).got_element(action());
+				typename ThreadingAPI::template packaged_task<SuccessElement>::type task(action);
+				auto result = task.get_future();
+				task();
+				std::forward<Observer>(observer).got_element(std::move(result));
 			});
 		}
 
@@ -71,7 +74,7 @@ namespace Si
 
 	private:
 
-		std::function<element_type ()> m_action;
+		std::function<SuccessElement ()> m_action;
 		typename ThreadingAPI::template future<void>::type m_worker;
 		bool m_has_finished;
 
