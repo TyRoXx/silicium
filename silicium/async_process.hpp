@@ -128,6 +128,12 @@ namespace Si
 		asio::reading_observable<stream> m_observable;
 	};
 
+	template <class AsioFileStream>
+	auto make_asio_file_stream(boost::asio::io_service &io, file_handle file)
+	{
+		return AsioFileStream(io, file.release());
+	}
+
 	inline error_or<async_process> launch_process(
 		async_process_parameters parameters,
 		native_file_descriptor standard_input,
