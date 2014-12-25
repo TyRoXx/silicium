@@ -152,7 +152,7 @@ namespace Si
 			if (read_error != 0)
 			{
 				assert(read_error == sizeof(error));
-				return boost::system::error_code(errno, boost::system::system_category());
+				return boost::system::error_code(error, boost::system::system_category());
 			}
 			return process.wait_for_exit();
 		}
