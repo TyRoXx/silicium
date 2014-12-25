@@ -39,6 +39,24 @@ namespace Si
 			write.swap(other.write);
 			read.swap(other.read);
 		}
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		pipe(pipe &&other) BOOST_NOEXCEPT
+			: write(std::move(other.write))
+			, read(std::move(other.read))
+		{
+		}
+
+		pipe &operator = (pipe &&other) BOOST_NOEXCEPT
+		{
+			write = std::move(other.write);
+			read = std::move(other.read);
+			return *this;
+		}
+
+		SILICIUM_DELETED_FUNCTION(pipe(pipe const &))
+		SILICIUM_DELETED_FUNCTION(pipe &operator = (pipe const &))
+#endif
 	};
 
 	inline error_or<pipe> make_pipe() BOOST_NOEXCEPT

@@ -7,7 +7,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 
-#ifndef _WIN32
 namespace
 {
 	template <class CharSink>
@@ -15,7 +14,7 @@ namespace
 	{
 		Si::spawn_coroutine([&io, destination, &file](Si::spawn_context yield)
 		{
-			Si::process_output output_reader(Si::make_unique<boost::asio::posix::stream_descriptor>(io, file.handle));
+			Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, file.handle));
 			file.release();
 			for (;;)
 			{
@@ -66,6 +65,7 @@ namespace
 	}
 }
 
+#ifndef _WIN32
 BOOST_AUTO_TEST_CASE(async_process_unix_which)
 {
 	Si::async_process_parameters parameters;
@@ -79,6 +79,23 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 	BOOST_CHECK_EQUAL("", result.error);
 	BOOST_CHECK_EQUAL(0, result.exit_code);
 }
+#endif
+
+#ifdef _WIN32
+BOOST_AUTO_TEST_CASE(async_process_win32_where)
+{
+	Si::async_process_parameters parameters;
+	parameters.executable = L"C:\\Windows\\System32\\where.exe";
+	parameters.current_path = boost::filesystem::current_path();
+
+	process_output result = run_process(parameters);
+
+	std::size_t const windows7whereHelpSize = 1830;
+	BOOST_CHECK_EQUAL(windows7whereHelpSize, result.output.size());
+	BOOST_CHECK_EQUAL("", result.error);
+	BOOST_CHECK_EQUAL(2, result.exit_code);
+}
+#endif
 
 BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 {
@@ -91,4 +108,3 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 		return ex.code() == boost::system::errc::no_such_file_or_directory;
 	});
 }
-#endif

@@ -67,6 +67,8 @@ link_directories(${Boost_LIBRARY_DIR})
 if(WIN32)
 	#Boost.Asio wants this for no reason
 	add_definitions("-D_WIN32_WINDOWS")
+
+	add_definitions("-DBOOST_ASIO_HAS_IOCP")
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")

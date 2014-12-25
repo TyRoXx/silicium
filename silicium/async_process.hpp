@@ -11,12 +11,12 @@
 #include <boost/filesystem/operations.hpp>
 
 #ifdef _WIN32
-
+#	include <boost/asio/windows/stream_handle.hpp>
 #else
-#include <boost/asio/posix/stream_descriptor.hpp>
-#include <fcntl.h>
-#include <sys/wait.h>
-#include <sys/prctl.h>
+#	include <boost/asio/posix/stream_descriptor.hpp>
+#	include <fcntl.h>
+#	include <sys/wait.h>
+#	include <sys/prctl.h>
 #endif
 
 namespace Si
@@ -30,37 +30,6 @@ namespace Si
 
 		/// must be an existing path, otherwise the child cannot launch properly
 		boost::filesystem::path current_path;
-	};
-
-#ifdef _WIN32
-
-#else
-	struct process_output
-	{
-		typedef error_or<memory_range> element_type;
-
-		process_output()
-		{
-		}
-
-		explicit process_output(std::unique_ptr<boost::asio::posix::stream_descriptor> pipe_reader)
-			: m_pipe_reader(std::move(pipe_reader))
-			, m_buffer(4096)
-			, m_observable(*m_pipe_reader, make_memory_range(m_buffer))
-		{
-		}
-
-		template <class Observer>
-		void async_get_one(Observer &&observer)
-		{
-			return m_observable.async_get_one(std::forward<Observer>(observer));
-		}
-
-	private:
-
-		std::unique_ptr<boost::asio::posix::stream_descriptor> m_pipe_reader;
-		std::vector<char> m_buffer;
-		asio::reading_observable<boost::asio::posix::stream_descriptor> m_observable;
 	};
 
 	struct async_process
@@ -79,7 +48,7 @@ namespace Si
 		}
 
 		async_process(async_process &&) BOOST_NOEXCEPT = default;
-		async_process &operator = (async_process &&) BOOST_NOEXCEPT = default;
+		async_process &operator = (async_process &&)BOOST_NOEXCEPT = default;
 
 		~async_process() BOOST_NOEXCEPT
 		{
@@ -87,6 +56,8 @@ namespace Si
 
 		error_or<int> wait_for_exit() BOOST_NOEXCEPT
 		{
+#ifdef _WIN32
+#else
 			int error = 0;
 			ssize_t read_error = read(child_error.handle, &error, sizeof(error));
 			if (read_error < 0)
@@ -98,8 +69,44 @@ namespace Si
 				assert(read_error == sizeof(error));
 				return boost::system::error_code(error, boost::system::system_category());
 			}
+#endif
 			return process.wait_for_exit();
 		}
+	};
+
+	struct process_output
+	{
+		typedef error_or<memory_range> element_type;
+		typedef
+#ifdef _WIN32
+			boost::asio::windows::stream_handle
+#else
+			boost::asio::posix::stream_descriptor
+#endif
+			stream;
+
+		process_output()
+		{
+		}
+
+		explicit process_output(std::unique_ptr<stream> pipe_reader)
+			: m_pipe_reader(std::move(pipe_reader))
+			, m_buffer(4096)
+			, m_observable(*m_pipe_reader, make_memory_range(m_buffer))
+		{
+		}
+
+		template <class Observer>
+		void async_get_one(Observer &&observer)
+		{
+			return m_observable.async_get_one(std::forward<Observer>(observer));
+		}
+
+	private:
+
+		std::unique_ptr<stream> m_pipe_reader;
+		std::vector<char> m_buffer;
+		asio::reading_observable<stream> m_observable;
 	};
 
 	inline error_or<async_process> launch_process(
@@ -108,6 +115,9 @@ namespace Si
 		native_file_descriptor standard_output,
 		native_file_descriptor standard_error)
 	{
+#ifdef _WIN32
+		throw std::logic_error("launch_process is to be implemented for Windows");
+#else
 		auto executable = parameters.executable.string();
 		auto arguments = parameters.arguments;
 		std::vector<char *> argument_pointers;
@@ -198,8 +208,8 @@ namespace Si
 		{
 			return async_process(process_handle(forked), std::move(child_error.read));
 		}
-	}
 #endif
+	}
 }
 
 #endif
