@@ -94,6 +94,14 @@
 #	define SILICIUM_DELETED_FUNCTION(f) private: f;
 #endif
 
+#define SILICIUM_DISABLE_COPY(struct_name) \
+	SILICIUM_DELETED_FUNCTION(struct_name(struct_name const &)) \
+	SILICIUM_DELETED_FUNCTION(struct_name &operator = (struct_name const &))
+
+#define SILICIUM_DEFAULT_NOEXCEPT_MOVE(struct_name) \
+	struct_name(struct_name &&) BOOST_NOEXCEPT = default; \
+	struct_name &operator = (struct_name &&) BOOST_NOEXCEPT = default;
+
 #ifdef _MSC_VER
 #	define SILICIUM_DEPRECATED __declspec(deprecated)
 #else
@@ -162,11 +170,20 @@ namespace Si
 }
 #include <boost/type_traits/is_copy_constructible.hpp>
 #include <boost/type_traits/is_convertible.hpp>
+#include <future>
 namespace Si
 {
 	using boost::is_copy_constructible;
 	template <class T>
+	struct is_copy_constructible<std::future<T>> : std::false_type
+	{
+	};
+	template <class T>
 	struct is_copy_assignable : std::true_type
+	{
+	};
+	template <class T>
+	struct is_copy_assignable<std::future<T>> : std::false_type
 	{
 	};
 	template <class T, class D>

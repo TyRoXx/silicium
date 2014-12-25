@@ -108,6 +108,25 @@ namespace Si
 		{
 		}
 
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		SILICIUM_DEFAULT_NOEXCEPT_MOVE(process_output)
+#else
+		process_output(process_output &&other) BOOST_NOEXCEPT
+			: m_pipe_reader(std::move(other.m_pipe_reader))
+			, m_buffer(std::move(other.m_buffer))
+			, m_observable(std::move(other.m_observable))
+		{
+		}
+
+		process_output &operator = (process_output &&other) BOOST_NOEXCEPT
+		{
+			m_pipe_reader = std::move(other.m_pipe_reader);
+			m_buffer = std::move(other.m_buffer);
+			m_observable = std::move(other.m_observable);
+			return *this;
+		}
+#endif
+
 		explicit process_output(std::unique_ptr<stream> pipe_reader)
 			: m_pipe_reader(std::move(pipe_reader))
 			, m_buffer(4096)
@@ -126,6 +145,8 @@ namespace Si
 		std::unique_ptr<stream> m_pipe_reader;
 		std::vector<char> m_buffer;
 		asio::reading_observable<stream> m_observable;
+		
+		SILICIUM_DISABLE_COPY(process_output)
 	};
 
 	template <class AsioFileStream>

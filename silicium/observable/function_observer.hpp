@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/element_from_optional_like.hpp>
+#include <silicium/optional.hpp>
 #include <boost/optional.hpp>
 
 namespace Si
@@ -17,6 +18,12 @@ namespace Si
 
 			template <class T>
 			operator boost::optional<T>() const
+			{
+				return static_cast<T>(std::forward<Element>(*value));
+			}
+
+			template <class T>
+			operator Si::optional<T>() const
 			{
 				return static_cast<T>(std::forward<Element>(*value));
 			}
@@ -45,7 +52,7 @@ namespace Si
 
 		void ended()
 		{
-			m_function(boost::none);
+			m_function(Si::none);
 		}
 
 	private:

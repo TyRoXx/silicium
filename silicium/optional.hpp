@@ -27,7 +27,7 @@ namespace Si
 		}
 
 #ifdef _MSC_VER
-		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+		template <class = typename std::enable_if<Si::is_copy_constructible<T>::value, void>::type>
 #endif
 		optional(optional const &other)
 			: content(other.content)
@@ -40,7 +40,7 @@ namespace Si
 		}
 
 #ifdef _MSC_VER
-		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+		template <class = typename std::enable_if<Si:::is_copy_constructible<T>::value, void>::type>
 #endif
 		optional(T const &value)
 			: content(value)
@@ -54,7 +54,7 @@ namespace Si
 		}
 
 #ifdef _MSC_VER
-		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+		template <class = typename std::enable_if<Si:::is_copy_constructible<T>::value, void>::type>
 #endif
 		optional &operator = (optional const &other)
 		{
@@ -63,7 +63,7 @@ namespace Si
 		}
 
 #ifdef _MSC_VER
-		template <class = typename std::enable_if<std::is_copy_constructible<T>::value, void>::type>
+		template <class = typename std::enable_if<Si:::is_copy_constructible<T>::value, void>::type>
 #endif
 		optional &operator = (T const &value)
 		{

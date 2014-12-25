@@ -4,6 +4,7 @@
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/config.hpp>
+#include <silicium/optional.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/coroutine/all.hpp>
 
@@ -149,10 +150,10 @@ namespace Si
 		}
 
 		template <class Observable>
-		boost::optional<typename std::decay<Observable>::type::element_type> get_one(Observable &&from)
+		Si::optional<typename std::decay<Observable>::type::element_type> get_one(Observable &&from)
 		{
 			typedef typename std::decay<Observable>::type::element_type element_type;
-			boost::optional<element_type> result;
+			Si::optional<element_type> result;
 			auto waiting_for = virtualize_observable(
 				transform_observer<nothing>(
 					std::forward<Observable>(from),
@@ -162,10 +163,10 @@ namespace Si
 						assert(async_state);
 						assert(async_state.use_count() >= 2);
 						return make_function_observer(
-		#ifdef _MSC_VER
-							std::function<void(boost::optional<element_type>)>
-		#endif
-							([previous_observer, async_state, &result](boost::optional<element_type> element)
+#ifdef _MSC_VER
+							std::function<void(Si::optional<element_type>)>
+#endif
+							([previous_observer, async_state, &result](Si::optional<element_type> element)
 							{
 								if (element)
 								{

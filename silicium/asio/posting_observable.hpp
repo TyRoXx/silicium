@@ -44,27 +44,40 @@ namespace Si
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
 					= std::forward<Observer>(observer_)
 #endif
-					](boost::optional<element_type> element) mutable
+					](Si::optional<element_type> element) mutable
 				{
-					m_io->post([element
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-						= std::move(element)
-#endif
-						, observer_
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-						= std::forward<Observer>(observer_)
-#endif
-						]() mutable
+					if (element)
 					{
-						if (element)
+#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
+						m_io->post([
+							element = std::move(element),
+							observer_ = std::forward<Observer>(observer_)
+						]() mutable
 						{
 							std::forward<Observer>(observer_).got_element(std::move(*element));
-						}
-						else
+						});
+#else
+						auto copyable_element = to_shared(std::move(*element));
+						m_io->post([
+							copyable_element,
+							observer_
+						]() mutable
+						{
+							std::forward<Observer>(observer_).got_element(std::move(*copyable_element));
+						});
+#endif
+					}
+					else
+					{
+						m_io->post([observer_
+#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
+							= std::forward<Observer>(observer_)
+#endif
+						]() mutable
 						{
 							std::forward<Observer>(observer_).ended();
-						}
-					});
+						});
+					}
 				}));
 			}
 
