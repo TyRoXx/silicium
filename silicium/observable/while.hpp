@@ -13,12 +13,37 @@ namespace Si
 	{
 		typedef typename Input::element_type element_type;
 
+		while_observable()
+			: receiver_(nullptr)
+		{
+		}
+
 		while_observable(Input input, ElementPredicate is_not_end)
 			: input(std::move(input))
 			, is_not_end(std::move(is_not_end))
 			, receiver_(nullptr)
 		{
 		}
+
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		while_observable(while_observable &&) = default;
+		while_observable &operator = (while_observable &&) = default;
+#else
+		while_observable(while_observable &&other)
+			: input(std::move(other.input))
+			, is_not_end(std::move(other.is_not_end))
+			, receiver_(other.receiver_)
+		{
+		}
+
+		while_observable &operator = (while_observable &&other)
+		{
+			input = std::move(other.input);
+			is_not_end = std::move(other.is_not_end);
+			receiver_ = std::move(other.receiver_);
+			return *this;
+		}
+#endif
 
 		template <class Observer>
 		void async_get_one(Observer &&receiver)

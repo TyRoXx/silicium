@@ -129,7 +129,7 @@ namespace Si
 	};
 
 	template <class AsioFileStream>
-	auto make_asio_file_stream(boost::asio::io_service &io, file_handle file)
+	AsioFileStream make_asio_file_stream(boost::asio::io_service &io, file_handle file)
 	{
 		return AsioFileStream(io, file.release());
 	}
