@@ -23,14 +23,34 @@ namespace Si
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		iterator_sink(iterator_sink &&other) = default;
+		iterator_sink &operator = (iterator_sink &&other) = default;
+		iterator_sink(iterator_sink const &other) = default;
+		iterator_sink &operator = (iterator_sink const &other) = default;
 #else
 		iterator_sink(iterator_sink &&other)
 			: m_out(std::move(other.m_out))
 		{
 		}
+
+		iterator_sink &operator = (iterator_sink &&other)
+		{
+			m_out = std::move(other.m_out);
+			return *this;
+		}
+
+		iterator_sink(iterator_sink const &other)
+			: m_out(other.m_out)
+		{
+		}
+
+		iterator_sink &operator = (iterator_sink const &other)
+		{
+			m_out = other.m_out;
+			return *this;
+		}
 #endif
 
-		success append(iterator_range<Element const *> data)
+		success append(iterator_range<Element const *> data) const
 		{
 			boost::range::copy(data, m_out);
 			return {};
