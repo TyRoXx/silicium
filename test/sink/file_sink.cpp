@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(file_sink_writev)
 	Si::pipe buffer = Si::make_pipe().get();
 	Si::file_sink sink(buffer.write.handle);
 	std::array<char, 9001> read_buffer;
-	auto source = Si::make_file_source(buffer.read.handle, Si::make_iterator_range(read_buffer));
+	auto source = Si::make_file_source(buffer.read.handle, Si::make_contiguous_range(read_buffer));
 	std::vector<Si::file_sink::element_type> writes;
 	std::vector<char> const payload(0x1000000, 'a');
 	writes.emplace_back(Si::make_memory_range(payload));

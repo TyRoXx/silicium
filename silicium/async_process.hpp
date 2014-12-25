@@ -9,10 +9,15 @@
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/asio/reading_observable.hpp>
 #include <boost/filesystem/operations.hpp>
+
+#ifdef _WIN32
+
+#else
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
+#endif
 
 namespace Si
 {
@@ -27,6 +32,9 @@ namespace Si
 		boost::filesystem::path current_path;
 	};
 
+#ifdef _WIN32
+
+#else
 	struct process_output
 	{
 		typedef error_or<memory_range> element_type;
@@ -191,6 +199,7 @@ namespace Si
 			return async_process(process_handle(forked), std::move(child_error.read));
 		}
 	}
+#endif
 }
 
 #endif

@@ -7,6 +7,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 
+#ifndef _WIN32
 namespace
 {
 	template <class CharSink>
@@ -90,3 +91,4 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 		return ex.code() == boost::system::errc::no_such_file_or_directory;
 	});
 }
+#endif

@@ -4,6 +4,7 @@
 #include <silicium/process_parameters.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/error_code.hpp>
+#include <silicium/posix/pipe.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <cassert>
@@ -55,48 +56,6 @@ namespace Si
 			}
 			return command_line;
 		}
-
-		struct pipe
-		{
-			unique_handle read, write;
-
-			pipe() BOOST_NOEXCEPT
-			{
-			}
-
-			pipe(pipe &&other) BOOST_NOEXCEPT
-			{
-				swap(other);
-			}
-
-			pipe &operator = (pipe &&other) BOOST_NOEXCEPT
-			{
-				swap(other);
-				return *this;
-			}
-
-			void swap(pipe &other) BOOST_NOEXCEPT
-			{
-				read.swap(other.read);
-				write.swap(other.write);
-			}
-		};
-
-		inline pipe create_anonymous_pipe()
-		{
-			SECURITY_ATTRIBUTES security{};
-			security.nLength = sizeof(security);
-			security.bInheritHandle = TRUE;
-			HANDLE read, write;
-			if (!CreatePipe(&read, &write, &security, 0))
-			{
-				throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
-			}
-			pipe result;
-			result.read.reset(read);
-			result.write.reset(write);
-			return result;
-		}
 	}
 
 	inline int run_process(process_parameters const &parameters)
@@ -109,13 +68,13 @@ namespace Si
 		SECURITY_ATTRIBUTES security{};
 		security.nLength = sizeof(security);
 		security.bInheritHandle = TRUE;
-		auto output = win32::create_anonymous_pipe();
+		auto output = make_pipe().get();
 		STARTUPINFOW startup{};
 		startup.cb = sizeof(startup);
 		startup.dwFlags |= STARTF_USESTDHANDLES;
-		startup.hStdError = parameters.out ? output.write.get() : INVALID_HANDLE_VALUE;
+		startup.hStdError = parameters.out ? output.write.handle : INVALID_HANDLE_VALUE;
 		startup.hStdInput = INVALID_HANDLE_VALUE;
-		startup.hStdOutput = parameters.out ? output.write.get() : INVALID_HANDLE_VALUE;
+		startup.hStdOutput = parameters.out ? output.write.handle : INVALID_HANDLE_VALUE;
 		PROCESS_INFORMATION process{};
 		if (!CreateProcessW(executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, parameters.current_path.c_str(), &startup, &process))
 		{
@@ -123,7 +82,7 @@ namespace Si
 		}
 		win32::unique_handle thread_closer(process.hThread);
 		win32::unique_handle process_closer(process.hProcess);
-		output.write.reset();
+		output.write.close();
 		if (parameters.out)
 		{
 			auto buffered_out  = make_buffering_sink(ref_sink(*parameters.out));
@@ -133,7 +92,7 @@ namespace Si
 				DWORD read_bytes = 0;
 				DWORD available = 0;
 				DWORD left = 0;
-				BOOL const peeked = PeekNamedPipe(output.read.get(), buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left);
+				BOOL const peeked = PeekNamedPipe(output.read.handle, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left);
 				if (!peeked)
 				{
 					auto error = ::GetLastError();
@@ -149,7 +108,7 @@ namespace Si
 				{
 					auto buffer = buffered_out.make_append_space(1);
 					DWORD read_bytes = 0;
-					BOOL const read_result = ReadFile(output.read.get(), buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, nullptr);
+					BOOL const read_result = ReadFile(output.read.handle, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, nullptr);
 					if (read_result)
 					{
 						buffered_out.flush_append_space();
@@ -167,7 +126,7 @@ namespace Si
 						throw boost::system::system_error(error, boost::system::native_ecat);
 					}
 				}
-				if (ReadFile(output.read.get(), buffer.begin(), available, &read_bytes, nullptr))
+				if (ReadFile(output.read.handle, buffer.begin(), available, &read_bytes, nullptr))
 				{
 					assert(available == read_bytes);
 					buffered_out.make_append_space(read_bytes);

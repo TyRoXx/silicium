@@ -32,7 +32,13 @@ namespace Si
 			DWORD const reading = static_cast<DWORD>(std::min<size_t>(read_buffer.size(), std::numeric_limits<DWORD>::max()));
 			if (!ReadFile(file, read_buffer.begin(), reading, &read_bytes, nullptr))
 			{
-				return file_read_result{boost::system::error_code(GetLastError(), boost::system::system_category())};
+				DWORD error = GetLastError();
+				if (error == ERROR_BROKEN_PIPE)
+				{
+					//end of pipe
+					return Si::none;
+				}
+				return file_read_result{boost::system::error_code(error, boost::system::system_category())};
 			}
 #else
 			ssize_t const read_bytes = ::read(file, read_buffer.begin(), read_buffer.size());

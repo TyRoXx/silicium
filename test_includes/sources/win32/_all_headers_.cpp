@@ -10,6 +10,7 @@
 #include <silicium/asio/tcp_trigger.hpp>
 #include <silicium/asio/timer.hpp>
 #include <silicium/asio/writing_observable.hpp>
+#include <silicium/async_process.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
 #include <silicium/build_result.hpp>
@@ -87,8 +88,10 @@
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/process_handle.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/ptr_adaptor.hpp>
+#include <silicium/range_value.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/sink/buffering_sink.hpp>
@@ -126,6 +129,7 @@
 #include <silicium/win32/dynamic_library_impl.hpp>
 #include <silicium/win32/native_file_descriptor.hpp>
 #include <silicium/win32/open.hpp>
+#include <silicium/win32/process_handle.hpp>
 #include <silicium/win32/run_process.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/write_file.hpp>
