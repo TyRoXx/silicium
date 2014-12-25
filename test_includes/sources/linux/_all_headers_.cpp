@@ -10,6 +10,7 @@
 #include <silicium/asio/tcp_trigger.hpp>
 #include <silicium/asio/timer.hpp>
 #include <silicium/asio/writing_observable.hpp>
+#include <silicium/async_process.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
 #include <silicium/build_result.hpp>

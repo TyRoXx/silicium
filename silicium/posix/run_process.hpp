@@ -36,11 +36,6 @@ namespace Si
 				buffer_helper.flush_append_space();
 			}
 		}
-
-		inline void set_close_on_exec(int file)
-		{
-			fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
-		}
 	}
 
 	inline int run_process(process_parameters const &parameters)

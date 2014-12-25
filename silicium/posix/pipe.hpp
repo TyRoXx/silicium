@@ -2,9 +2,18 @@
 #define SILICIUM_POSIX_PIPE_HPP
 
 #include <silicium/file_handle.hpp>
+#include <fcntl.h>
 
 namespace Si
 {
+	namespace detail
+	{
+		inline void set_close_on_exec(native_file_descriptor file)
+		{
+			fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
+		}
+	}
+
 	struct pipe
 	{
 		file_handle write, read;
