@@ -20,11 +20,12 @@ namespace Si
 		{
 		}
 
-		void async_get_one(observer<element_type> &receiver)
+		template <class Observer>
+		void async_get_one(Observer &&receiver)
 		{
 			assert(!receiver_);
-			receiver_ = &receiver;
-			input.async_get_one(*this);
+			receiver_ = receiver.get();
+			input.async_get_one(extend(std::forward<Observer>(receiver), observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this))));
 		}
 
 	private:
