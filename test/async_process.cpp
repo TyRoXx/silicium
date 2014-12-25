@@ -42,11 +42,11 @@ namespace
 
 	process_output run_process(Si::async_process_parameters parameters)
 	{
-		Si::pipe standard_input = Si::make_pipe().get();
-		Si::pipe standard_output = Si::make_pipe().get();
-		Si::pipe standard_error = Si::make_pipe().get();
+		Si::pipe standard_input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
+		Si::pipe standard_output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
+		Si::pipe standard_error = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 
-		Si::async_process process = Si::launch_process(parameters, standard_input.read.handle, standard_output.write.handle, standard_error.write.handle).get();
+		Si::async_process process = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::launch_process(parameters, standard_input.read.handle, standard_output.write.handle, standard_error.write.handle).get());
 		standard_input.read.close();
 		standard_output.write.close();
 		standard_error.write.close();

@@ -47,8 +47,27 @@ namespace Si
 		{
 		}
 
+#if SILICIUM_COMPILER_GENERATES_MOVES
 		async_process(async_process &&) BOOST_NOEXCEPT = default;
 		async_process &operator = (async_process &&)BOOST_NOEXCEPT = default;
+#else
+		async_process(async_process &&other) BOOST_NOEXCEPT
+			: process(std::move(other.process))
+			, child_error(std::move(other.child_error))
+		{
+		}
+
+		async_process &operator = (async_process &&other) BOOST_NOEXCEPT
+		{
+			process = std::move(other.process);
+			child_error = std::move(other.child_error);
+			return *this;
+		}
+
+		SILICIUM_DELETED_FUNCTION(async_process(async_process const &))
+		SILICIUM_DELETED_FUNCTION(async_process &operator = (async_process const &))
+	public:
+#endif
 
 		~async_process() BOOST_NOEXCEPT
 		{

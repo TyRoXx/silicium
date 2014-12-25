@@ -68,7 +68,7 @@ namespace Si
 		SECURITY_ATTRIBUTES security{};
 		security.nLength = sizeof(security);
 		security.bInheritHandle = TRUE;
-		auto output = make_pipe().get();
+		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(make_pipe().get());
 		STARTUPINFOW startup{};
 		startup.cb = sizeof(startup);
 		startup.dwFlags |= STARTF_USESTDHANDLES;

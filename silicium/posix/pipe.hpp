@@ -29,6 +29,10 @@ namespace Si
 	{
 		file_handle write, read;
 
+		pipe() BOOST_NOEXCEPT
+		{
+		}
+
 		void close() BOOST_NOEXCEPT
 		{
 			pipe().swap(*this);

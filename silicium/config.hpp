@@ -6,6 +6,7 @@
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/version.hpp>
+#include <boost/preprocessor/if.hpp>
 
 #ifdef _MSC_VER
 #	define SILICIUM_COMPILER_CXX11 1
@@ -115,6 +116,11 @@
 
 //TODO
 #define SILICIUM_CXX14_CONSTEXPR
+
+#define SILICIUM_IF(condition, value) BOOST_PP_IF(condition, value, BOOST_PP_EMPTY())
+#define SILICIUM_IF_NOT(condition, value) BOOST_PP_IF(condition, BOOST_PP_EMPTY(), value)
+
+#define SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(should_be_rvalue) BOOST_PP_IF(SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER, (should_be_rvalue), std::move((should_be_rvalue)))
 
 namespace Si
 {
