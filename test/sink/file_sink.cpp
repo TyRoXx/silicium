@@ -1,9 +1,13 @@
 #include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/open.hpp>
+#include <silicium/source/file_source.hpp>
 #include <silicium/read_file.hpp>
+#include <silicium/posix/pipe.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/thread/future.hpp>
+#include <array>
 
 BOOST_AUTO_TEST_CASE(file_sink_success)
 {
@@ -68,4 +72,41 @@ BOOST_AUTO_TEST_CASE(file_sink_error)
 	BOOST_CHECK_EQUAL(boost::system::error_code(SILICIUM_PLATFORM_ERROR(22, ERROR_NEGATIVE_SEEK), boost::system::system_category()), Si::append(sink, Si::file_sink_element{Si::seek_add{-4}}));
 	BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::seek_set{2}}));
 #undef SILICIUM_PLATFORM_ERROR
+}
+
+BOOST_AUTO_TEST_CASE(file_sink_writev)
+{
+	Si::pipe buffer = Si::make_pipe().get();
+	Si::file_sink sink(buffer.write.handle);
+	std::array<char, 9001> read_buffer;
+	auto source = Si::make_file_source(buffer.read.handle, Si::make_iterator_range(read_buffer));
+	std::vector<Si::file_sink::element_type> writes;
+	std::vector<char> const payload(0x1000000, 'a');
+	writes.emplace_back(Si::make_memory_range(payload));
+	writes.emplace_back(Si::make_memory_range(payload));
+	writes.emplace_back(Si::make_memory_range(payload));
+
+	auto writer = boost::async([&]()
+	{
+		auto error = sink.append(Si::make_contiguous_range(writes));
+		BOOST_CHECK(!error);
+		buffer.write.close();
+	});
+
+	std::vector<char> all_read;
+	for (;;)
+	{
+		auto piece = Si::get(source);
+		if (!piece)
+		{
+			break;
+		}
+		std::size_t size = piece->get();
+		all_read.insert(all_read.end(), read_buffer.begin(), read_buffer.begin() + size);
+	}
+
+	BOOST_CHECK_EQUAL(payload.size() * 3, all_read.size());
+	BOOST_CHECK(std::all_of(all_read.begin(), all_read.end(), [](char c) { return c == 'a'; }));
+
+	writer.get();
 }
