@@ -9,7 +9,7 @@ namespace Si
 {
 	namespace detail
 	{
-		inline boost::system::error_code set_close_on_exec(native_file_descriptor file)
+		inline boost::system::error_code set_close_on_exec(native_file_descriptor file) BOOST_NOEXCEPT
 		{
 			if (fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC) < 0)
 			{
@@ -35,7 +35,7 @@ namespace Si
 		}
 	};
 
-	inline error_or<pipe> make_pipe()
+	inline error_or<pipe> make_pipe() BOOST_NOEXCEPT
 	{
 		std::array<int, 2> fds;
 		if (::pipe(fds.data()) < 0)

@@ -14,7 +14,7 @@ namespace Si
 		{
 		}
 
-		explicit process_handle(pid_t id)
+		explicit process_handle(pid_t id) BOOST_NOEXCEPT
 			: m_id(id)
 		{
 		}

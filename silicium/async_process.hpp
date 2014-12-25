@@ -60,24 +60,24 @@ namespace Si
 		process_handle process;
 		file_handle child_error;
 
-		async_process()
+		async_process() BOOST_NOEXCEPT
 		{
 		}
 
-		async_process(process_handle process, file_handle child_error)
+		async_process(process_handle process, file_handle child_error) BOOST_NOEXCEPT
 			: process(std::move(process))
 			, child_error(std::move(child_error))
 		{
 		}
 
-		async_process(async_process &&) = default;
-		async_process &operator = (async_process &&) = default;
+		async_process(async_process &&) BOOST_NOEXCEPT = default;
+		async_process &operator = (async_process &&) BOOST_NOEXCEPT = default;
 
-		~async_process()
+		~async_process() BOOST_NOEXCEPT
 		{
 		}
 
-		error_or<int> wait_for_exit()
+		error_or<int> wait_for_exit() BOOST_NOEXCEPT
 		{
 			int error = 0;
 			ssize_t read_error = read(child_error.handle, &error, sizeof(error));
@@ -188,8 +188,7 @@ namespace Si
 		//parent
 		else
 		{
-			process_handle process(forked);
-			return async_process(std::move(process), std::move(child_error.read));
+			return async_process(process_handle(forked), std::move(child_error.read));
 		}
 	}
 }
