@@ -3,6 +3,7 @@
 
 #include <silicium/process_parameters.hpp>
 #include <silicium/file_handle.hpp>
+#include <silicium/process_handle.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/observable/virtualized.hpp>
@@ -52,65 +53,6 @@ namespace Si
 		std::unique_ptr<boost::asio::posix::stream_descriptor> m_pipe_reader;
 		std::vector<char> m_buffer;
 		asio::reading_observable<boost::asio::posix::stream_descriptor> m_observable;
-	};
-
-	struct process_handle
-	{
-		process_handle() BOOST_NOEXCEPT
-			: m_id(-1)
-		{
-		}
-
-		explicit process_handle(pid_t id)
-			: m_id(id)
-		{
-		}
-
-		~process_handle() BOOST_NOEXCEPT
-		{
-			if (m_id < 0)
-			{
-				return;
-			}
-			wait_for_exit();
-		}
-
-		process_handle(process_handle &&other) BOOST_NOEXCEPT
-			: m_id(-1)
-		{
-			swap(other);
-		}
-
-		process_handle &operator = (process_handle &&other) BOOST_NOEXCEPT
-		{
-			swap(other);
-			return *this;
-		}
-
-		void swap(process_handle &other) BOOST_NOEXCEPT
-		{
-			boost::swap(m_id, other.m_id);
-		}
-
-		error_or<int> wait_for_exit() BOOST_NOEXCEPT
-		{
-			int status = 0;
-			int wait_id = Si::exchange(m_id, -1);
-			assert(wait_id >= 1);
-			if (waitpid(wait_id, &status, 0) < 0)
-			{
-				return boost::system::error_code(errno, boost::system::system_category());
-			}
-			int const exit_status = WEXITSTATUS(status);
-			return exit_status;
-		}
-
-	private:
-
-		pid_t m_id;
-
-		SILICIUM_DELETED_FUNCTION(process_handle(process_handle const &))
-		SILICIUM_DELETED_FUNCTION(process_handle &operator = (process_handle const &))
 	};
 
 	struct async_process

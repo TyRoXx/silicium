@@ -96,6 +96,7 @@
 #include <silicium/posix/open.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/posix/run_process.hpp>
+#include <silicium/process_handle.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
