@@ -117,20 +117,14 @@ namespace Si
 	{
 		process_handle process;
 		file_handle child_error;
-		file_handle standard_output;
-		file_handle standard_error;
-		file_handle standard_input;
 
 		async_process()
 		{
 		}
 
-		async_process(process_handle process, file_handle child_error, file_handle standard_output, file_handle standard_error, file_handle standard_input)
+		async_process(process_handle process, file_handle child_error)
 			: process(std::move(process))
 			, child_error(std::move(child_error))
-			, standard_output(std::move(standard_output))
-			, standard_error(std::move(standard_error))
-			, standard_input(std::move(standard_input))
 		{
 		}
 
@@ -158,7 +152,11 @@ namespace Si
 		}
 	};
 
-	inline error_or<async_process> launch_process(async_process_parameters parameters)
+	inline error_or<async_process> launch_process(
+		async_process_parameters parameters,
+		native_file_descriptor standard_input,
+		native_file_descriptor standard_output,
+		native_file_descriptor standard_error)
 	{
 		auto executable = parameters.executable.string();
 		auto arguments = parameters.arguments;
@@ -170,9 +168,6 @@ namespace Si
 		});
 		argument_pointers.emplace_back(nullptr);
 
-		pipe stdout = make_pipe();
-		pipe stderr = make_pipe();
-		pipe stdin = make_pipe();
 		pipe child_error = make_pipe();
 
 		pid_t const forked = fork();
@@ -199,15 +194,15 @@ namespace Si
 				_exit(0);
 			};
 
-			if (dup2(stdout.write.handle, STDOUT_FILENO) < 0)
+			if (dup2(standard_output, STDOUT_FILENO) < 0)
 			{
 				fail();
 			}
-			if (dup2(stderr.write.handle, STDERR_FILENO) < 0)
+			if (dup2(standard_error, STDERR_FILENO) < 0)
 			{
 				fail();
 			}
-			if (dup2(stdin.read.handle, STDIN_FILENO) < 0)
+			if (dup2(standard_input, STDIN_FILENO) < 0)
 			{
 				fail();
 			}
@@ -239,7 +234,7 @@ namespace Si
 		else
 		{
 			process_handle process(forked);
-			return async_process(std::move(process), std::move(child_error.read), std::move(stdout.read), std::move(stderr.read), std::move(stdin.write));
+			return async_process(std::move(process), std::move(child_error.read));
 		}
 	}
 }

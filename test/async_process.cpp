@@ -33,6 +33,36 @@ namespace
 			}
 		});
 	}
+
+	struct process_output
+	{
+		int exit_code;
+		std::string output, error;
+	};
+
+	process_output run_process(Si::async_process_parameters parameters)
+	{
+		Si::pipe standard_input = Si::make_pipe();
+		Si::pipe standard_output = Si::make_pipe();
+		Si::pipe standard_error = Si::make_pipe();
+
+		Si::async_process process = Si::launch_process(parameters, standard_input.read.handle, standard_output.write.handle, standard_error.write.handle).get();
+		standard_input.read.close();
+		standard_output.write.close();
+		standard_error.write.close();
+
+		boost::asio::io_service io;
+
+		process_output result;
+
+		begin_reading_output(io, Si::make_container_sink(result.output), std::move(standard_output.read));
+		begin_reading_output(io, Si::make_container_sink(result.error), std::move(standard_error.read));
+
+		io.run();
+
+		result.exit_code = process.wait_for_exit().get();
+		return result;
+	}
 }
 
 BOOST_AUTO_TEST_CASE(async_process_unix_which)
@@ -42,18 +72,21 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 	parameters.arguments.emplace_back("which");
 	parameters.current_path = boost::filesystem::current_path();
 
-	Si::async_process process = Si::launch_process(parameters).get();
-	boost::asio::io_service io;
+	process_output result = run_process(parameters);
 
-	std::string standard_output;
-	begin_reading_output(io, Si::make_container_sink(standard_output), std::move(process.standard_output));
+	BOOST_CHECK_EQUAL("/usr/bin/which\n", result.output);
+	BOOST_CHECK_EQUAL("", result.error);
+	BOOST_CHECK_EQUAL(0, result.exit_code);
+}
 
-	std::string standard_error;
-	begin_reading_output(io, Si::make_container_sink(standard_error), std::move(process.standard_error));
+BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
+{
+	Si::async_process_parameters parameters;
+	parameters.executable = "does-not-exist";
+	parameters.current_path = boost::filesystem::current_path();
 
-	io.run();
-
-	BOOST_CHECK_EQUAL("/usr/bin/which\n", standard_output);
-	BOOST_CHECK_EQUAL("", standard_error);
-	BOOST_CHECK_EQUAL(0, process.wait_for_exit().get());
+	BOOST_CHECK_EXCEPTION(run_process(parameters), boost::system::system_error, [](boost::system::system_error const &ex)
+	{
+		return ex.code() == boost::system::errc::no_such_file_or_directory;
+	});
 }
