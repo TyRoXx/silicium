@@ -121,12 +121,8 @@ namespace Si
 		//child
 		if (forked == 0)
 		{
-			auto const fail = [&child_error]()
-#if defined(__GNUC__) && !defined(__clang__)
-				__attribute__ ((__noreturn__))
-#endif
+			auto const fail_with_error = [&child_error](int error) SILICIUM_NORETURN
 			{
-				int error = errno;
 				ssize_t written = write(child_error.write.handle, &error, sizeof(error));
 				if (written != sizeof(error))
 				{
@@ -134,6 +130,11 @@ namespace Si
 				}
 				child_error.write.close();
 				_exit(0);
+			};
+
+			auto const fail = [fail_with_error]() SILICIUM_NORETURN
+			{
+				fail_with_error(errno);
 			};
 
 			if (dup2(standard_output, STDOUT_FILENO) < 0)
@@ -150,9 +151,18 @@ namespace Si
 			}
 
 			child_error.read.close();
-			detail::set_close_on_exec(child_error.write.handle);
 
-			boost::filesystem::current_path(parameters.current_path);
+			boost::system::error_code ec = detail::set_close_on_exec(child_error.write.handle);
+			if (ec)
+			{
+				fail_with_error(ec.value());
+			}
+
+			boost::filesystem::current_path(parameters.current_path, ec);
+			if (ec)
+			{
+				fail_with_error(ec.value());
+			}
 
 			//close inherited file descriptors
 			long max_fd = sysconf(_SC_OPEN_MAX);
@@ -162,11 +172,14 @@ namespace Si
 				{
 					continue;
 				}
-				close(i);
+				close(i); //ignore errors because we will close many non-file-descriptors
 			}
 
 			//kill the child when the parent exits
-			prctl(PR_SET_PDEATHSIG, SIGHUP);
+			if (prctl(PR_SET_PDEATHSIG, SIGHUP) < 0)
+			{
+				fail();
+			}
 
 			execvp(parameters.executable.c_str(), argument_pointers.data());
 			fail();

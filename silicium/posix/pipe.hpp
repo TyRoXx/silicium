@@ -8,9 +8,13 @@ namespace Si
 {
 	namespace detail
 	{
-		inline void set_close_on_exec(native_file_descriptor file)
+		inline boost::system::error_code set_close_on_exec(native_file_descriptor file)
 		{
-			fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC);
+			if (fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC) < 0)
+			{
+				return boost::system::error_code(errno, boost::system::native_ecat);
+			}
+			return {};
 		}
 	}
 
