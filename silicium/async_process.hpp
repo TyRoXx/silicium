@@ -110,7 +110,7 @@ namespace Si
 		});
 		argument_pointers.emplace_back(nullptr);
 
-		pipe child_error = make_pipe();
+		pipe child_error = make_pipe().get();
 
 		pid_t const forked = fork();
 		if (forked < 0)

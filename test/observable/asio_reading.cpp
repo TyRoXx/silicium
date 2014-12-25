@@ -10,7 +10,7 @@
 BOOST_AUTO_TEST_CASE(asio_reading_observable)
 {
 	boost::asio::io_service io;
-	Si::pipe p = Si::make_pipe();
+	Si::pipe p = Si::make_pipe().get();
 	boost::asio::posix::stream_descriptor reader(io, p.read.release());
 	boost::asio::posix::stream_descriptor writer(io, p.write.release());
 	boost::array<char, 1024> read_buffer;

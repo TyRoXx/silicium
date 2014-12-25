@@ -53,11 +53,11 @@ namespace Si
 		pipe stdout;
 		if (parameters.out)
 		{
-			stdout = make_pipe();
+			stdout = make_pipe().get();
 		}
 
-		auto stdin = make_pipe();
-		auto child_error = make_pipe();
+		auto stdin = make_pipe().get();
+		auto child_error = make_pipe().get();
 
 		pid_t const forked = fork();
 		if (forked < 0)

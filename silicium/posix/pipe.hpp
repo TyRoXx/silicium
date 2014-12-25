@@ -2,6 +2,7 @@
 #define SILICIUM_POSIX_PIPE_HPP
 
 #include <silicium/file_handle.hpp>
+#include <silicium/error_or.hpp>
 #include <fcntl.h>
 
 namespace Si
@@ -34,17 +35,17 @@ namespace Si
 		}
 	};
 
-	inline pipe make_pipe()
+	inline error_or<pipe> make_pipe()
 	{
 		std::array<int, 2> fds;
 		if (::pipe(fds.data()) < 0)
 		{
-			throw boost::system::system_error(errno, boost::system::system_category());
+			return boost::system::error_code(errno, boost::system::system_category());
 		}
 		pipe result;
 		result.read  = file_handle(fds[0]);
 		result.write = file_handle(fds[1]);
-		return result;
+		return std::move(result);
 	}
 }
 

@@ -42,9 +42,9 @@ namespace
 
 	process_output run_process(Si::async_process_parameters parameters)
 	{
-		Si::pipe standard_input = Si::make_pipe();
-		Si::pipe standard_output = Si::make_pipe();
-		Si::pipe standard_error = Si::make_pipe();
+		Si::pipe standard_input = Si::make_pipe().get();
+		Si::pipe standard_output = Si::make_pipe().get();
+		Si::pipe standard_error = Si::make_pipe().get();
 
 		Si::async_process process = Si::launch_process(parameters, standard_input.read.handle, standard_output.write.handle, standard_error.write.handle).get();
 		standard_input.read.close();
