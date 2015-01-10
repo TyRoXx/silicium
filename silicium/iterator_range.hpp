@@ -49,6 +49,14 @@ namespace Si
 		{
 		}
 
+		template <class OtherIterator>
+		iterator_range &operator = (iterator_range<OtherIterator> const &other) BOOST_NOEXCEPT
+		{
+			m_begin = other.begin();
+			m_end = other.end();
+			return *this;
+		}
+
 		BOOST_CONSTEXPR Iterator const &begin() const BOOST_NOEXCEPT
 		{
 			return m_begin;

@@ -102,6 +102,10 @@
 	struct_name(struct_name &&) BOOST_NOEXCEPT = default; \
 	struct_name &operator = (struct_name &&) BOOST_NOEXCEPT = default;
 
+#define SILICIUM_DEFAULT_COPY(struct_name) \
+	struct_name(struct_name const &) = default; \
+	struct_name &operator = (struct_name const &) = default;
+
 #ifdef _MSC_VER
 #	define SILICIUM_DEPRECATED __declspec(deprecated)
 #else

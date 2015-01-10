@@ -60,8 +60,7 @@ namespace
 			: socket(&socket)
 			, yield(&yield)
 			, received(4096)
-			, receiver(socket, Si::make_iterator_range(received.data(), received.data() + received.size()))
-			, receiving_(Si::observable_source<socket_observable, Si::push_context<Si::nothing>>(receiver, yield))
+			, receiving_(Si::observable_source<socket_observable, Si::push_context<Si::nothing>>(socket_observable(socket, Si::make_iterator_range(received.data(), received.data() + received.size())), yield))
 		{
 		}
 
@@ -94,7 +93,6 @@ namespace
 		boost::asio::ip::tcp::socket *socket;
 		Si::push_context<Si::nothing> *yield;
 		std::vector<char> received;
-		socket_observable receiver;
 		Si::virtualized_source<Si::observable_source<socket_observable, Si::push_context<Si::nothing>>> receiving_;
 	};
 

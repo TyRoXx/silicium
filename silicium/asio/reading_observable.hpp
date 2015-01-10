@@ -28,6 +28,11 @@ namespace Si
 				assert(this->buffer.size() >= 1);
 			}
 
+#if SILICIUM_COMPILER_GENERATES_MOVES
+			SILICIUM_DEFAULT_NOEXCEPT_MOVE(reading_observable)
+			SILICIUM_DEFAULT_COPY(reading_observable)
+#endif
+
 			template <class Observer>
 			void async_get_one(Observer &&receiver)
 			{

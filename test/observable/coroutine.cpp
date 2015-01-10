@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(spawn_coroutine_get_one)
 		BOOST_REQUIRE(!elapsed);
 		auto timer = Si::asio::make_timer(io);
 		timer.expires_from_now(std::chrono::microseconds(1));
-		boost::optional<Si::asio::timer_elapsed> e = yield.get_one(Si::ref(timer));
+		Si::optional<Si::asio::timer_elapsed> e = yield.get_one(Si::ref(timer));
 		BOOST_CHECK(e);
 		BOOST_REQUIRE(!elapsed);
 		elapsed = true;
