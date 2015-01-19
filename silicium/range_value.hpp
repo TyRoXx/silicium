@@ -1,6 +1,7 @@
 #ifndef SILICIUM_RANGE_VALUE_HPP
 #define SILICIUM_RANGE_VALUE_HPP
 
+#include <silicium/config.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
