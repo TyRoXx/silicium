@@ -1,19 +1,46 @@
 #ifndef SILICIUM_NOEXCEPT_STRING_HPP
 #define SILICIUM_NOEXCEPT_STRING_HPP
 
-#ifdef _MSC_VER
-#	include <string>
-#else
-#	include <boost/container/string.hpp>
-#endif
+#include <string>
+#include <boost/container/string.hpp>
 
 namespace Si
 {
 #ifdef _MSC_VER
 	//boost string does not work at all on VC++ 2013 Update 3, so we use std::string instead
 	typedef std::string noexcept_string;
+
+	inline noexcept_string to_noexcept_string(boost::container::string const &str)
+	{
+		return noexcept_string(str.data(), str.size());
+	}
+
+	inline noexcept_string &&to_noexcept_string(noexcept_string &&str)
+	{
+		return std::move(str);
+	}
+
+	inline noexcept_string to_noexcept_string(noexcept_string const &str)
+	{
+		return str;
+	}
 #else
 	typedef boost::container::string noexcept_string;
+
+	inline noexcept_string to_noexcept_string(std::string const &str)
+	{
+		return noexcept_string(str.data(), str.size());
+	}
+
+	inline noexcept_string &&to_noexcept_string(noexcept_string &&str)
+	{
+		return std::move(str);
+	}
+
+	inline noexcept_string to_noexcept_string(noexcept_string const &str)
+	{
+		return str;
+	}
 #endif
 }
 
