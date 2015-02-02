@@ -31,6 +31,7 @@
 #include <silicium/fast_variant.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/file_notification.hpp>
+#include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/git/oxid.hpp>
 #include <silicium/git/repository.hpp>
@@ -49,6 +50,7 @@
 #include <silicium/linux/dynamic_library_impl.hpp>
 #include <silicium/linux/inotify.hpp>
 #include <silicium/linux/inotify_watch_descriptor.hpp>
+#include <silicium/linux/process_handle.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
