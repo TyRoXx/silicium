@@ -43,6 +43,8 @@ namespace Si
 	template <class Value, class Error = boost::system::error_code>
 	struct error_or
 	{
+		typedef Value value_type;
+
 		error_or() BOOST_NOEXCEPT
 			: code(0)
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
