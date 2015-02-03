@@ -107,6 +107,12 @@ namespace Si
 	};
 
 	template <class Iterator>
+	bool operator == (iterator_range<Iterator> const &left, iterator_range<Iterator> const &right)
+	{
+		return (left.begin() == right.begin()) && (left.end() == right.end());
+	}
+
+	template <class Iterator>
 	BOOST_CONSTEXPR Iterator const &begin(iterator_range<Iterator> const &range)
 	{
 		return range.begin();
