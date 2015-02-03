@@ -127,6 +127,7 @@
 #include <silicium/source/ref.hpp>
 #include <silicium/source/single_source.hpp>
 #include <silicium/source/source.hpp>
+#include <silicium/source/throwing_source.hpp>
 #include <silicium/source/transforming_source.hpp>
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/std_threading.hpp>

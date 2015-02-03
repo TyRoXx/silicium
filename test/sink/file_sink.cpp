@@ -101,8 +101,8 @@ BOOST_AUTO_TEST_CASE(file_sink_writev)
 		{
 			break;
 		}
-		std::size_t size = piece->get();
-		all_read.insert(all_read.end(), read_buffer.begin(), read_buffer.begin() + size);
+		auto piece_buffer = piece->get();
+		all_read.insert(all_read.end(), piece_buffer.begin(), piece_buffer.end());
 	}
 
 	BOOST_CHECK_EQUAL(payload.size() * 3, all_read.size());

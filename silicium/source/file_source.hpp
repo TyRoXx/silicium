@@ -4,6 +4,7 @@
 #include <silicium/source/generator_source.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/config.hpp>
+#include <silicium/memory_range.hpp>
 #include <silicium/file_handle.hpp>
 #include <boost/system/error_code.hpp>
 #include <functional>
@@ -14,7 +15,7 @@
 
 namespace Si
 {
-	typedef Si::error_or<std::size_t> file_read_result;
+	typedef Si::error_or<Si::memory_range> file_read_result;
 
 	inline auto make_file_source(native_file_descriptor file, iterator_range<char *> read_buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
@@ -52,7 +53,7 @@ namespace Si
 				//end of file
 				return Si::none;
 			}
-			return file_read_result{static_cast<std::size_t>(read_bytes)};
+			return file_read_result{Si::make_memory_range(read_buffer.begin(), read_buffer.begin() + read_bytes)};
 		}));
 	}
 }
