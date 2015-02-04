@@ -78,9 +78,11 @@ namespace Si
 			KeyStringLike const &key,
 			ValueStringLike const &value)
 		{
+			append(sink, " ");
 			append(sink, key);
 			append(sink, "=\"");
-			write_escaped(sink, value);
+			//TODO: escape " or sth
+			append(sink, value);
 			append(sink, '"');
 		}
 
@@ -122,6 +124,14 @@ namespace Si
 			{
 				open_element(m_out, name);
 				make_content();
+				close_element(m_out, name);
+			}
+
+			template <class StringLike>
+			void element_with_text(boost::string_ref const &name, StringLike const &text)
+			{
+				open_element(m_out, name);
+				write(text);
 				close_element(m_out, name);
 			}
 
