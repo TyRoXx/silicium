@@ -34,7 +34,7 @@ namespace
 			Si::http::generate_status_line(response_writer, "HTTP/1.0", "200", "OK");
 			std::string const content = "Hello";
 			Si::http::generate_header(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
-			Si::append(response_writer, "\r\n");
+			Si::http::finish_headers(response_writer);
 			Si::append(response_writer, content);
 		}
 

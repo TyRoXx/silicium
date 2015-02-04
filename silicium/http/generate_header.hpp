@@ -9,13 +9,19 @@ namespace Si
 {
 	namespace http
 	{
+		template <class CharSink>
+		void finish_line(CharSink &&out)
+		{
+			append(out, "\r\n");
+		}
+
 		template <class CharSink, class Key, class Value>
 		void generate_header(CharSink &&out, Key const &key, Value const &value)
 		{
 			append(out, key);
 			append(out, ": ");
 			append(out, value);
-			append(out, "\r\n");
+			finish_line(out);
 		}
 
 		namespace detail
@@ -28,6 +34,12 @@ namespace Si
 					generate_header(out, argument.first, argument.second);
 				}
 			}
+		}
+
+		template <class CharSink>
+		void finish_headers(CharSink &&out)
+		{
+			finish_line(out);
 		}
 	}
 }
