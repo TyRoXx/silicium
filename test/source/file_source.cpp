@@ -10,13 +10,14 @@ namespace
 {
 	Si::file_handle read_test_file()
 	{
-		return Si::open_reading(
+		auto const name =
 #ifdef _WIN32
 			"C:/Windows/system.ini"
 #else
 			"/dev/zero"
 #endif
-		).get();
+		;
+		return SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::open_reading(name).get());
 	}
 }
 

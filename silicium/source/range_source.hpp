@@ -71,6 +71,9 @@ namespace Si
 
 	template <class ForwardRange>
 	auto make_range_source(ForwardRange &&range)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> range_source<typename std::decay<ForwardRange>::type>
+#endif
 	{
 		return range_source<typename std::decay<ForwardRange>::type>(std::forward<ForwardRange>(range));
 	}
