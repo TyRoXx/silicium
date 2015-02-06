@@ -434,6 +434,21 @@ namespace Si
 		return out << value.get();
 	}
 
+	namespace detail
+	{
+		template <class T>
+		typename std::remove_reference<T>::type &&move_if(boost::mpl::true_, T &&ref)
+		{
+			return std::move(ref);
+		}
+
+		template <class T>
+		T &move_if(boost::mpl::false_, T &&ref)
+		{
+			return ref;
+		}
+	}
+
 	template <class ErrorOr, class OnValue, class CleanErrorOr = typename std::decay<ErrorOr>::type, class = typename std::enable_if<is_error_or<CleanErrorOr>::value, void>::type>
 	auto map(ErrorOr &&maybe, OnValue &&on_value)
 		-> error_or<decltype(std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get()))>
@@ -442,7 +457,15 @@ namespace Si
 		{
 			return maybe.error();
 		}
-		return std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get());
+		return std::forward<OnValue>(on_value)(
+#if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+			detail::move_if(boost::mpl::bool_<!boost::is_lvalue_reference<ErrorOr>::value>(),
+#endif
+				std::forward<ErrorOr>(maybe).get()
+#if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+			)
+#endif
+		);
 	}
 
 	template <class Value, class Error>

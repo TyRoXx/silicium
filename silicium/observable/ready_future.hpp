@@ -43,6 +43,19 @@ namespace Si
 		{
 		}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		ready_future(ready_future &&other)
+			: value(std::move(other.value))
+		{
+		}
+
+		ready_future &operator = (ready_future &&other)
+		{
+			value = std::move(other.value);
+			return *this;
+		}
+#endif
+
 		explicit ready_future(Element value)
 			: value(std::move(value))
 		{
