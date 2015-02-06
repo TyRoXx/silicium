@@ -3,17 +3,28 @@
 
 #include <silicium/source/transforming_source.hpp>
 
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+#	include <silicium/source/ptr_source.hpp>
+#endif
+
 namespace Si
 {
 	template <class SourceOfErrorOrs>
 	auto make_throwing_source(SourceOfErrorOrs &&input)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> ptr_source<std::unique_ptr<source<typename std::decay<SourceOfErrorOrs>::type::element_type::value_type>>>
+#endif
 	{
-		return make_transforming_source(
+		return
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			erase_source
+#endif
+			(make_transforming_source(
 			std::forward<SourceOfErrorOrs>(input),
 			[](typename std::decay<SourceOfErrorOrs>::type::element_type element)
 		{
 			return std::move(element).get();
-		});
+		}));
 	}
 }
 

@@ -34,6 +34,19 @@ namespace Si
 		{
 		}
 
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		enumerating_source(enumerating_source &&other)
+			: m_input(std::move(other.m_input))
+		{
+		}
+
+		enumerating_source &operator = (enumerating_source &&other)
+		{
+			m_input = std::move(other.m_input);
+			return *this;
+		}
+#endif
+
 		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (!m_rest.empty())

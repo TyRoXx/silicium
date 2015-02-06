@@ -11,6 +11,10 @@ namespace Si
 	template <class From, class Transformation, class To>
 	struct transforming_source SILICIUM_FINAL : source<To>
 	{
+		transforming_source()
+		{
+		}
+
 		template <class Transformation2>
 		explicit transforming_source(From original, Transformation2 &&transform)
 			: original(std::move(original))

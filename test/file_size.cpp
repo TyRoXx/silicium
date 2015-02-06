@@ -32,12 +32,21 @@ BOOST_AUTO_TEST_CASE(file_size_non_empty)
 
 BOOST_AUTO_TEST_CASE(file_size_error)
 {
-	Si::optional<boost::uintmax_t> size = Si::file_size(
 #ifdef _WIN32
-		GetStdHandle(STD_INPUT_HANDLE)
+	Si::native_file_descriptor stdinput = GetStdHandle(STD_INPUT_HANDLE);
+	BOOST_REQUIRE_NE(Si::no_file_handle, stdinput);
+#endif
+	Si::error_or<Si::optional<boost::uintmax_t>> size = Si::file_size(
+#ifdef _WIN32
+		stdinput
 #else
 		STDIN_FILENO
 #endif
-		).get();
-	BOOST_CHECK_EQUAL(Si::none, size);
+		);
+#ifdef _WIN32
+	BOOST_REQUIRE(size.is_error());
+	BOOST_CHECK_EQUAL(boost::system::error_code(ERROR_INVALID_HANDLE, boost::system::system_category()), size.error());
+#else
+	BOOST_CHECK_EQUAL(Si::none, size.get());
+#endif
 }

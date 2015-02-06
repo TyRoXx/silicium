@@ -4,8 +4,8 @@
 #include <silicium/asio/reading_observable.hpp>
 #include <silicium/source/error_extracting_source.hpp>
 #include <silicium/source/enumerating_source.hpp>
+#include <silicium/source/ptr_source.hpp>
 #include <silicium/source/observable_source.hpp>
-#include <silicium/source/ref.hpp>
 #include <silicium/http/parse_request.hpp>
 #include <boost/array.hpp>
 
