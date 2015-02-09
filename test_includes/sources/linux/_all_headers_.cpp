@@ -63,6 +63,8 @@
 #include <silicium/observable/empty.hpp>
 #include <silicium/observable/end.hpp>
 #include <silicium/observable/enumerate.hpp>
+#include <silicium/observable/erase_shared.hpp>
+#include <silicium/observable/erase_unique.hpp>
 #include <silicium/observable/erased_observer.hpp>
 #include <silicium/observable/extensible_observer.hpp>
 #include <silicium/observable/filter.hpp>

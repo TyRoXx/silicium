@@ -3,6 +3,7 @@
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/for_each.hpp>
 #include <silicium/observable/coroutine_generator.hpp>
+#include <silicium/observable/erase_shared.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/interprocess/sync/null_mutex.hpp>
 

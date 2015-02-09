@@ -11,6 +11,8 @@
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/coroutine_generator.hpp>
+#include <silicium/observable/erase_shared.hpp>
+#include <silicium/observable/erase_unique.hpp>
 #include <silicium/asio/reading_observable.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>

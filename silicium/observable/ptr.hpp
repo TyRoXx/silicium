@@ -64,64 +64,6 @@ namespace Si
 
 		Ptr content;
 	};
-
-#if SILICIUM_COMPILER_HAS_USING
-	template <class Element>
-	using unique_observable = ptr_observable<Element, std::unique_ptr<observable<Element>>>;
-#else
-	template <class Element>
-	struct unique_observable : ptr_observable<Element, std::unique_ptr<observable<Element>>>
-	{
-		typedef ptr_observable<Element, std::unique_ptr<observable<Element>>> base;
-
-		template <class Initializer>
-		unique_observable(Initializer &&init)
-			: base(std::forward<Initializer>(init))
-		{
-		}
-	};
-#endif
-
-#if SILICIUM_COMPILER_HAS_USING
-	template <class Element>
-	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element>>>;
-#else
-	template <class Element>
-	struct shared_observable : ptr_observable<Element, std::shared_ptr<observable<Element>>>
-	{
-		typedef ptr_observable<Element, std::shared_ptr<observable<Element>>> base;
-
-		template <class Initializer>
-		shared_observable(Initializer &&init)
-			: base(std::forward<Initializer>(init))
-		{
-		}
-	};
-#endif
-
-	template <class Input>
-	auto erase_unique(Input &&input) -> Si::unique_observable<typename std::decay<Input>::type::element_type>
-	{
-		typedef typename std::decay<Input>::type clean_input;
-		typedef typename clean_input::element_type element_type;
-		return Si::unique_observable<element_type>(
-					Si::make_unique<Si::virtualized_observable<clean_input>>(
-						std::forward<Input>(input)
-					)
-				);
-	}
-
-	template <class Input>
-	auto erase_shared(Input &&input) -> Si::shared_observable<typename std::decay<Input>::type::element_type>
-	{
-		typedef typename std::decay<Input>::type clean_input;
-		typedef typename clean_input::element_type element_type;
-		return Si::shared_observable<element_type>(
-					std::make_shared<Si::virtualized_observable<clean_input>>(
-						std::forward<Input>(input)
-					)
-				);
-	}
 }
 
 #endif
