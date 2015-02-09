@@ -102,6 +102,10 @@
 	struct_name(struct_name &&) BOOST_NOEXCEPT = default; \
 	struct_name &operator = (struct_name &&) BOOST_NOEXCEPT = default;
 
+#define SILICIUM_DEFAULT_MOVE(struct_name) \
+	struct_name(struct_name &&) = default; \
+	struct_name &operator = (struct_name &&) = default;
+
 #define SILICIUM_DEFAULT_COPY(struct_name) \
 	struct_name(struct_name const &) = default; \
 	struct_name &operator = (struct_name const &) = default;

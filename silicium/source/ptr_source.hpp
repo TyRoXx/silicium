@@ -21,7 +21,9 @@ namespace Si
 		{
 		}
 
-#if !SILICIUM_COMPILER_GENERATES_MOVES
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		SILICIUM_DEFAULT_MOVE(ptr_source)
+#else
 		ptr_source(ptr_source &&other)
 			: m_ptr(std::move(other.m_ptr))
 		{
