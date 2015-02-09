@@ -50,7 +50,7 @@ namespace Si
 		bool get_one(Observable &&from, Gotten &result) const
 		{
 			bool got_result = false;
-			auto tf = Si::virtualize_observable(Si::transform(Si::ref(from), [&result, &got_result](Gotten element)
+			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result, &got_result](Gotten element)
 			{
 				result = std::move(element);
 				got_result = true;
