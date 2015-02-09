@@ -68,7 +68,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_bridge)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::observable<int>>> first(bridge);
+		Si::ptr_observable<int, std::shared_ptr<Si::observable<int, Si::ptr_observer<Si::observer<int>>>>> first(bridge);
 		auto ones  = Si::make_generator_observable([]{ return 1; });
 		auto both = Si::make_tuple(first, ones);
 		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
@@ -94,7 +94,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::observable<int>>> first{bridge};
+		Si::ptr_observable<int, std::shared_ptr<Si::observable<int, Si::ptr_observer<Si::observer<int>>>>> first{bridge};
 		auto buf = Si::make_buffer_observable(first, 2);
 		buf.prefetch();
 
@@ -170,7 +170,7 @@ namespace Si
 		boost::asio::io_service *dispatcher;
 		boost::optional<boost::asio::io_service::work> blocker;
 		Action action;
-		Si::observable<Element> *from;
+		Si::observable<Element, Si::ptr_observer<Si::observer<Element>>> *from;
 
 		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
 			: dispatcher(&dispatcher)
@@ -205,7 +205,8 @@ namespace Si
 	};
 
 	template <class Element, class Action>
-	auto blocking_then(boost::asio::io_service &io, Si::observable<Element> &from, Action &&action) -> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
+	auto blocking_then(boost::asio::io_service &io, Si::observable<Element, Si::ptr_observer<Si::observer<Element>>> &from, Action &&action)
+		-> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
 	{
 		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(io, std::forward<Action>(action));
 		from.async_get_one(*state);
@@ -229,7 +230,7 @@ namespace Si
 	};
 
 	template <class Element>
-	struct connection : observable<Element>
+	struct connection : observable<Element, ptr_observer<observer<Element>>>
 	{
 		typedef Element element_type;
 

@@ -32,7 +32,7 @@ struct silicium_receiver : Si::observer<void *>
 	}
 };
 
-struct silicium_observable : Si::observable<void *>
+struct silicium_observable : Si::observable<void *, Si::ptr_observer<Si::observer<void *>>>
 {
 	silicium_receiver receiver;
 };

@@ -15,7 +15,7 @@ namespace Si
 			virtual ~basic_yield_context()
 			{
 			}
-			virtual void get_one(observable<nothing> &target) = 0;
+			virtual void get_one(observable<nothing, ptr_observer<observer<nothing>>> &target) = 0;
 		};
 
 		template <class Element>
@@ -36,7 +36,7 @@ namespace Si
 		boost::optional<Gotten> get_one(Observable &&from) const
 		{
 			boost::optional<Gotten> result;
-			auto tf = Si::virtualize_observable(Si::transform(Si::ref(from), [&result](Gotten element)
+			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result](Gotten element)
 			{
 				assert(!result);
 				result = std::move(element);

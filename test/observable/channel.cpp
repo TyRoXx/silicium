@@ -121,7 +121,7 @@ namespace Si
 			yield.get_one(message_bound);
 		}
 
-		observable<Message> &receiver()
+		observable<Message, ptr_observer<observer<Message>>> &receiver()
 		{
 			return receiving;
 		}
@@ -129,7 +129,7 @@ namespace Si
 	private:
 
 		detail::channel_common_state<Message, mutex> state;
-		virtualized_observable<detail::channel_receiving_end<Message, mutex>> receiving;
+		virtualized_observable<detail::channel_receiving_end<Message, mutex>, ptr_observer<observer<Message>>> receiving;
 		detail::channel_sending_end<Message, mutex> sending;
 	};
 }

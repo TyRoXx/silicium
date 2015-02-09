@@ -9,7 +9,7 @@ namespace Si
 {
 	template <class Input>
 	struct cache_observable
-			: public observable<typename Input::element_type>
+			: public observable<typename Input::element_type, ptr_observer<observer<typename Input::element_type>>>
 			, private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;

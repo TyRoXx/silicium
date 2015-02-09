@@ -184,7 +184,7 @@ namespace Si
 				}
 			}
 
-			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
+			virtual void get_one(observable<nothing, ptr_observer<observer<nothing>>> &target) SILICIUM_OVERRIDE
 			{
 				got_something.block(target);
 			}

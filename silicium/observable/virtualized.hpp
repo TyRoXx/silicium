@@ -8,8 +8,8 @@
 
 namespace Si
 {
-	template <class Observable>
-	struct virtualized_observable : observable<typename Observable::element_type>
+	template <class Observable, class Observer>
+	struct virtualized_observable : observable<typename Observable::element_type, Observer>
 	{
 		typedef typename Observable::element_type element_type;
 
@@ -35,7 +35,7 @@ namespace Si
 		}
 #endif
 
-		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(Observer receiver) SILICIUM_OVERRIDE
 		{
 			return next.async_get_one(receiver);
 		}
@@ -45,13 +45,13 @@ namespace Si
 		Observable next;
 	};
 
-	template <class Observable>
+	template <class Observer, class Observable>
 	BOOST_CONCEPT_REQUIRES(
 		((Si::Observable<typename std::decay<Observable>::type>)),
-		(virtualized_observable<typename std::decay<Observable>::type>))
+		(virtualized_observable<typename std::decay<Observable>::type, Observer>))
 	virtualize_observable(Observable &&next)
 	{
-		return virtualized_observable<typename std::decay<Observable>::type>(std::forward<Observable>(next));
+		return virtualized_observable<typename std::decay<Observable>::type, Observer>(std::forward<Observable>(next));
 	}
 }
 

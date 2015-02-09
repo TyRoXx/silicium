@@ -7,12 +7,12 @@ namespace Si
 {
 #if SILICIUM_COMPILER_HAS_USING
 	template <class Element>
-	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element>>>;
+	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element, ptr_observer<observer<Element>>>>>;
 #else
 	template <class Element>
-	struct shared_observable : ptr_observable<Element, std::shared_ptr<observable<Element>>>
+	struct shared_observable : ptr_observable<Element, std::shared_ptr<observable<Element, ptr_observer<observer<Element>>>>>
 	{
-		typedef ptr_observable<Element, std::shared_ptr<observable<Element>>> base;
+		typedef ptr_observable<Element, std::shared_ptr<observable<Element, ptr_observer<observer<Element>>>>> base;
 
 		template <class Initializer>
 		shared_observable(Initializer &&init)
@@ -28,7 +28,7 @@ namespace Si
 		typedef typename std::decay<Input>::type clean_input;
 		typedef typename clean_input::element_type element_type;
 		return Si::shared_observable<element_type>(
-					std::make_shared<Si::virtualized_observable<clean_input>>(
+					std::make_shared<Si::virtualized_observable<clean_input, ptr_observer<observer<element_type>>>>(
 						std::forward<Input>(input)
 					)
 				);

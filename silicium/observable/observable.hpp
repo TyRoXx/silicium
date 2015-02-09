@@ -7,7 +7,7 @@
 
 namespace Si
 {
-	template <class Element, class Observer = ptr_observer<observer<Element>>>
+	template <class Element, class Observer>
 	struct observable
 	{
 		typedef Element element_type;

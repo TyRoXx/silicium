@@ -56,7 +56,7 @@ namespace Si
 
 		struct yield
 		{
-			Si::observable<nothing> *target;
+			observable<nothing, ptr_observer<observer<nothing>>> *target;
 		};
 
 		template <class Element>
@@ -84,7 +84,7 @@ namespace Si
 				(*consumer)(detail::result<Element *>(&result));
 			}
 
-			virtual void get_one(observable<nothing> &target) SILICIUM_OVERRIDE
+			virtual void get_one(observable<nothing, ptr_observer<observer<nothing>>> &target) SILICIUM_OVERRIDE
 			{
 				(*consumer)(detail::yield{&target});
 			}

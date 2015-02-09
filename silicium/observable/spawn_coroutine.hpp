@@ -137,7 +137,7 @@ namespace Si
 
 	struct spawn_context
 	{
-		typedef std::function<void(observable<nothing> &)> wait_function;
+		typedef std::function<void(observable<nothing, ptr_observer<observer<nothing>>> &)> wait_function;
 
 		spawn_context()
 		{
@@ -154,7 +154,7 @@ namespace Si
 		{
 			typedef typename std::decay<Observable>::type::element_type element_type;
 			Si::optional<element_type> result;
-			auto waiting_for = virtualize_observable(
+			auto waiting_for = virtualize_observable<ptr_observer<observer<nothing>>>(
 				transform_observer<nothing>(
 					std::forward<Observable>(from),
 					[this, &result](ptr_observer<observer<nothing>> previous_observer)
@@ -207,7 +207,7 @@ namespace Si
 				m_coro = coroutine::pull_type([this, function](coroutine::push_type &push)
 				{
 					spawn_context context(
-						[this, &push](observable<nothing> &waiting_for)
+						[this, &push](observable<nothing, ptr_observer<observer<nothing>>> &waiting_for)
 						{
 							wait_for(waiting_for);
 							if (m_waiting)
@@ -230,7 +230,7 @@ namespace Si
 			bool m_waiting;
 			bool m_suspended;
 
-			void wait_for(observable<nothing> &waiting_for)
+			void wait_for(observable<nothing, ptr_observer<observer<nothing>>> &waiting_for)
 			{
 				m_waiting = true;
 				waiting_for.async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));

@@ -78,7 +78,7 @@ namespace
 
 			auto sending = Si::asio::make_writing_observable(*socket);
 			sending.set_buffer(data);
-			auto virtualized = Si::virtualize_observable(sending);
+			auto virtualized = Si::virtualize_observable<Si::ptr_observer<Si::observer<boost::system::error_code>>>(sending);
 
 			//ignore error
 			yield->get_one(virtualized);
