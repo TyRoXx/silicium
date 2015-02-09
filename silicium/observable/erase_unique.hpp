@@ -23,7 +23,10 @@ namespace Si
 #endif
 
 	template <class Input>
-	auto erase_unique(Input &&input) -> Si::unique_observable<typename std::decay<Input>::type::element_type>
+	auto erase_unique(Input &&input)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> Si::unique_observable<typename std::decay<Input>::type::element_type>
+#endif
 	{
 		typedef typename std::decay<Input>::type clean_input;
 		typedef typename clean_input::element_type element_type;
