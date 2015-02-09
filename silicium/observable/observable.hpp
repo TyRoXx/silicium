@@ -7,7 +7,7 @@
 
 namespace Si
 {
-	template <class Element>
+	template <class Element, class Observer = ptr_observer<observer<Element>>>
 	struct observable
 	{
 		typedef Element element_type;
@@ -16,7 +16,7 @@ namespace Si
 		{
 		}
 
-		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) = 0;
+		virtual void async_get_one(Observer receiver) = 0;
 	};
 
 	template <class X>
