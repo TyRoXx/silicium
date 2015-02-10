@@ -2,6 +2,7 @@
 #define SILICIUM_ERASED_OBSERVER_HPP
 
 #include <silicium/observable/observer.hpp>
+#include <silicium/to_unique.hpp>
 
 namespace Si
 {
@@ -16,7 +17,7 @@ namespace Si
 
 		template <class Observer>
 		explicit erased_observer(Observer &&observer)
-			: m_original(Si::to_unique(Si::virtualize_observer(std::forward<Observer>(observer))))
+			: m_original(to_unique(virtualize_observer(std::forward<Observer>(observer))))
 		{
 		}
 
