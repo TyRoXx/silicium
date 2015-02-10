@@ -6,6 +6,7 @@
 #include <silicium/observable/transform_if_initialized.hpp>
 #include <silicium/observable/enumerate.hpp>
 #include <silicium/observable/ref.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <boost/optional.hpp>
 
 namespace Si
@@ -20,6 +21,9 @@ namespace Si
 			case IN_CREATE: return file_notification_type::add;
 			case IN_DELETE: return file_notification_type::remove;
 			case IN_MODIFY: return file_notification_type::change;
+			case IN_MOVED_FROM: return file_notification_type::remove;
+			case IN_MOVED_TO: return file_notification_type::add;
+
 			default:
 				return boost::none;
 			}
@@ -54,7 +58,21 @@ namespace Si
 		template <class Observer>
 		void async_get_one(Observer &&receiver)
 		{
-			impl.async_get_one(std::forward<Observer>(receiver));
+			impl.async_get_one(
+				function_observer<std::function<void (optional<file_notification>)>>(
+					[observer = std::forward<Observer>(receiver)](optional<file_notification> element) mutable
+					{
+						if (element)
+						{
+							std::move(observer).got_element(std::move(*element));
+						}
+						else
+						{
+							std::move(observer).ended();
+						}
+					}
+				)
+			);
 		}
 
 	private:
@@ -64,7 +82,8 @@ namespace Si
 		conditional_transformer<
 			file_notification,
 			enumerator<ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
-			boost::optional<file_notification>(*)(linux::file_notification &&)
+			boost::optional<file_notification>(*)(linux::file_notification &&),
+			function_observer<std::function<void (optional<file_notification>)>>
 		> impl;
 		linux::watch_descriptor root;
 	};

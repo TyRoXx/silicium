@@ -5,7 +5,7 @@
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/linux/inotify_watch_descriptor.hpp>
-#include <boost/filesystem/path.hpp>
+#include <silicium/path.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/swap.hpp>
 #include <boost/optional.hpp>
@@ -19,7 +19,7 @@ namespace Si
 		struct file_notification
 		{
 			boost::uint32_t mask;
-			boost::filesystem::path name;
+			path name;
 		};
 
 		struct inotify_observable : private boost::noncopyable
@@ -83,7 +83,7 @@ namespace Si
 						for (std::size_t i = 0; i < bytes_read; )
 						{
 							inotify_event const &event = *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-							changes.emplace_back(file_notification{event.mask, boost::filesystem::path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0'))});
+							changes.emplace_back(file_notification{event.mask, path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0'))});
 							i += sizeof(inotify_event);
 							i += event.len;
 						}

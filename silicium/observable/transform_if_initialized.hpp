@@ -10,7 +10,7 @@
 
 namespace Si
 {
-	template <class Element, class Input, class Transformation>
+	template <class Element, class Input, class Transformation, class Observer = ptr_observer<observer<Element>>>
 	struct conditional_transformer
 		: private observer<typename Input::element_type>
 	{
@@ -48,10 +48,9 @@ namespace Si
 		}
 #endif
 
-		void async_get_one(ptr_observer<observer<element_type>> receiver)
+		void async_get_one(Observer receiver)
 		{
-			assert(!receiver_);
-			receiver_ = receiver.get();
+			receiver_ = receiver;
 			fetch();
 		}
 
@@ -59,7 +58,7 @@ namespace Si
 
 		Input original;
 		Transformation transform; //TODO: optimize for emptiness
-		observer<element_type> *receiver_;
+		Observer receiver_;
 
 		SILICIUM_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &))
 		SILICIUM_DELETED_FUNCTION(conditional_transformer &operator = (conditional_transformer const &))
@@ -71,11 +70,10 @@ namespace Si
 
 		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
 		{
-			assert(receiver_);
 			auto converted = transform(std::move(value));
 			if (converted)
 			{
-				Si::exchange(receiver_, nullptr)->got_element(std::move(*converted));
+				std::move(receiver_).got_element(std::move(*converted));
 			}
 			else
 			{
@@ -85,8 +83,7 @@ namespace Si
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			assert(receiver_);
-			Si::exchange(receiver_, nullptr)->ended();
+			std::move(receiver_).ended();
 		}
 	};
 

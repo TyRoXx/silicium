@@ -1,5 +1,6 @@
 #include <silicium/directory_watcher.hpp>
 #include <silicium/observable/consume.hpp>
+#include <silicium/observable/spawn_coroutine.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -68,9 +69,8 @@ namespace Si
 			std::bind(touch, test_file),
 			[&test_file](file_notification const &event)
 		{
-
 			BOOST_CHECK(file_notification_type::add == event.type);
-			BOOST_CHECK(equivalent(test_file, event.name));
+			BOOST_CHECK(equivalent(test_file, event.name.to_boost_path()));
 		});
 	}
 
@@ -90,7 +90,7 @@ namespace Si
 			[&test_file, &watched_dir](file_notification const &event)
 		{
 			BOOST_CHECK(file_notification_type::remove == event.type);
-			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
+			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
 		});
 	}
 
@@ -112,7 +112,51 @@ namespace Si
 			[&test_file, &watched_dir](file_notification const &event)
 		{
 			BOOST_CHECK(file_notification_type::change == event.type);
-			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
+			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
 		});
+	}
+
+	BOOST_AUTO_TEST_CASE(file_system_watcher_rename)
+	{
+		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
+		boost::filesystem::path const test_file_a = watched_dir / "test_a.txt";
+		boost::filesystem::path const test_file_b = watched_dir / "test_b.txt";
+
+		touch(test_file_a);
+		boost::filesystem::remove(test_file_b);
+
+		boost::asio::io_service io;
+		directory_watcher watcher(io, watched_dir);
+
+		bool got_something = false;
+
+		spawn_coroutine([&watcher, &test_file_a, &test_file_b, &got_something](spawn_context &yield)
+		{
+			optional<file_notification> first_event = yield.get_one(Si::ref(watcher));
+			BOOST_REQUIRE(first_event);
+			optional<file_notification> second_event = yield.get_one(Si::ref(watcher));
+			BOOST_REQUIRE(second_event);
+
+			got_something = true;
+
+			file_notification *remove = &*first_event;
+			file_notification *add = &*second_event;
+			if (add->type != file_notification_type::add)
+			{
+				using std::swap;
+				swap(remove, add);
+			}
+
+			BOOST_CHECK(file_notification_type::remove == remove->type);
+			BOOST_CHECK_EQUAL(test_file_a.leaf(), remove->name.to_boost_path());
+
+			BOOST_CHECK(file_notification_type::add == add->type);
+			BOOST_CHECK_EQUAL(test_file_b.leaf(), add->name.to_boost_path());
+		});
+
+		boost::filesystem::rename(test_file_a, test_file_b);
+		io.run();
+
+		BOOST_CHECK(got_something);
 	}
 }

@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_FILE_NOTIFICATION_HPP
 
 #include <boost/detail/scoped_enum_emulation.hpp>
-#include <boost/filesystem/path.hpp>
+#include <silicium/path.hpp>
 
 namespace Si
 {
@@ -17,14 +17,14 @@ namespace Si
 	struct file_notification
 	{
 		file_notification_type type;
-		boost::filesystem::path name;
+		path name;
 
-		file_notification()
+		file_notification() BOOST_NOEXCEPT
 			: type(file_notification_type::change)
 		{
 		}
 
-		file_notification(file_notification_type type, boost::filesystem::path name)
+		file_notification(file_notification_type type, path name) BOOST_NOEXCEPT
 			: type(type)
 			, name(std::move(name))
 		{
