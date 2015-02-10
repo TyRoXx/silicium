@@ -94,20 +94,49 @@ namespace Si
 		});
 	}
 
-	BOOST_AUTO_TEST_CASE(file_system_watcher_change)
+	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_write)
 	{
 		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
 		boost::filesystem::path const test_file = watched_dir / "test.txt";
 
 		touch(test_file);
 
+		std::ofstream file(test_file.string());
+		BOOST_REQUIRE(file);
+
 		test_single_event(
 			watched_dir,
-			[&test_file]
+			[&file]
 		{
-			std::ofstream file(test_file.string());
-			BOOST_REQUIRE(file);
 			file << "hello\n";
+			file.flush();
+			//we write to the file without closing it
+		},
+			[&test_file, &watched_dir](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::change == event.type);
+			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
+		});
+	}
+
+	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_close)
+	{
+		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
+		boost::filesystem::path const test_file = watched_dir / "test.txt";
+
+		touch(test_file);
+
+		std::ofstream file(test_file.string());
+		BOOST_REQUIRE(file);
+		file << "hello\n";
+		file.flush();
+
+		test_single_event(
+			watched_dir,
+			[&file]
+		{
+			//The closing of the file is expected to trigger a change event.
+			file.close();
 		},
 			[&test_file, &watched_dir](file_notification const &event)
 		{

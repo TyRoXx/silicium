@@ -18,11 +18,17 @@ namespace Si
 		{
 			switch (mask)
 			{
-			case IN_CREATE: return file_notification_type::add;
-			case IN_DELETE: return file_notification_type::remove;
-			case IN_MODIFY: return file_notification_type::change;
-			case IN_MOVED_FROM: return file_notification_type::remove;
-			case IN_MOVED_TO: return file_notification_type::add;
+			case IN_MOVED_TO:
+			case IN_CREATE:
+				return file_notification_type::add;
+
+			case IN_MOVED_FROM:
+			case IN_DELETE:
+				return file_notification_type::remove;
+
+			case IN_CLOSE_WRITE:
+			case IN_MODIFY:
+				return file_notification_type::change;
 
 			default:
 				return boost::none;
