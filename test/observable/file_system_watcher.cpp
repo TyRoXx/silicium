@@ -145,6 +145,28 @@ namespace Si
 		});
 	}
 
+	BOOST_AUTO_TEST_CASE(file_system_watcher_change_metadata)
+	{
+		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
+		boost::filesystem::path const test_file = watched_dir / "test.txt";
+
+		touch(test_file);
+
+		chmod(test_file.c_str(), 0555);
+
+		test_single_event(
+			watched_dir,
+			[&test_file]
+		{
+			chmod(test_file.c_str(), 0755);
+		},
+			[&test_file, &watched_dir](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::change_metadata == event.type);
+			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
+		});
+	}
+
 	BOOST_AUTO_TEST_CASE(file_system_watcher_move_out)
 	{
 
