@@ -14,34 +14,42 @@ namespace Si
 #ifdef __linux__
 	namespace linux
 	{
+		namespace detail
+		{
+			inline bool are_set(boost::uint32_t bitset, boost::uint32_t tested_bits)
+			{
+				return (bitset & tested_bits) == tested_bits;
+			}
+		}
+
 		boost::optional<file_notification_type> to_portable_file_notification_type(boost::uint32_t mask)
 		{
-			switch (mask)
+			using detail::are_set;
+			if (are_set(mask, IN_MOVED_TO) || are_set(mask, IN_CREATE))
 			{
-			case IN_MOVED_TO:
-			case IN_CREATE:
 				return file_notification_type::add;
-
-			case IN_MOVED_FROM:
-			case IN_DELETE:
-				return file_notification_type::remove;
-
-			case IN_CLOSE_WRITE:
-			case IN_MODIFY:
-				return file_notification_type::change;
-
-			case IN_MOVE_SELF:
-				return file_notification_type::move_self;
-
-			case IN_DELETE_SELF:
-				return file_notification_type::remove_self;
-
-			case IN_ATTRIB:
-				return file_notification_type::change_metadata;
-
-			default:
-				return boost::none;
 			}
+			if (are_set(mask, IN_MOVED_FROM) || are_set(mask, IN_DELETE))
+			{
+				return file_notification_type::remove;
+			}
+			if (are_set(mask, IN_CLOSE_WRITE) || are_set(mask, IN_MODIFY))
+			{
+				return file_notification_type::change;
+			}
+			if (are_set(mask, IN_MOVE_SELF))
+			{
+				return file_notification_type::move_self;
+			}
+			if (are_set(mask, IN_DELETE_SELF))
+			{
+				return file_notification_type::remove_self;
+			}
+			if (are_set(mask, IN_ATTRIB))
+			{
+				return file_notification_type::change_metadata;
+			}
+			return boost::none;
 		}
 
 		boost::optional<Si::file_notification> to_portable_file_notification(linux::file_notification &&original)

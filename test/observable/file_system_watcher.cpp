@@ -55,7 +55,7 @@ namespace Si
 		}
 	}
 
-	BOOST_AUTO_TEST_CASE(file_system_watcher_add)
+	BOOST_AUTO_TEST_CASE(file_system_watcher_add_regular)
 	{
 		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
 		boost::filesystem::path const test_file = watched_dir / "test.txt";
@@ -67,6 +67,29 @@ namespace Si
 		test_single_event(
 			watched_dir,
 			std::bind(touch, test_file),
+			[&test_file](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::add == event.type);
+			BOOST_CHECK(equivalent(test_file, event.name.to_boost_path()));
+		});
+	}
+
+	BOOST_AUTO_TEST_CASE(file_system_watcher_add_directory)
+	{
+		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
+		boost::filesystem::path const test_file = watched_dir / "test";
+
+		{
+			boost::system::error_code ec;
+			boost::filesystem::remove(test_file, ec);
+		}
+
+		test_single_event(
+			watched_dir,
+			[&test_file]
+		{
+			boost::filesystem::create_directory(test_file);
+		},
 			[&test_file](file_notification const &event)
 		{
 			BOOST_CHECK(file_notification_type::add == event.type);
@@ -93,6 +116,27 @@ namespace Si
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
 		});
 	}
+
+	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_directory)
+	{
+		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
+		boost::filesystem::path const test_file = watched_dir / "test";
+
+		boost::filesystem::create_directory(test_file);
+
+		test_single_event(
+			watched_dir,
+			[&test_file]
+		{
+			boost::filesystem::remove(test_file);
+		},
+			[&test_file, &watched_dir](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::remove == event.type);
+			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
+		});
+	}
+
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_write)
 	{
