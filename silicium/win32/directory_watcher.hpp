@@ -6,6 +6,7 @@
 #include <silicium/observable/enumerate.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/transform_if_initialized.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
 
@@ -52,9 +53,26 @@ namespace Si
 		}
 
 		template <class Observer>
-		void async_get_one(Observer &&receiver)
+		void async_get_one(Observer &&observer)
 		{
-			return impl.async_get_one(std::forward<Observer>(receiver));
+			impl.async_get_one(
+				function_observer<std::function<void(optional<file_notification>)>>(
+				[observer
+#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
+				= std::forward<Observer>(receiver)
+#endif
+				](optional<file_notification> element) mutable
+				{
+					if (element)
+					{
+						std::move(observer).got_element(std::move(*element));
+					}
+					else
+					{
+						std::move(observer).ended();
+					}
+				})
+			);
 		}
 
 	private:
@@ -63,7 +81,8 @@ namespace Si
 		conditional_transformer<
 			file_notification,
 			enumerator<win32::directory_changes>,
-			boost::optional<file_notification>(*)(win32::file_notification &&)
+			boost::optional<file_notification>(*)(win32::file_notification &&),
+			function_observer<std::function<void(optional<file_notification>)>>
 		> impl;
 		boost::optional<boost::asio::io_service::work> work;
 	};

@@ -196,13 +196,21 @@ namespace Si
 
 		touch(test_file);
 
+#ifdef _WIN32
+		throw std::logic_error("test has not been ported yet");
+#else
 		chmod(test_file.c_str(), 0555);
+#endif
 
 		test_single_event(
 			watched_dir,
 			[&test_file]
 		{
+#ifdef _WIN32
+			throw std::logic_error("test has not been ported yet");
+#else
 			chmod(test_file.c_str(), 0755);
+#endif
 		},
 			[&test_file, &watched_dir](file_notification const &event)
 		{

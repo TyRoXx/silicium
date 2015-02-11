@@ -5,6 +5,7 @@
 #include <silicium/observable/transform.hpp>
 #include <silicium/config.hpp>
 #include <silicium/observable/ptr.hpp>
+#include <silicium/observable/erase_unique.hpp>
 
 namespace Si
 {

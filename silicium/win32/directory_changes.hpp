@@ -5,7 +5,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/config.hpp>
-#include <boost/filesystem/path.hpp>
+#include <silicium/path.hpp>
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
 #include <future>
@@ -17,13 +17,13 @@ namespace Si
 		struct file_notification
 		{
 			DWORD action = 0;
-			boost::filesystem::path name;
+			path name;
 
 			file_notification()
 			{
 			}
 
-			file_notification(DWORD action, boost::filesystem::path name)
+			file_notification(DWORD action, path name)
 				: action(action)
 				, name(std::move(name))
 			{

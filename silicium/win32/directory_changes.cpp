@@ -70,7 +70,7 @@ namespace Si
 				for (char *next_event = buffer.data(); ;)
 				{
 					FILE_NOTIFY_INFORMATION const &notification = reinterpret_cast<FILE_NOTIFY_INFORMATION const &>(*next_event);
-					boost::filesystem::path name(notification.FileName, notification.FileName + (notification.FileNameLength / sizeof(WCHAR)));
+					path name(notification.FileName + 0, notification.FileName + (notification.FileNameLength / sizeof(WCHAR)));
 					notifications.emplace_back(file_notification(notification.Action, std::move(name)));
 					if (0 == notification.NextEntryOffset)
 					{
