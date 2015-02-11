@@ -96,6 +96,7 @@
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/path.hpp>
 #include <silicium/posix/native_file_descriptor.hpp>
 #include <silicium/posix/open.hpp>
 #include <silicium/posix/pipe.hpp>
