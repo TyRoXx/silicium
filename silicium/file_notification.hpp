@@ -10,7 +10,9 @@ namespace Si
 	{
 		add,
 		remove,
-		change
+		change,
+		move_self,
+		remove_self
 	}
 	BOOST_SCOPED_ENUM_DECLARE_END(file_notification_type)
 

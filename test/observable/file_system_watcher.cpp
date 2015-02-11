@@ -198,6 +198,54 @@ namespace Si
 		});
 	}
 
+	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_watched_dir)
+	{
+
+		boost::filesystem::path const root_dir = boost::filesystem::current_path();
+		boost::filesystem::path const watched_dir = root_dir / "watched";
+		boost::filesystem::path const new_name = root_dir / "renamed";
+
+		boost::filesystem::remove_all(watched_dir);
+		boost::filesystem::remove_all(new_name);
+
+		boost::filesystem::create_directories(watched_dir);
+
+		test_single_event(
+			watched_dir,
+			[&watched_dir, &new_name]
+		{
+			boost::filesystem::rename(watched_dir, new_name);
+		},
+			[&watched_dir](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::move_self == event.type);
+			BOOST_CHECK_EQUAL("", event.name.underlying());
+		});
+	}
+
+	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_watched_dir)
+	{
+
+		boost::filesystem::path const root_dir = boost::filesystem::current_path();
+		boost::filesystem::path const watched_dir = root_dir / "watched";
+
+		boost::filesystem::remove_all(watched_dir);
+
+		boost::filesystem::create_directories(watched_dir);
+
+		test_single_event(
+			watched_dir,
+			[&watched_dir]
+		{
+			boost::filesystem::remove(watched_dir);
+		},
+			[&watched_dir](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::remove_self == event.type);
+			BOOST_CHECK_EQUAL("", event.name.underlying());
+		});
+	}
+
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_in_dir)
 	{
 		boost::filesystem::path const watched_dir = boost::filesystem::current_path();

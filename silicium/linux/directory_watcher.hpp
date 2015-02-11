@@ -30,6 +30,12 @@ namespace Si
 			case IN_MODIFY:
 				return file_notification_type::change;
 
+			case IN_MOVE_SELF:
+				return file_notification_type::move_self;
+
+			case IN_DELETE_SELF:
+				return file_notification_type::remove_self;
+
 			default:
 				return boost::none;
 			}
@@ -57,7 +63,7 @@ namespace Si
 		explicit directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
 			: inotify(io)
 			, impl(enumerate(ref(inotify)), linux::to_portable_file_notification)
-			, root(get(inotify.watch(watched, IN_ALL_EVENTS)))
+			, root(get(inotify.watch(watched, (IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF))))
 		{
 		}
 
