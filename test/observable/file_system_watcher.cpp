@@ -145,7 +145,60 @@ namespace Si
 		});
 	}
 
-	BOOST_AUTO_TEST_CASE(file_system_watcher_rename)
+	BOOST_AUTO_TEST_CASE(file_system_watcher_move_out)
+	{
+
+		boost::filesystem::path const root_dir = boost::filesystem::current_path();
+		boost::filesystem::path const watched_dir = root_dir / "watched";
+		boost::filesystem::path const original_name = watched_dir / "test.txt";
+		boost::filesystem::path const new_name = root_dir / "renamed.txt";
+
+		boost::filesystem::remove_all(new_name);
+		boost::filesystem::remove_all(watched_dir);
+
+		boost::filesystem::create_directories(watched_dir);
+		touch(original_name);
+
+		test_single_event(
+			watched_dir,
+			[&original_name, &new_name]
+		{
+			boost::filesystem::rename(original_name, new_name);
+		},
+			[&original_name, &watched_dir](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::remove == event.type);
+			BOOST_CHECK_EQUAL(original_name, watched_dir / event.name.to_boost_path());
+		});
+	}
+
+	BOOST_AUTO_TEST_CASE(file_system_watcher_move_in)
+	{
+
+		boost::filesystem::path const root_dir = boost::filesystem::current_path();
+		boost::filesystem::path const watched_dir = root_dir / "watched";
+		boost::filesystem::path const original_name = root_dir / "test.txt";
+		boost::filesystem::path const new_name = watched_dir / "renamed.txt";
+
+		boost::filesystem::remove_all(watched_dir);
+
+		boost::filesystem::create_directories(watched_dir);
+		touch(original_name);
+
+		test_single_event(
+			watched_dir,
+			[&original_name, &new_name]
+		{
+			boost::filesystem::rename(original_name, new_name);
+		},
+			[&new_name, &watched_dir](file_notification const &event)
+		{
+			BOOST_CHECK(file_notification_type::add == event.type);
+			BOOST_CHECK_EQUAL(new_name, watched_dir / event.name.to_boost_path());
+		});
+	}
+
+	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_in_dir)
 	{
 		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
 		boost::filesystem::path const test_file_a = watched_dir / "test_a.txt";
