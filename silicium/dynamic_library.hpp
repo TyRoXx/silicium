@@ -9,6 +9,8 @@
 #	include <silicium/linux/dynamic_library_impl.hpp>
 #endif
 
+#include <boost/static_assert.hpp>
+
 namespace Si
 {
 	typedef detail::basic_dynamic_library<

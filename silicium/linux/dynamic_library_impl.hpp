@@ -1,7 +1,8 @@
 #ifndef SILICIUM_LINUX_DYNAMIC_LIBRARY_IMPL_HPP
 #define SILICIUM_LINUX_DYNAMIC_LIBRARY_IMPL_HPP
 
-#include <boost/filesystem/path.hpp>
+#include <silicium/c_string.hpp>
+#include <boost/system/error_code.hpp>
 #include <dlfcn.h>
 
 namespace Si
@@ -10,7 +11,7 @@ namespace Si
 	{
 		struct dynamic_library_impl
 		{
-			static void *open(boost::filesystem::path const &file, boost::system::error_code &ec)
+			static void *open(c_string file, boost::system::error_code &ec)
 			{
 				void * const handle = dlopen(file.c_str(), RTLD_LAZY);
 				if (handle)
@@ -29,7 +30,7 @@ namespace Si
 				dlclose(handle);
 			}
 
-			static void *find_symbol(void *handle, std::string const &name)
+			static void *find_symbol(void *handle, c_string const &name)
 			{
 				return dlsym(handle, name.c_str());
 			}

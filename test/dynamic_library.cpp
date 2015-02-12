@@ -5,13 +5,13 @@ namespace
 {
 	Si::dynamic_library load_libm()
 	{
-		return Si::dynamic_library(
+		return Si::dynamic_library(Si::c_string(
 #ifdef _WIN32
 			"msvcr110.dll" //assuming VC++ 2013
 #else
 			"libm.so"
 #endif
-			);
+			));
 	}
 
 	Si::dynamic_library load_some_library()
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(dynamic_library_find_symbol)
 {
 	Si::dynamic_library lib = load_libm();
 	BOOST_REQUIRE(!lib.empty());
-	void *sin_ = lib.find_symbol("sin");
+	void *sin_ = lib.find_symbol(Si::c_string("sin"));
 	BOOST_REQUIRE(sin_);
 	auto const sin_callable = Si::function_ptr_cast<double (*)(double)>(sin_);
 	BOOST_CHECK_EQUAL(0, sin_callable(0));

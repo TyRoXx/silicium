@@ -1,8 +1,9 @@
 #ifndef SILICIUM_DETAIL_BASIC_DYNAMIC_LIBRARY_HPP
 #define SILICIUM_DETAIL_BASIC_DYNAMIC_LIBRARY_HPP
 
-#include <silicium/config.hpp>
-#include <boost/filesystem/path.hpp>
+#include <silicium/c_string.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/throw_exception.hpp>
 
 namespace Si
 {
@@ -15,7 +16,7 @@ namespace Si
 			{
 			}
 
-			explicit basic_dynamic_library(boost::filesystem::path const &file)
+			explicit basic_dynamic_library(c_string const &file)
 			{
 				open(file);
 			}
@@ -39,7 +40,7 @@ namespace Si
 			{
 			}
 
-			void open(boost::filesystem::path const &file, boost::system::error_code &ec)
+			void open(c_string const &file, boost::system::error_code &ec)
 			{
 				std::unique_ptr<void, deleter> new_handle(DynamicLibraryImpl::open(file, ec));
 				if (!ec)
@@ -48,7 +49,7 @@ namespace Si
 				}
 			}
 
-			void open(boost::filesystem::path const &file)
+			void open(c_string const &file)
 			{
 				boost::system::error_code ec;
 				open(file, ec);
@@ -58,7 +59,7 @@ namespace Si
 				}
 			}
 
-			void *find_symbol(std::string const &name) const
+			void *find_symbol(c_string const &name) const
 			{
 				return DynamicLibraryImpl::find_symbol(handle.get(), name);
 			}
