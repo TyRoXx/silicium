@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_WIN32_DIRECTORY_WATCHER_HPP
-#define SILICIUM_REACTIVE_WIN32_DIRECTORY_WATCHER_HPP
+#ifndef SILICIUM_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
+#define SILICIUM_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
 
 #include <silicium/win32/directory_changes.hpp>
 #include <silicium/file_notification.hpp>
@@ -38,15 +38,15 @@ namespace Si
 		}
 	}
 
-	struct directory_watcher
+	struct single_directory_watcher
 	{
 		typedef file_notification element_type;
 
-		directory_watcher()
+		single_directory_watcher()
 		{
 		}
 
-		explicit directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
+		explicit single_directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
 			: impl(enumerate(win32::directory_changes(watched, false)), win32::to_portable_file_notification)
 			, work(boost::in_place(boost::ref(io)))
 		{
