@@ -21,8 +21,6 @@
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
-#include <silicium/directory_allocator.hpp>
-#include <silicium/directory_builder.hpp>
 #include <silicium/dynamic_library.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/error_or.hpp>
@@ -32,7 +30,6 @@
 #include <silicium/file_notification.hpp>
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
-#include <silicium/git/oxid.hpp>
 #include <silicium/git/repository.hpp>
 #include <silicium/html.hpp>
 #include <silicium/http/generate_header.hpp>

@@ -1,25 +1,11 @@
-add_executable(run_process "run_process.cpp")
-target_link_libraries(run_process silicium ${Boost_LIBRARIES})
-
 if(NOT (Boost_VERSION LESS 105300))
 	add_executable(hellohttp "hellohttp.cpp")
 	target_link_libraries(hellohttp silicium ${Boost_LIBRARIES})
 endif()
 
-if(NOT MSVC) #disabled because VC++ 2013 crashes with "internal compiler error in self.cpp"
-	add_executable(self "self.cpp")
-	target_link_libraries(self silicium ${Boost_LIBRARIES})
-endif()
-
 if(LIBGIT2_FOUND)
-	add_executable(si_git "si_git.cpp")
-	target_link_libraries(si_git silicium ${Boost_LIBRARIES})
-
 	add_executable(si_libgit2 "libgit2.cpp")
 	target_link_libraries(si_libgit2 silicium ${Boost_LIBRARIES} ${LIBGIT2_LIBRARIES})
-
-	add_executable(service "service.cpp")
-	target_link_libraries(service silicium ${Boost_LIBRARIES} ${LIBGIT2_LIBRARIES})
 endif()
 
 if(SDL2_FOUND)
