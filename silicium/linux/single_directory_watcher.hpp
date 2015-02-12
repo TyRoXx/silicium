@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_LINUX_DIRECTORY_WATCHER_HPP
-#define SILICIUM_REACTIVE_LINUX_DIRECTORY_WATCHER_HPP
+#ifndef SILICIUM_LINUX_SINGLE_DIRECTORY_WATCHER_HPP
+#define SILICIUM_LINUX_SINGLE_DIRECTORY_WATCHER_HPP
 
 #include <silicium/linux/inotify.hpp>
 #include <silicium/file_notification.hpp>
@@ -63,15 +63,15 @@ namespace Si
 		}
 	}
 
-	struct directory_watcher
+	struct single_directory_watcher
 	{
 		typedef file_notification element_type;
 
-		directory_watcher()
+		single_directory_watcher()
 		{
 		}
 
-		explicit directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
+		explicit single_directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
 			: inotify(io)
 			, impl(enumerate(ref(inotify)), linux::to_portable_file_notification)
 			, root(get(inotify.watch(watched, (IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_ATTRIB))))

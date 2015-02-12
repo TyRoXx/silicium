@@ -23,7 +23,6 @@
 #include <silicium/detail/proper_value_function.hpp>
 #include <silicium/directory_allocator.hpp>
 #include <silicium/directory_builder.hpp>
-#include <silicium/directory_watcher.hpp>
 #include <silicium/dynamic_library.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/error_or.hpp>
@@ -46,11 +45,11 @@
 #include <silicium/http/request_parser_sink.hpp>
 #include <silicium/http/uri.hpp>
 #include <silicium/iterator_range.hpp>
-#include <silicium/linux/directory_watcher.hpp>
 #include <silicium/linux/dynamic_library_impl.hpp>
 #include <silicium/linux/inotify.hpp>
 #include <silicium/linux/inotify_watch_descriptor.hpp>
 #include <silicium/linux/process_handle.hpp>
+#include <silicium/linux/single_directory_watcher.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
@@ -107,6 +106,7 @@
 #include <silicium/range_value.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/run_process.hpp>
+#include <silicium/single_directory_watcher.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>

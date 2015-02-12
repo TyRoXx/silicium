@@ -1,4 +1,4 @@
-#include <silicium/directory_watcher.hpp>
+#include <silicium/single_directory_watcher.hpp>
 #include <silicium/observable/consume.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <boost/test/unit_test.hpp>
@@ -24,7 +24,7 @@ namespace Si
 			std::function<void (file_notification const &)> const &on_event)
 		{
 			boost::asio::io_service io;
-			directory_watcher watcher(io, watched_dir);
+			single_directory_watcher watcher(io, watched_dir);
 
 			bool got_event = false;
 			auto consumer = consume<file_notification>([&io, &got_event, &on_event](file_notification const &event)
@@ -330,7 +330,7 @@ namespace Si
 		boost::filesystem::remove(test_file_b);
 
 		boost::asio::io_service io;
-		directory_watcher watcher(io, watched_dir);
+		single_directory_watcher watcher(io, watched_dir);
 
 		bool got_something = false;
 
