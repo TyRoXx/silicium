@@ -13,7 +13,6 @@
 #include <silicium/async_process.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
-#include <silicium/build_result.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
