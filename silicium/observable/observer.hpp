@@ -24,6 +24,7 @@ namespace Si
 	struct any_ptr_observer
 	{
 		typedef typename std::decay<decltype(*std::declval<ObserverPtr>())>::type observer_type;
+		typedef typename observer_type::element_type element_type;
 
 		any_ptr_observer()
 			: m_impl(ObserverPtr())
@@ -40,7 +41,7 @@ namespace Si
 			return m_impl;
 		}
 
-		void got_element(typename observer_type::element_type element) const
+		void got_element(element_type element) const
 		{
 			assert(m_impl);
 			m_impl->got_element(std::move(element));
