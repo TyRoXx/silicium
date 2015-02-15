@@ -1,4 +1,5 @@
 #include <silicium/observable/thread_generator.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/observable/consume.hpp>
 #include <silicium/config.hpp>
@@ -43,6 +44,23 @@ BOOST_AUTO_TEST_CASE(make_thread_generator_non_empty)
 	a.async_get_one(Si::observe_by_ref(*pusher));
 	a.wait();
 	BOOST_CHECK(expected == produced);
+}
+
+BOOST_AUTO_TEST_CASE(make_thread_generator_owning_observer)
+{
+	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
+	{
+		yield(23);
+	});
+	Si::optional<int> got_element;
+	a.async_get_one(Si::make_function_observer([&got_element](Si::optional<int> element)
+	{
+		BOOST_REQUIRE(!got_element);
+		got_element = element;
+		BOOST_CHECK(got_element);
+	}));
+	a.wait();
+	BOOST_CHECK_EQUAL(Si::make_optional(23), got_element);
 }
 
 BOOST_AUTO_TEST_CASE(make_thread_generator_nesting)
