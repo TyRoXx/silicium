@@ -450,4 +450,25 @@ namespace Si
 		);
 		BOOST_CHECK_EQUAL(3, result);
 	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_visit_return_void)
+	{
+		fast_variant<int, nothing> v(3);
+		bool got_result = false;
+		visit<void>(
+			v,
+			[](nothing) -> int
+			{
+				BOOST_FAIL("unexpected type");
+				return 0; //should be ignored
+			},
+			[&got_result](int element)
+			{
+				BOOST_REQUIRE(!got_result);
+				got_result = true;
+				BOOST_CHECK_EQUAL(3, element);
+			}
+		);
+		BOOST_CHECK(got_result);
+	}
 }
