@@ -6,14 +6,17 @@
 
 namespace Si
 {
-	struct c_string
+	template <class Char>
+	struct basic_c_string
 	{
-		c_string()
+		typedef Char char_type;
+
+		basic_c_string()
 			: m_begin(nullptr)
 		{
 		}
 
-		explicit c_string(char const *begin)
+		explicit basic_c_string(char_type const *begin)
 			: m_begin(begin)
 		{
 			assert(m_begin);
@@ -30,7 +33,7 @@ namespace Si
 			return (*m_begin == '\0');
 		}
 
-		char const *c_str() const BOOST_NOEXCEPT
+		char_type const *c_str() const BOOST_NOEXCEPT
 		{
 			assert(is_set());
 			return m_begin;
@@ -38,8 +41,19 @@ namespace Si
 
 	private:
 
-		char const *m_begin;
+		char_type const *m_begin;
 	};
+
+	typedef basic_c_string<char> c_string;
+	typedef basic_c_string<wchar_t> cw_string;
+
+	typedef
+#ifdef _WIN32
+		cw_string
+#else
+		c_string
+#endif
+		native_path_string;
 }
 
 #endif

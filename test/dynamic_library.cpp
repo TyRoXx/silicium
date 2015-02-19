@@ -5,9 +5,9 @@ namespace
 {
 	Si::dynamic_library load_libm()
 	{
-		return Si::dynamic_library(Si::c_string(
+		return Si::dynamic_library(Si::native_path_string(
 #ifdef _WIN32
-			"msvcr110.dll" //assuming VC++ 2013
+			L"msvcr110.dll" //assuming VC++ 2013
 #else
 			"libm.so"
 #endif

@@ -11,7 +11,7 @@ namespace Si
 	{
 		struct dynamic_library_impl
 		{
-			static void *open(boost::filesystem::path const &file, boost::system::error_code &ec)
+			static void *open(native_path_string file, boost::system::error_code &ec)
 			{
 				HMODULE const handle = LoadLibraryW(file.c_str());
 				if (handle)
@@ -30,7 +30,7 @@ namespace Si
 				FreeLibrary(static_cast<HMODULE>(handle));
 			}
 
-			static void *find_symbol(void *handle, std::string const &name)
+			static void *find_symbol(void *handle, c_string name)
 			{
 				return GetProcAddress(static_cast<HMODULE>(handle), name.c_str());
 			}

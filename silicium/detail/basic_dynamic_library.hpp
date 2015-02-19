@@ -16,7 +16,7 @@ namespace Si
 			{
 			}
 
-			explicit basic_dynamic_library(c_string const &file)
+			explicit basic_dynamic_library(native_path_string file)
 			{
 				open(file);
 			}
@@ -40,7 +40,7 @@ namespace Si
 			{
 			}
 
-			void open(c_string const &file, boost::system::error_code &ec)
+			void open(native_path_string file, boost::system::error_code &ec)
 			{
 				std::unique_ptr<void, deleter> new_handle(DynamicLibraryImpl::open(file, ec));
 				if (!ec)
@@ -49,7 +49,7 @@ namespace Si
 				}
 			}
 
-			void open(c_string const &file)
+			void open(native_path_string file)
 			{
 				boost::system::error_code ec;
 				open(file, ec);
@@ -59,7 +59,7 @@ namespace Si
 				}
 			}
 
-			void *find_symbol(c_string const &name) const
+			void *find_symbol(c_string name) const
 			{
 				return DynamicLibraryImpl::find_symbol(handle.get(), name);
 			}
