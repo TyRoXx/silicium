@@ -2,6 +2,7 @@
 #define SILICIUM_WIN32_DYNAMIC_LIBRARY_IMPL_HPP
 
 #include <silicium/win32/win32.hpp>
+#include <silicium/c_string.hpp>
 #include <boost/filesystem/path.hpp>
 
 namespace Si

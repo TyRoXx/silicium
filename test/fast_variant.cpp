@@ -32,6 +32,8 @@ namespace Si
 		BOOST_CHECK_EQUAL(boost::make_optional(1), try_get<int>(v));
 		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(w));
 		v = w;
+		BOOST_CHECK_EQUAL(v.which(), w.which());
+		BOOST_CHECK_EQUAL(v.which(), 0u);
 		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(v));
 		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(w));
 	}
@@ -42,6 +44,8 @@ namespace Si
 		BOOST_CHECK_EQUAL(boost::make_optional(0), try_get<int>(v));
 		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(w));
 		v = w;
+		BOOST_CHECK_EQUAL(v.which(), w.which());
+		BOOST_CHECK_EQUAL(v.which(), 1u);
 		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(v));
 		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(w));
 	}
@@ -457,10 +461,9 @@ namespace Si
 		bool got_result = false;
 		visit<void>(
 			v,
-			[](nothing) -> int
+			[](nothing)
 			{
 				BOOST_FAIL("unexpected type");
-				return 0; //should be ignored
 			},
 			[&got_result](int element)
 			{
