@@ -42,6 +42,20 @@ namespace Si
 			immovable->read_runner = std::async(std::launch::async, [&dispatcher]{ dispatcher.run(); });
 		}
 
+		directory_changes::~directory_changes()
+		{
+			if (watch_file.get() != nullptr &&
+				watch_file.get() != INVALID_HANDLE_VALUE &&
+				!CancelIoEx(watch_file.get(), nullptr))
+			{
+				DWORD error = GetLastError();
+				if (error != ERROR_NOT_FOUND)
+				{
+					std::terminate();
+				}
+			}
+		}
+
 		directory_changes &directory_changes::operator = (directory_changes &&other)
 		{
 			is_recursive = other.is_recursive;
@@ -64,7 +78,7 @@ namespace Si
 				if (!ReadDirectoryChangesW(watch_file.get(), buffer.data(), static_cast<DWORD>(buffer.size()), is_recursive, actions, &received, nullptr, nullptr))
 				{
 					//TODO: handle ERROR_NOTIFY_ENUM_DIR (overflow of event queue)
-					throw std::logic_error("to do: error handling");
+					return;
 				}
 				std::vector<file_notification> notifications;
 				for (char *next_event = buffer.data(); ;)

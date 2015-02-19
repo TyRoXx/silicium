@@ -221,7 +221,6 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_move_out)
 	{
-
 		boost::filesystem::path const root_dir = boost::filesystem::current_path();
 		boost::filesystem::path const watched_dir = root_dir / "watched";
 		boost::filesystem::path const original_name = watched_dir / "test.txt";
@@ -248,7 +247,6 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_move_in)
 	{
-
 		boost::filesystem::path const root_dir = boost::filesystem::current_path();
 		boost::filesystem::path const watched_dir = root_dir / "watched";
 		boost::filesystem::path const original_name = root_dir / "test.txt";
@@ -274,7 +272,6 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_watched_dir)
 	{
-
 		boost::filesystem::path const root_dir = boost::filesystem::current_path();
 		boost::filesystem::path const watched_dir = root_dir / "watched";
 		boost::filesystem::path const new_name = root_dir / "renamed";
@@ -299,7 +296,6 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_watched_dir)
 	{
-
 		boost::filesystem::path const root_dir = boost::filesystem::current_path();
 		boost::filesystem::path const watched_dir = root_dir / "watched";
 
@@ -359,6 +355,14 @@ namespace Si
 		});
 
 		boost::filesystem::rename(test_file_a, test_file_b);
+
+		boost::asio::steady_timer timeout(io);
+		timeout.expires_from_now(std::chrono::seconds(1));
+		timeout.async_wait([&io](boost::system::error_code)
+		{
+			io.stop();
+		});
+
 		io.run();
 
 		BOOST_CHECK(got_something);

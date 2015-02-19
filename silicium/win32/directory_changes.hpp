@@ -6,6 +6,7 @@
 #include <silicium/win32/win32.hpp>
 #include <silicium/config.hpp>
 #include <silicium/path.hpp>
+#include <silicium/error_or.hpp>
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
 #include <future>
@@ -37,6 +38,7 @@ namespace Si
 			directory_changes();
 			directory_changes(directory_changes &&other);
 			explicit directory_changes(boost::filesystem::path const &watched, bool is_recursive);
+			~directory_changes();
 			directory_changes &operator = (directory_changes &&other);
 			void async_get_one(ptr_observer<observer<element_type>> receiver);
 
@@ -44,7 +46,6 @@ namespace Si
 
 			bool is_recursive;
 			observer<element_type> *receiver_ = nullptr;
-			Si::win32::unique_handle watch_file;
 
 			struct immovable_state : private boost::noncopyable
 			{
@@ -67,6 +68,10 @@ namespace Si
 
 			//this indirection is needed for movability
 			std::unique_ptr<immovable_state> immovable;
+
+			//The watch file comes after the threading state so that it will be destroyed first to unblock a possible read operation
+			//in the reading thread.
+			Si::win32::unique_handle watch_file;
 
 			BOOST_DELETED_FUNCTION(directory_changes(directory_changes const &));
 			BOOST_DELETED_FUNCTION(directory_changes &operator = (directory_changes const &));
