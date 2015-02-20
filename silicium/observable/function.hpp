@@ -3,6 +3,7 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/detail/proper_value_function.hpp>
+#include <silicium/detail/element_from_optional_like.hpp>
 #include <utility>
 
 namespace Si
@@ -40,6 +41,26 @@ namespace Si
 #endif
 	{
 		return function_observable<Element, typename std::decay<AsyncGetOne>::type>(std::forward<AsyncGetOne>(get));
+	}
+
+	template <class GenerateElement>
+	auto make_function_observable2(GenerateElement &&generate)
+	{
+		typedef typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type element_type;
+		return make_function_observable<element_type>(
+			[generate = std::forward<GenerateElement>(generate)](ptr_observer<observer<element_type>> observer_) mutable
+			{
+				Si::optional<element_type> element = std::forward<GenerateElement>(generate)();
+				if (element)
+				{
+					observer_.got_element(std::move(*element));
+				}
+				else
+				{
+					observer_.ended();
+				}
+			}
+		);
 	}
 }
 
