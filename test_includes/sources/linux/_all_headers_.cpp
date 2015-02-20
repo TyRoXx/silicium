@@ -80,6 +80,7 @@
 #include <silicium/observable/source.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
+#include <silicium/observable/take.hpp>
 #include <silicium/observable/thread.hpp>
 #include <silicium/observable/thread_generator.hpp>
 #include <silicium/observable/total_consumer.hpp>
