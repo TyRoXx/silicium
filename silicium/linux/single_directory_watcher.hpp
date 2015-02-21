@@ -3,6 +3,7 @@
 
 #include <silicium/linux/inotify.hpp>
 #include <silicium/file_notification.hpp>
+#include <silicium/optional.hpp>
 #include <silicium/observable/transform_if_initialized.hpp>
 #include <silicium/observable/enumerate.hpp>
 #include <silicium/observable/ref.hpp>
@@ -22,7 +23,7 @@ namespace Si
 			}
 		}
 
-		boost::optional<file_notification_type> to_portable_file_notification_type(boost::uint32_t mask)
+		Si::optional<file_notification_type> to_portable_file_notification_type(boost::uint32_t mask)
 		{
 			using detail::are_set;
 			if (are_set(mask, IN_MOVED_TO) || are_set(mask, IN_CREATE))
@@ -49,15 +50,15 @@ namespace Si
 			{
 				return file_notification_type::change_metadata;
 			}
-			return boost::none;
+			return Si::none;
 		}
 
-		boost::optional<Si::file_notification> to_portable_file_notification(linux::file_notification &&original)
+		Si::optional<Si::file_notification> to_portable_file_notification(linux::file_notification &&original)
 		{
 			auto const type = to_portable_file_notification_type(original.mask);
 			if (!type)
 			{
-				return boost::none;
+				return Si::none;
 			}
 			return Si::file_notification(*type, std::move(original.name));
 		}
@@ -105,7 +106,7 @@ namespace Si
 		conditional_transformer<
 			file_notification,
 			enumerator<ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
-			boost::optional<file_notification>(*)(linux::file_notification &&),
+			Si::optional<file_notification>(*)(linux::file_notification &&),
 			function_observer<std::function<void (optional<file_notification>)>>
 		> impl;
 		linux::watch_descriptor root;
