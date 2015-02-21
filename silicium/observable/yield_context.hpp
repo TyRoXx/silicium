@@ -12,10 +12,11 @@ namespace Si
 	{
 		struct basic_yield_context
 		{
+			typedef observable<nothing, ptr_observer<observer<nothing>>> observable_type;
 			virtual ~basic_yield_context()
 			{
 			}
-			virtual void get_one(observable<nothing, ptr_observer<observer<nothing>>> &target) = 0;
+			virtual void get_one(observable_type &target) = 0;
 		};
 
 		template <class Element>

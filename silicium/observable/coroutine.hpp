@@ -15,9 +15,9 @@ namespace Si
 		struct coroutine_yield_context : basic_yield_context
 		{
 #if BOOST_VERSION >= 105500
-			typedef boost::coroutines::coroutine<observable<nothing, ptr_observer<observer<nothing>>> *>::push_type consumer_type;
+			typedef boost::coroutines::coroutine<observable_type *>::push_type consumer_type;
 #else
-			typedef boost::coroutines::coroutine<observable<nothing, ptr_observer<observer<nothing>>> *()>::caller_type consumer_type;
+			typedef boost::coroutines::coroutine<observable_type *()>::caller_type consumer_type;
 #endif
 
 			explicit coroutine_yield_context(consumer_type &consumer)
@@ -25,7 +25,7 @@ namespace Si
 			{
 			}
 
-			virtual void get_one(observable<nothing, ptr_observer<observer<nothing>>> &target) SILICIUM_OVERRIDE
+			virtual void get_one(observable_type &target) SILICIUM_OVERRIDE
 			{
 				(*consumer)(&target);
 			}

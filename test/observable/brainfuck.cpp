@@ -23,7 +23,7 @@ namespace bf
 		end_loop
 	};
 
-	boost::optional<command> detect_command(char c)
+	Si::optional<command> detect_command(char c)
 	{
 		switch (c)
 		{
@@ -35,14 +35,14 @@ namespace bf
 		case ',': return command::read;
 		case '[': return command::begin_loop;
 		case ']': return command::end_loop;
-		default: return boost::none;
+		default: return Si::none;
 		}
 	}
 
 	template <class Source>
 	auto scan(Source &&source)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> Si::conditional_transformer<command, typename std::decay<Source>::type, boost::optional<command>(*)(char)>
+		-> Si::conditional_transformer<command, typename std::decay<Source>::type, Si::optional<command>(*)(char)>
 #endif
 	{
 		return Si::transform_if_initialized(std::forward<Source>(source), detect_command);
