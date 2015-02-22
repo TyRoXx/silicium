@@ -1,6 +1,7 @@
 #ifndef SILICIUM_TAKE_OBSERVABLE_HPP
 #define SILICIUM_TAKE_OBSERVABLE_HPP
 
+#include <silicium/config.hpp>
 #include <silicium/observable/observer.hpp>
 
 namespace Si
@@ -42,6 +43,9 @@ namespace Si
 
 	template <class Input, class Counter>
 	auto take(Input &&input, Counter &&count)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> take_observable<typename std::decay<Input>::type, typename std::decay<Counter>::type>
+#endif
 	{
 		return take_observable<typename std::decay<Input>::type, typename std::decay<Counter>::type>(
 			std::forward<Input>(input),

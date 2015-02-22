@@ -45,10 +45,23 @@ namespace Si
 
 	template <class GenerateElement>
 	auto make_function_observable2(GenerateElement &&generate)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> function_observable<
+			typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type,
+			std::function<void(ptr_observer<observer<typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type>>)>
+		>
+#endif
 	{
 		typedef typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type element_type;
 		return make_function_observable<element_type>(
-			[generate = std::forward<GenerateElement>(generate)](ptr_observer<observer<element_type>> observer_) mutable
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			std::function<void(ptr_observer<observer<element_type>>)>
+#endif
+			([generate
+#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
+			= std::forward<GenerateElement>(generate)
+#endif
+			](ptr_observer<observer<element_type>> observer_) mutable
 			{
 				Si::optional<element_type> element = std::forward<GenerateElement>(generate)();
 				if (element)
@@ -59,7 +72,7 @@ namespace Si
 				{
 					observer_.ended();
 				}
-			}
+			})
 		);
 	}
 }
