@@ -3,7 +3,7 @@
 
 #include <boost/asio/io_service.hpp>
 #include <silicium/observable/observer.hpp>
-#include <silicium/win32/win32.hpp>
+#include <silicium/win32/file_notification.hpp>
 #include <silicium/config.hpp>
 #include <silicium/path.hpp>
 #include <silicium/error_or.hpp>
@@ -16,22 +16,6 @@ namespace Si
 {
 	namespace win32
 	{
-		struct file_notification
-		{
-			DWORD action = 0;
-			path name;
-
-			file_notification()
-			{
-			}
-
-			file_notification(DWORD action, path name)
-				: action(action)
-				, name(std::move(name))
-			{
-			}
-		};
-
 		struct directory_changes
 		{
 			using element_type = std::vector<file_notification>;

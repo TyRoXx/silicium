@@ -1,7 +1,7 @@
 #ifndef SILICIUM_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
 #define SILICIUM_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
 
-#include <silicium/win32/directory_changes.hpp>
+#include <silicium/win32/overlapped_directory_changes.hpp>
 #include <silicium/file_notification.hpp>
 #include <silicium/observable/enumerate.hpp>
 #include <silicium/observable/ref.hpp>
@@ -62,7 +62,7 @@ namespace Si
 		}
 
 		explicit single_directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched, single_directory_watcher_recursion recursion)
-			: impl(enumerate(win32::directory_changes(watched, recursion == single_directory_watcher_recursion::infinite)), win32::to_portable_file_notification)
+			: impl(enumerate(win32::overlapped_directory_changes(io, watched, recursion == single_directory_watcher_recursion::infinite)), win32::to_portable_file_notification)
 			, work(boost::in_place(boost::ref(io)))
 		{
 		}
@@ -95,7 +95,7 @@ namespace Si
 		//TODO: save the memory for the function pointer
 		conditional_transformer<
 			file_notification,
-			enumerator<win32::directory_changes>,
+			enumerator<win32::overlapped_directory_changes>,
 			boost::optional<file_notification>(*)(win32::file_notification &&),
 			function_observer<std::function<void(optional<file_notification>)>>
 		> impl;
