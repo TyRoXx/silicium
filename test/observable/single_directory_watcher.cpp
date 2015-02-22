@@ -1,6 +1,8 @@
 #include <silicium/single_directory_watcher.hpp>
 #include <silicium/observable/consume.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/open.hpp>
+#include <silicium/sink/file_sink.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -142,18 +144,17 @@ namespace Si
 	{
 		boost::filesystem::path const watched_dir = boost::filesystem::current_path();
 		boost::filesystem::path const test_file = watched_dir / "test.txt";
-
-		touch(test_file);
-
-		std::ofstream file(test_file.string());
-		BOOST_REQUIRE(file);
+		
+		boost::filesystem::create_directories(watched_dir);
+		Si::file_handle file = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::overwrite_file(test_file).get());
 
 		test_single_event(
 			watched_dir,
 			[&file]
 		{
-			file << "hello\n";
-			file.flush();
+			Si::file_sink sink(file.handle);
+			Si::append(sink, Si::file_sink_element(Si::make_c_str_range("hello\n")));
+			Si::append(sink, Si::file_sink_element(Si::flush()));
 			//we write to the file without closing it
 		},
 			[&test_file, &watched_dir](file_notification const &event)
