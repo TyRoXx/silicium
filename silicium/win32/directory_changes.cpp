@@ -74,7 +74,7 @@ namespace Si
 			{
 				DWORD received = 0;
 				std::array<char, 0x10000> buffer;
-				DWORD const actions = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_CREATION;
+				DWORD const actions = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_ATTRIBUTES;
 				if (!ReadDirectoryChangesW(watch_file.get(), buffer.data(), static_cast<DWORD>(buffer.size()), is_recursive, actions, &received, nullptr, nullptr))
 				{
 					//TODO: handle ERROR_NOTIFY_ENUM_DIR (overflow of event queue)

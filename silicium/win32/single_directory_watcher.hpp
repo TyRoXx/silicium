@@ -28,7 +28,8 @@ namespace Si
 				return file_notification_type::remove;
 
 			case FILE_ACTION_MODIFIED:
-				return file_notification_type::change;
+				return file_notification_type::change_content_or_metadata;
+
 			default:
 				return boost::none; //TODO
 			}

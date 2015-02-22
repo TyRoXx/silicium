@@ -10,10 +10,11 @@ namespace Si
 	{
 		add,
 		remove,
-		change,
 		move_self,
 		remove_self,
-		change_metadata
+		change_content,
+		change_metadata,
+		change_content_or_metadata
 	}
 	BOOST_SCOPED_ENUM_DECLARE_END(file_notification_type)
 
@@ -23,7 +24,7 @@ namespace Si
 		path name;
 
 		file_notification() BOOST_NOEXCEPT
-			: type(file_notification_type::change)
+			: type(file_notification_type::change_content_or_metadata)
 		{
 		}
 

@@ -16,6 +16,10 @@ namespace Si
 	{
 		void touch(boost::filesystem::path const &name)
 		{
+			//remove existing file to reset the attributes
+			boost::system::error_code ec;
+			boost::filesystem::remove(name, ec);
+
 			std::ofstream file(name.string());
 			BOOST_REQUIRE(file);
 		}
@@ -159,7 +163,7 @@ namespace Si
 		},
 			[&test_file, &watched_dir](file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::change == event.type);
+			BOOST_CHECK(event.type == file_notification_type::change_content || event.type == file_notification_type::change_content_or_metadata);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
 		});
 	}
@@ -185,7 +189,7 @@ namespace Si
 		},
 			[&test_file, &watched_dir](file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::change == event.type);
+			BOOST_CHECK(event.type == file_notification_type::change_content || event.type == file_notification_type::change_content_or_metadata);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
 		});
 	}
@@ -198,9 +202,9 @@ namespace Si
 		touch(test_file);
 
 #ifdef _WIN32
-		throw std::logic_error("test has not been ported yet");
+		BOOST_REQUIRE(SetFileAttributesW(test_file.c_str(), FILE_ATTRIBUTE_NORMAL));
 #else
-		chmod(test_file.c_str(), 0555);
+		BOOST_REQUIRE(!chmod(test_file.c_str(), 0555));
 #endif
 
 		test_single_event(
@@ -208,14 +212,14 @@ namespace Si
 			[&test_file]
 		{
 #ifdef _WIN32
-			throw std::logic_error("test has not been ported yet");
+			BOOST_REQUIRE(SetFileAttributesW(test_file.c_str(), FILE_ATTRIBUTE_TEMPORARY));
 #else
-			chmod(test_file.c_str(), 0755);
+			BOOST_REQUIRE(!chmod(test_file.c_str(), 0755));
 #endif
 		},
 			[&test_file, &watched_dir](file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::change_metadata == event.type);
+			BOOST_CHECK(file_notification_type::change_content_or_metadata == event.type || file_notification_type::change_metadata == event.type);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name.to_boost_path());
 		});
 	}
