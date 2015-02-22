@@ -130,8 +130,10 @@
 #include <silicium/version.hpp>
 #include <silicium/win32/directory_changes.hpp>
 #include <silicium/win32/dynamic_library_impl.hpp>
+#include <silicium/win32/file_notification.hpp>
 #include <silicium/win32/native_file_descriptor.hpp>
 #include <silicium/win32/open.hpp>
+#include <silicium/win32/overlapped_directory_changes.hpp>
 #include <silicium/win32/process_handle.hpp>
 #include <silicium/win32/run_process.hpp>
 #include <silicium/win32/single_directory_watcher.hpp>
