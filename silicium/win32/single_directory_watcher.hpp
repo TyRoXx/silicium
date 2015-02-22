@@ -19,9 +19,16 @@ namespace Si
 		{
 			switch (action)
 			{
-			case FILE_ACTION_ADDED: return file_notification_type::add;
-			case FILE_ACTION_REMOVED: return file_notification_type::remove;
-			case FILE_ACTION_MODIFIED: return file_notification_type::change;
+			case FILE_ACTION_RENAMED_NEW_NAME:
+			case FILE_ACTION_ADDED:
+				return file_notification_type::add;
+
+			case FILE_ACTION_RENAMED_OLD_NAME:
+			case FILE_ACTION_REMOVED:
+				return file_notification_type::remove;
+
+			case FILE_ACTION_MODIFIED:
+				return file_notification_type::change;
 			default:
 				return boost::none; //TODO
 			}
