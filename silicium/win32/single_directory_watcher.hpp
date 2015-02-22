@@ -46,6 +46,13 @@ namespace Si
 		}
 	}
 
+	BOOST_SCOPED_ENUM_DECLARE_BEGIN(single_directory_watcher_recursion)
+	{
+		infinite,
+		none
+	}
+	BOOST_SCOPED_ENUM_DECLARE_END(single_directory_watcher_recursion)
+
 	struct single_directory_watcher
 	{
 		typedef file_notification element_type;
@@ -54,8 +61,8 @@ namespace Si
 		{
 		}
 
-		explicit single_directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
-			: impl(enumerate(win32::directory_changes(watched, false)), win32::to_portable_file_notification)
+		explicit single_directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched, single_directory_watcher_recursion recursion)
+			: impl(enumerate(win32::directory_changes(watched, recursion == single_directory_watcher_recursion::infinite)), win32::to_portable_file_notification)
 			, work(boost::in_place(boost::ref(io)))
 		{
 		}
