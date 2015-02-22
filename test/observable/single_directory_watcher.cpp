@@ -270,6 +270,8 @@ namespace Si
 		});
 	}
 
+#ifndef _WIN32
+	//we cannot yet detect the renaming of the watched directory
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_watched_dir)
 	{
 		boost::filesystem::path const root_dir = boost::filesystem::current_path();
@@ -293,7 +295,10 @@ namespace Si
 			BOOST_CHECK_EQUAL("", event.name.underlying());
 		});
 	}
+#endif
 
+#ifndef _WIN32
+	//we cannot yet detect the removal of the watched directory
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_watched_dir)
 	{
 		boost::filesystem::path const root_dir = boost::filesystem::current_path();
@@ -315,6 +320,7 @@ namespace Si
 			BOOST_CHECK_EQUAL("", event.name.underlying());
 		});
 	}
+#endif
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_in_dir)
 	{
