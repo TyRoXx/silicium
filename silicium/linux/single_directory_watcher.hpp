@@ -36,7 +36,7 @@ namespace Si
 			}
 			if (are_set(mask, IN_CLOSE_WRITE) || are_set(mask, IN_MODIFY))
 			{
-				return file_notification_type::change;
+				return file_notification_type::change_content;
 			}
 			if (are_set(mask, IN_MOVE_SELF))
 			{

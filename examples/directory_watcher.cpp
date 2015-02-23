@@ -10,7 +10,7 @@ int main()
 	auto const watched_dir = boost::filesystem::current_path();
 	std::cerr << "Watching " << watched_dir << '\n';
 
-	Si::single_directory_watcher notifier(io, watched_dir, Si::single_directory_watcher_recursion::none);
+	Si::single_directory_watcher notifier(io, watched_dir);
 	auto all = Si::for_each(Si::ref(notifier), [](Si::file_notification const &event)
 	{
 		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
