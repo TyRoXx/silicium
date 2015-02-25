@@ -39,3 +39,24 @@ BOOST_AUTO_TEST_CASE(iterator_range_non_member_begin_end)
 	BOOST_CHECK_EQUAL(&e, begin(r));
 	BOOST_CHECK_EQUAL(&e + 1, end(r));
 }
+
+BOOST_AUTO_TEST_CASE(iterator_range_forward_iterators)
+{
+	std::istringstream sstr;
+	sstr.str("test");
+	auto r = Si::make_iterator_range(std::istream_iterator<char>(sstr), std::istream_iterator<char>());
+	BOOST_REQUIRE(!r.empty());
+	BOOST_CHECK_EQUAL('t', r.front());
+	r.pop_front();
+	BOOST_REQUIRE(!r.empty());
+	BOOST_CHECK_EQUAL('e', r.front());
+	r.pop_front();
+	BOOST_REQUIRE(!r.empty());
+	BOOST_CHECK_EQUAL('s', r.front());
+	r.pop_front();
+	BOOST_REQUIRE(!r.empty());
+	BOOST_CHECK_EQUAL('t', r.front());
+	r.pop_front();
+	BOOST_CHECK(r.empty());
+	BOOST_CHECK(r.begin() == r.end());
+}

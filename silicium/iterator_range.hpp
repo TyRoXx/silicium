@@ -72,11 +72,15 @@ namespace Si
 			return m_begin == m_end;
 		}
 
+		/// This method is only available with random access iterators. Use std::distance(begin(r), end(r))
+		/// if you really want a potential O(n) operation.
 		BOOST_CONSTEXPR difference_type size() const BOOST_NOEXCEPT
 		{
-			return std::distance(m_begin, m_end);
+			return m_end - m_begin;
 		}
 
+		/// This method is only available with random access iterators.
+		/// If you need this for weaker iterators, use a loop that calls pop_front() for individual elements.
 		SILICIUM_CXX14_CONSTEXPR void pop_front(difference_type n) BOOST_NOEXCEPT
 		{
 			assert(n <= size());
@@ -86,15 +90,16 @@ namespace Si
 		SILICIUM_CXX14_CONSTEXPR void pop_front() BOOST_NOEXCEPT
 		{
 			assert(!empty());
-			pop_front(1);
+			++m_begin;
 		}
 
 		value_type &front() const BOOST_NOEXCEPT
 		{
 			assert(!empty());
-			return (*this)[0];
+			return *begin();
 		}
 
+		/// This method is only available with random access iterators so that it takes O(1) in time.
 		value_type &operator[](difference_type index) const BOOST_NOEXCEPT
 		{
 			assert(index < size());
