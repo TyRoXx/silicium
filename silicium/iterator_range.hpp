@@ -112,8 +112,8 @@ namespace Si
 		Iterator m_begin, m_end;
 	};
 
-	template <class Iterator>
-	bool operator == (iterator_range<Iterator> const &left, iterator_range<Iterator> const &right)
+	template <class Iterator1, class Iterator2>
+	BOOST_CONSTEXPR bool pointing_to_same_subrange(iterator_range<Iterator1> const &left, iterator_range<Iterator2> const &right)
 	{
 		return (left.begin() == right.begin()) && (left.end() == right.end());
 	}

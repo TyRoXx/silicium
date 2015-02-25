@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(file_source)
 	auto s = Si::make_file_source(f.handle, Si::make_iterator_range(buffer.data(), buffer.data() + buffer.size()));
 	auto r = Si::get(s);
 	BOOST_REQUIRE(r);
-	BOOST_CHECK(Si::file_read_result{Si::make_contiguous_range(buffer)} == *r);
+	BOOST_CHECK(pointing_to_same_subrange(Si::make_contiguous_range(buffer), r->get()));
 }
 
 BOOST_AUTO_TEST_CASE(file_source_enumerate)
