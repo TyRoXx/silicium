@@ -7,7 +7,6 @@
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
-#include <silicium/asio/tcp_trigger.hpp>
 #include <silicium/asio/timer.hpp>
 #include <silicium/asio/use_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
