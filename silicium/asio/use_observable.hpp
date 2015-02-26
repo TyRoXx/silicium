@@ -3,7 +3,7 @@
 
 #include <silicium/observable/ptr.hpp>
 #include <silicium/observable/erased_observer.hpp>
-#include <silicium/fast_variant.hpp>
+#include <silicium/error_or.hpp>
 #include <boost/asio/async_result.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -84,6 +84,20 @@ namespace Si
 					m_observable->fulfill(ec);
 				}
 
+				template <class A2>
+				void operator()(boost::system::error_code ec, A2 &&a2)
+				{
+					assert(m_observable);
+					if (ec)
+					{
+						m_observable->fulfill(ec);
+					}
+					else
+					{
+						m_observable->fulfill(std::forward<A2>(a2));
+					}
+				}
+
 				std::shared_ptr<future_observable<Element>> const &get_observable() const
 				{
 					return m_observable;
@@ -125,6 +139,12 @@ namespace boost
 		struct handler_type<Si::asio::use_observable_t, ReturnType(boost::system::error_code)>
 		{
 			typedef Si::asio::detail::observable_handler<boost::system::error_code> type;
+		};
+
+		template <typename ReturnType, class A2>
+		struct handler_type<Si::asio::use_observable_t, ReturnType(boost::system::error_code, A2)>
+		{
+			typedef Si::asio::detail::observable_handler<Si::error_or<A2>> type;
 		};
 	}
 }
