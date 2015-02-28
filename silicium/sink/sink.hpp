@@ -8,7 +8,9 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/utility/string_ref.hpp>
-#include <boost/utility/explicit_operator_bool.hpp>
+#if BOOST_VERSION >= 105500
+#	include <boost/utility/explicit_operator_bool.hpp>
+#endif
 #include <boost/container/string.hpp>
 #include <fstream>
 #include <array>

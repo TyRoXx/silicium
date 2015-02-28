@@ -204,7 +204,7 @@ namespace Si
 			template <class Function>
 			void start(Function &&function)
 			{
-				m_coro = coroutine::pull_type([this, function](coroutine::push_type &push)
+				m_coro = coroutine([this, function](coroutine_push_type &push)
 				{
 					spawn_context context(
 						[this, &push](observable<nothing, ptr_observer<observer<nothing>>> &waiting_for)
@@ -225,12 +225,14 @@ namespace Si
 		private:
 
 #if BOOST_VERSION >= 105600
-			typedef boost::coroutines::asymmetric_coroutine<nothing> coroutine;
+			typedef boost::coroutines::asymmetric_coroutine<nothing>::pull_type coroutine;
+			typedef boost::coroutines::asymmetric_coroutine<nothing>::push_type coroutine_push_type;
 #else
-			typedef boost::coroutines::coroutine<nothing> coroutine;
+			typedef boost::coroutines::coroutine<nothing ()> coroutine;
+			typedef boost::coroutines::coroutine<nothing ()>::caller_type coroutine_push_type;
 #endif
 
-			coroutine::pull_type m_coro;
+			coroutine m_coro;
 			bool m_waiting;
 			bool m_suspended;
 

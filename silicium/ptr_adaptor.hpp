@@ -2,7 +2,10 @@
 #define SILICIUM_PTR_ADAPTOR_HPP
 
 #include <silicium/config.hpp>
-#include <boost/utility/explicit_operator_bool.hpp>
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 105500
+#	include <boost/utility/explicit_operator_bool.hpp>
+#endif
 
 namespace Si
 {
@@ -33,8 +36,13 @@ namespace Si
 #ifdef BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT
 		//the noexcept version was added in 1.56 http://www.boost.org/doc/libs/1_57_0/libs/core/doc/html/core/explicit_operator_bool.html
 		BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
-#else
+#elif defined(BOOST_EXPLICIT_OPERATOR_BOOL)
 		BOOST_EXPLICIT_OPERATOR_BOOL()
+#else
+		operator bool() const BOOST_NOEXCEPT
+		{
+			return true;
+		}
 #endif
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
