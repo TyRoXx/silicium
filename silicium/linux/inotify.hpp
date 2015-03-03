@@ -31,7 +31,7 @@ namespace Si
 			}
 
 			explicit inotify_observable(boost::asio::io_service &io)
-				: notifier(boost::in_place(boost::ref(io)))
+				: notifier(Si::make_unique<boost::asio::posix::stream_descriptor>(boost::ref(io)))
 			{
 				int fd = inotify_init();
 				if (fd < 0)
@@ -94,7 +94,7 @@ namespace Si
 
 		private:
 
-			boost::optional<boost::asio::posix::stream_descriptor> notifier;
+			std::unique_ptr<boost::asio::posix::stream_descriptor> notifier;
 			std::vector<char> read_buffer;
 		};
 	}
