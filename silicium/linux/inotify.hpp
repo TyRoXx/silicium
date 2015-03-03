@@ -22,7 +22,7 @@ namespace Si
 			path name;
 		};
 
-		struct inotify_observable : private boost::noncopyable
+		struct inotify_observable
 		{
 			typedef std::vector<file_notification> element_type;
 
@@ -30,7 +30,7 @@ namespace Si
 			{
 			}
 
-			inotify_observable(boost::asio::io_service &io)
+			explicit inotify_observable(boost::asio::io_service &io)
 				: notifier(boost::in_place(boost::ref(io)))
 			{
 				int fd = inotify_init();
