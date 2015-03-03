@@ -26,7 +26,7 @@ namespace Si
 		{
 			typedef std::vector<file_notification> element_type;
 
-			inotify_observable()
+			inotify_observable() BOOST_NOEXCEPT
 			{
 			}
 
@@ -49,10 +49,10 @@ namespace Si
 				}
 			}
 
-			error_or<watch_descriptor> watch(boost::filesystem::path const &target, boost::uint32_t mask)
+			error_or<watch_descriptor> watch(boost::filesystem::path const &target, boost::uint32_t mask) BOOST_NOEXCEPT
 			{
 				assert(notifier);
-				int const wd = inotify_add_watch(notifier->native_handle(), target.string().c_str(), mask);
+				int const wd = inotify_add_watch(notifier->native_handle(), target.c_str(), mask);
 				if (wd < 0)
 				{
 					return boost::system::error_code(errno, boost::system::posix_category);
