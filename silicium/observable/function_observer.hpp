@@ -40,8 +40,9 @@ namespace Si
 			>::type
 		>::type element_type;
 
-		explicit function_observer(Function function)
-			: m_function(std::move(function))
+		template <class F>
+		explicit function_observer(F &&function)
+			: m_function(std::forward<F>(function))
 		{
 		}
 
