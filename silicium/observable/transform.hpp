@@ -61,6 +61,11 @@ namespace Si
 			original.async_get_one(extend(std::forward<Observer>(receiver), observe_by_ref(static_cast<observer<typename Original::element_type> &>(*this))));
 		}
 
+		Original &get_input()
+		{
+			return original;
+		}
+
 	private:
 
 		typedef typename detail::proper_value_function<

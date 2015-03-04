@@ -110,6 +110,11 @@ namespace Si
 			}
 #endif
 
+			Next &get_input()
+			{
+				return m_next;
+			}
+
 		private:
 
 			Dispatcher *m_io;

@@ -38,6 +38,11 @@ namespace Si
 			input.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
+		Input &get_input()
+		{
+			return input;
+		}
+
 	private:
 
 		Input input;
