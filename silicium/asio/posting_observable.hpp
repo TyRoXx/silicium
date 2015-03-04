@@ -4,12 +4,23 @@
 #include <silicium/exchange.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <boost/asio/io_service.hpp>
+#include <boost/asio/strand.hpp>
 
 namespace Si
 {
 	namespace asio
 	{
-		template <class Next>
+		inline boost::asio::io_service &get_io_service(boost::asio::io_service &io)
+		{
+			return io;
+		}
+
+		inline boost::asio::io_service &get_io_service(boost::asio::io_service::strand &strand)
+		{
+			return strand.get_io_service();
+		}
+
+		template <class Next, class Dispatcher = boost::asio::io_service>
 		struct posting_observable
 		{
 			typedef typename Next::element_type element_type;
@@ -19,7 +30,7 @@ namespace Si
 			{
 			}
 
-			explicit posting_observable(boost::asio::io_service &io, Next next)
+			explicit posting_observable(Dispatcher &io, Next next)
 				: m_io(&io)
 				, m_next(std::move(next))
 			{
@@ -34,7 +45,7 @@ namespace Si
 #else
 					std::make_shared
 #endif
-					<boost::asio::io_service::work>(*m_io);
+					<boost::asio::io_service::work>(get_io_service(*m_io));
 				m_next.async_get_one(
 					make_function_observer([this, keep_io_running
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
@@ -101,7 +112,7 @@ namespace Si
 
 		private:
 
-			boost::asio::io_service *m_io;
+			Dispatcher *m_io;
 			Next m_next;
 
 			SILICIUM_DELETED_FUNCTION(posting_observable(posting_observable const &))
