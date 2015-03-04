@@ -20,6 +20,17 @@ namespace Si
 		{
 			boost::uint32_t mask;
 			path name;
+
+			file_notification() BOOST_NOEXCEPT
+			    : mask(0)
+			{
+			}
+
+			explicit file_notification(boost::uint32_t mask, path name) BOOST_NOEXCEPT
+			    : mask(mask)
+			    , name(std::move(name))
+			{
+			}
 		};
 
 		struct inotify_observable
