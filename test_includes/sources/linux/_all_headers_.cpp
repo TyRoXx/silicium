@@ -30,6 +30,7 @@
 #include <silicium/file_notification.hpp>
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
+#include <silicium/function.hpp>
 #include <silicium/git/repository.hpp>
 #include <silicium/html.hpp>
 #include <silicium/http/generate_header.hpp>

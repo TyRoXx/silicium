@@ -32,3 +32,13 @@ BOOST_AUTO_TEST_CASE(function_observer_copy)
 	auto b = a;
 	a = b;
 }
+
+BOOST_AUTO_TEST_CASE(function_observer_noncopyable_function)
+{
+	std::unique_ptr<long> p;
+	auto a = Si::make_function_observer([p = std::move(p)](Si::optional<int>)
+	{
+	});
+	auto b = std::move(a);
+	a = std::move(b);
+}

@@ -41,10 +41,17 @@ namespace Si
 		>::type element_type;
 
 		template <class F>
-		explicit function_observer(F &&function)
+		explicit function_observer(F &&function, typename boost::enable_if_c<!std::is_same<function_observer, typename std::decay<F>::type>::value, void>::type * = nullptr)
 			: m_function(std::forward<F>(function))
 		{
 		}
+
+#if SILICIUM_COMPILER_GENERATES_MOVES
+		function_observer(function_observer &&other) = default;
+		function_observer(function_observer const &other) = default;
+		function_observer &operator = (function_observer &&other) = default;
+		function_observer &operator = (function_observer const &other) = default;
+#endif
 
 		template <class Element>
 		void got_element(Element &&element)
