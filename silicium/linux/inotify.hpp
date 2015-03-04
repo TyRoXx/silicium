@@ -20,15 +20,18 @@ namespace Si
 		{
 			boost::uint32_t mask;
 			path name;
+			int watch_descriptor;
 
 			file_notification() BOOST_NOEXCEPT
 			    : mask(0)
+			    , watch_descriptor(-1)
 			{
 			}
 
-			explicit file_notification(boost::uint32_t mask, path name) BOOST_NOEXCEPT
+			explicit file_notification(boost::uint32_t mask, path name, int watch_descriptor) BOOST_NOEXCEPT
 			    : mask(mask)
 			    , name(std::move(name))
+			    , watch_descriptor(watch_descriptor)
 			{
 			}
 		};
@@ -96,7 +99,7 @@ namespace Si
 						for (std::size_t i = 0; i < bytes_read; )
 						{
 							inotify_event const &event = *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-							changes.emplace_back(file_notification{event.mask, path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0'))});
+							changes.emplace_back(file_notification{event.mask, path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')), event.wd});
 							i += sizeof(inotify_event);
 							i += event.len;
 						}
