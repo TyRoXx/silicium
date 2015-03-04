@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/element_from_optional_like.hpp>
+#include <silicium/detail/proper_value_function.hpp>
 #include <silicium/optional.hpp>
 #include <boost/optional.hpp>
 
@@ -57,7 +58,9 @@ namespace Si
 
 	private:
 
-		Function m_function;
+		typedef typename detail::proper_value_function<Function, void, typename detail::argument_of<Function>::type>::type function_holder;
+
+		function_holder m_function;
 	};
 
 	BOOST_STATIC_ASSERT(std::is_same<int, function_observer<void (*)(boost::optional<int> const &)>::element_type>::value);
