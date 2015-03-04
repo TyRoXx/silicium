@@ -67,7 +67,9 @@ namespace Si
 				std::size_t const additional_buffer = 8192;
 				read_buffer.resize(min_buffer_size + additional_buffer);
 				assert(notifier);
-				notifier->async_read_some(boost::asio::buffer(read_buffer), [this, receiver](boost::system::error_code error, std::size_t bytes_read) mutable
+				notifier->async_read_some(
+					boost::asio::buffer(read_buffer),
+					[this, receiver = std::forward<Observer>(receiver)](boost::system::error_code error, std::size_t bytes_read) mutable
 				{
 					if (error)
 					{
