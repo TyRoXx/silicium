@@ -6,8 +6,18 @@
 
 namespace Si
 {
+	typedef
+#ifdef _WIN32
+		wchar_t
+#else
+		char
+#endif
+		native_path_char;
+
 	struct path
 	{
+		typedef native_path_char char_type;
+
 		path() BOOST_NOEXCEPT
 		{
 		}
@@ -26,6 +36,11 @@ namespace Si
 		{
 		}
 
+		explicit path(char_type const *c_str)
+			: m_value(c_str)
+		{
+		}
+
 		template <class Iterator>
 		path(Iterator begin, Iterator end)
 		    : m_value(begin, end)
@@ -37,9 +52,20 @@ namespace Si
 		{
 		}
 
+		path(path const &other)
+			: m_value(other.m_value)
+		{
+		}
+
 		path &operator = (path &&other) BOOST_NOEXCEPT
 		{
 			m_value = std::move(other.m_value);
+			return *this;
+		}
+
+		path &operator = (path const &other)
+		{
+			m_value = other.m_value;
 			return *this;
 		}
 
@@ -71,6 +97,11 @@ namespace Si
 			return m_value;
 		}
 
+		char_type const *c_str() const BOOST_NOEXCEPT
+		{
+			return m_value.c_str();
+		}
+
 	private:
 
 #ifdef _WIN32
@@ -84,6 +115,68 @@ namespace Si
 	{
 		return out << p.underlying();
 	}
+
+	template <class ComparableToPath>
+	inline bool operator == (path const &left, ComparableToPath const &right)
+	{
+		return left.underlying() == right;
+	}
+
+	template <class ComparableToPath>
+	inline bool operator == (ComparableToPath const &left, path const &right)
+	{
+		return left == right.underlying();
+	}
+
+	inline bool operator == (path const &left, boost::filesystem::path const &right)
+	{
+		return right.compare(left.c_str()) == 0;
+	}
+
+	inline bool operator == (boost::filesystem::path const &left, path const &right)
+	{
+		return left.compare(right.c_str()) == 0;
+	}
+
+	inline bool operator == (path const &left, path const &right)
+	{
+		return left.underlying() == right.underlying();
+	}
+
+	template <class ComparableToPath>
+	inline bool operator != (path const &left, ComparableToPath const &right)
+	{
+		return !(left == right);
+	}
+
+	template <class ComparableToPath>
+	inline bool operator != (ComparableToPath const &left, path const &right)
+	{
+		return !(left == right);
+	}
+
+	inline bool operator < (path const &left, path const &right)
+	{
+		return left.underlying() < right.underlying();
+	}
+
+	inline std::size_t hash_value(path const &value)
+	{
+		using boost::hash_value;
+		return hash_value(value.underlying());
+	}
+}
+
+namespace std
+{
+	template <>
+	struct hash< ::Si::path>
+	{
+		std::size_t operator()(Si::path const &value) const
+		{
+			return hash_value(value);
+		}
+	};
 }
 
 #endif
