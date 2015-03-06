@@ -60,7 +60,7 @@ namespace Si
 			{
 				return Si::none;
 			}
-			return Si::file_notification(*type, std::move(original.name));
+			return Si::file_notification(*type, std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR);
 		}
 	}
 
