@@ -169,7 +169,19 @@ namespace Si
 	inline path leaf(path const &whole)
 	{
 		//TODO: do this efficiently
-		return path(whole.to_boost_path().leaf().c_str());
+		return path(whole.to_boost_path().leaf());
+	}
+
+	inline path parent(path const &whole)
+	{
+		//TODO: do this efficiently
+		return path(whole.to_boost_path().parent_path());
+	}
+
+	inline path operator / (path const &front, path const &back)
+	{
+		//TODO: do this efficiently
+		return path(front.to_boost_path() / back.to_boost_path());
 	}
 }
 
