@@ -165,6 +165,12 @@ namespace Si
 		using boost::hash_value;
 		return hash_value(value.underlying());
 	}
+
+	inline path leaf(path const &whole)
+	{
+		//TODO: do this efficiently
+		return path(whole.to_boost_path().leaf().c_str());
+	}
 }
 
 namespace std
