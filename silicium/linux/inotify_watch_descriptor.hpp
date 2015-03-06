@@ -52,6 +52,11 @@ namespace Si
 				watch = -1;
 			}
 
+			int get_watch_descriptor() const BOOST_NOEXCEPT
+			{
+				return watch;
+			}
+
 		private:
 
 			int notifier;
