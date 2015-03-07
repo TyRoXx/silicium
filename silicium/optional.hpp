@@ -321,6 +321,17 @@ namespace Si
 		return out;
 	}
 
+	template <class T>
+	std::size_t hash_value(optional<T> const &value)
+	{
+		if (value)
+		{
+			using boost::hash_value;
+			return hash_value(*value);
+		}
+		return 0;
+	}
+
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t>) == 2);
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int16_t>) == 4);
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
@@ -332,7 +343,10 @@ namespace std
 	template <class T>
 	struct hash<Si::optional<T>>
 	{
-		std::size_t operator()(Si::optional<T> const &v) const;
+		std::size_t operator()(Si::optional<T> const &value) const
+		{
+			return hash_value(value);
+		}
 	};
 }
 

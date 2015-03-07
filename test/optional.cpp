@@ -1,6 +1,8 @@
 #include <silicium/optional.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/io_service.hpp>
+#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 BOOST_AUTO_TEST_CASE(optional_default_ctor)
 {
@@ -73,4 +75,33 @@ BOOST_AUTO_TEST_CASE(optional_construct_inplace)
 	BOOST_REQUIRE(a);
 	Si::optional<boost::asio::io_service::work> b(Si::some, *a);
 	BOOST_REQUIRE(b);
+}
+
+namespace
+{
+	template <class Map>
+	void test_map(Map &m)
+	{
+		m.insert(std::make_pair(Si::optional<int>(1), -1L));
+		m.insert(std::make_pair(Si::optional<int>(2), -4L));
+		m.insert(std::make_pair(Si::optional<int>(3), -7L));
+		m.insert(std::make_pair(Si::optional<int>(),  -9L));
+		BOOST_CHECK_EQUAL(4u, m.size());
+		BOOST_CHECK_EQUAL(-1L, m[Si::optional<int>(1)]);
+		BOOST_CHECK_EQUAL(-4L, m[Si::optional<int>(2)]);
+		BOOST_CHECK_EQUAL(-7L, m[Si::optional<int>(3)]);
+		BOOST_CHECK_EQUAL(-9L, m[Si::optional<int>()]);
+	}
+}
+
+BOOST_AUTO_TEST_CASE(optional_std_hash)
+{
+	std::unordered_map<Si::optional<int>, long> m;
+	test_map(m);
+}
+
+BOOST_AUTO_TEST_CASE(optional_boost_hash)
+{
+	boost::unordered_map<Si::optional<int>, long> m;
+	test_map(m);
 }
