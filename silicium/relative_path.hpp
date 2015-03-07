@@ -95,6 +95,11 @@ namespace Si
 			return m_value.c_str();
 		}
 
+		bool empty() const BOOST_NOEXCEPT
+		{
+			return underlying().empty();
+		}
+
 	private:
 
 #ifdef _WIN32
