@@ -68,7 +68,7 @@ namespace Si
 			auto first_line = get(lines);
 			if (!first_line)
 			{
-				return boost::none;
+				return none;
 			}
 			response header;
 			header.arguments = Si::make_unique<std::map<noexcept_string, noexcept_string>>();
@@ -76,7 +76,7 @@ namespace Si
 				auto const version_end = std::find(first_line->begin(), first_line->end(), ' ');
 				if (version_end == first_line->end())
 				{
-					return boost::none;
+					return none;
 				}
 				header.http_version.assign(first_line->begin(), version_end);
 
@@ -84,7 +84,7 @@ namespace Si
 				auto const status_end = std::find(status_begin, first_line->end(), ' ');
 				if (status_end == first_line->end())
 				{
-					return boost::none;
+					return none;
 				}
 				try
 				{
@@ -92,7 +92,7 @@ namespace Si
 				}
 				catch (boost::bad_lexical_cast const &)
 				{
-					return boost::none;
+					return none;
 				}
 
 				header.status_text.assign(status_end + 1, first_line->end());
@@ -102,7 +102,7 @@ namespace Si
 				auto value_line = get(lines);
 				if (!value_line)
 				{
-					return boost::none;
+					return none;
 				}
 				if (value_line->empty())
 				{
