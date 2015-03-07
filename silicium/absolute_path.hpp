@@ -93,28 +93,12 @@ namespace Si
 		noexcept_string m_value;
 #endif
 
-		explicit absolute_path(noexcept_string const &value)
-			: m_value(value)
-		{
-		}
-
 		explicit absolute_path(boost::filesystem::path const &value)
 #ifdef _WIN32
 			: m_value(value)
 #else
 			: m_value(value.c_str())
 #endif
-		{
-		}
-
-		explicit absolute_path(char_type const *c_str)
-			: m_value(c_str)
-		{
-		}
-
-		template <class Iterator>
-		absolute_path(Iterator begin, Iterator end)
-			: m_value(begin, end)
 		{
 		}
 	};
