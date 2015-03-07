@@ -52,7 +52,7 @@ namespace Si
 			return 0;
 		}
 
-		boost::optional<boost::uintmax_t> maximum_size()
+		optional<boost::uintmax_t> maximum_size()
 		{
 			return boost::none;
 		}

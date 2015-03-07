@@ -268,7 +268,7 @@ namespace Si
 			return &get();
 		}
 
-		boost::optional<Value> get_optional()
+		optional<Value> get_optional()
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 			&&
 #endif
@@ -276,7 +276,7 @@ namespace Si
 			auto *value = get_ptr();
 			if (!value)
 			{
-				return boost::none;
+				return none;
 			}
 			return std::move(*value);
 		}

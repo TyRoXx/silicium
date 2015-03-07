@@ -5,6 +5,7 @@
 #include <silicium/to_unique.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/optional.hpp>
 #include <map>
 
 namespace Si
@@ -61,7 +62,7 @@ namespace Si
 		};
 
 		template <class CharSource>
-		boost::optional<response> parse_response(CharSource &&in)
+		optional<response> parse_response(CharSource &&in)
 		{
 			Si::detail::line_source lines(in);
 			auto first_line = get(lines);

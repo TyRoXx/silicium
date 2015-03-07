@@ -55,9 +55,6 @@ namespace Si
 			typedef int element_type;
 			iterator_range<element_type const *> map_next(std::size_t size);
 			element_type *copy_next(iterator_range<element_type *> destination);
-			boost::uintmax_t minimum_size();
-			boost::optional<boost::uintmax_t> maximum_size();
-			std::size_t skip(std::size_t count);
 		};
 
 		BOOST_CONCEPT_ASSERT((Source<minimum_source>));

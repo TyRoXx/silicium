@@ -4,6 +4,7 @@
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/win32/win32.hpp>
+#include <boost/swap.hpp>
 
 namespace Si
 {

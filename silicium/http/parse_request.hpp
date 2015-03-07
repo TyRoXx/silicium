@@ -5,6 +5,7 @@
 #include <silicium/source/source.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <silicium/to_unique.hpp>
+#include <boost/optional.hpp>
 #include <boost/lexical_cast.hpp>
 #include <map>
 
