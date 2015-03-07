@@ -2,6 +2,7 @@
 #define SILICIUM_ABSOLUTE_PATH_HPP
 
 #include <silicium/relative_path.hpp>
+#include <silicium/optional.hpp>
 #include <boost/filesystem/operations.hpp>
 
 namespace Si
@@ -11,31 +12,6 @@ namespace Si
 		typedef native_path_char char_type;
 
 		absolute_path() BOOST_NOEXCEPT
-		{
-		}
-
-		explicit absolute_path(noexcept_string const &value)
-		    : m_value(value)
-		{
-		}
-
-		explicit absolute_path(boost::filesystem::path const &value)
-#ifdef _WIN32
-		    : m_value(value)
-#else
-			: m_value(value.c_str())
-#endif
-		{
-		}
-
-		explicit absolute_path(char_type const *c_str)
-			: m_value(c_str)
-		{
-		}
-
-		template <class Iterator>
-		absolute_path(Iterator begin, Iterator end)
-		    : m_value(begin, end)
 		{
 		}
 
@@ -94,6 +70,21 @@ namespace Si
 			return m_value.c_str();
 		}
 
+		void combine(relative_path const &back)
+		{
+			//TODO: optimize
+			*this = absolute_path(to_boost_path() / back.to_boost_path());
+		}
+
+		static optional<absolute_path> create(boost::filesystem::path const &maybe_absolute)
+		{
+			if (maybe_absolute.is_absolute())
+			{
+				return absolute_path(maybe_absolute);
+			}
+			return none;
+		}
+
 	private:
 
 #ifdef _WIN32
@@ -101,6 +92,31 @@ namespace Si
 #else
 		noexcept_string m_value;
 #endif
+
+		explicit absolute_path(noexcept_string const &value)
+			: m_value(value)
+		{
+		}
+
+		explicit absolute_path(boost::filesystem::path const &value)
+#ifdef _WIN32
+			: m_value(value)
+#else
+			: m_value(value.c_str())
+#endif
+		{
+		}
+
+		explicit absolute_path(char_type const *c_str)
+			: m_value(c_str)
+		{
+		}
+
+		template <class Iterator>
+		absolute_path(Iterator begin, Iterator end)
+			: m_value(begin, end)
+		{
+		}
 	};
 
 	inline std::ostream &operator << (std::ostream &out, absolute_path const &p)
@@ -164,16 +180,23 @@ namespace Si
 		return relative_path(whole.to_boost_path().leaf());
 	}
 
-	inline absolute_path parent(absolute_path const &whole)
+	inline optional<absolute_path> parent(absolute_path const &whole)
 	{
 		//TODO: do this efficiently
-		return absolute_path(whole.to_boost_path().parent_path());
+		auto boosted = whole.to_boost_path();
+		if (boosted.has_parent_path())
+		{
+			return *absolute_path::create(boosted.parent_path());
+		}
+		return none;
 	}
 
 	inline absolute_path operator / (absolute_path const &front, relative_path const &back)
 	{
 		//TODO: do this efficiently
-		return absolute_path(front.to_boost_path() / back.to_boost_path());
+		absolute_path result = front;
+		result.combine(back);
+		return result;
 	}
 
 	template <std::size_t N>
@@ -184,7 +207,7 @@ namespace Si
 
 	inline absolute_path get_current_working_directory()
 	{
-		return absolute_path(boost::filesystem::current_path());
+		return *absolute_path::create(boost::filesystem::current_path());
 	}
 
 	inline boost::system::error_code remove_file(absolute_path const &name)

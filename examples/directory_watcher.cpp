@@ -7,10 +7,10 @@ int main()
 {
 	boost::asio::io_service io;
 
-	auto const watched_dir = boost::filesystem::current_path();
+	auto const watched_dir = Si::get_current_working_directory();
 	std::cerr << "Watching " << watched_dir << '\n';
 
-	Si::single_directory_watcher notifier(io, Si::absolute_path(watched_dir));
+	Si::single_directory_watcher notifier(io, watched_dir);
 	auto all = Si::for_each(Si::ref(notifier), [](Si::file_notification const &event)
 	{
 		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
