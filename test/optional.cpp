@@ -3,6 +3,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
+#include <map>
 
 BOOST_AUTO_TEST_CASE(optional_default_ctor)
 {
@@ -104,4 +105,24 @@ BOOST_AUTO_TEST_CASE(optional_boost_hash)
 {
 	boost::unordered_map<Si::optional<int>, long> m;
 	test_map(m);
+}
+
+BOOST_AUTO_TEST_CASE(optional_std_map)
+{
+	std::map<Si::optional<int>, long> m;
+	test_map(m);
+}
+
+BOOST_AUTO_TEST_CASE(optional_less)
+{
+	BOOST_CHECK_LT(Si::optional<int>(), Si::optional<int>(0));
+	BOOST_CHECK_LT(Si::optional<int>(), Si::optional<int>(-1));
+	BOOST_CHECK_LT(Si::optional<int>(), Si::optional<int>(1));
+	BOOST_CHECK_LT(Si::optional<int>(0), Si::optional<int>(1));
+	BOOST_CHECK_LT(Si::optional<int>(-1), Si::optional<int>(1));
+	BOOST_CHECK_LT(Si::optional<int>(-1), Si::optional<int>(0));
+	BOOST_CHECK(!(Si::optional<int>() < Si::optional<int>()));
+	BOOST_CHECK(!(Si::optional<int>(0) < Si::optional<int>(0)));
+	BOOST_CHECK(!(Si::optional<int>(1) < Si::optional<int>(0)));
+	BOOST_CHECK(!(Si::optional<int>(1) < Si::optional<int>(-1)));
 }

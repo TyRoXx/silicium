@@ -296,6 +296,33 @@ namespace Si
 	}
 
 	template <class T>
+	bool operator < (optional<T> const &left, optional<T> const &right)
+	{
+		if (left)
+		{
+			if (right)
+			{
+				return (*left < *right);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (right)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	template <class T>
 	Si::optional<typename std::decay<T>::type> make_optional(T &&value)
 	{
 		return Si::optional<typename std::decay<T>::type>(std::forward<T>(value));
