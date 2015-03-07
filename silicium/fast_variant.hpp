@@ -22,6 +22,9 @@ namespace Si
 		return std::forward<Variant>(variant).apply_visitor(std::forward<Visitor>(visitor));
 	}
 
+	template <class T>
+	struct inplace {};
+
 	namespace detail
 	{
 		template <class ...T>
@@ -312,6 +315,17 @@ namespace Si
 				new (&storage.storage()) CleanU(std::forward<U>(value));
 			}
 
+			template <
+				class Requested,
+				class ...Args,
+				std::size_t Index = index_of<Requested, T...>::value
+			>
+			explicit fast_variant_base(inplace<Requested>, Args &&...args)
+			{
+				storage.which(Index);
+				new (&storage.storage()) Requested(std::forward<Args>(args)...);
+			}
+
 			which_type which() const BOOST_NOEXCEPT
 			{
 				return storage.which();
@@ -441,6 +455,12 @@ namespace Si
 				>::type>
 			fast_variant_base(U &&value)
 				: base(std::forward<U>(value))
+			{
+			}
+
+			template <class Requested, class ...Args>
+			explicit fast_variant_base(inplace<Requested> i, Args &&...args)
+				: base(i, std::forward<Args>(args)...)
 			{
 			}
 

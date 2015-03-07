@@ -1,5 +1,6 @@
 #include <silicium/fast_variant.hpp>
 #include <silicium/config.hpp>
+#include <silicium/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <boost/container/string.hpp>
 #include <boost/variant/static_visitor.hpp>
@@ -473,5 +474,62 @@ namespace Si
 			}
 		);
 		BOOST_CHECK(got_result);
+	}
+
+	struct needs_inplace_construction : boost::noncopyable
+	{
+		int v;
+
+		explicit needs_inplace_construction(int v)
+			: v(v)
+		{
+		}
+	};
+
+	bool operator == (needs_inplace_construction const &left, needs_inplace_construction const &right)
+	{
+		return left.v == right.v;
+	}
+
+	std::ostream &operator << (std::ostream &out, needs_inplace_construction const &value)
+	{
+		return out << value.v;
+	}
+
+	BOOST_AUTO_TEST_CASE(fast_variant_construct_inplace)
+	{
+		typedef fast_variant<int, float, nothing, std::string, needs_inplace_construction> var;
+		{
+			var a(Si::inplace<int>(), 12);
+			var b(12);
+			BOOST_CHECK_EQUAL(b, a);
+		}
+		{
+			var a(Si::inplace<float>(), 12.0f);
+			var b(12.0f);
+			BOOST_CHECK_EQUAL(b, a);
+		}
+		{
+			var a((Si::inplace<nothing>()), Si::nothing());
+			var b((Si::nothing()));
+			BOOST_CHECK_EQUAL(b, a);
+		}
+		{
+			var a((Si::inplace<std::string>()), "test");
+			var b(std::string("test"));
+			BOOST_CHECK_EQUAL(b, a);
+		}
+		{
+			var a((Si::inplace<needs_inplace_construction>()), 123);
+			BOOST_CHECK_EQUAL(a, a);
+			BOOST_CHECK_EQUAL(123, Si::visit<optional<int>>(
+				a,
+				[](int) { BOOST_FAIL("unexpected type"); return none; },
+				[](float) { BOOST_FAIL("unexpected type"); return none; },
+				[](nothing) { BOOST_FAIL("unexpected type"); return none; },
+				[](std::string const &) { BOOST_FAIL("unexpected type"); return none; },
+				[](needs_inplace_construction const &value) { return value.v; }
+			));
+		}
 	}
 }

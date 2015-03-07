@@ -147,6 +147,11 @@ namespace Si
 		}
 	};
 
+	inline bool operator == (nothing const &, nothing const &)
+	{
+		return true;
+	}
+
 	template <class T, class ...Args>
 	auto make_unique(Args &&...args) -> std::unique_ptr<T>
 	{
