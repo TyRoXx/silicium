@@ -10,7 +10,7 @@
 BOOST_AUTO_TEST_CASE(asio_use_observable_with_timer)
 {
 	boost::asio::io_service io;
-	boost::asio::basic_waitable_timer<boost::chrono::system_clock> timer(io);
+	boost::asio::basic_waitable_timer<boost::chrono::steady_clock> timer(io);
 	timer.expires_from_now(boost::chrono::nanoseconds(1));
 	auto elapsed = timer.async_wait(Si::asio::use_observable);
 	bool got_result = false;

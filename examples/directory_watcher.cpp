@@ -1,6 +1,6 @@
 #include <silicium/single_directory_watcher.hpp>
 #include <silicium/observable/for_each.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <silicium/absolute_path.hpp>
 #include <iostream>
 
 int main()

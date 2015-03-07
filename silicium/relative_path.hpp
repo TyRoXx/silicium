@@ -34,6 +34,25 @@ namespace Si
 		{
 		}
 
+		template <std::size_t N>
+		explicit relative_path(char_type const (&c_str_literal)[N])
+			: m_value(c_str_literal)
+		{
+		}
+
+#ifdef _WIN32
+		explicit relative_path(char const *c_str)
+			: m_value(c_str)
+		{
+		}
+
+		template <std::size_t N>
+		explicit relative_path(char const (&c_str_literal)[N])
+			: m_value(c_str_literal)
+		{
+		}
+#endif
+
 		template <class Iterator>
 		relative_path(Iterator begin, Iterator end)
 		    : m_value(begin, end)

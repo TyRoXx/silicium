@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
+#include <map>
 
 BOOST_AUTO_TEST_CASE(path_empty)
 {

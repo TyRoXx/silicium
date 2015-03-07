@@ -189,6 +189,14 @@ namespace Si
 		return front / relative_path(boost::filesystem::path(&literal[0]));
 	}
 
+#ifdef _WIN32
+	template <std::size_t N>
+	inline absolute_path operator / (absolute_path const &front, char const (&literal)[N])
+	{
+		return front / relative_path(boost::filesystem::path(&literal[0]));
+	}
+#endif
+
 	inline absolute_path get_current_working_directory()
 	{
 		return *absolute_path::create(boost::filesystem::current_path());

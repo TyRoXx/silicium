@@ -16,7 +16,7 @@ namespace Si
 		}
 
 		explicit path(noexcept_string const &value)
-		    : m_value(value)
+			: m_value(value)
 		{
 		}
 
@@ -33,6 +33,25 @@ namespace Si
 			: m_value(c_str)
 		{
 		}
+
+		template <std::size_t N>
+		explicit path(char_type const (&c_str_literal)[N])
+			: m_value(c_str_literal)
+		{
+		}
+
+#ifdef _WIN32
+		explicit path(char const *c_str)
+			: m_value(c_str)
+		{
+		}
+
+		template <std::size_t N>
+		explicit path(char const (&c_str_literal)[N])
+			: m_value(c_str_literal)
+		{
+		}
+#endif
 
 		template <class Iterator>
 		path(Iterator begin, Iterator end)

@@ -33,6 +33,7 @@ BOOST_AUTO_TEST_CASE(function_observer_copy)
 	a = b;
 }
 
+#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
 BOOST_AUTO_TEST_CASE(function_observer_noncopyable_function)
 {
 	std::unique_ptr<long> p;
@@ -42,3 +43,4 @@ BOOST_AUTO_TEST_CASE(function_observer_noncopyable_function)
 	auto b = std::move(a);
 	a = std::move(b);
 }
+#endif

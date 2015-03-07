@@ -1,3 +1,4 @@
+#include <silicium/absolute_path.hpp>
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
@@ -7,8 +8,8 @@
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
-#include <silicium/asio/tcp_trigger.hpp>
 #include <silicium/asio/timer.hpp>
+#include <silicium/asio/use_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/async_process.hpp>
 #include <silicium/boost_threading.hpp>
@@ -30,6 +31,7 @@
 #include <silicium/file_notification.hpp>
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
+#include <silicium/function.hpp>
 #include <silicium/git/repository.hpp>
 #include <silicium/html.hpp>
 #include <silicium/http/generate_header.hpp>
@@ -89,11 +91,14 @@
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/path.hpp>
+#include <silicium/path_char.hpp>
+#include <silicium/path_segment.hpp>
 #include <silicium/process_handle.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
 #include <silicium/read_file.hpp>
+#include <silicium/relative_path.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/single_directory_watcher.hpp>
 #include <silicium/sink/buffering_sink.hpp>

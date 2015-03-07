@@ -2,7 +2,7 @@
 #define SILICIUM_WIN32_OVERLAPPED_DIRECTORY_CHANGES_HPP
 
 #include <boost/asio.hpp>
-#include <silicium/path.hpp>
+#include <silicium/absolute_path.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/win32/file_notification.hpp>
@@ -30,7 +30,7 @@ namespace Si
 			{
 			}
 
-			explicit overlapped_directory_changes(boost::asio::io_service &io, boost::filesystem::path const &watched, bool is_recursive)
+			explicit overlapped_directory_changes(boost::asio::io_service &io, absolute_path const &watched, bool is_recursive)
 				: is_recursive(is_recursive)
 				, io(&io)
 				, receiver_(nullptr)
@@ -97,7 +97,7 @@ namespace Si
 					for (char *next_event = buffer.data();;)
 					{
 						FILE_NOTIFY_INFORMATION const &notification = reinterpret_cast<FILE_NOTIFY_INFORMATION const &>(*next_event);
-						path name(notification.FileName + 0, notification.FileName + (notification.FileNameLength / sizeof(WCHAR)));
+						relative_path name(notification.FileName + 0, notification.FileName + (notification.FileNameLength / sizeof(WCHAR)));
 						notifications.emplace_back(file_notification(notification.Action, std::move(name)));
 						if (0 == notification.NextEntryOffset)
 						{
