@@ -1,3 +1,4 @@
+#include <silicium/absolute_path.hpp>
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
@@ -95,6 +96,7 @@
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/path.hpp>
+#include <silicium/path_char.hpp>
 #include <silicium/posix/native_file_descriptor.hpp>
 #include <silicium/posix/open.hpp>
 #include <silicium/posix/pipe.hpp>
@@ -104,6 +106,7 @@
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
 #include <silicium/read_file.hpp>
+#include <silicium/relative_path.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/single_directory_watcher.hpp>
 #include <silicium/sink/buffering_sink.hpp>

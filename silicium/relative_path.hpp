@@ -1,5 +1,5 @@
-#ifndef SILICIUM_PATH_HPP
-#define SILICIUM_PATH_HPP
+#ifndef SILICIUM_RELATIVE_PATH_HPP
+#define SILICIUM_RELATIVE_PATH_HPP
 
 #include <silicium/path_char.hpp>
 #include <silicium/noexcept_string.hpp>
@@ -7,20 +7,20 @@
 
 namespace Si
 {
-	struct path
+	struct relative_path
 	{
 		typedef native_path_char char_type;
 
-		path() BOOST_NOEXCEPT
+		relative_path() BOOST_NOEXCEPT
 		{
 		}
 
-		explicit path(noexcept_string const &value)
+		explicit relative_path(noexcept_string const &value)
 		    : m_value(value)
 		{
 		}
 
-		explicit path(boost::filesystem::path const &value)
+		explicit relative_path(boost::filesystem::path const &value)
 #ifdef _WIN32
 		    : m_value(value)
 #else
@@ -29,40 +29,40 @@ namespace Si
 		{
 		}
 
-		explicit path(char_type const *c_str)
+		explicit relative_path(char_type const *c_str)
 			: m_value(c_str)
 		{
 		}
 
 		template <class Iterator>
-		path(Iterator begin, Iterator end)
+		relative_path(Iterator begin, Iterator end)
 		    : m_value(begin, end)
 		{
 		}
 
-		path(path &&other) BOOST_NOEXCEPT
+		relative_path(relative_path &&other) BOOST_NOEXCEPT
 		    : m_value(std::move(other.m_value))
 		{
 		}
 
-		path(path const &other)
+		relative_path(relative_path const &other)
 			: m_value(other.m_value)
 		{
 		}
 
-		path &operator = (path &&other) BOOST_NOEXCEPT
+		relative_path &operator = (relative_path &&other) BOOST_NOEXCEPT
 		{
 			m_value = std::move(other.m_value);
 			return *this;
 		}
 
-		path &operator = (path const &other)
+		relative_path &operator = (relative_path const &other)
 		{
 			m_value = other.m_value;
 			return *this;
 		}
 
-		void swap(path &other) BOOST_NOEXCEPT
+		void swap(relative_path &other) BOOST_NOEXCEPT
 		{
 			m_value.swap(other.m_value);
 		}
@@ -104,86 +104,86 @@ namespace Si
 #endif
 	};
 
-	inline std::ostream &operator << (std::ostream &out, path const &p)
+	inline std::ostream &operator << (std::ostream &out, relative_path const &p)
 	{
 		return out << p.underlying();
 	}
 
 	template <class ComparableToPath>
-	inline bool operator == (path const &left, ComparableToPath const &right)
+	inline bool operator == (relative_path const &left, ComparableToPath const &right)
 	{
 		return left.underlying() == right;
 	}
 
 	template <class ComparableToPath>
-	inline bool operator == (ComparableToPath const &left, path const &right)
+	inline bool operator == (ComparableToPath const &left, relative_path const &right)
 	{
 		return left == right.underlying();
 	}
 
-	inline bool operator == (path const &left, boost::filesystem::path const &right)
+	inline bool operator == (relative_path const &left, boost::filesystem::path const &right)
 	{
 		return right.compare(left.c_str()) == 0;
 	}
 
-	inline bool operator == (boost::filesystem::path const &left, path const &right)
+	inline bool operator == (boost::filesystem::path const &left, relative_path const &right)
 	{
 		return left.compare(right.c_str()) == 0;
 	}
 
-	inline bool operator == (path const &left, path const &right)
+	inline bool operator == (relative_path const &left, relative_path const &right)
 	{
 		return left.underlying() == right.underlying();
 	}
 
 	template <class ComparableToPath>
-	inline bool operator != (path const &left, ComparableToPath const &right)
+	inline bool operator != (relative_path const &left, ComparableToPath const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class ComparableToPath>
-	inline bool operator != (ComparableToPath const &left, path const &right)
+	inline bool operator != (ComparableToPath const &left, relative_path const &right)
 	{
 		return !(left == right);
 	}
 
-	inline bool operator < (path const &left, path const &right)
+	inline bool operator < (relative_path const &left, relative_path const &right)
 	{
 		return left.underlying() < right.underlying();
 	}
 
-	inline std::size_t hash_value(path const &value)
+	inline std::size_t hash_value(relative_path const &value)
 	{
 		using boost::hash_value;
 		return hash_value(value.underlying());
 	}
 
-	inline path leaf(path const &whole)
+	inline relative_path leaf(relative_path const &whole)
 	{
 		//TODO: do this efficiently
-		return path(whole.to_boost_path().leaf());
+		return relative_path(whole.to_boost_path().leaf());
 	}
 
-	inline path parent(path const &whole)
+	inline relative_path parent(relative_path const &whole)
 	{
 		//TODO: do this efficiently
-		return path(whole.to_boost_path().parent_path());
+		return relative_path(whole.to_boost_path().parent_path());
 	}
 
-	inline path operator / (path const &front, path const &back)
+	inline relative_path operator / (relative_path const &front, relative_path const &back)
 	{
 		//TODO: do this efficiently
-		return path(front.to_boost_path() / back.to_boost_path());
+		return relative_path(front.to_boost_path() / back.to_boost_path());
 	}
 }
 
 namespace std
 {
 	template <>
-	struct hash< ::Si::path>
+	struct hash< ::Si::relative_path>
 	{
-		std::size_t operator()(Si::path const &value) const
+		std::size_t operator()(Si::relative_path const &value) const
 		{
 			return hash_value(value);
 		}
