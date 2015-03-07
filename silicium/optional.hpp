@@ -10,6 +10,10 @@ namespace Si
 
 	static none_t BOOST_CONSTEXPR_OR_CONST none;
 
+	struct some_t {};
+
+	static some_t BOOST_CONSTEXPR_OR_CONST some;
+
 	template <class T>
 	struct optional
 	{
@@ -38,6 +42,12 @@ namespace Si
 
 		optional(T const &value)
 			: content(value)
+		{
+		}
+
+		template <class ...Args>
+		explicit optional(some_t, Args &&...args)
+			: content(inplace<T>{}, std::forward<Args>(args)...)
 		{
 		}
 

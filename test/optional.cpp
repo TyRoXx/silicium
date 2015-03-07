@@ -1,5 +1,6 @@
 #include <silicium/optional.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/asio/io_service.hpp>
 
 BOOST_AUTO_TEST_CASE(optional_default_ctor)
 {
@@ -64,4 +65,12 @@ BOOST_AUTO_TEST_CASE(optional_rvalue_assignment)
 	BOOST_REQUIRE(*o);
 	BOOST_CHECK_EQUAL(3, **o);
 	BOOST_CHECK(Si::optional<std::unique_ptr<int>>() != o);
+}
+
+BOOST_AUTO_TEST_CASE(optional_construct_inplace)
+{
+	Si::optional<boost::asio::io_service> a(Si::some);
+	BOOST_REQUIRE(a);
+	Si::optional<boost::asio::io_service::work> b(Si::some, *a);
+	BOOST_REQUIRE(b);
 }
