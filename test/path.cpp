@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(path_less_than)
 	m[Si::path("a")] = 1;
 	m[Si::path("b")] = 2;
 	m[Si::path("c")] = 3;
-	BOOST_CHECK_EQUAL(3, m.size());
+	BOOST_CHECK_EQUAL(3u, m.size());
 	BOOST_CHECK_EQUAL(1, m[Si::path("a")]);
 	BOOST_CHECK_EQUAL(2, m[Si::path("b")]);
 	BOOST_CHECK_EQUAL(3, m[Si::path("c")]);
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(path_std_hash)
 	m[Si::path("a")] = 1;
 	m[Si::path("b")] = 2;
 	m[Si::path("c")] = 3;
-	BOOST_CHECK_EQUAL(3, m.size());
+	BOOST_CHECK_EQUAL(3u, m.size());
 	BOOST_CHECK_EQUAL(1, m[Si::path("a")]);
 	BOOST_CHECK_EQUAL(2, m[Si::path("b")]);
 	BOOST_CHECK_EQUAL(3, m[Si::path("c")]);
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(path_boost_hash)
 	m[Si::path("a")] = 1;
 	m[Si::path("b")] = 2;
 	m[Si::path("c")] = 3;
-	BOOST_CHECK_EQUAL(3, m.size());
+	BOOST_CHECK_EQUAL(3u, m.size());
 	BOOST_CHECK_EQUAL(1, m[Si::path("a")]);
 	BOOST_CHECK_EQUAL(2, m[Si::path("b")]);
 	BOOST_CHECK_EQUAL(3, m[Si::path("c")]);

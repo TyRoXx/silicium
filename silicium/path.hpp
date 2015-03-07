@@ -60,8 +60,13 @@ namespace Si
 		}
 
 		path(path &&other) BOOST_NOEXCEPT
+#ifndef _WIN32
 		    : m_value(std::move(other.m_value))
+#endif
 		{
+#ifdef _WIN32
+			m_value.swap(other.m_value);
+#endif
 		}
 
 		path(path const &other)
@@ -71,7 +76,11 @@ namespace Si
 
 		path &operator = (path &&other) BOOST_NOEXCEPT
 		{
+#ifdef _WIN32
+			m_value.swap(other.m_value);
+#else
 			m_value = std::move(other.m_value);
+#endif
 			return *this;
 		}
 

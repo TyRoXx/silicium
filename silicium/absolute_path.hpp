@@ -48,11 +48,7 @@ namespace Si
 #endif
 		to_boost_path() const
 		{
-			return m_value
-#ifndef _WIN32
-			        .c_str()
-#endif
-			;
+			return m_value.to_boost_path();
 		}
 
 #ifdef _WIN32
@@ -62,7 +58,7 @@ namespace Si
 #endif
 		underlying() const BOOST_NOEXCEPT
 		{
-			return m_value;
+			return m_value.underlying();
 		}
 
 		char_type const *c_str() const BOOST_NOEXCEPT
@@ -87,18 +83,10 @@ namespace Si
 
 	private:
 
-#ifdef _WIN32
-		boost::filesystem::path m_value;
-#else
-		noexcept_string m_value;
-#endif
+		path m_value;
 
 		explicit absolute_path(boost::filesystem::path const &value)
-#ifdef _WIN32
 			: m_value(value)
-#else
-			: m_value(value.c_str())
-#endif
 		{
 		}
 	};
