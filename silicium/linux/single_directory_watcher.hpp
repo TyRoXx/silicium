@@ -72,7 +72,7 @@ namespace Si
 		{
 		}
 
-		explicit single_directory_watcher(boost::asio::io_service &io, boost::filesystem::path const &watched)
+		explicit single_directory_watcher(boost::asio::io_service &io, absolute_path const &watched)
 			: inotify(io)
 			, impl(enumerate(ref(inotify)), linux::to_portable_file_notification)
 			, root(get(inotify.watch(watched, (IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_ATTRIB))))

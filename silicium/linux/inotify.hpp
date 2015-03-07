@@ -64,7 +64,7 @@ namespace Si
 				}
 			}
 
-			error_or<watch_descriptor> watch(boost::filesystem::path const &target, boost::uint32_t mask) BOOST_NOEXCEPT
+			error_or<watch_descriptor> watch(absolute_path const &target, boost::uint32_t mask) BOOST_NOEXCEPT
 			{
 				assert(notifier);
 				int const wd = inotify_add_watch(notifier->native_handle(), target.c_str(), mask);

@@ -2,7 +2,7 @@
 #define SILICIUM_ABSOLUTE_PATH_HPP
 
 #include <silicium/relative_path.hpp>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 
 namespace Si
 {
@@ -158,10 +158,10 @@ namespace Si
 		return hash_value(value.underlying());
 	}
 
-	inline absolute_path leaf(absolute_path const &whole)
+	inline relative_path leaf(absolute_path const &whole)
 	{
 		//TODO: do this efficiently
-		return absolute_path(whole.to_boost_path().leaf());
+		return relative_path(whole.to_boost_path().leaf());
 	}
 
 	inline absolute_path parent(absolute_path const &whole)
@@ -174,6 +174,24 @@ namespace Si
 	{
 		//TODO: do this efficiently
 		return absolute_path(front.to_boost_path() / back.to_boost_path());
+	}
+
+	template <std::size_t N>
+	inline absolute_path operator / (absolute_path const &front, absolute_path::char_type const (&literal)[N])
+	{
+		return front / relative_path(boost::filesystem::path(&literal[0]));
+	}
+
+	inline absolute_path get_current_working_directory()
+	{
+		return absolute_path(boost::filesystem::current_path());
+	}
+
+	inline boost::system::error_code remove_file(absolute_path const &name)
+	{
+		boost::system::error_code ec;
+		boost::filesystem::remove(name.to_boost_path(), ec);
+		return ec;
 	}
 }
 
