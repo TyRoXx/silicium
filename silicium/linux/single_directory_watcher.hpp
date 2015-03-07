@@ -53,14 +53,14 @@ namespace Si
 			return Si::none;
 		}
 
-		Si::optional<Si::file_notification> to_portable_file_notification(linux::file_notification &&original)
+		Si::optional<Si::file_notification> to_portable_file_notification(linux::file_notification &&original, Si::relative_path const &root)
 		{
 			auto const type = to_portable_file_notification_type(original.mask);
 			if (!type)
 			{
 				return Si::none;
 			}
-			return Si::file_notification(*type, std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR);
+			return Si::file_notification(*type, root / std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR);
 		}
 	}
 
@@ -74,7 +74,7 @@ namespace Si
 
 		explicit single_directory_watcher(boost::asio::io_service &io, absolute_path const &watched)
 			: inotify(io)
-			, impl(enumerate(ref(inotify)), linux::to_portable_file_notification)
+			, impl(enumerate(ref(inotify)), [](linux::file_notification &&notification) { return linux::to_portable_file_notification(std::move(notification), Si::relative_path()); })
 			, root(get(inotify.watch(watched, (IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_ATTRIB))))
 		{
 		}
@@ -102,11 +102,10 @@ namespace Si
 	private:
 
 		linux::inotify_observable inotify;
-		//TODO: save the memory for the function pointer
 		conditional_transformer<
 			file_notification,
 			enumerator<ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
-			Si::optional<file_notification>(*)(linux::file_notification &&),
+			std::function<Si::optional<file_notification>(linux::file_notification &&)>,
 			function_observer<std::function<void (optional<file_notification>)>>
 		> impl;
 		linux::watch_descriptor root;

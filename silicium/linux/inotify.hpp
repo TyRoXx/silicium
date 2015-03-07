@@ -6,7 +6,7 @@
 #include <silicium/exchange.hpp>
 #include <silicium/linux/inotify_watch_descriptor.hpp>
 #include <silicium/absolute_path.hpp>
-#include <silicium/relative_path.hpp>
+#include <silicium/path_segment.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/swap.hpp>
 #include <boost/optional.hpp>
@@ -20,7 +20,7 @@ namespace Si
 		struct file_notification
 		{
 			boost::uint32_t mask;
-			relative_path name;
+			path_segment name;
 			int watch_descriptor;
 
 			file_notification() BOOST_NOEXCEPT
@@ -29,7 +29,7 @@ namespace Si
 			{
 			}
 
-			explicit file_notification(boost::uint32_t mask, relative_path name, int watch_descriptor) BOOST_NOEXCEPT
+			explicit file_notification(boost::uint32_t mask, path_segment name, int watch_descriptor) BOOST_NOEXCEPT
 			    : mask(mask)
 			    , name(std::move(name))
 			    , watch_descriptor(watch_descriptor)
@@ -100,7 +100,9 @@ namespace Si
 						for (std::size_t i = 0; i < bytes_read; )
 						{
 							inotify_event const &event = *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-							changes.emplace_back(file_notification{event.mask, relative_path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')), event.wd});
+							optional<path_segment> segment = path_segment::create(boost::filesystem::path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
+							assert(segment);
+							changes.emplace_back(file_notification{event.mask, std::move(*segment), event.wd});
 							i += sizeof(inotify_event);
 							i += event.len;
 						}

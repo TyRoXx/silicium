@@ -2,6 +2,7 @@
 #define SILICIUM_PATH_SEGMENT_HPP
 
 #include <silicium/relative_path.hpp>
+#include <silicium/absolute_path.hpp>
 #include <silicium/optional.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -156,6 +157,18 @@ namespace Si
 	{
 		//TODO: do this efficiently
 		relative_path result(front.to_boost_path() / back.to_boost_path());
+		return result;
+	}
+
+	inline relative_path operator / (relative_path const &front, path_segment const &back)
+	{
+		return front / relative_path(back.to_boost_path());
+	}
+
+	inline absolute_path operator / (absolute_path const &front, path_segment const &back)
+	{
+		absolute_path result = front;
+		result.combine(relative_path(back.to_boost_path()));
 		return result;
 	}
 }
