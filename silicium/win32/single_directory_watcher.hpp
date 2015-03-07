@@ -8,7 +8,7 @@
 #include <silicium/observable/transform_if_initialized.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/absolute_path.hpp>
-#include <boost/optional.hpp>
+#include <silicium/optional.hpp>
 #include <boost/ref.hpp>
 
 namespace Si
@@ -16,7 +16,7 @@ namespace Si
 #ifdef _WIN32
 	namespace win32
 	{
-		inline boost::optional<file_notification_type> to_portable_file_notification_type(DWORD action)
+		inline optional<file_notification_type> to_portable_file_notification_type(DWORD action)
 		{
 			switch (action)
 			{
@@ -32,16 +32,16 @@ namespace Si
 				return file_notification_type::change_content_or_metadata;
 
 			default:
-				return boost::none; //TODO
+				return none; //TODO
 			}
 		}
 
-		inline boost::optional<Si::file_notification> to_portable_file_notification(win32::file_notification &&original)
+		inline optional<Si::file_notification> to_portable_file_notification(win32::file_notification &&original)
 		{
 			auto const type = to_portable_file_notification_type(original.action);
 			if (!type)
 			{
-				return boost::none;
+				return none;
 			}
 			return Si::file_notification(*type, std::move(original.name), true);
 		}
@@ -90,7 +90,7 @@ namespace Si
 		conditional_transformer<
 			file_notification,
 			enumerator<win32::overlapped_directory_changes>,
-			boost::optional<file_notification>(*)(win32::file_notification &&),
+			optional<file_notification>(*)(win32::file_notification &&),
 			function_observer<std::function<void(optional<file_notification>)>>
 		> impl;
 		boost::optional<boost::asio::io_service::work> work;
