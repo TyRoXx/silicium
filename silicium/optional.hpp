@@ -8,6 +8,17 @@
 
 namespace Si
 {
+	template <class T>
+	struct alignment_of : std::integral_constant<std::size_t,
+#ifdef _MSC_VER
+		__alignof(T)
+#else
+		alignof(T)
+#endif
+	>
+	{
+	};
+
 	typedef nothing none_t;
 
 	static none_t BOOST_CONSTEXPR_OR_CONST none;
@@ -229,12 +240,7 @@ namespace Si
 
 		enum
 		{
-			alignment =
-#ifdef _MSC_VER
-			__alignof(T)
-#else
-			alignof(T)
-#endif
+			alignment = alignment_of<T>::value
 		};
 
 		typename std::aligned_storage<sizeof(T), alignment>::type m_storage;
@@ -362,7 +368,7 @@ namespace Si
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t>) == 2);
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int16_t>) == 4);
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
-	BOOST_STATIC_ASSERT(sizeof(optional<char *>) == (sizeof(boost::uint32_t) + sizeof(char *)));
+	BOOST_STATIC_ASSERT(sizeof(optional<char *>) == (alignment_of<char *>::value + sizeof(char *)));
 }
 
 namespace std
