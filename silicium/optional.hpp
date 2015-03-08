@@ -5,6 +5,7 @@
 #include <ostream>
 #include <type_traits>
 #include <boost/static_assert.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace Si
 {
