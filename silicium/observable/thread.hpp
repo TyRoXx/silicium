@@ -48,7 +48,8 @@ namespace Si
 				typename ThreadingAPI::template packaged_task<SuccessElement>::type task(action);
 				auto result = task.get_future();
 				task();
-				std::forward<Observer>(observer).got_element(std::move(result));
+				auto observer_ = std::forward<Observer>(observer);
+				std::forward<Observer>(observer_).got_element(std::move(result));
 			});
 		}
 
@@ -74,8 +75,10 @@ namespace Si
 
 	private:
 
+		typedef typename ThreadingAPI::template future<void>::type worker_type;
+
 		std::function<SuccessElement ()> m_action;
-		typename ThreadingAPI::template future<void>::type m_worker;
+		worker_type m_worker;
 		bool m_has_finished;
 
 		SILICIUM_DELETED_FUNCTION(thread_observable(thread_observable const &))
