@@ -54,7 +54,7 @@ namespace Si
 
 		optional<boost::uintmax_t> maximum_size()
 		{
-			return boost::none;
+			return none;
 		}
 
 		std::size_t skip(std::size_t count)

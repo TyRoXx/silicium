@@ -81,6 +81,11 @@ namespace Si
 			return none;
 		}
 
+		static optional<absolute_path> create(noexcept_string const &maybe_absolute)
+		{
+			return create(boost::filesystem::path(maybe_absolute.c_str()));
+		}
+
 	private:
 
 		path m_value;

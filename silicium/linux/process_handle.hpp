@@ -4,6 +4,7 @@
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
 #include <sys/wait.h>
+#include <boost/swap.hpp>
 
 namespace Si
 {

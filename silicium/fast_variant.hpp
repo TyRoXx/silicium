@@ -255,9 +255,15 @@ namespace Si
 		template <class ...T>
 		struct fast_variant_base<false, T...>
 		{
+			enum
+			{
+				is_noexcept_movable =
 #if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
-			BOOST_STATIC_ASSERT_MSG(detail::are_noexcept_movable<T...>::value, "All contained types must be nothrow/noexcept-movable");
+					detail::are_noexcept_movable<T...>::value
+#else
+					1
 #endif
+			};
 
 			typedef unsigned which_type;
 
@@ -272,12 +278,14 @@ namespace Si
 				destroy_storage(storage.which(), storage.storage());
 			}
 
+			template <class U = void, class V = typename boost::enable_if_c<is_noexcept_movable, U>::type>
 			fast_variant_base(fast_variant_base &&other) BOOST_NOEXCEPT
 			{
 				storage.which(other.storage.which());
 				move_construct_storage(storage.which(), storage.storage(), other.storage.storage());
 			}
 
+			template <class U = void, class V = typename boost::enable_if_c<is_noexcept_movable, U>::type>
 			fast_variant_base &operator = (fast_variant_base &&other) BOOST_NOEXCEPT
 			{
 				if (storage.which() == other.which())

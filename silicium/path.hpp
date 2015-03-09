@@ -10,6 +10,13 @@ namespace Si
 	struct path
 	{
 		typedef native_path_char char_type;
+		typedef
+#ifdef _WIN32
+			boost::filesystem::path
+#else
+			noexcept_string
+#endif
+			underlying_type;
 
 		path() BOOST_NOEXCEPT
 		{
@@ -125,11 +132,7 @@ namespace Si
 
 	private:
 
-#ifdef _WIN32
-		boost::filesystem::path m_value;
-#else
-		noexcept_string m_value;
-#endif
+		underlying_type m_value;
 	};
 
 	inline std::ostream &operator << (std::ostream &out, path const &p)

@@ -6,7 +6,7 @@
 
 namespace
 {
-	Si::noexcept_string const absolute_root =
+	Si::path::underlying_type const absolute_root =
 #ifdef _WIN32
 		"C:/"
 #else
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(absolute_path_equality_with_other_types)
 	BOOST_CHECK_EQUAL(a, "");
 	BOOST_CHECK_EQUAL(a, boost::filesystem::path());
 	BOOST_CHECK_EQUAL(b, absolute_root + "b");
-	BOOST_CHECK_EQUAL(b, boost::filesystem::path(absolute_root + "b"));
+	BOOST_CHECK_EQUAL(b, boost::filesystem::path((absolute_root + "b").c_str()));
 	BOOST_CHECK_NE(a, "x");
 	BOOST_CHECK_NE(a, boost::filesystem::path("x"));
 }

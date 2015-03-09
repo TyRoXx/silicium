@@ -3,6 +3,7 @@
 
 #include <silicium/source/source.hpp>
 #include <silicium/exchange.hpp>
+#include <algorithm>
 
 namespace Si
 {
