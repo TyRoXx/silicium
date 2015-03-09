@@ -46,8 +46,12 @@ namespace Si
 					std::make_shared
 #endif
 					<boost::asio::io_service::work>(get_io_service(*m_io));
+
+				//VC++ 2013 bug: this cannot be captured by the following lambda for some reason (fails with
+				//nonsense compiler error about a generated posting_observable copy operator)
+				auto *io = m_io;
 				m_next.async_get_one(
-					make_function_observer([this, keep_io_running
+					make_function_observer([io, keep_io_running
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
 					= std::move(keep_io_running)
 #endif
@@ -60,7 +64,7 @@ namespace Si
 					if (element)
 					{
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-						m_io->post([
+						io->post([
 							element = std::move(element),
 							observer_ = std::forward<Observer>(observer_)
 						]() mutable
@@ -69,7 +73,7 @@ namespace Si
 						});
 #else
 						auto copyable_element = to_shared(std::move(*element));
-						m_io->post([
+						io->post([
 							copyable_element,
 							observer_
 						]() mutable
@@ -80,7 +84,7 @@ namespace Si
 					}
 					else
 					{
-						m_io->post([observer_
+						io->post([observer_
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
 							= std::forward<Observer>(observer_)
 #endif
