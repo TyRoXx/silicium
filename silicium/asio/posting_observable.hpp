@@ -64,13 +64,19 @@ namespace Si
 					if (element)
 					{
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-						io->post([
-							element = std::move(element),
-							observer_ = std::forward<Observer>(observer_)
-						]() mutable
-						{
-							std::forward<Observer>(observer_).got_element(std::move(*element));
-						});
+						io->post(
+							//The additional indirection makes the function object copyable even
+							//if element_type is not. post() would not take a noncopyable function.
+							//TODO: do this only when necessary
+							function<void ()>
+							([
+								element = std::move(element),
+								observer_ = std::forward<Observer>(observer_)
+							]() mutable
+							{
+								std::forward<Observer>(observer_).got_element(std::move(*element));
+							})
+						);
 #else
 						auto copyable_element = to_shared(std::move(*element));
 						io->post([
