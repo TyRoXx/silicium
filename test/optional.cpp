@@ -4,6 +4,7 @@
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
 #include <map>
+#include <future>
 
 BOOST_AUTO_TEST_CASE(optional_default_ctor)
 {
@@ -125,4 +126,12 @@ BOOST_AUTO_TEST_CASE(optional_less)
 	BOOST_CHECK(!(Si::optional<int>(0) < Si::optional<int>(0)));
 	BOOST_CHECK(!(Si::optional<int>(1) < Si::optional<int>(0)));
 	BOOST_CHECK(!(Si::optional<int>(1) < Si::optional<int>(-1)));
+}
+
+BOOST_AUTO_TEST_CASE(optional_movable_only)
+{
+	Si::optional<std::future<int>> f{std::promise<int>().get_future()};
+	BOOST_CHECK(f);
+	f = std::move(f);
+	BOOST_CHECK(f);
 }
