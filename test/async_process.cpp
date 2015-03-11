@@ -69,9 +69,9 @@ namespace
 BOOST_AUTO_TEST_CASE(async_process_unix_which)
 {
 	Si::async_process_parameters parameters;
-	parameters.executable = "/usr/bin/which";
+	parameters.executable = *Si::absolute_path::create("/usr/bin/which");
 	parameters.arguments.emplace_back("which");
-	parameters.current_path = boost::filesystem::current_path();
+	parameters.current_path = Si::get_current_working_directory();
 
 	process_output result = run_process(parameters);
 
@@ -97,11 +97,22 @@ BOOST_AUTO_TEST_CASE(async_process_win32_where)
 }
 #endif
 
+namespace
+{
+	Si::absolute_path const arbitrary_root_dir = *Si::absolute_path::create(
+#ifdef _WIN32
+		L"C:\\"
+#else
+		"/"
+#endif
+	);
+}
+
 BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 {
 	Si::async_process_parameters parameters;
-	parameters.executable = "does-not-exist";
-	parameters.current_path = boost::filesystem::current_path();
+	parameters.executable = arbitrary_root_dir / "does-not-exist";
+	parameters.current_path = Si::get_current_working_directory();
 
 	BOOST_CHECK_EXCEPTION(run_process(parameters), boost::system::system_error, [](boost::system::system_error const &ex)
 	{
