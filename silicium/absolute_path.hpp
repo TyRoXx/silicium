@@ -4,12 +4,14 @@
 #include <silicium/relative_path.hpp>
 #include <silicium/optional.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <iostream>
 
 namespace Si
 {
 	struct absolute_path
 	{
 		typedef native_path_char char_type;
+		typedef path::underlying_type underlying_type;
 
 		absolute_path() BOOST_NOEXCEPT
 		{
@@ -72,6 +74,11 @@ namespace Si
 			*this = absolute_path(to_boost_path() / back.to_boost_path());
 		}
 
+		bool empty() const BOOST_NOEXCEPT
+		{
+			return underlying().empty();
+		}
+
 		static optional<absolute_path> create(boost::filesystem::path const &maybe_absolute)
 		{
 			if (maybe_absolute.is_absolute())
@@ -84,6 +91,11 @@ namespace Si
 		static optional<absolute_path> create(noexcept_string const &maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute.c_str()));
+		}
+
+		static optional<absolute_path> create(native_path_char const *maybe_absolute)
+		{
+			return create(boost::filesystem::path(maybe_absolute));
 		}
 
 	private:
@@ -99,6 +111,24 @@ namespace Si
 	inline std::ostream &operator << (std::ostream &out, absolute_path const &p)
 	{
 		return out << p.underlying();
+	}
+
+	inline std::istream &operator >> (std::istream &in, absolute_path &p)
+	{
+		absolute_path::underlying_type temp;
+		in >> temp;
+		if (!in)
+		{
+			return in;
+		}
+		optional<absolute_path> checked = absolute_path::create(std::move(temp));
+		if (!checked)
+		{
+			in.setstate(std::ios::failbit);
+			return in;
+		}
+		p = std::move(*checked);
+		return in;
 	}
 
 	template <class ComparableToPath>

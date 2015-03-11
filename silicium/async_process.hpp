@@ -8,7 +8,7 @@
 #include <silicium/posix/pipe.hpp>
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/asio/reading_observable.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <silicium/absolute_path.hpp>
 
 #ifdef _WIN32
 #	include <boost/asio/windows/stream_handle.hpp>
@@ -23,13 +23,13 @@ namespace Si
 {
 	struct async_process_parameters
 	{
-		boost::filesystem::path executable;
+		Si::absolute_path executable;
 
 		/// the values for the child's argv[1...]
-		std::vector<std::string> arguments;
+		std::vector<Si::noexcept_string> arguments;
 
 		/// must be an existing path, otherwise the child cannot launch properly
-		boost::filesystem::path current_path;
+		Si::absolute_path current_path;
 	};
 
 	struct async_process
@@ -160,11 +160,11 @@ namespace Si
 #ifdef _WIN32
 		throw std::logic_error("launch_process is to be implemented for Windows");
 #else
-		auto executable = parameters.executable.string();
+		auto executable = parameters.executable.underlying();
 		auto arguments = parameters.arguments;
 		std::vector<char *> argument_pointers;
 		argument_pointers.emplace_back(const_cast<char *>(executable.c_str()));
-		std::transform(begin(arguments), end(arguments), std::back_inserter(argument_pointers), [](std::string &arg)
+		std::transform(begin(arguments), end(arguments), std::back_inserter(argument_pointers), [](Si::noexcept_string &arg)
 		{
 			return &arg[0];
 		});
@@ -218,7 +218,7 @@ namespace Si
 				fail_with_error(ec.value());
 			}
 
-			boost::filesystem::current_path(parameters.current_path, ec);
+			boost::filesystem::current_path(parameters.current_path.to_boost_path(), ec);
 			if (ec)
 			{
 				fail_with_error(ec.value());
