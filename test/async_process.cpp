@@ -85,8 +85,8 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 BOOST_AUTO_TEST_CASE(async_process_win32_where)
 {
 	Si::async_process_parameters parameters;
-	parameters.executable = L"C:\\Windows\\System32\\where.exe";
-	parameters.current_path = boost::filesystem::current_path();
+	parameters.executable = *Si::absolute_path::create(L"C:\\Windows\\System32\\where.exe");
+	parameters.current_path = Si::get_current_working_directory();
 
 	process_output result = run_process(parameters);
 

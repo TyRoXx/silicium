@@ -6,7 +6,7 @@
 
 namespace
 {
-	Si::path::underlying_type const absolute_root =
+	Si::noexcept_string const absolute_root =
 #ifdef _WIN32
 		"C:/"
 #else
