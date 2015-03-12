@@ -93,7 +93,12 @@ namespace Si
 			return create(boost::filesystem::path(maybe_absolute.c_str()));
 		}
 
-		static optional<absolute_path> create(native_path_char const *maybe_absolute)
+		static optional<absolute_path> create(char const *maybe_absolute)
+		{
+			return create(boost::filesystem::path(maybe_absolute));
+		}
+
+		static optional<absolute_path> create(wchar_t const *maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute));
 		}
