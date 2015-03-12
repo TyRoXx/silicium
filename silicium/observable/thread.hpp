@@ -31,11 +31,12 @@ namespace Si
 			}
 			assert(m_action);
 			auto action = std::move(m_action);
+			optional<typename std::decay<Observer>::type> maybe_observer{std::forward<Observer>(observer)};
 			m_worker = ThreadingAPI::launch_async([
 				this,
-				observer
+					maybe_observer
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-					= std::forward<Observer>(observer)
+					= std::forward<Observer>(maybe_observer)
 #endif
 				,
 				action
@@ -48,8 +49,11 @@ namespace Si
 				typename ThreadingAPI::template packaged_task<SuccessElement>::type task(action);
 				auto result = task.get_future();
 				task();
-				auto observer_ = std::forward<Observer>(observer);
+				assert(maybe_observer);
+				auto observer_ = std::forward<Observer>(*maybe_observer);
 				std::forward<Observer>(observer_).got_element(std::move(result));
+				//kill the observer with fire so that it cannot keep any shared state alive
+				maybe_observer = none;
 			});
 		}
 
