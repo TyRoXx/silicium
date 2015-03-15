@@ -48,7 +48,15 @@ namespace Si
 
 		error_or<int> wait_for_exit() BOOST_NOEXCEPT
 		{
-			throw std::logic_error("todo");
+			WaitForSingleObject(m_id, INFINITE);
+			DWORD exit_code = 1;
+			if (!GetExitCodeProcess(m_id, &exit_code))
+			{
+				return boost::system::error_code(::GetLastError(), boost::system::native_ecat);
+			}
+			CloseHandle(m_id);
+			m_id = INVALID_HANDLE_VALUE;
+			return static_cast<int>(exit_code);
 		}
 
 	private:

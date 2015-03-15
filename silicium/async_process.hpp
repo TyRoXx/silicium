@@ -9,6 +9,7 @@
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/asio/reading_observable.hpp>
 #include <silicium/absolute_path.hpp>
+#include <silicium/run_process.hpp>
 
 #ifdef _WIN32
 #	include <boost/asio/windows/stream_handle.hpp>
@@ -21,12 +22,20 @@
 
 namespace Si
 {
+	typedef
+#ifdef _WIN32
+		std::wstring
+#else
+		std::string
+#endif
+		async_process_string;
+
 	struct async_process_parameters
 	{
 		Si::absolute_path executable;
 
 		/// the values for the child's argv[1...]
-		std::vector<Si::noexcept_string> arguments;
+		std::vector<async_process_string> arguments;
 
 		/// must be an existing path, otherwise the child cannot launch properly
 		Si::absolute_path current_path;
@@ -35,17 +44,26 @@ namespace Si
 	struct async_process
 	{
 		process_handle process;
+#ifndef _WIN32
 		file_handle child_error;
+#endif
 
 		async_process() BOOST_NOEXCEPT
 		{
 		}
 
-		async_process(process_handle process, file_handle child_error) BOOST_NOEXCEPT
+#ifdef _WIN32
+		explicit async_process(process_handle process) BOOST_NOEXCEPT
+			: process(std::move(process))
+		{
+		}
+#else
+		explicit async_process(process_handle process, file_handle child_error) BOOST_NOEXCEPT
 			: process(std::move(process))
 			, child_error(std::move(child_error))
 		{
 		}
+#endif
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		async_process(async_process &&) BOOST_NOEXCEPT = default;
@@ -53,14 +71,18 @@ namespace Si
 #else
 		async_process(async_process &&other) BOOST_NOEXCEPT
 			: process(std::move(other.process))
+#ifndef _WIN32
 			, child_error(std::move(other.child_error))
+#endif
 		{
 		}
 
 		async_process &operator = (async_process &&other) BOOST_NOEXCEPT
 		{
 			process = std::move(other.process);
+#ifndef _WIN32
 			child_error = std::move(other.child_error);
+#endif
 			return *this;
 		}
 
@@ -75,8 +97,7 @@ namespace Si
 
 		error_or<int> wait_for_exit() BOOST_NOEXCEPT
 		{
-#ifdef _WIN32
-#else
+#ifndef _WIN32
 			int error = 0;
 			ssize_t read_error = read(child_error.handle, &error, sizeof(error));
 			if (read_error < 0)
@@ -151,15 +172,62 @@ namespace Si
 		return AsioFileStream(io, file.release());
 	}
 
+#ifdef _WIN32
+	namespace detail
+	{
+		inline async_process_string build_command_line(std::vector<async_process_string> const &arguments)
+		{
+			async_process_string command_line;
+			for (auto a = begin(arguments); a != end(arguments); ++a)
+			{
+				if (a != begin(arguments))
+				{
+					command_line += L" ";
+				}
+				command_line += *a;
+			}
+			return command_line;
+		}
+	}
+
 	inline error_or<async_process> launch_process(
 		async_process_parameters parameters,
 		native_file_descriptor standard_input,
 		native_file_descriptor standard_output,
 		native_file_descriptor standard_error)
 	{
-#ifdef _WIN32
-		throw std::logic_error("launch_process is to be implemented for Windows");
+		std::vector<async_process_string> all_arguments;
+		all_arguments.emplace_back(L"\"" + parameters.executable.underlying().wstring() + L"\"");
+		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
+		win32::winapi_string command_line = detail::build_command_line(all_arguments);
+
+		SECURITY_ATTRIBUTES security{};
+		security.nLength = sizeof(security);
+		security.bInheritHandle = TRUE;
+
+		STARTUPINFOW startup{};
+		startup.cb = sizeof(startup);
+		startup.dwFlags |= STARTF_USESTDHANDLES;
+		startup.hStdError = standard_error;
+		startup.hStdInput = INVALID_HANDLE_VALUE;
+		startup.hStdOutput = standard_output;
+		PROCESS_INFORMATION process{};
+		if (!CreateProcessW(parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, parameters.current_path.c_str(), &startup, &process))
+		{
+			return boost::system::error_code(::GetLastError(), boost::system::native_ecat);
+		}
+
+		win32::unique_handle thread_closer(process.hThread);
+		process_handle process_closer(process.hProcess);
+		return async_process(std::move(process_closer));
+	}
 #else
+	inline error_or<async_process> launch_process(
+		async_process_parameters parameters,
+		native_file_descriptor standard_input,
+		native_file_descriptor standard_output,
+		native_file_descriptor standard_error)
+	{
 		auto executable = parameters.executable.underlying();
 		auto arguments = parameters.arguments;
 		std::vector<char *> argument_pointers;
@@ -250,8 +318,8 @@ namespace Si
 		{
 			return async_process(process_handle(forked), std::move(child_error.read));
 		}
-#endif
 	}
+#endif
 }
 
 #endif

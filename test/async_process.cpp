@@ -46,7 +46,14 @@ namespace
 		Si::pipe standard_output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		Si::pipe standard_error = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 
-		Si::async_process process = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::launch_process(parameters, standard_input.read.handle, standard_output.write.handle, standard_error.write.handle).get());
+		Si::async_process process = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(
+			Si::launch_process(
+				parameters,
+				standard_input.read.handle,
+				standard_output.write.handle,
+				standard_error.write.handle
+			).get()
+		);
 		standard_input.read.close();
 		standard_output.write.close();
 		standard_error.write.close();
