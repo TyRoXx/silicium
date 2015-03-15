@@ -56,6 +56,64 @@ namespace Si
 			}
 			return command_line;
 		}
+
+		template <class ByteSink>
+		void copy_whole_pipe(HANDLE pipe_in, ByteSink &&sink_out)
+		{
+			auto buffered_out = make_buffering_sink(std::forward<ByteSink>(sink_out));
+			for (;;)
+			{
+				auto buffer = buffered_out.make_append_space((std::numeric_limits<DWORD>::max)());
+				DWORD read_bytes = 0;
+				DWORD available = 0;
+				DWORD left = 0;
+				BOOL const peeked = PeekNamedPipe(pipe_in, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left);
+				if (!peeked)
+				{
+					auto error = ::GetLastError();
+					if (error == ERROR_BROKEN_PIPE)
+					{
+						buffered_out.make_append_space(read_bytes);
+						buffered_out.flush_append_space();
+						break;
+					}
+					throw boost::system::system_error(error, boost::system::native_ecat);
+				}
+				if (available == 0)
+				{
+					auto buffer = buffered_out.make_append_space(1);
+					DWORD read_bytes = 0;
+					BOOL const read_result = ReadFile(pipe_in, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, nullptr);
+					if (read_result)
+					{
+						buffered_out.flush_append_space();
+						continue;
+					}
+					else
+					{
+						auto error = ::GetLastError();
+						if (error == ERROR_BROKEN_PIPE)
+						{
+							buffered_out.make_append_space(read_bytes);
+							buffered_out.flush_append_space();
+							break;
+						}
+						throw boost::system::system_error(error, boost::system::native_ecat);
+					}
+				}
+				if (ReadFile(pipe_in, buffer.begin(), available, &read_bytes, nullptr))
+				{
+					assert(available == read_bytes);
+					buffered_out.make_append_space(read_bytes);
+					buffered_out.flush_append_space();
+				}
+				else
+				{
+					throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+				}
+			}
+			buffered_out.flush();
+		}
 	}
 
 	inline int run_process(process_parameters const &parameters)
@@ -85,59 +143,7 @@ namespace Si
 		output.write.close();
 		if (parameters.out)
 		{
-			auto buffered_out  = make_buffering_sink(ref_sink(*parameters.out));
-			for (;;)
-			{
-				auto buffer = buffered_out.make_append_space((std::numeric_limits<DWORD>::max)());
-				DWORD read_bytes = 0;
-				DWORD available = 0;
-				DWORD left = 0;
-				BOOL const peeked = PeekNamedPipe(output.read.handle, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left);
-				if (!peeked)
-				{
-					auto error = ::GetLastError();
-					if (error == ERROR_BROKEN_PIPE)
-					{
-						buffered_out.make_append_space(read_bytes);
-						buffered_out.flush_append_space();
-						break;
-					}
-					throw boost::system::system_error(error, boost::system::native_ecat);
-				}
-				if (available == 0)
-				{
-					auto buffer = buffered_out.make_append_space(1);
-					DWORD read_bytes = 0;
-					BOOL const read_result = ReadFile(output.read.handle, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, nullptr);
-					if (read_result)
-					{
-						buffered_out.flush_append_space();
-						continue;
-					}
-					else
-					{
-						auto error = ::GetLastError();
-						if (error == ERROR_BROKEN_PIPE)
-						{
-							buffered_out.make_append_space(read_bytes);
-							buffered_out.flush_append_space();
-							break;
-						}
-						throw boost::system::system_error(error, boost::system::native_ecat);
-					}
-				}
-				if (ReadFile(output.read.handle, buffer.begin(), available, &read_bytes, nullptr))
-				{
-					assert(available == read_bytes);
-					buffered_out.make_append_space(read_bytes);
-					buffered_out.flush_append_space();
-				}
-				else
-				{
-					throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
-				}
-			}
-			buffered_out.flush();
+			win32::copy_whole_pipe(output.read.handle, ref_sink(*parameters.out));
 		}
 		WaitForSingleObject(process.hProcess, INFINITE);
 		DWORD exit_code = 1;

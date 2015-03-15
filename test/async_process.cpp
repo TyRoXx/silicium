@@ -3,19 +3,34 @@
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/observable/transform.hpp>
 #include <silicium/observable/ref.hpp>
+#include <silicium/observable/thread.hpp>
+#include <silicium/asio/posting_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/std_threading.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 
 namespace
 {
 	template <class CharSink>
-	void begin_reading_output(boost::asio::io_service &io, CharSink &&destination, Si::file_handle &&file)
+	void begin_reading_output(boost::asio::io_service &io, CharSink &&destination, Si::native_file_descriptor file)
 	{
-		Si::spawn_coroutine([&io, destination, &file](Si::spawn_context yield)
+#ifdef _WIN32
+		auto work = std::make_shared<boost::asio::io_service::work>(io);
+		Si::spawn_observable(
+			Si::asio::make_posting_observable(
+				io,
+				Si::make_thread_observable<Si::std_threading>([work, file, destination]()
+				{
+					Si::win32::copy_whole_pipe(file, destination);
+					return Si::nothing();
+				})
+			)
+		);
+#else
+		Si::spawn_coroutine([&io, destination, file](Si::spawn_context yield)
 		{
-			Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, file.handle));
-			file.release();
+			Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, file));
 			for (;;)
 			{
 				auto piece = yield.get_one(Si::ref(output_reader));
@@ -32,6 +47,7 @@ namespace
 				Si::append(destination, data);
 			}
 		});
+#endif
 	}
 
 	struct process_output
@@ -62,8 +78,8 @@ namespace
 
 		process_output result;
 
-		begin_reading_output(io, Si::make_container_sink(result.output), std::move(standard_output.read));
-		begin_reading_output(io, Si::make_container_sink(result.error), std::move(standard_error.read));
+		begin_reading_output(io, Si::make_container_sink(result.output), standard_output.read.handle);
+		begin_reading_output(io, Si::make_container_sink(result.error), standard_error.read.handle);
 
 		io.run();
 
