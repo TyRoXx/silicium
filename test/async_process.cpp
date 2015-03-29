@@ -4,7 +4,6 @@
 #include <silicium/observable/transform.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/thread.hpp>
-#include <silicium/asio/posting_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/std_threading.hpp>
 #include <boost/test/unit_test.hpp>
@@ -18,14 +17,11 @@ namespace
 #ifdef _WIN32
 		auto work = std::make_shared<boost::asio::io_service::work>(io);
 		Si::spawn_observable(
-			Si::asio::make_posting_observable(
-				io,
-				Si::make_thread_observable<Si::std_threading>([work, file, destination]()
-				{
-					Si::win32::copy_whole_pipe(file, destination);
-					return Si::nothing();
-				})
-			)
+			Si::make_thread_observable<Si::std_threading>([work, file, destination]()
+			{
+				Si::win32::copy_whole_pipe(file, destination);
+				return Si::nothing();
+			})
 		);
 #else
 		Si::spawn_coroutine([&io, destination, file](Si::spawn_context yield)
