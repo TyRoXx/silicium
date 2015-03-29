@@ -107,6 +107,18 @@ namespace Si
 			append(sink, '>');
 		}
 
+		template <class CharSink, class StringLike>
+		void unpaired_element(
+			CharSink &&sink,
+			StringLike const &name)
+		{
+			using Si::append;
+			append(sink, '<');
+			append(sink, name);
+			append(sink, '/');
+			append(sink, '>');
+		}
+
 		template <class CharSink>
 		struct generator
 		{
@@ -127,10 +139,15 @@ namespace Si
 				close_element(m_out, name);
 			}
 
-			template <class ContentMaker>
-			void operator()(boost::string_ref const &name, ContentMaker make_content)
+			void element(boost::string_ref const &name)
 			{
-				element(name, make_content);
+				unpaired_element(m_out, name);
+			}
+
+			template <class ...Args>
+			void operator()(Args &&...args)
+			{
+				element(std::forward<Args>(args)...);
 			}
 
 			template <class StringLike>
