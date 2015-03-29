@@ -127,6 +127,12 @@ namespace Si
 				close_element(m_out, name);
 			}
 
+			template <class ContentMaker>
+			void operator()(boost::string_ref const &name, ContentMaker make_content)
+			{
+				element(name, make_content);
+			}
+
 			template <class StringLike>
 			void element_with_text(boost::string_ref const &name, StringLike const &text)
 			{
