@@ -252,6 +252,45 @@ namespace Si
 		}
 	}
 #endif
+
+	namespace experimental
+	{
+		//TODO: find a more generic API for reading from a pipe portably
+		template <class CharSink>
+		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::native_file_descriptor file)
+		{
+#ifdef _WIN32
+			auto work = std::make_shared<boost::asio::io_service::work>(io);
+			Si::spawn_observable(
+				Si::make_thread_observable<Si::std_threading>([work, file, destination]()
+				{
+					Si::win32::copy_whole_pipe(file, destination);
+					return Si::nothing();
+				})
+			);
+#else
+			Si::spawn_coroutine([&io, destination, file](Si::spawn_context yield)
+			{
+				Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, file));
+				for (;;)
+				{
+					auto piece = yield.get_one(Si::ref(output_reader));
+					assert(piece);
+					if (piece->is_error())
+					{
+						break;
+					}
+					Si::memory_range data = piece->get();
+					if (data.empty())
+					{
+						break;
+					}
+					Si::append(destination, data);
+				}
+			});
+#endif
+		}
+	}
 }
 
 #endif

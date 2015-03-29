@@ -11,41 +11,6 @@
 
 namespace
 {
-	template <class CharSink>
-	void begin_reading_output(boost::asio::io_service &io, CharSink &&destination, Si::native_file_descriptor file)
-	{
-#ifdef _WIN32
-		auto work = std::make_shared<boost::asio::io_service::work>(io);
-		Si::spawn_observable(
-			Si::make_thread_observable<Si::std_threading>([work, file, destination]()
-			{
-				Si::win32::copy_whole_pipe(file, destination);
-				return Si::nothing();
-			})
-		);
-#else
-		Si::spawn_coroutine([&io, destination, file](Si::spawn_context yield)
-		{
-			Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, file));
-			for (;;)
-			{
-				auto piece = yield.get_one(Si::ref(output_reader));
-				assert(piece);
-				if (piece->is_error())
-				{
-					break;
-				}
-				Si::memory_range data = piece->get();
-				if (data.empty())
-				{
-					break;
-				}
-				Si::append(destination, data);
-			}
-		});
-#endif
-	}
-
 	struct process_output
 	{
 		int exit_code;
@@ -74,8 +39,8 @@ namespace
 
 		process_output result;
 
-		begin_reading_output(io, Si::make_container_sink(result.output), standard_output.read.handle);
-		begin_reading_output(io, Si::make_container_sink(result.error), standard_error.read.handle);
+		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.output), standard_output.read.handle);
+		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.error), standard_error.read.handle);
 
 		io.run();
 
