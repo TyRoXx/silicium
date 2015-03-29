@@ -7,6 +7,9 @@ namespace Si
 {
 	struct ostream_ref_sink
 	{
+		typedef char element_type;
+		typedef success error_type;
+
 		ostream_ref_sink()
 			: m_file(nullptr)
 		{
@@ -17,10 +20,11 @@ namespace Si
 		{
 		}
 
-		void append(iterator_range<char const *> data)
+		error_type append(iterator_range<char const *> data)
 		{
 			assert(m_file);
 			m_file->write(data.begin(), data.size());
+			return{};
 		}
 
 	private:
