@@ -1,6 +1,7 @@
 #ifndef SILICIUM_ASYNC_PROCESS_HPP
 #define SILICIUM_ASYNC_PROCESS_HPP
 
+#include <silicium/os_string.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/process_handle.hpp>
@@ -19,20 +20,12 @@
 
 namespace Si
 {
-	typedef
-#ifdef _WIN32
-		std::wstring
-#else
-		std::string
-#endif
-		async_process_string;
-
 	struct async_process_parameters
 	{
 		Si::absolute_path executable;
 
 		/// the values for the child's argv[1...]
-		std::vector<async_process_string> arguments;
+		std::vector<os_string> arguments;
 
 		/// must be an existing path, otherwise the child cannot launch properly
 		Si::absolute_path current_path;
@@ -114,9 +107,9 @@ namespace Si
 #ifdef _WIN32
 	namespace detail
 	{
-		inline async_process_string build_command_line(std::vector<async_process_string> const &arguments)
+		inline os_string build_command_line(std::vector<os_string> const &arguments)
 		{
-			async_process_string command_line;
+			os_string command_line;
 			for (auto a = begin(arguments); a != end(arguments); ++a)
 			{
 				if (a != begin(arguments))
@@ -135,7 +128,7 @@ namespace Si
 		native_file_descriptor standard_output,
 		native_file_descriptor standard_error)
 	{
-		std::vector<async_process_string> all_arguments;
+		std::vector<os_string> all_arguments;
 		all_arguments.emplace_back(L"\"" + parameters.executable.underlying().wstring() + L"\"");
 		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
 		win32::winapi_string command_line = detail::build_command_line(all_arguments);

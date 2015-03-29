@@ -2,9 +2,9 @@
 #define SILICIUM_WIN32_PROCESS_HPP
 
 #include <silicium/process_parameters.hpp>
-#include <silicium/win32/win32.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/posix/pipe.hpp>
+#include <silicium/os_string.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <cassert>
@@ -14,35 +14,6 @@ namespace Si
 {
 	namespace win32
 	{
-		typedef std::basic_string<WCHAR> winapi_string;
-
-		inline winapi_string utf8_to_winapi_string(char const *original, size_t length)
-		{
-			if (length > static_cast<size_t>((std::numeric_limits<int>::max)()))
-			{
-				throw std::invalid_argument("Input string is too long for WinAPI");
-			}
-			int const output_size = MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), nullptr, 0);
-			assert(output_size >= 0);
-			if (output_size == 0)
-			{
-				assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
-				throw std::invalid_argument("Input string is not UTF-8");
-			}
-			winapi_string result;
-			result.resize(static_cast<size_t>(output_size));
-			if (!result.empty())
-			{
-				MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), &result[0], output_size);
-			}
-			return result;
-		}
-
-		inline winapi_string utf8_to_winapi_string(std::string const &str)
-		{
-			return utf8_to_winapi_string(str.data(), str.size());
-		}
-
 		inline winapi_string build_command_line(std::vector<std::string> const &arguments)
 		{
 			winapi_string command_line;
@@ -118,7 +89,7 @@ namespace Si
 
 	inline int run_process(process_parameters const &parameters)
 	{
-		win32::winapi_string const executable = win32::utf8_to_winapi_string(parameters.executable.string());
+		win32::winapi_string const &executable = parameters.executable.wstring();
 		std::vector<std::string> all_arguments;
 		all_arguments.emplace_back("\"" + parameters.executable.string() + "\"");
 		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());

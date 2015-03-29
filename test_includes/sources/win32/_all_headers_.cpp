@@ -91,6 +91,7 @@
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/os_string.hpp>
 #include <silicium/path.hpp>
 #include <silicium/path_char.hpp>
 #include <silicium/path_segment.hpp>
