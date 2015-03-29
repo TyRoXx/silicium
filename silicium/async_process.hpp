@@ -141,7 +141,7 @@ namespace Si
 		startup.cb = sizeof(startup);
 		startup.dwFlags |= STARTF_USESTDHANDLES;
 		startup.hStdError = standard_error;
-		startup.hStdInput = INVALID_HANDLE_VALUE;
+		startup.hStdInput = standard_input;
 		startup.hStdOutput = standard_output;
 		PROCESS_INFORMATION process{};
 		if (!CreateProcessW(parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, parameters.current_path.c_str(), &startup, &process))
