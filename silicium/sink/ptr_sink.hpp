@@ -21,7 +21,7 @@ namespace Si
 		{
 		}
 
-		error_type append(iterator_range<element_type const *> data)
+		error_type append(iterator_range<element_type const *> data) const
 		{
 			return next->append(data);
 		}
