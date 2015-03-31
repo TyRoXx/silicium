@@ -8,6 +8,8 @@
 #include <silicium/error_or.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/observable/virtualized.hpp>
+#include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/observable/ref.hpp>
 #include <silicium/asio/process_output.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/run_process.hpp>
@@ -257,21 +259,23 @@ namespace Si
 	{
 		//TODO: find a more generic API for reading from a pipe portably
 		template <class CharSink>
-		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::native_file_descriptor file)
+		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file)
 		{
+			auto copyable_file = Si::to_shared(std::move(file));
 #ifdef _WIN32
 			auto work = std::make_shared<boost::asio::io_service::work>(io);
 			Si::spawn_observable(
-				Si::make_thread_observable<Si::std_threading>([work, file, destination]()
+				Si::make_thread_observable<Si::std_threading>([work, copyable_file, destination]()
 				{
-					Si::win32::copy_whole_pipe(file, destination);
+					Si::win32::copy_whole_pipe(copyable_file->handle, destination);
 					return Si::nothing();
 				})
 			);
 #else
-			Si::spawn_coroutine([&io, destination, file](Si::spawn_context yield)
+			Si::spawn_coroutine([&io, destination, copyable_file](Si::spawn_context yield)
 			{
-				Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, file));
+				Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, copyable_file->handle));
+				copyable_file->release();
 				for (;;)
 				{
 					auto piece = yield.get_one(Si::ref(output_reader));

@@ -4,6 +4,7 @@
 #include <silicium/asio/connecting_source.hpp>
 #include <silicium/asio/post_forwarder.hpp>
 #include <silicium/asio/posting_observable.hpp>
+#include <silicium/asio/process_output.hpp>
 #include <silicium/asio/reading_observable.hpp>
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
@@ -95,6 +96,7 @@
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/open.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/os_string.hpp>
 #include <silicium/path.hpp>
 #include <silicium/path_char.hpp>
 #include <silicium/path_segment.hpp>

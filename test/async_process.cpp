@@ -39,8 +39,8 @@ namespace
 
 		process_output result;
 
-		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.output), standard_output.read.handle);
-		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.error), standard_error.read.handle);
+		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.output), std::move(standard_output.read));
+		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.error), std::move(standard_error.read));
 
 		io.run();
 
