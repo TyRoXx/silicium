@@ -81,8 +81,7 @@ namespace Si
 			append(sink, " ");
 			append(sink, key);
 			append(sink, "=\"");
-			//TODO: escape " or sth
-			append(sink, value);
+			write_string(sink, value);
 			append(sink, '"');
 		}
 
@@ -137,6 +136,25 @@ namespace Si
 				open_element(m_out, name);
 				make_content();
 				close_element(m_out, name);
+			}
+
+			template <class AttributeMaker, class ContentMaker>
+			void element(boost::string_ref const &name, AttributeMaker make_attributes, ContentMaker make_content)
+			{
+				open_attributed_element(m_out, name);
+				make_attributes();
+				finish_attributes(m_out);
+				make_content();
+				close_element(m_out, name);
+			}
+
+
+			template <class KeyStringLike, class ValueStringLike>
+			void attribute(
+				KeyStringLike const &key,
+				ValueStringLike const &value)
+			{
+				add_attribute(m_out, key, value);
 			}
 
 			void element(boost::string_ref const &name)
