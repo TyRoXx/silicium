@@ -44,10 +44,10 @@ namespace Si
 		auto lambda_to_value(Function &&function)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			-> decltype(lambda_to_value_impl(
-			std::forward<Function>(function),
-			std::integral_constant<bool,
-			std::is_move_assignable<typename std::decay<Function>::type>::value &&
-			std::is_move_constructible<typename std::decay<Function>::type>::value
+				std::forward<Function>(function),
+				std::integral_constant<bool,
+				std::is_move_assignable<typename std::decay<Function>::type>::value &&
+				std::is_move_constructible<typename std::decay<Function>::type>::value
 			>()))
 #endif
 		{
