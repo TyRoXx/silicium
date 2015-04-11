@@ -266,6 +266,7 @@ namespace Si
 			};
 
 			typedef unsigned which_type;
+			typedef boost::mpl::vector<T...> element_types;
 
 			fast_variant_base() BOOST_NOEXCEPT
 			{
