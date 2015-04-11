@@ -62,6 +62,11 @@ namespace Si
 	{
 		return win32::utf8_to_winapi_string(c_str, std::strlen(c_str));
 	}
+
+	inline os_string to_os_string(noexcept_string const &original)
+	{
+		return win32::utf8_to_winapi_string(original.data(), original.size());
+	}
 #endif
 }
 
