@@ -4,6 +4,7 @@
 #include <silicium/source/source.hpp>
 #include <silicium/exchange.hpp>
 #include <algorithm>
+#include <boost/concept_check.hpp>
 
 namespace Si
 {

@@ -3,6 +3,7 @@
 
 #include <silicium/source/source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
+#include <boost/concept_check.hpp>
 
 namespace Si
 {

@@ -2,6 +2,7 @@
 #define SILICIUM_MEMORY_SOURCE_HPP
 
 #include <silicium/source/source.hpp>
+#include <boost/concept_check.hpp>
 #include <vector>
 #include <string>
 #include <array>
@@ -22,7 +23,7 @@ namespace Si
 
 		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
-			(void)size;
+			boost::ignore_unused_variable_warning(size);
 			return m_elements;
 		}
 

@@ -4,7 +4,6 @@
 #include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/optional.hpp>
-#include <boost/concept_check.hpp>
 #include <boost/cstdint.hpp>
 #include <vector>
 
@@ -22,43 +21,6 @@ namespace Si
 		virtual iterator_range<element_type const *> map_next(std::size_t size) = 0;
 		virtual element_type *copy_next(iterator_range<element_type *> destination) = 0;
 	};
-
-	template <class X>
-	struct Source
-	{
-		typedef typename X::element_type element_type;
-
-		BOOST_CONCEPT_USAGE(Source)
-		{
-			X move_constructed = std::move(source);
-			boost::ignore_unused_variable_warning(move_constructed);
-			source = std::move(move_constructed);
-			X default_constructible;
-			boost::ignore_unused_variable_warning(default_constructible);
-			iterator_range<element_type const *> mapped = source.map_next(std::size_t(0));
-			boost::ignore_unused_variable_warning(mapped);
-			element_type * const copied = source.copy_next(iterator_range<element_type *>());
-			boost::ignore_unused_variable_warning(copied);
-		}
-
-	private:
-
-		X source;
-		element_type element;
-	};
-
-	namespace detail
-	{
-		//example and test for the smallest possible Source
-		struct minimum_source
-		{
-			typedef int element_type;
-			iterator_range<element_type const *> map_next(std::size_t size);
-			element_type *copy_next(iterator_range<element_type *> destination);
-		};
-
-		BOOST_CONCEPT_ASSERT((Source<minimum_source>));
-	}
 
 	template <class Source>
 	Si::optional<typename Source::element_type> get(Source &from)

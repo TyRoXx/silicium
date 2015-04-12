@@ -3,7 +3,6 @@
 
 #include <silicium/source/source.hpp>
 #include <silicium/config.hpp>
-#include <boost/concept/requires.hpp>
 
 namespace Si
 {
@@ -37,9 +36,7 @@ namespace Si
 	};
 
 	template <class Source>
-	BOOST_CONCEPT_REQUIRES(
-		((Si::Source<typename std::decay<Source>::type>)),
-		(virtualized_source<typename std::decay<Source>::type>))
+	virtualized_source<typename std::decay<Source>::type>
 	virtualize_source(Source &&next)
 	{
 		return virtualized_source<typename std::decay<Source>::type>(std::forward<Source>(next));
