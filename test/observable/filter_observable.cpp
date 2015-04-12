@@ -3,6 +3,7 @@
 #include <silicium/observable/bridge.hpp>
 #include <silicium/observable/ref.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/concept_check.hpp>
 
 BOOST_AUTO_TEST_CASE(filter_true)
 {
