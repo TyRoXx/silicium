@@ -1,7 +1,6 @@
 #ifndef SILICIUM_SINK_HPP
 #define SILICIUM_SINK_HPP
 
-#include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/utility.hpp>
@@ -12,9 +11,6 @@
 #	include <boost/utility/explicit_operator_bool.hpp>
 #endif
 #include <boost/container/string.hpp>
-#include <fstream>
-#include <array>
-#include <memory>
 
 namespace Si
 {

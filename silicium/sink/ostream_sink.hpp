@@ -2,6 +2,7 @@
 #define SILICIUM_OSTREAM_SINK_HPP
 
 #include <silicium/sink/virtualized_sink.hpp>
+#include <fstream>
 
 namespace Si
 {
