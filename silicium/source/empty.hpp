@@ -2,6 +2,7 @@
 #define SILICIUM_EMPTY_SOURCE_HPP
 
 #include <silicium/source/source.hpp>
+#include <boost/concept_check.hpp>
 #include <vector>
 #include <string>
 
