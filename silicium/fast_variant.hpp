@@ -10,6 +10,7 @@
 #include <boost/mpl/find.hpp>
 #include <boost/mpl/push_front.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/contains.hpp>
 #include <boost/integer.hpp>
 #include <boost/optional.hpp>
 #include <boost/type_traits.hpp>
@@ -702,12 +703,14 @@ namespace Si
 	template <class Element, class ...T>
 	Element *try_get_ptr(fast_variant<T...> &from) BOOST_NOEXCEPT
 	{
+		BOOST_STATIC_ASSERT(boost::mpl::contains<boost::mpl::vector<T...>, Element>::value);
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
 
 	template <class Element, class ...T>
 	typename std::add_const<Element>::type *try_get_ptr(fast_variant<T...> const &from) BOOST_NOEXCEPT
 	{
+		BOOST_STATIC_ASSERT(boost::mpl::contains<boost::mpl::vector<T...>, Element>::value);
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
 
