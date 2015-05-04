@@ -120,6 +120,8 @@ namespace Si
 		path m_value;
 	};
 
+	BOOST_STATIC_ASSERT(is_handle<relative_path>::value);
+
 	inline std::ostream &operator << (std::ostream &out, relative_path const &p)
 	{
 		return out << p.underlying();

@@ -8,7 +8,7 @@
 #endif
 
 #include <silicium/exchange.hpp>
-#include <silicium/config.hpp>
+#include <silicium/is_handle.hpp>
 
 namespace Si
 {
@@ -67,6 +67,8 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(file_handle(file_handle const &))
 		SILICIUM_DELETED_FUNCTION(file_handle &operator = (file_handle const &))
 	};
+
+	BOOST_STATIC_ASSERT(is_handle<file_handle>::value);
 }
 
 #endif

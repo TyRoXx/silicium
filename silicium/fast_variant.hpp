@@ -1,7 +1,7 @@
 #ifndef SILICIUM_FAST_VARIANT_HPP
 #define SILICIUM_FAST_VARIANT_HPP
 
-#include <silicium/config.hpp>
+#include <silicium/is_handle.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <new>
 #include <array>
@@ -630,6 +630,9 @@ namespace Si
 		}
 	};
 #endif
+
+	BOOST_STATIC_ASSERT(is_handle<fast_variant<int>>::value);
+	BOOST_STATIC_ASSERT(is_handle<fast_variant<int, nothing>>::value);
 
 	template <class ...T>
 	bool operator != (fast_variant<T...> const &left, fast_variant<T...> const &right)

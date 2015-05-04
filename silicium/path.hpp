@@ -135,6 +135,8 @@ namespace Si
 		underlying_type m_value;
 	};
 
+	BOOST_STATIC_ASSERT(is_handle<path>::value);
+
 	inline std::ostream &operator << (std::ostream &out, path const &p)
 	{
 		return out << p.underlying();

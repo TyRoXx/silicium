@@ -2,6 +2,7 @@
 #define SILICIUM_ITERATOR_RANGE_HPP
 
 #include <silicium/config.hpp>
+#include <silicium/is_handle.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>

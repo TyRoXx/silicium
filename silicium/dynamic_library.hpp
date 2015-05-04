@@ -1,6 +1,7 @@
 #ifndef SILICIUM_DYNAMIC_LIBRARY_HPP
 #define SILICIUM_DYNAMIC_LIBRARY_HPP
 
+#include <silicium/is_handle.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
 
 #ifdef _WIN32
@@ -22,6 +23,7 @@ namespace Si
 	> dynamic_library;
 
 	BOOST_STATIC_ASSERT(sizeof(dynamic_library) == sizeof(void *));
+	BOOST_STATIC_ASSERT(is_handle<dynamic_library>::value);
 }
 
 #endif

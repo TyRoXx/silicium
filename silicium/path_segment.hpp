@@ -86,6 +86,8 @@ namespace Si
 		}
 	};
 
+	BOOST_STATIC_ASSERT(is_handle<path_segment>::value);
+
 	inline std::ostream &operator << (std::ostream &out, path_segment const &p)
 	{
 		return out << p.underlying();
