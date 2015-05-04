@@ -1,6 +1,7 @@
 #include <silicium/observable/function.hpp>
 #include <silicium/observable/consume.hpp>
 #include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(function_observable_trivial)

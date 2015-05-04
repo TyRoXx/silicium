@@ -2,6 +2,7 @@
 #include <silicium/observable/consume.hpp>
 #include <silicium/observable/function.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/optional/optional_io.hpp>
 
 BOOST_AUTO_TEST_CASE(take_observable)
 {

@@ -613,14 +613,43 @@ namespace Si
 	{
 		typedef typename detail::select_fast_variant_base<T...>::type base;
 
-		fast_variant()
+		fast_variant() BOOST_NOEXCEPT
 		{
 		}
 
-		template <class Initializer>
-		fast_variant(Initializer &&init)
-			: base(std::forward<Initializer>(init))
+		template <class First, class ...Initializer, class = typename boost::disable_if<boost::is_same<boost::decay<First>::type, fast_variant>, void>::type>
+		fast_variant(First &&first, Initializer &&...init)
+			: base(std::forward<First>(first), std::forward<Initializer>(init)...)
 		{
+		}
+
+		fast_variant(fast_variant &&other) BOOST_NOEXCEPT
+			: base(std::move(static_cast<base &>(other)))
+		{
+		}
+
+		fast_variant(fast_variant const &other)
+			: base(static_cast<base const &>(other))
+		{
+		}
+
+		template <class Content, class = typename boost::disable_if<boost::is_same<boost::decay<Content>::type, fast_variant>, void>::type>
+		fast_variant &operator = (Content &&other)
+		{
+			static_cast<base &>(*this) = std::forward<Content>(other);
+			return *this;
+		}
+
+		fast_variant &operator = (fast_variant &&other) BOOST_NOEXCEPT
+		{
+			static_cast<base &>(*this) = std::move(static_cast<base &>(other));
+			return *this;
+		}
+
+		fast_variant &operator = (fast_variant const &other)
+		{
+			static_cast<base &>(*this) = static_cast<base const &>(other);
+			return *this;
 		}
 
 		template <class Other>

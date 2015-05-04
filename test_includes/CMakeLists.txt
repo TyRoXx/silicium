@@ -14,5 +14,5 @@ if(SILICIUM_TEST_INCLUDES)
 	add_library(test_includes ${sources} ${sources_asio} ${sources_detail} ${sources_git} ${sources_http} ${sources_linux} ${sources_win32})
 
 	add_executable(test_includes_generate "generate_sources.cpp")
-	target_link_libraries(test_includes_generate silicium ${Boost_LIBRARIES})
+	target_link_libraries(test_includes_generate ${Boost_LIBRARIES})
 endif()

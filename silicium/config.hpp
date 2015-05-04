@@ -76,7 +76,7 @@
 #	define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 0
 #endif
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER != 1900)) //VS 2015 has a buggy variadic template using
 #	define SILICIUM_COMPILER_HAS_USING 1
 #else
 #	define SILICIUM_COMPILER_HAS_USING 0

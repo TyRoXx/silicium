@@ -72,10 +72,6 @@ if(WIN32)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-find_package(Libgit2 REQUIRED)
-if(LIBGIT2_FOUND)
-	include_directories(SYSTEM ${LIBGIT2_INCLUDE_DIR})
-endif()
 
 find_package(SDL2)
 if(SDL2_FOUND)
@@ -98,7 +94,6 @@ if(URIPARSER_FOUND)
 endif()
 
 include_directories(".")
-add_subdirectory("silicium")
 add_subdirectory("c_binding")
 add_subdirectory("test")
 add_subdirectory("test_includes")
