@@ -81,7 +81,7 @@
 #	define SILICIUM_COMPILER_HAS_USING 0
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 #	define SILICIUM_COMPILER_HAS_CXX11_UNION 0
 #else
 #	define SILICIUM_COMPILER_HAS_CXX11_UNION 1
