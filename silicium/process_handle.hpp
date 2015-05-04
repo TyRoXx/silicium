@@ -7,4 +7,9 @@
 #	include <silicium/linux/process_handle.hpp>
 #endif
 
+namespace Si
+{
+	BOOST_STATIC_ASSERT(is_handle<process_handle>::value);
+}
+
 #endif

@@ -348,6 +348,10 @@ namespace Si
 		}
 	};
 
+	BOOST_STATIC_ASSERT(is_handle<error_or<nothing>>::value);
+	BOOST_STATIC_ASSERT(is_handle<error_or<int>>::value);
+	BOOST_STATIC_ASSERT(is_handle<error_or<std::unique_ptr<int>>>::value);
+
 	template <class T>
 	struct is_error_or : std::false_type
 	{
