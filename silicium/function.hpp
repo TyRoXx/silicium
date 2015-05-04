@@ -1,7 +1,7 @@
 #ifndef SILICIUM_FUNCTION_HPP
 #define SILICIUM_FUNCTION_HPP
 
-#include <silicium/config.hpp>
+#include <silicium/is_handle.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <memory>
 #include <cassert>
@@ -103,6 +103,8 @@ namespace Si
 
 		std::shared_ptr<holder_base> m_content;
 	};
+
+	BOOST_STATIC_ASSERT(is_handle<function<void ()>>::value);
 }
 
 #endif

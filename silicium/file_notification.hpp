@@ -37,6 +37,8 @@ namespace Si
 		{
 		}
 	};
+
+	BOOST_STATIC_ASSERT(is_handle<file_notification>::value);
 }
 
 #endif
