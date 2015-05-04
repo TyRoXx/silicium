@@ -2,6 +2,7 @@
 #define SILICIUM_OPTIONAL_HPP
 
 #include <silicium/config.hpp>
+#include <silicium/is_handle.hpp>
 #include <ostream>
 #include <type_traits>
 #include <boost/static_assert.hpp>
@@ -20,7 +21,7 @@ namespace Si
 	{
 	};
 
-	typedef nothing none_t;
+	struct none_t {};
 
 	static none_t BOOST_CONSTEXPR_OR_CONST none;
 
@@ -173,7 +174,7 @@ namespace Si
 			return *this;
 		}
 
-		optional &operator = (none_t const &)BOOST_NOEXCEPT
+		optional &operator = (none_t const &) BOOST_NOEXCEPT
 		{
 			if (m_is_set)
 			{
@@ -257,6 +258,9 @@ namespace Si
 			return reinterpret_cast<T const *>(&m_storage);
 		}
 	};
+
+	BOOST_STATIC_ASSERT(is_handle<optional<int>>::value);
+	BOOST_STATIC_ASSERT(is_handle<optional<nothing>>::value);
 
 	template <class T>
 	bool operator == (optional<T> const &left, optional<T> const &right)

@@ -496,6 +496,11 @@ namespace Si
 		return out << value.v;
 	}
 
+	std::ostream &operator << (std::ostream &out, Si::nothing)
+	{
+		return out << "nothing";
+	}
+
 	BOOST_AUTO_TEST_CASE(fast_variant_construct_inplace)
 	{
 		typedef fast_variant<int, float, nothing, std::string, needs_inplace_construction> var;
