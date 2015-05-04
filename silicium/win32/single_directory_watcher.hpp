@@ -68,7 +68,7 @@ namespace Si
 				function_observer<std::function<void(optional<file_notification>)>>(
 				[observer
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-				= std::forward<Observer>(receiver)
+					= std::forward<Observer>(observer)
 #endif
 				](optional<file_notification> element) mutable
 				{
