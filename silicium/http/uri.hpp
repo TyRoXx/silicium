@@ -2,7 +2,7 @@
 #define SILICIUM_HTTP_URI_HPP
 
 #include <silicium/iterator_range.hpp>
-#include <boost/optional.hpp>
+#include <silicium/optional.hpp>
 #include <uriparser/Uri.h>
 #include <vector>
 
@@ -54,7 +54,7 @@ namespace Si
 			};
 		}
 
-		inline boost::optional<uri> parse_uri(iterator_range<char const *> encoded)
+		inline optional<uri> parse_uri(iterator_range<char const *> encoded)
 		{
 			UriParserStateA parser;
 			UriUriA parsed;
@@ -63,7 +63,7 @@ namespace Si
 			int const rc = uriParseUriExA(&parser, encoded.begin(), encoded.end());
 			if (rc != URI_SUCCESS)
 			{
-				return boost::none;
+				return none;
 			}
 			uri result;
 			result.scheme = detail::string_from_parser(parsed.scheme);
@@ -76,15 +76,15 @@ namespace Si
 			return result;
 		}
 
-		typedef std::pair<std::string, boost::optional<std::string>> html_query_pair;
+		typedef std::pair<std::string, optional<std::string>> html_query_pair;
 
-		inline boost::optional<std::vector<html_query_pair>> parse_html_query(iterator_range<char const *> encoded_query)
+		inline optional<std::vector<html_query_pair>> parse_html_query(iterator_range<char const *> encoded_query)
 		{
 			UriQueryListA *pairs = nullptr;
 			int pair_count = 0;
 			if (uriDissectQueryMallocA(&pairs, &pair_count, encoded_query.begin(), encoded_query.end()) != URI_SUCCESS)
 			{
-				return boost::none;
+				return none;
 			}
 			std::unique_ptr<UriQueryListA, detail::query_list_deleter> const pairs_clean_up(pairs);
 			std::vector<html_query_pair> converted_pairs;
@@ -95,7 +95,7 @@ namespace Si
 				converted_pair.first = p->key;
 				if (p->value)
 				{
-					converted_pair.second = boost::in_place(p->value);
+					converted_pair.second.emplace(p->value);
 				}
 				converted_pairs.emplace_back(std::move(converted_pair));
 			}

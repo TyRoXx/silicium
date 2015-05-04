@@ -25,7 +25,7 @@ namespace
 
 BOOST_AUTO_TEST_CASE(uri_parse_http)
 {
-	boost::optional<Si::http::uri> const parsed = Si::http::parse_uri(Si::make_c_str_range("http://localhost:8080/a/b?k=0#h"));
+	Si::optional<Si::http::uri> const parsed = Si::http::parse_uri(Si::make_c_str_range("http://localhost:8080/a/b?k=0#h"));
 	BOOST_REQUIRE(parsed);
 	BOOST_CHECK_EQUAL("http", to_string(parsed->scheme));
 	BOOST_CHECK_EQUAL("k=0", to_string(parsed->query));
@@ -49,14 +49,14 @@ namespace boost
 
 BOOST_AUTO_TEST_CASE(uri_parse_html_query)
 {
-	boost::optional<std::vector<Si::http::html_query_pair>> const parsed = Si::http::parse_html_query(Si::make_c_str_range("a=2&b=3&c=&d"));
+	Si::optional<std::vector<Si::http::html_query_pair>> const parsed = Si::http::parse_html_query(Si::make_c_str_range("a=2&b=3&c=&d"));
 	BOOST_REQUIRE(parsed);
 	std::vector<Si::http::html_query_pair> const expected
 	{
-		std::make_pair("a", boost::optional<std::string>("2")),
-		std::make_pair("b", boost::optional<std::string>("3")),
-		std::make_pair("c", boost::optional<std::string>("")),
-		std::make_pair("d", boost::optional<std::string>()),
+		std::make_pair("a", Si::optional<std::string>("2")),
+		std::make_pair("b", Si::optional<std::string>("3")),
+		std::make_pair("c", Si::optional<std::string>("")),
+		std::make_pair("d", Si::optional<std::string>()),
 	};
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), parsed->begin(), parsed->end());
 }
