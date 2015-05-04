@@ -2,7 +2,7 @@
 #define SILICIUM_C_STRING_HPP
 
 #include <cassert>
-#include <silicium/config.hpp>
+#include <silicium/is_handle.hpp>
 
 namespace Si
 {
@@ -11,7 +11,7 @@ namespace Si
 	{
 		typedef Char char_type;
 
-		basic_c_string()
+		basic_c_string() BOOST_NOEXCEPT
 			: m_begin(nullptr)
 		{
 		}
@@ -46,6 +46,9 @@ namespace Si
 
 	typedef basic_c_string<char> c_string;
 	typedef basic_c_string<wchar_t> cw_string;
+
+	BOOST_STATIC_ASSERT(is_handle<c_string>::value);
+	BOOST_STATIC_ASSERT(is_handle<cw_string>::value);
 
 	typedef
 #ifdef _WIN32
