@@ -27,6 +27,7 @@
 #include <silicium/error_code.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/explicit_operator_bool.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/file_notification.hpp>
@@ -43,6 +44,7 @@
 #include <silicium/http/receive_request.hpp>
 #include <silicium/http/request_parser_sink.hpp>
 #include <silicium/http/uri.hpp>
+#include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/noexcept_string.hpp>
