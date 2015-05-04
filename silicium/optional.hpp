@@ -238,6 +238,14 @@ namespace Si
 			return data();
 		}
 
+		template <class ...Args>
+		void emplace(Args &&...args)
+		{
+			*this = none;
+			new (data()) T{std::forward<Args>(args)...};
+			m_is_set = true;
+		}
+
 	private:
 
 		enum

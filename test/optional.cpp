@@ -135,3 +135,35 @@ BOOST_AUTO_TEST_CASE(optional_movable_only)
 	f = std::move(f);
 	BOOST_CHECK(f);
 }
+
+BOOST_AUTO_TEST_CASE(optional_emplace_empty)
+{
+	Si::optional<int> p;
+	p.emplace(123);
+	BOOST_CHECK(p);
+	BOOST_CHECK_EQUAL(123, p);
+}
+
+BOOST_AUTO_TEST_CASE(optional_emplace_non_empty)
+{
+	Si::optional<int> p(456);
+	p.emplace(123);
+	BOOST_CHECK(p);
+	BOOST_CHECK_EQUAL(123, p);
+}
+
+BOOST_AUTO_TEST_CASE(optional_emplace_no_parameters)
+{
+	Si::optional<int> p;
+	p.emplace();
+	BOOST_CHECK(p);
+	BOOST_CHECK_EQUAL(0, p);
+}
+
+BOOST_AUTO_TEST_CASE(optional_emplace_multiple_parameters)
+{
+	Si::optional<std::pair<int, float>> p;
+	p.emplace(2, 3.5f);
+	BOOST_CHECK(p);
+	BOOST_CHECK(std::make_pair(2, 3.5f) == p);
+}
