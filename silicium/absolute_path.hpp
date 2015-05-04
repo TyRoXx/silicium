@@ -3,6 +3,7 @@
 
 #include <silicium/relative_path.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/is_handle.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <iostream>
 
@@ -112,6 +113,8 @@ namespace Si
 		{
 		}
 	};
+
+	BOOST_STATIC_ASSERT(Si::is_handle<absolute_path>::value);
 
 	inline std::ostream &operator << (std::ostream &out, absolute_path const &p)
 	{
