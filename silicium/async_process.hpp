@@ -13,6 +13,7 @@
 #include <silicium/asio/process_output.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/run_process.hpp>
+#include <silicium/asio/posting_observable.hpp>
 
 #ifndef _WIN32
 #	include <fcntl.h>
@@ -265,11 +266,14 @@ namespace Si
 #ifdef _WIN32
 			auto work = std::make_shared<boost::asio::io_service::work>(io);
 			Si::spawn_observable(
-				Si::make_thread_observable<Si::std_threading>([work, copyable_file, destination]()
-				{
-					Si::win32::copy_whole_pipe(copyable_file->handle, destination);
-					return Si::nothing();
-				})
+				Si::asio::make_posting_observable(
+					io,
+					Si::make_thread_observable<Si::std_threading>([work, copyable_file, destination]()
+					{
+						Si::win32::copy_whole_pipe(copyable_file->handle, destination);
+						return Si::nothing();
+					})
+				)
 			);
 #else
 			Si::spawn_coroutine([&io, destination, copyable_file](Si::spawn_context yield)
