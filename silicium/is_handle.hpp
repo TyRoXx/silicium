@@ -10,7 +10,8 @@ namespace Si
 	struct is_handle : std::integral_constant<bool,
 		Si::is_nothrow_default_constructible<T>::value &&
 		Si::is_nothrow_move_assignable<T>::value &&
-		Si::is_nothrow_move_constructible<T>::value
+		Si::is_nothrow_move_constructible<T>::value &&
+		std::is_nothrow_destructible<T>::value
 	>
 	{
 	};
