@@ -6,6 +6,7 @@
 
 namespace Si
 {
+#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
 	template <class T>
 	struct is_handle : std::integral_constant<bool,
 		Si::is_nothrow_default_constructible<T>::value &&
@@ -15,6 +16,18 @@ namespace Si
 	>
 	{
 	};
+#else
+	template <class T>
+	struct is_handle : std::integral_constant<bool,
+		!std::is_const<T>::value &&
+		!std::is_reference<T>::value &&
+		Si::is_default_constructible<T>::value &&
+		Si::is_move_assignable<T>::value &&
+		Si::is_move_constructible<T>::value
+	>
+	{
+	};
+#endif
 
 	BOOST_STATIC_ASSERT(is_handle<char>::value);
 	BOOST_STATIC_ASSERT(is_handle<int>::value);
@@ -37,12 +50,18 @@ namespace Si
 		};
 		BOOST_STATIC_ASSERT(!is_handle<non_copyable>::value);
 
+#ifndef _MSC_VER
 		struct non_assignable
 		{
 			SILICIUM_DELETED_FUNCTION(non_assignable &operator = (non_assignable const &))
 		};
+		//VC++ 2013 std::is_{move,copy}_assignable do not return the correct result
+		BOOST_STATIC_ASSERT(!Si::is_move_assignable<non_assignable>::value);
+		BOOST_STATIC_ASSERT(!Si::is_copy_assignable<non_assignable>::value);
 		BOOST_STATIC_ASSERT(!is_handle<non_assignable>::value);
+#endif
 
+#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
 		struct non_noexcept_move_constructible
 		{
 			non_noexcept_move_constructible(non_noexcept_move_constructible &&) BOOST_NOEXCEPT_IF(false);
@@ -54,6 +73,7 @@ namespace Si
 			non_noexcept_move_assignable &operator = (non_noexcept_move_assignable &&) BOOST_NOEXCEPT_IF(false);
 		};
 		BOOST_STATIC_ASSERT(!is_handle<non_noexcept_move_assignable>::value);
+#endif
 	}
 }
 

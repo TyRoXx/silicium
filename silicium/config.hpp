@@ -221,6 +221,7 @@ namespace Si
 {
 	using std::is_default_constructible;
 	using std::is_move_assignable;
+	using std::is_move_constructible;
 	using std::is_nothrow_default_constructible;
 	using std::is_nothrow_move_constructible;
 	using std::is_nothrow_move_assignable;
@@ -231,6 +232,10 @@ namespace Si
 	};
 	template <class T>
 	struct is_move_assignable : std::false_type
+	{
+	};
+	template <class T>
+	struct is_move_constructible : std::false_type
 	{
 	};
 	template <class T>
