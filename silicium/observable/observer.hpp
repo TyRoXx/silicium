@@ -58,8 +58,27 @@ namespace Si
 		ObserverPtr m_impl;
 	};
 
+#if SILICIUM_COMPILER_HAS_USING
 	template <class Element>
 	using ptr_observer = any_ptr_observer<Element *>;
+#else
+	template <class T>
+	struct ptr_observer : any_ptr_observer<T *>
+	{
+		typedef typename any_ptr_observer<T *>::observer_type observer_type;
+		typedef typename observer_type::element_type element_type;
+
+		ptr_observer()
+			: any_ptr_observer<T *>(nullptr)
+		{
+		}
+
+		explicit ptr_observer(T *impl)
+			: any_ptr_observer<T *>(impl)
+		{
+		}
+	};
+#endif
 
 	template <class Element>
 	ptr_observer<observer<Element>> observe_by_ref(observer<Element> &ref)

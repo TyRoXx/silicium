@@ -8,6 +8,12 @@
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
 
+#if defined(__GNUC__)
+#	define SILICIUM_GCC ((__GNUC__ * 100) + __GNUC_MINOR__)
+#else
+#	define SILICIUM_GCC 0
+#endif
+
 #ifdef _MSC_VER
 #	define SILICIUM_COMPILER_CXX11 1
 #	define SILICIUM_COMPILER_CXX14 1
@@ -225,29 +231,46 @@ namespace Si
 	using std::is_nothrow_default_constructible;
 	using std::is_nothrow_move_constructible;
 	using std::is_nothrow_move_assignable;
+	using std::is_nothrow_destructible;
 #else
 	template <class T>
-	struct is_default_constructible : std::false_type
+	struct is_default_constructible : std::conditional<
+		std::is_reference<T>::value,
+		std::false_type,
+		std::is_constructible<T>
+	>::type
 	{
 	};
 	template <class T>
-	struct is_move_assignable : std::false_type
+	struct is_nothrow_default_constructible : std::has_nothrow_default_constructor<T>
 	{
 	};
 	template <class T>
-	struct is_move_constructible : std::false_type
+	struct is_nothrow_move_constructible : std::has_nothrow_copy_constructor<T>
 	{
 	};
 	template <class T>
-	struct is_nothrow_default_constructible : std::true_type
+	struct is_nothrow_move_assignable : std::has_nothrow_copy_assign<T>
 	{
 	};
 	template <class T>
-	struct is_nothrow_move_constructible : std::true_type
+	struct is_nothrow_destructible : std::true_type
 	{
 	};
 	template <class T>
-	struct is_nothrow_move_assignable : std::true_type
+	struct is_move_assignable : is_nothrow_move_assignable<T>
+	{
+	};
+	template <class T>
+	struct is_move_assignable<std::unique_ptr<T>> : std::true_type
+	{
+	};
+	template <class T>
+	struct is_move_constructible : is_nothrow_move_constructible<T>
+	{
+	};
+	template <class T>
+	struct is_move_constructible<std::unique_ptr<T>> : std::true_type
 	{
 	};
 #endif
