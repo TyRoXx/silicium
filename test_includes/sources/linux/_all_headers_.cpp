@@ -52,6 +52,7 @@
 #include <silicium/linux/process_handle.hpp>
 #include <silicium/linux/single_directory_watcher.hpp>
 #include <silicium/memory_range.hpp>
+#include <silicium/move_if_noexcept.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
 #include <silicium/observable/cache.hpp>
