@@ -14,7 +14,7 @@ dependencies
 This installs the dependencies on Ubuntu 14.04:
 
 ```
-sudo apt-get install libboost-all-dev liburiparser-dev zlib1g-dev liblua5.1-0-dev libsdl2-dev
+sudo apt-get install libboost-all-dev liburiparser-dev zlib1g-dev
 ```
 
 On ancient operating systems, you may have to install some of the
@@ -34,13 +34,3 @@ zlib (required)
 ---------------
 
 http://zlib.net/
-
-Lua 5.1 (optional)
-------------------
-
-http://www.lua.org/versions.html
-
-SDL2 (optional)
----------------
-
-https://www.libsdl.org/download-2.0.php

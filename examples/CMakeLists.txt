@@ -3,16 +3,6 @@ if(NOT (Boost_VERSION LESS 105300))
 	target_link_libraries(hellohttp ${Boost_LIBRARIES})
 endif()
 
-if(LIBGIT2_FOUND)
-	add_executable(si_libgit2 "libgit2.cpp")
-	target_link_libraries(si_libgit2 silicium ${Boost_LIBRARIES} ${LIBGIT2_LIBRARIES})
-endif()
-
-if(SDL2_FOUND)
-	add_executable(sdl "sdl.cpp")
-	target_link_libraries(sdl ${Boost_LIBRARIES} ${SDL2_LIBRARY})
-endif()
-
 add_executable(rxhttp "rxhttp.cpp")
 target_link_libraries(rxhttp ${Boost_LIBRARIES})
 

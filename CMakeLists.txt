@@ -73,11 +73,6 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-find_package(SDL2)
-if(SDL2_FOUND)
-	include_directories(SYSTEM ${SDL2_INCLUDE_DIR})
-endif()
-
 find_package(Lua51)
 if(LUA51_FOUND)
 	include_directories(SYSTEM ${LUA_INCLUDE_DIR})
