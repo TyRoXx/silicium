@@ -20,23 +20,34 @@ sudo apt-get install libboost-all-dev liburiparser-dev zlib1g-dev
 On ancient operating systems, you may have to install some of the
 libraries from a recent source release.
 
-Boost 1.54+ (required)
----------------------
+Boost 1.54 or later (required)
+------------------------------
 
 http://www.boost.org/users/download/
 
-UriParser 0.7+ (required)
--------------------------
+```
+sudo apt-get install libboost-all-dev
+```
+
+UriParser 0.7 or later (optional)
+---------------------------------
 
 http://uriparser.sourceforge.net/#download
 
-zlib (required)
+```
+sudo apt-get install liburiparser-dev
+```
+
+zlib (optional)
 ---------------
 
 http://zlib.net/
+
+```
+sudo apt-get install zlib1g-dev
+```
 
 to do
 =====
 
 * do not depend on Boost.IOStreams
-* make UriParser optional

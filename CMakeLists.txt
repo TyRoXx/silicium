@@ -78,7 +78,7 @@ if(ZLIB_FOUND)
 	include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
 endif()
 
-find_package(UriParser REQUIRED)
+find_package(UriParser)
 if(URIPARSER_FOUND)
 	include_directories(SYSTEM ${URIPARSER_INCLUDE_DIR})
 endif()
