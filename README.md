@@ -14,7 +14,7 @@ dependencies
 This installs the dependencies on Ubuntu 14.04:
 
 ```
-sudo apt-get install libboost-all-dev liburiparser-dev zlib1g-dev liblua5.1-0-dev libsdl2-dev libgit2-dev
+sudo apt-get install libboost-all-dev liburiparser-dev zlib1g-dev liblua5.1-0-dev libsdl2-dev
 ```
 
 On ancient operating systems, you may have to install some of the
@@ -29,11 +29,6 @@ UriParser 0.7+ (required)
 -------------------------
 
 http://uriparser.sourceforge.net/#download
-
-libgit2 v0.21+ (required)
--------------------------
-
-https://github.com/libgit2/libgit2/releases
 
 zlib (required)
 ---------------
