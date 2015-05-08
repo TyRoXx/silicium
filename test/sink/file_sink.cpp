@@ -2,12 +2,21 @@
 #include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/open.hpp>
 #include <silicium/source/file_source.hpp>
-#include <silicium/read_file.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread/future.hpp>
 #include <array>
+#include <fstream>
+
+namespace
+{
+	std::vector<char> read_file(boost::filesystem::path const &name)
+	{
+		std::ifstream file(name.string(), std::ios::binary);
+		return std::vector<char>((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	}
+}
 
 BOOST_AUTO_TEST_CASE(file_sink_success)
 {
@@ -27,7 +36,7 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 		}};
 		BOOST_CHECK_EQUAL(boost::system::error_code(), sink.append(make_iterator_range(write_vector.data(), write_vector.data() + write_vector.size())));
 	}
-	std::vector<char> content = Si::read_file(file_name);
+	std::vector<char> content = read_file(file_name);
 	std::string const expected = "tesaaabbbbccccc";
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), content.begin(), content.end());
 }

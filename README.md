@@ -50,4 +50,5 @@ sudo apt-get install zlib1g-dev
 to do
 =====
 
-* do not depend on Boost.IOStreams
+* measure test coverage
+* static analysis
