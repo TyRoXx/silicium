@@ -34,3 +34,9 @@ zlib (required)
 ---------------
 
 http://zlib.net/
+
+to do
+=====
+
+* do not depend on Boost.IOStreams
+* make UriParser optional

@@ -73,12 +73,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-find_package(Lua51)
-if(LUA51_FOUND)
-	include_directories(SYSTEM ${LUA_INCLUDE_DIR})
-endif()
-
-find_package(ZLIB REQUIRED)
+find_package(ZLIB)
 if(ZLIB_FOUND)
 	include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
 endif()
