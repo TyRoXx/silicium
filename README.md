@@ -52,3 +52,5 @@ to do
 
 * measure test coverage
 * static analysis
+* move the web server stuff to a separate library (including the uriparser dependency)
+* move the zlib wrapper to a separate library
