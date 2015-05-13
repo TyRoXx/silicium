@@ -8,7 +8,9 @@
 #include <silicium/to_unique.hpp>
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
-#	define SILICIUM_MOVABLE_MEMBER(struct_name, member_name) SILICIUM_DEFAULT_NOEXCEPT_MOVE(struct_name)
+#	define SILICIUM_MOVABLE_MEMBER(struct_name, member_name) \
+	struct_name() = default; \
+	SILICIUM_DEFAULT_MOVE(struct_name)
 #else
 #	define SILICIUM_MOVABLE_MEMBER(struct_name, member_name) \
 	struct_name() : member_name() BOOST_NOEXCEPT {} \
