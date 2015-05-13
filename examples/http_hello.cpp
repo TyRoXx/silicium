@@ -6,6 +6,7 @@
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <iostream>
 
 namespace
 {
@@ -44,29 +45,57 @@ namespace
 		//ignore shutdown failures, they do not matter here
 		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 	}
+
+	boost::system::error_code spawn_server(boost::asio::io_service &io)
+	{
+		boost::system::error_code ec;
+		boost::asio::ip::tcp::acceptor acceptor(io);
+
+		acceptor.open(boost::asio::ip::tcp::v4(), ec);
+		if (ec)
+		{
+			return ec;
+		}
+
+		acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080), ec);
+		if (ec)
+		{
+			return ec;
+		}
+
+		acceptor.listen(boost::asio::ip::tcp::acceptor::max_connections, ec);
+		if (ec)
+		{
+			return ec;
+		}
+
+		Si::spawn_observable(
+			Si::transform(
+				Si::asio::make_tcp_acceptor(std::move(acceptor)),
+				[](Si::asio::tcp_acceptor_result maybe_client)
+				{
+					auto client = maybe_client.get();
+					Si::spawn_coroutine([client](Si::spawn_context yield)
+					{
+						serve_client(*client, yield);
+					});
+					return Si::nothing();
+				}
+			)
+		);
+
+		return {};
+	}
 }
 
 int main()
 {
 	boost::asio::io_service io;
-	Si::spawn_observable(
-		Si::transform(
-			Si::asio::make_tcp_acceptor(
-				boost::asio::ip::tcp::acceptor(
-					io,
-					boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080)
-				)
-			),
-			[](Si::asio::tcp_acceptor_result maybe_client)
-			{
-				auto client = maybe_client.get();
-				Si::spawn_coroutine([client](Si::spawn_context yield)
-				{
-					serve_client(*client, yield);
-				});
-				return Si::nothing();
-			}
-		)
-	);
+	boost::system::error_code ec = spawn_server(io);
+	if (ec)
+	{
+		std::cerr << ec << ": " << ec.message() << '\n';
+		return 1;
+	}
 	io.run();
 }
