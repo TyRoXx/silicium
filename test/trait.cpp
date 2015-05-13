@@ -37,18 +37,40 @@
 		); \
 	}
 
+#define SILICIUM_DETAIL_MAKE_BOX_METHOD(r, data, elem) \
+	BOOST_PP_TUPLE_ELEM(4, 2, elem) \
+	BOOST_PP_TUPLE_ELEM(4, 0, elem) \
+	SILICIUM_DETAIL_MAKE_PARAMETERS(BOOST_PP_TUPLE_ELEM(4, 1, elem)) \
+	BOOST_PP_TUPLE_ELEM(4, 3, elem) { \
+		assert(original); \
+		return original -> BOOST_PP_TUPLE_ELEM(4, 0, elem) ( \
+			BOOST_PP_ENUM_PARAMS(BOOST_PP_ARRAY_SIZE(BOOST_PP_TUPLE_ELEM(4, 1, elem)), arg) \
+		); \
+	}
+
 #define SILICIUM_DETAIL_MAKE_ERASER(name, methods) template <class Original> struct name : interface { \
 	Original original; \
 	explicit name(Original original) : original(std::move(original)) {} \
 	BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_ERASER_METHOD, _, methods) \
 };
 
+#define SILICIUM_DETAIL_MAKE_BOX(name, methods) struct box { \
+	std::unique_ptr<interface> original; \
+	explicit name(std::unique_ptr<interface> original) : original(std::move(original)) {} \
+	BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_BOX_METHOD, _, methods) \
+};
+
 #define SILICIUM_TRAIT(name, methods) struct name { \
 	SILICIUM_DETAIL_MAKE_INTERFACE(interface, methods) \
 	SILICIUM_DETAIL_MAKE_ERASER(eraser, methods) \
+	SILICIUM_DETAIL_MAKE_BOX(box, methods) \
 	template <class Original> \
 	static auto erase(Original &&original) { \
 		return eraser<typename std::decay<Original>::type>{std::forward<Original>(original)}; \
+	} \
+	template <class Original> \
+	static auto make_box(Original &&original) { \
+		return box{Si::to_unique(erase(std::forward<Original>(original)))}; \
 	} \
 };
 
@@ -81,6 +103,7 @@ SILICIUM_TRAIT(
 	((resize, (1, (size_t)), void))
 	((resize, (2, (size_t, T const &)), void))
 	((empty, (0, ()), bool, const))
+	((size, (0, ()), size_t, const BOOST_NOEXCEPT))
 )
 
 BOOST_AUTO_TEST_CASE(templatized_trait)
@@ -110,4 +133,22 @@ BOOST_AUTO_TEST_CASE(trait_const_method)
 	BOOST_CHECK(const_ref.empty());
 	container.original.resize(1);
 	BOOST_CHECK(!const_ref.empty());
+}
+
+BOOST_AUTO_TEST_CASE(trait_noexcept_method)
+{
+	auto container = Container<int>::erase(std::vector<int>{});
+	auto const &const_ref = container;
+	BOOST_CHECK_EQUAL(0, const_ref.size());
+	container.original.resize(3);
+	BOOST_CHECK_EQUAL(3, const_ref.size());
+	BOOST_STATIC_ASSERT(BOOST_NOEXCEPT_EXPR(const_ref.size()));
+}
+
+BOOST_AUTO_TEST_CASE(trait_box)
+{
+	Container<int>::box container = Container<int>::make_box(std::vector<int>{});
+	container.emplace_back(3);
+	BOOST_CHECK(!container.empty());
+	BOOST_CHECK_EQUAL(1, container.size());
 }
