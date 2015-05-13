@@ -30,25 +30,6 @@
 namespace Si
 {
 #if SILICIUM_RX_TUPLE_AVAILABLE
-	BOOST_AUTO_TEST_CASE(reactive_transform)
-	{
-		auto twos = Si::make_generator_observable([]{ return 2; });
-		auto ones  = Si::make_generator_observable([]{ return 1; });
-		auto both = Si::make_tuple(twos, ones);
-		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
-		{
-			return std::get<0>(element) + std::get<1>(element);
-		});
-		std::vector<int> generated;
-		auto consumer = Si::consume<int>([&generated](int element)
-		{
-			generated.emplace_back(element);
-		});
-		added.async_get_one(Si::observe_by_ref(consumer));
-		std::vector<int> const expected(1, 3);
-		BOOST_CHECK(expected == generated);
-	}
-
 	template <class Observable>
 	void test_value_semantics(Observable &&original)
 	{

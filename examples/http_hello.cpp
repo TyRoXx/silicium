@@ -79,7 +79,6 @@ namespace
 					{
 						serve_client(*client, yield);
 					});
-					return Si::nothing();
 				}
 			)
 		);
