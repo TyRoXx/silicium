@@ -135,6 +135,7 @@ BOOST_AUTO_TEST_CASE(trait_const_method)
 	BOOST_CHECK(!const_ref.empty());
 }
 
+#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
 BOOST_AUTO_TEST_CASE(trait_noexcept_method)
 {
 	auto container = Container<int>::erase(std::vector<int>{});
@@ -144,6 +145,7 @@ BOOST_AUTO_TEST_CASE(trait_noexcept_method)
 	BOOST_CHECK_EQUAL(3, const_ref.size());
 	BOOST_STATIC_ASSERT(BOOST_NOEXCEPT_EXPR(const_ref.size()));
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(trait_box)
 {

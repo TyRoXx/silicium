@@ -4,6 +4,7 @@
 #include <silicium/observable/consume.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_RX_TUPLE_AVAILABLE
 BOOST_AUTO_TEST_CASE(transform)
 {
 	auto twos = Si::make_generator_observable([]{ return 2; });
@@ -22,6 +23,7 @@ BOOST_AUTO_TEST_CASE(transform)
 	std::vector<int> const expected(1, 3);
 	BOOST_CHECK(expected == generated);
 }
+#endif
 
 namespace
 {

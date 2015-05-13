@@ -5,7 +5,7 @@
 #include <silicium/config.hpp>
 #include <bitset>
 
-#if defined(_MSC_VER) || !SILICIUM_COMPILER_HAS_USING
+#if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING
 #	define SILICIUM_RX_TUPLE_AVAILABLE 0
 #else
 #	define SILICIUM_RX_TUPLE_AVAILABLE 1
