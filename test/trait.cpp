@@ -162,8 +162,45 @@ BOOST_AUTO_TEST_CASE(trait_noexcept_method)
 
 BOOST_AUTO_TEST_CASE(trait_box)
 {
-	Container<int>::box container = Container<int>::make_box(std::vector<int>{});
+	//default constructor is available:
+	Container<int>::box container;
+
+	{
+		//move construction is available:
+		Container<int>::box container2 = Container<int>::make_box(std::vector<int>{});
+
+		//move assignment is available:
+		container = std::move(container2);
+
+		BOOST_REQUIRE(container.original);
+		BOOST_CHECK(!container2.original);
+	}
+
 	container.emplace_back(3);
 	BOOST_CHECK(!container.empty());
 	BOOST_CHECK_EQUAL(1, container.size());
+}
+
+BOOST_AUTO_TEST_CASE(trait_eraser)
+{
+	//default constructor is available:
+	Container<int>::eraser<std::vector<int>> container;
+
+	{
+		//move construction is available:
+		Container<int>::eraser<std::vector<int>> container2 = Container<int>::erase(std::vector<int>{1, 2, 3});
+
+		BOOST_CHECK_EQUAL(0, container.original.size());
+		BOOST_CHECK_EQUAL(3, container2.original.size());
+
+		//move assignment is available:
+		container = std::move(container2);
+
+		BOOST_CHECK_EQUAL(3, container.original.size());
+		BOOST_CHECK_EQUAL(0, container2.original.size());
+	}
+
+	container.emplace_back(4);
+	BOOST_CHECK(!container.empty());
+	BOOST_CHECK_EQUAL(4, container.size());
 }
