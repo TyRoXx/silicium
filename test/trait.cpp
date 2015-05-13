@@ -19,9 +19,10 @@ namespace Si
 
 #define SILICIUM_DETAIL_MAKE_PURE_VIRTUAL_METHOD(r, data, elem) \
 	virtual \
-	BOOST_PP_TUPLE_ELEM(3, 2, elem) \
-	BOOST_PP_TUPLE_ELEM(3, 0, elem) \
-	SILICIUM_DETAIL_MAKE_PARAMETERS(BOOST_PP_TUPLE_ELEM(3, 1, elem)) \
+	BOOST_PP_TUPLE_ELEM(4, 2, elem) \
+	BOOST_PP_TUPLE_ELEM(4, 0, elem) \
+	SILICIUM_DETAIL_MAKE_PARAMETERS(BOOST_PP_TUPLE_ELEM(4, 1, elem)) \
+	BOOST_PP_TUPLE_ELEM(4, 3, elem) \
 	= 0;
 
 #define SILICIUM_DETAIL_MAKE_INTERFACE(name, methods) struct name { \
@@ -36,12 +37,13 @@ namespace Si
 
 #define SILICIUM_DETAIL_MAKE_ERASER_METHOD(r, data, elem) \
 	virtual \
-	BOOST_PP_TUPLE_ELEM(3, 2, elem) \
-	BOOST_PP_TUPLE_ELEM(3, 0, elem) \
-	SILICIUM_DETAIL_MAKE_PARAMETERS(BOOST_PP_TUPLE_ELEM(3, 1, elem)) \
+	BOOST_PP_TUPLE_ELEM(4, 2, elem) \
+	BOOST_PP_TUPLE_ELEM(4, 0, elem) \
+	SILICIUM_DETAIL_MAKE_PARAMETERS(BOOST_PP_TUPLE_ELEM(4, 1, elem)) \
+	BOOST_PP_TUPLE_ELEM(4, 3, elem) \
 	SILICIUM_OVERRIDE { \
-		return original. BOOST_PP_TUPLE_ELEM(3, 0, elem) ( \
-			BOOST_PP_ENUM_PARAMS(BOOST_PP_ARRAY_SIZE(BOOST_PP_TUPLE_ELEM(3, 1, elem)), arg) \
+		return original. BOOST_PP_TUPLE_ELEM(4, 0, elem) ( \
+			BOOST_PP_ENUM_PARAMS(BOOST_PP_ARRAY_SIZE(BOOST_PP_TUPLE_ELEM(4, 1, elem)), arg) \
 		); \
 	}
 
@@ -89,6 +91,7 @@ SILICIUM_TRAIT(
 	((emplace_back, (1, (T)), void))
 	((resize, (1, (size_t)), void))
 	((resize, (2, (size_t, T const &)), void))
+	((empty, (0, ()), bool, const))
 )
 
 BOOST_AUTO_TEST_CASE(templatized_trait)
@@ -109,4 +112,13 @@ BOOST_AUTO_TEST_CASE(templatized_trait)
 		std::vector<int> const expected{123, 0, 7};
 		BOOST_CHECK(expected == container.original);
 	}
+}
+
+BOOST_AUTO_TEST_CASE(trait_const_method)
+{
+	auto container = Container<int>::erase(std::vector<int>{});
+	auto const &const_ref = container;
+	BOOST_CHECK(const_ref.empty());
+	container.original.resize(1);
+	BOOST_CHECK(!const_ref.empty());
 }
