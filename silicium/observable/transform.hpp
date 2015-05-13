@@ -103,16 +103,24 @@ namespace Si
 
 	namespace detail
 	{
-		template <class F>
+		template <class Argument, class F>
 		F &&nothingify(F &&f, std::false_type)
 		{
 			return std::forward<F>(f);
 		}
 
-		template <class F>
+		template <class F, class Argument>
 		struct void_to_nothing_wrapper
 		{
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+			typename detail::proper_value_function<
+				F,
+				void,
+				Argument
+			>::type original;
+#else
 			F original;
+#endif
 
 			template <class ...Args>
 			nothing operator()(Args &&...args) const
@@ -122,8 +130,8 @@ namespace Si
 			}
 		};
 
-		template <class F>
-		void_to_nothing_wrapper<typename std::decay<F>::type>
+		template <class Argument, class F>
+		void_to_nothing_wrapper<typename std::decay<F>::type, Argument>
 		nothingify(F &&f, std::true_type)
 		{
 			return {std::forward<F>(f)};
@@ -136,7 +144,7 @@ namespace Si
 	-> transformation<
 		typename std::decay<
 			decltype(
-				detail::nothingify(
+				detail::nothingify<typename std::decay<Original>::type::element_type>(
 					std::forward<Transform>(transform),
 					std::is_void<
 						decltype(
@@ -154,7 +162,7 @@ namespace Si
 	{
 		typedef typename std::decay<Original>::type clean_original;
 		typedef std::is_void<decltype(transform(std::declval<typename clean_original::element_type>()))> returns_void;
-		auto transform_that_returns_non_void = detail::nothingify(std::forward<Transform>(transform), returns_void());
+		auto transform_that_returns_non_void = detail::nothingify<typename clean_original::element_type>(std::forward<Transform>(transform), returns_void());
 		return transformation<
 			typename std::decay<decltype(transform_that_returns_non_void)>::type,
 			clean_original
