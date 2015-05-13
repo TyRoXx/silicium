@@ -134,7 +134,20 @@ namespace Si
 	auto transform(Original &&original, Transform &&transform)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	-> transformation<
-		typename std::decay<Transform>::type,
+		typename std::decay<
+			decltype(
+				detail::nothingify(
+					std::forward<Transform>(transform),
+					std::is_void<
+						decltype(
+							transform(
+								std::declval<typename std::decay<Original>::type::element_type>()
+							)
+						)
+					>()
+	            )
+	        )
+		>::type,
 		typename std::decay<Original>::type
 	>
 #endif
