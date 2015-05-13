@@ -22,20 +22,20 @@ namespace Si
 		};
 
 		template <class CharSource>
-		boost::optional<request> parse_request(CharSource &&in)
+		optional<request> parse_request(CharSource &&in)
 		{
 			Si::detail::line_source lines(in);
 			auto first_line = get(lines);
 			if (!first_line)
 			{
-				return boost::none;
+				return none;
 			}
 			request header;
 			{
 				auto const method_end = std::find(first_line->begin(), first_line->end(), ' ');
 				if (method_end == first_line->end())
 				{
-					return boost::none;
+					return none;
 				}
 				header.method.assign(first_line->begin(), method_end);
 
@@ -43,7 +43,7 @@ namespace Si
 				auto const path_end = std::find(path_begin, first_line->end(), ' ');
 				if (path_end == first_line->end())
 				{
-					return boost::none;
+					return none;
 				}
 				header.path.assign(path_begin, path_end);
 
@@ -55,7 +55,7 @@ namespace Si
 				auto value_line = get(lines);
 				if (!value_line)
 				{
-					return boost::none;
+					return none;
 				}
 				if (value_line->empty())
 				{

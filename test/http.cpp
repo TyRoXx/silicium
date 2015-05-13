@@ -21,7 +21,7 @@ namespace Si
 				"\r\n"
 				;
 		auto source = Si::make_container_source(incoming);
-		boost::optional<Si::http::request> const parsed = Si::http::parse_request(source);
+		Si::optional<Si::http::request> const parsed = Si::http::parse_request(source);
 		BOOST_REQUIRE(parsed);
 		BOOST_CHECK_EQUAL("GET", parsed->method);
 		BOOST_CHECK_EQUAL("/", parsed->path);

@@ -20,7 +20,7 @@ namespace
 			Si::asio::socket_sink sender(*client, yield);
 			auto buffered_sender = Si::make_buffering_sink(Si::ref_sink(sender));
 			auto buffered_receiver = receiver | Si::buffered(4096);
-			boost::optional<Si::http::request> const header = Si::http::parse_request(buffered_receiver);
+			Si::optional<Si::http::request> const header = Si::http::parse_request(buffered_receiver);
 			if (!header)
 			{
 				Si::http::response response;

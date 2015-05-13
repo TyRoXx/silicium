@@ -27,7 +27,7 @@ namespace
 		boost::uintmax_t visitor_number)
 	{
 		Si::received_from_socket_source bytes_receiver(client.receiving());
-		boost::optional<Si::http::request> request = Si::http::parse_request(bytes_receiver);
+		Si::optional<Si::http::request> request = Si::http::parse_request(bytes_receiver);
 		if (!request)
 		{
 			return;
