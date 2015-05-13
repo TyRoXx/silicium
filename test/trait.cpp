@@ -7,13 +7,6 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <silicium/to_unique.hpp>
 
-namespace Si
-{
-
-}
-
-#define SILICIUM_DETAIL_REMOVE_PARENTHESES(...) __VA_ARGS__
-
 #define SILICIUM_DETAIL_MAKE_PARAMETER(z, n, array) BOOST_PP_COMMA_IF(n) BOOST_PP_ARRAY_ELEM(n, array) BOOST_PP_CAT(arg, n)
 #define SILICIUM_DETAIL_MAKE_PARAMETERS(array) ( BOOST_PP_REPEAT(BOOST_PP_ARRAY_SIZE(array), SILICIUM_DETAIL_MAKE_PARAMETER, array) )
 
@@ -30,9 +23,6 @@ namespace Si
 	BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_PURE_VIRTUAL_METHOD, _, methods) \
 };
 
-#define SILICIUM_DETAIL_CAT_COMMA_IMPL(a, b) a, b
-#define SILICIUM_DETAIL_CAT_COMMA(a, b) SILICIUM_DETAIL_CAT_COMMA_IMPL(a, b)
-
 #define SILICIUM_DETAIL_ERASER_METHOD_ARGUMENT(z, n, text) , BOOST_PP_CAT(_, n)
 
 #define SILICIUM_DETAIL_MAKE_ERASER_METHOD(r, data, elem) \
@@ -46,7 +36,6 @@ namespace Si
 			BOOST_PP_ENUM_PARAMS(BOOST_PP_ARRAY_SIZE(BOOST_PP_TUPLE_ELEM(4, 1, elem)), arg) \
 		); \
 	}
-
 
 #define SILICIUM_DETAIL_MAKE_ERASER(name, methods) template <class Original> struct name : interface { \
 	Original original; \
