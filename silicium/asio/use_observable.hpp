@@ -1,6 +1,9 @@
 #ifndef SILICIUM_ASIO_USE_OBSERVABLE_HPP
 #define SILICIUM_ASIO_USE_OBSERVABLE_HPP
 
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 105400
 #include <silicium/observable/ptr.hpp>
 #include <silicium/observable/erased_observer.hpp>
 #include <silicium/fast_variant.hpp>
@@ -150,5 +153,7 @@ namespace boost
 		};
 	}
 }
+
+#endif
 
 #endif

@@ -8,6 +8,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if BOOST_VERSION >= 105400
+
 BOOST_AUTO_TEST_CASE(asio_use_observable_with_timer)
 {
 	boost::asio::io_service io;
@@ -49,3 +51,5 @@ BOOST_AUTO_TEST_CASE(asio_use_observable_with_socket)
 	io.run();
 	BOOST_CHECK(got_result);
 }
+
+#endif

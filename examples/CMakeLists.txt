@@ -1,4 +1,4 @@
-if(NOT (Boost_VERSION LESS 105300))
+if(NOT (Boost_VERSION LESS 105400))
 	add_executable(hellohttp "hellohttp.cpp")
 	target_link_libraries(hellohttp ${Boost_LIBRARIES})
 endif()

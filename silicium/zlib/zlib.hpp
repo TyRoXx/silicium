@@ -8,7 +8,7 @@ namespace Si
 {
 	struct zlib_error_category : boost::system::error_category
 	{
-		virtual const char *name() const BOOST_SYSTEM_NOEXCEPT SILICIUM_OVERRIDE
+		virtual const char *name() const BOOST_NOEXCEPT SILICIUM_OVERRIDE
 		{
 			return "zlib";
 		}

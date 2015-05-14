@@ -59,8 +59,7 @@ namespace Si
 			//in the reading thread.
 			Si::win32::unique_handle watch_file;
 
-			BOOST_DELETED_FUNCTION(directory_changes(directory_changes const &));
-			BOOST_DELETED_FUNCTION(directory_changes &operator = (directory_changes const &));
+			SILICIUM_DISABLE_COPY(directory_changes)
 		};
 
 		inline directory_changes::directory_changes()
