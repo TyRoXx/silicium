@@ -1,6 +1,7 @@
 #ifndef SILICIUM_SINK_HPP
 #define SILICIUM_SINK_HPP
 
+#include <silicium/trait.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/utility.hpp>
@@ -26,6 +27,12 @@ namespace Si
 
 		virtual error_type append(iterator_range<element_type const *> data) = 0;
 	};
+
+	template <class Element, class Error>
+	SILICIUM_TRAIT(
+		Sink,
+		((append, (1, (iterator_range<Element const *>)), Error))
+	)
 
 	template <class Element, class Error = boost::system::error_code>
 	struct null_sink
