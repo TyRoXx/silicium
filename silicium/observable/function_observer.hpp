@@ -71,7 +71,7 @@ namespace Si
 		function_holder m_function;
 	};
 
-	BOOST_STATIC_ASSERT(std::is_same<int, function_observer<void (*)(boost::optional<int> const &)>::element_type>::value);
+	BOOST_STATIC_ASSERT((std::is_same<int, function_observer<void (*)(boost::optional<int> const &)>::element_type>::value));
 
 	template <class Function>
 	auto make_function_observer(Function &&function)

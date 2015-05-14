@@ -11,6 +11,7 @@
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/asio/timer.hpp>
 #include <silicium/to_unique.hpp>
+#include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/io_service.hpp>
 #include <functional>

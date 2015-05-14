@@ -3,6 +3,7 @@
 #include <silicium/observable/function_observer.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/array.hpp>
+#include <algorithm>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <silicium/run_process.hpp>
 

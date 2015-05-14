@@ -2,6 +2,7 @@
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/ref.hpp>
 #include <iostream>
+#include <chrono>
 
 template <class YieldContext, class Duration>
 void sleep(boost::asio::io_service &io, YieldContext &&yield, Duration duration)

@@ -3,6 +3,7 @@
 #include <silicium/config.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/asio/post_forwarder.hpp>
+#include <algorithm>
 #include <boost/asio/io_service.hpp>
 #include <boost/test/unit_test.hpp>
 

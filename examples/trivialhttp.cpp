@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
 #include <memory>

@@ -1,6 +1,7 @@
 #ifndef SILICIUM_WIN32_OVERLAPPED_DIRECTORY_CHANGES_HPP
 #define SILICIUM_WIN32_OVERLAPPED_DIRECTORY_CHANGES_HPP
 
+#include <algorithm>
 #include <boost/asio.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/exchange.hpp>
@@ -130,8 +131,7 @@ namespace Si
 			std::array<char, 0x10000> buffer;
 			Si::win32::unique_handle watch_file;
 
-			BOOST_DELETED_FUNCTION(overlapped_directory_changes(overlapped_directory_changes const &));
-			BOOST_DELETED_FUNCTION(overlapped_directory_changes &operator = (overlapped_directory_changes const &));
+			SILICIUM_DISABLE_COPY(overlapped_directory_changes)
 		};
 	}
 }

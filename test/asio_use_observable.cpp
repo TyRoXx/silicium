@@ -1,6 +1,7 @@
 #include <silicium/asio/use_observable.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/error_or.hpp>
+#include <algorithm>
 #include <boost/asio/basic_waitable_timer.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <boost/chrono/system_clocks.hpp>

@@ -5,6 +5,7 @@
 #include <silicium/exchange.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/ptr_adaptor.hpp>
+#include <algorithm>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace Si

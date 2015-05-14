@@ -5,6 +5,7 @@
 #include <silicium/observable/erased_observer.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/error_or.hpp>
+#include <algorithm>
 #include <boost/asio/async_result.hpp>
 #include <boost/system/error_code.hpp>
 

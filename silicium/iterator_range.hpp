@@ -145,7 +145,7 @@ namespace Si
 #endif
 	{
 		typedef typename std::decay<Iterator1>::type iterator_type;
-		BOOST_STATIC_ASSERT(std::is_same<iterator_type, typename std::decay<Iterator2>::type>::value);
+		BOOST_STATIC_ASSERT((std::is_same<iterator_type, typename std::decay<Iterator2>::type>::value));
 		return iterator_range<iterator_type>(std::forward<Iterator1>(begin), std::forward<Iterator2>(end));
 	}
 

@@ -8,6 +8,7 @@
 #include <silicium/observable/constant.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/iterator_range.hpp>
+#include <algorithm>
 #include <boost/asio/write.hpp>
 
 namespace Si

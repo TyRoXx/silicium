@@ -154,8 +154,8 @@ struct impl_with_typedefs
 BOOST_AUTO_TEST_CASE(trait_with_typedefs)
 {
 	WithTypedefs::box b = WithTypedefs::make_box(impl_with_typedefs{});
-	BOOST_STATIC_ASSERT(std::is_same<float, WithTypedefs::eraser<impl_with_typedefs>::element_type>::value);
-	BOOST_STATIC_ASSERT(std::is_same<float, WithTypedefs::interface::element_type>::value);
-	BOOST_STATIC_ASSERT(std::is_same<float, WithTypedefs::box::element_type>::value);
+	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::eraser<impl_with_typedefs>::element_type>::value));
+	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::interface::element_type>::value));
+	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::box::element_type>::value));
 	BOOST_CHECK_EQUAL(12.0f, b.get());
 }

@@ -1,6 +1,7 @@
 #ifndef SILICIUM_REACTIVE_DIRECTORY_CHANGES_HPP
 #define SILICIUM_REACTIVE_DIRECTORY_CHANGES_HPP
 
+#include <algorithm>
 #include <boost/asio/io_service.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/win32/file_notification.hpp>

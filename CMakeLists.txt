@@ -38,6 +38,8 @@ if(MSVC)
 	#disable "'std::_Copy_n': Function call with parameters that may be unsafe"
 	add_definitions("/wd4996")
 
+	add_definitions("-DBOOST_ALL_NO_LIB")
+
 	#workaround for Boost 1.55 Context error LNK2026
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 endif()

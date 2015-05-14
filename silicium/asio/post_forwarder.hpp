@@ -3,6 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <silicium/observable/for_each.hpp>
+#include <algorithm>
 #include <boost/asio/io_service.hpp>
 
 namespace Si

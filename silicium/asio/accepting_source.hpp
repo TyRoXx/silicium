@@ -1,6 +1,7 @@
 #ifndef SILICIUM_ASIO_ACCEPTING_SOURCE_HPP
 #define SILICIUM_ASIO_ACCEPTING_SOURCE_HPP
 
+#include <algorithm>
 #include <silicium/source/source.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>

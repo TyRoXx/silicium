@@ -5,6 +5,7 @@
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/optional.hpp>
+#include <algorithm>
 #include <boost/asio/io_service.hpp>
 #include <boost/coroutine/all.hpp>
 

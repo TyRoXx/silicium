@@ -2,6 +2,7 @@
 #define SILICIUM_SUCCESS_HPP
 
 #include <silicium/explicit_operator_bool.hpp>
+#include <boost/config.hpp>
 
 namespace Si
 {

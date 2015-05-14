@@ -560,13 +560,13 @@ namespace Si
 
 		BOOST_STATIC_ASSERT(are_copyable<>::value);
 		BOOST_STATIC_ASSERT(are_copyable<int>::value);
-		BOOST_STATIC_ASSERT(are_copyable<int BOOST_PP_COMMA() float>::value);
+		BOOST_STATIC_ASSERT((are_copyable<int, float>::value));
 
 		//In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
 		//so this assert would fail.
 #if SILICIUM_HAS_PROPER_COPY_TRAITS
 		//GCC 4.6 with Boost < 1.55 is also a problem
-		BOOST_STATIC_ASSERT(!are_copyable<int BOOST_PP_COMMA() std::unique_ptr<int>>::value);
+		BOOST_STATIC_ASSERT((!are_copyable<int, std::unique_ptr<int>>::value));
 #endif
 
 #if SILICIUM_COMPILER_HAS_USING
@@ -661,7 +661,7 @@ namespace Si
 #endif
 
 	BOOST_STATIC_ASSERT(is_handle<fast_variant<int>>::value);
-	BOOST_STATIC_ASSERT(is_handle<fast_variant<int, nothing>>::value);
+	BOOST_STATIC_ASSERT((is_handle<fast_variant<int, nothing>>::value));
 
 	template <class ...T>
 	bool operator != (fast_variant<T...> const &left, fast_variant<T...> const &right)
@@ -735,14 +735,14 @@ namespace Si
 	template <class Element, class ...T>
 	Element *try_get_ptr(fast_variant<T...> &from) BOOST_NOEXCEPT
 	{
-		BOOST_STATIC_ASSERT(boost::mpl::contains<boost::mpl::vector<T...>, Element>::value);
+		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
 
 	template <class Element, class ...T>
 	typename std::add_const<Element>::type *try_get_ptr(fast_variant<T...> const &from) BOOST_NOEXCEPT
 	{
-		BOOST_STATIC_ASSERT(boost::mpl::contains<boost::mpl::vector<T...>, Element>::value);
+		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
 

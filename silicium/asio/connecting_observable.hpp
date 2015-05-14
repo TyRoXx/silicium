@@ -3,6 +3,7 @@
 
 #include <silicium/exchange.hpp>
 #include <silicium/observable/observer.hpp>
+#include <algorithm>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace Si
