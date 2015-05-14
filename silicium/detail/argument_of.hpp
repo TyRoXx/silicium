@@ -34,7 +34,7 @@ namespace Si
 			typedef Argument type;
 		};
 
-		BOOST_STATIC_ASSERT(std::is_same<int, argument_of<void(*)(int)>::type>::value);
+		BOOST_STATIC_ASSERT((std::is_same<int, argument_of<void(*)(int)>::type>::value));
 	}
 }
 

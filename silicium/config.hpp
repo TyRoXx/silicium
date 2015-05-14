@@ -275,9 +275,12 @@ namespace Si
 	};
 #endif
 
-#if BOOST_VERSION == 105400
-	//uintptr_t is somehow missing from Boost 1.54
-	typedef std::uintptr_t uintptr_t;
+#if BOOST_VERSION <= 105400
+#	if defined(_MSC_VER) && (_MSC_VER < 1900)
+		typedef std::size_t uintptr_t;
+#	else
+		typedef std::uintptr_t uintptr_t;
+#	endif
 #else
 	typedef boost::uintptr_t uintptr_t;
 #endif
