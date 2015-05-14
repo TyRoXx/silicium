@@ -73,7 +73,7 @@
 	BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_BOX_METHOD, _, methods) \
 };
 
-#define SILICIUM_TRAIT(name, methods) struct name { \
+#define SILICIUM_SPECIALIZED_TRAIT(name, specialization, methods) struct name specialization { \
 	SILICIUM_DETAIL_MAKE_INTERFACE(interface, methods) \
 	SILICIUM_DETAIL_MAKE_ERASER(eraser, methods) \
 	SILICIUM_DETAIL_MAKE_BOX(box, methods) \
@@ -86,6 +86,8 @@
 		return box{Si::to_unique(erase(std::forward<Original>(original)))}; \
 	} \
 };
+
+#define SILICIUM_TRAIT(name, methods) SILICIUM_SPECIALIZED_TRAIT(name, , methods)
 
 typedef long element;
 
@@ -203,4 +205,20 @@ BOOST_AUTO_TEST_CASE(trait_eraser)
 	container.emplace_back(4);
 	BOOST_CHECK(!container.empty());
 	BOOST_CHECK_EQUAL(4, container.size());
+}
+
+template <class Signature>
+struct Callable;
+
+template <class Result, class A0>
+SILICIUM_SPECIALIZED_TRAIT(
+	Callable,
+	<Result(A0)>,
+	((operator(), (1, (A0)), Result))
+)
+
+BOOST_AUTO_TEST_CASE(trait_specialization)
+{
+	auto add_two = Callable<int(int)>::make_box([](int a) { return a + 2; });
+	BOOST_CHECK_EQUAL(3, add_two(1));
 }
