@@ -3,6 +3,7 @@
 
 #include <silicium/source/source.hpp>
 #include <silicium/sink/sink.hpp>
+#include <silicium/success.hpp>
 #include <vector>
 #include <string>
 #include <boost/filesystem/path.hpp>

@@ -3,6 +3,7 @@
 
 #include <silicium/sink/sink.hpp>
 #include <silicium/config.hpp>
+#include <silicium/success.hpp>
 
 namespace Si
 {

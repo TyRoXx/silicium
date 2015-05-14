@@ -106,23 +106,6 @@ namespace Si
 	{
 		return out.append(elements);
 	}
-
-	struct success
-	{
-		bool operator !() const BOOST_NOEXCEPT
-		{
-			return true;
-		}
-
-#ifdef BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT
-		BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
-#else
-		operator bool() const BOOST_NOEXCEPT
-		{
-			return !!*this;
-		}
-#endif
-	};
 }
 
 #endif
