@@ -48,7 +48,7 @@ namespace Si
 
 			provoke_event();
 
-			boost::asio::steady_timer timeout(io);
+			boost::asio::basic_waitable_timer<std::chrono::steady_clock> timeout(io);
 			timeout.expires_from_now(std::chrono::seconds(1));
 			timeout.async_wait([&io](boost::system::error_code)
 			{
@@ -360,7 +360,7 @@ namespace Si
 
 		boost::filesystem::rename(test_file_a.to_boost_path(), test_file_b.to_boost_path());
 
-		boost::asio::steady_timer timeout(io);
+		boost::asio::basic_waitable_timer<std::chrono::steady_clock> timeout(io);
 		timeout.expires_from_now(std::chrono::seconds(1));
 		timeout.async_wait([&io](boost::system::error_code)
 		{
