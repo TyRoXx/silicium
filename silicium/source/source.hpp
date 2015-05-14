@@ -1,6 +1,7 @@
 #ifndef SILICIUM_SOURCE_HPP
 #define SILICIUM_SOURCE_HPP
 
+#include <silicium/trait.hpp>
 #include <silicium/config.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/optional.hpp>
@@ -21,6 +22,15 @@ namespace Si
 		virtual iterator_range<element_type const *> map_next(std::size_t size) = 0;
 		virtual element_type *copy_next(iterator_range<element_type *> destination) = 0;
 	};
+
+	template <class Element>
+	SILICIUM_TRAIT_WITH_TYPEDEFS(
+		Source,
+		typedef Element element_type;
+		,
+		((map_next, (1, (std::size_t)), iterator_range<element_type const *>))
+		((copy_next, (1, (iterator_range<element_type *>)), element_type *))
+	)
 
 	template <class Source>
 	Si::optional<typename Source::element_type> get(Source &from)

@@ -29,9 +29,12 @@ namespace Si
 	};
 
 	template <class Element, class Error>
-	SILICIUM_TRAIT(
+	SILICIUM_TRAIT_WITH_TYPEDEFS(
 		Sink,
-		((append, (1, (iterator_range<Element const *>)), Error))
+		typedef Element element_type;
+		typedef Error error_type;
+		,
+		((append, (1, (iterator_range<element_type const *>)), error_type))
 	)
 
 	template <class Element, class Error = boost::system::error_code>

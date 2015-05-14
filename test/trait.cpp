@@ -126,6 +126,7 @@ template <class Result, class A0>
 SILICIUM_SPECIALIZED_TRAIT(
 	Callable,
 	<Result(A0)>,
+	,
 	((operator(), (1, (A0)), Result))
 )
 
@@ -133,4 +134,28 @@ BOOST_AUTO_TEST_CASE(trait_specialization)
 {
 	auto add_two = Callable<int(int)>::make_box([](int a) { return a + 2; });
 	BOOST_CHECK_EQUAL(3, add_two(1));
+}
+
+SILICIUM_TRAIT_WITH_TYPEDEFS(
+	WithTypedefs,
+	typedef float element_type;
+	,
+	((get, (0, ()), element_type))
+)
+
+struct impl_with_typedefs
+{
+	float get()
+	{
+		return 12.0f;
+	}
+};
+
+BOOST_AUTO_TEST_CASE(trait_with_typedefs)
+{
+	WithTypedefs::box b = WithTypedefs::make_box(impl_with_typedefs{});
+	BOOST_STATIC_ASSERT(std::is_same<float, WithTypedefs::eraser<impl_with_typedefs>::element_type>::value);
+	BOOST_STATIC_ASSERT(std::is_same<float, WithTypedefs::interface::element_type>::value);
+	BOOST_STATIC_ASSERT(std::is_same<float, WithTypedefs::box::element_type>::value);
+	BOOST_CHECK_EQUAL(12.0f, b.get());
 }

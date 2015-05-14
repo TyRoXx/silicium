@@ -27,8 +27,9 @@
 	BOOST_PP_TUPLE_ELEM(4, 3, elem) \
 	= 0;
 
-#define SILICIUM_DETAIL_MAKE_INTERFACE(name, methods) struct name { \
+#define SILICIUM_DETAIL_MAKE_INTERFACE(name, typedefs, methods) struct name { \
 	virtual ~name() {} \
+	typedefs \
 	BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_PURE_VIRTUAL_METHOD, _, methods) \
 };
 
@@ -57,24 +58,26 @@
 		); \
 		}
 
-#define SILICIUM_DETAIL_MAKE_ERASER(name, methods) template <class Original> struct name : interface { \
+#define SILICIUM_DETAIL_MAKE_ERASER(name, typedefs, methods) template <class Original> struct name : interface { \
+	typedefs \
 	Original original; \
 	SILICIUM_MOVABLE_MEMBER(name, original) \
 	explicit name(Original original) : original(std::move(original)) {} \
 	BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_ERASER_METHOD, _, methods) \
 };
 
-#define SILICIUM_DETAIL_MAKE_BOX(name, methods) struct box { \
+#define SILICIUM_DETAIL_MAKE_BOX(name, typedefs, methods) struct box { \
+	typedefs \
 	std::unique_ptr<interface> original; \
 	SILICIUM_MOVABLE_MEMBER(name, original) \
 	explicit name(std::unique_ptr<interface> original) BOOST_NOEXCEPT : original(std::move(original)) {} \
 	BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_BOX_METHOD, _, methods) \
 };
 
-#define SILICIUM_SPECIALIZED_TRAIT(name, specialization, methods) struct name specialization { \
-	SILICIUM_DETAIL_MAKE_INTERFACE(interface, methods) \
-	SILICIUM_DETAIL_MAKE_ERASER(eraser, methods) \
-	SILICIUM_DETAIL_MAKE_BOX(box, methods) \
+#define SILICIUM_SPECIALIZED_TRAIT(name, specialization, typedefs, methods) struct name specialization { \
+	SILICIUM_DETAIL_MAKE_INTERFACE(interface, typedefs, methods) \
+	SILICIUM_DETAIL_MAKE_ERASER(eraser, typedefs, methods) \
+	SILICIUM_DETAIL_MAKE_BOX(box, typedefs, methods) \
 	template <class Original> \
 	static eraser<typename std::decay<Original>::type> erase(Original &&original) { \
 		return eraser<typename std::decay<Original>::type>{std::forward<Original>(original)}; \
@@ -85,6 +88,8 @@
 		} \
 };
 
-#define SILICIUM_TRAIT(name, methods) SILICIUM_SPECIALIZED_TRAIT(name, , methods)
+#define SILICIUM_TRAIT(name, methods) SILICIUM_SPECIALIZED_TRAIT(name, , , methods)
+
+#define SILICIUM_TRAIT_WITH_TYPEDEFS(name, typedefs, methods) SILICIUM_SPECIALIZED_TRAIT(name, , typedefs, methods)
 
 #endif
