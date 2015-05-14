@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(trait_box)
 
 	container.emplace_back(3);
 	BOOST_CHECK(!container.empty());
-	BOOST_CHECK_EQUAL(1, container.size());
+	BOOST_CHECK_EQUAL(1u, container.size());
 }
 
 BOOST_AUTO_TEST_CASE(trait_eraser)
