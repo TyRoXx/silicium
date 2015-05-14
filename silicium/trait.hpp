@@ -4,6 +4,9 @@
 #include <silicium/to_unique.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/array/size.hpp>
+#include <boost/preprocessor/array/elem.hpp>
+#include <boost/preprocessor/enum_params.hpp>
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 #	define SILICIUM_MOVABLE_MEMBER(struct_name, member_name) \
