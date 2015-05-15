@@ -1,6 +1,12 @@
 #ifndef SILICIUM_COROUTINE_HPP
 #define SILICIUM_COROUTINE_HPP
 
+#include <boost/version.hpp>
+
+#define SILICIUM_HAS_COROUTINE_OBSERVABLE (BOOST_VERSION >= 105300)
+
+#if SILICIUM_HAS_COROUTINE_OBSERVABLE
+
 #include <silicium/exchange.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
@@ -180,5 +186,7 @@ namespace Si
 		return coroutine_observable<Element>(std::forward<Action>(action));
 	}
 }
+
+#endif
 
 #endif

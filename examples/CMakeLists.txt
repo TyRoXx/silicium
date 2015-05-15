@@ -12,8 +12,10 @@ target_link_libraries(trivialhttp ${Boost_LIBRARIES})
 add_executable(directory_watcher "directory_watcher.cpp")
 target_link_libraries(directory_watcher ${Boost_LIBRARIES})
 
-add_executable(sleep "sleep.cpp")
-target_link_libraries(sleep ${Boost_LIBRARIES})
+if(NOT (Boost_VERSION LESS 105300)) #Boost.Coroutine required
+	add_executable(sleep "sleep.cpp")
+	target_link_libraries(sleep ${Boost_LIBRARIES})
+endif()
 
 add_executable(http_hello "http_hello.cpp")
 target_link_libraries(http_hello ${Boost_LIBRARIES})

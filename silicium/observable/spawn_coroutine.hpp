@@ -1,6 +1,12 @@
 #ifndef SILICIUM_SPAWN_COROUTINE_HPP
 #define SILICIUM_SPAWN_COROUTINE_HPP
 
+#include <boost/version.hpp>
+
+#define SILICIUM_HAS_SPAWN_COROUTINE (BOOST_VERSION >= 105300)
+
+#if SILICIUM_HAS_SPAWN_COROUTINE
+
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/config.hpp>
@@ -267,5 +273,7 @@ namespace Si
 		s->start(std::forward<Function>(function));
 	}
 }
+
+#endif
 
 #endif

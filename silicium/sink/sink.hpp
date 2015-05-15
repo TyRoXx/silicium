@@ -7,7 +7,9 @@
 #include <silicium/utility.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/utility/string_ref.hpp>
+#if BOOST_VERSION >= 105300
+#	include <boost/utility/string_ref.hpp>
+#endif
 #if BOOST_VERSION >= 105500
 #	include <boost/utility/explicit_operator_bool.hpp>
 #endif
@@ -83,11 +85,13 @@ namespace Si
 		return out.append(make_iterator_range(str.data(), str.data() + str.size()));
 	}
 
+#if BOOST_VERSION >= 105300
 	template <class Sink, class Element, class CharTraits>
 	typename error_type<Sink>::type append(Sink &&out, boost::basic_string_ref<Element, CharTraits> const &str)
 	{
 		return out.append(make_memory_range(str));
 	}
+#endif
 
 	template <class Sink, class Element>
 	typename error_type<Sink>::type append(Sink &&out, Element const *c_str)

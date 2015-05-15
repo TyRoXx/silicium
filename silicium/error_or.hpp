@@ -5,7 +5,9 @@
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/mpl/bool.hpp>
 #include <system_error>
+#include <array>
 
 namespace Si
 {

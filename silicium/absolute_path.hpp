@@ -153,12 +153,12 @@ namespace Si
 
 	inline bool operator == (absolute_path const &left, boost::filesystem::path const &right)
 	{
-		return right.compare(left.c_str()) == 0;
+		return right == left.c_str();
 	}
 
 	inline bool operator == (boost::filesystem::path const &left, absolute_path const &right)
 	{
-		return left.compare(right.c_str()) == 0;
+		return left == right.c_str();
 	}
 
 	inline bool operator == (absolute_path const &left, absolute_path const &right)

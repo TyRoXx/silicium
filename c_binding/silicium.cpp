@@ -37,6 +37,7 @@ struct silicium_observable : Si::observable<void *, Si::ptr_observer<Si::observe
 	silicium_receiver receiver;
 };
 
+#if SILICIUM_HAS_COROUTINE_OBSERVABLE
 struct silicium_coroutine : silicium_observable
 {
 	template <class ...Args>
@@ -81,6 +82,7 @@ silicium_observable *silicium_make_coroutine(silicium_coroutine_function action,
 		return nullptr;
 	}
 }
+#endif
 
 extern "C"
 void silicium_async_get_one(silicium_observable *observable, silicium_observer_function callback, void *user_data)
@@ -97,7 +99,9 @@ void silicium_free_observable(silicium_observable *observable)
 	std::unique_ptr<silicium_observable>{observable};
 }
 
+#if SILICIUM_HAS_COROUTINE_OBSERVABLE
 void *silicium_yield_get_one(silicium_yield_context *yield, silicium_observable *from)
 {
 	return yield->get_one(Si::ref(*from)).get_value_or(nullptr);
 }
+#endif

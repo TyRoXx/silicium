@@ -6,7 +6,11 @@
 
 namespace Si
 {
+#ifdef BOOST_SCOPED_ENUM_DECLARE_BEGIN
 	BOOST_SCOPED_ENUM_DECLARE_BEGIN(file_notification_type)
+#else
+	enum class file_notification_type
+#endif
 	{
 		add,
 		remove,
@@ -16,7 +20,11 @@ namespace Si
 		change_metadata,
 		change_content_or_metadata
 	}
+#ifdef BOOST_SCOPED_ENUM_DECLARE_END
 	BOOST_SCOPED_ENUM_DECLARE_END(file_notification_type)
+#else
+	;
+#endif
 
 	struct file_notification
 	{
