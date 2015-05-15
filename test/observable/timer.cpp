@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(asio_timer)
 		BOOST_REQUIRE_EQUAL(0U, elapsed_count);
 		for (std::size_t i = 0; i < loop_count; ++i)
 		{
-			t.expires_from_now(std::chrono::microseconds(1));
+			t.expires_from_now(boost::chrono::microseconds(1));
 			boost::optional<Si::asio::timer_elapsed> e = yield.get_one(t);
 			BOOST_REQUIRE(e);
 			++elapsed_count;
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(asio_owning_timer)
 {
 	boost::asio::io_service io;
 	auto t = Si::asio::make_timer(io);
-	t.expires_from_now(std::chrono::microseconds(1));
+	t.expires_from_now(boost::chrono::microseconds(1));
 	auto observer = std::make_shared<test_observer>();
 	t.async_get_one(Si::any_ptr_observer<std::shared_ptr<test_observer>>(observer));
 	BOOST_CHECK(!observer->is_element);

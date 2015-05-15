@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/chrono/duration.hpp>
+#include <boost/chrono/system_clocks.hpp>
 
 namespace Si
 {
@@ -74,7 +75,7 @@ namespace Si
 			SILICIUM_DELETED_FUNCTION(timer &operator = (timer const &))
 		};
 
-		template <class AsioTimer = boost::asio::basic_waitable_timer<std::chrono::steady_clock>>
+		template <class AsioTimer = boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>
 		auto make_timer(boost::asio::io_service &io)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			-> timer<AsioTimer>

@@ -49,21 +49,23 @@ namespace
 	boost::system::error_code spawn_server(boost::asio::io_service &io)
 	{
 		boost::system::error_code ec;
-		boost::asio::ip::tcp::acceptor acceptor(io);
 
-		acceptor.open(boost::asio::ip::tcp::v4(), ec);
+		//use a unique_ptr to support older versions of Boost where acceptor was not movable
+		auto acceptor = Si::make_unique<boost::asio::ip::tcp::acceptor>(io);
+
+		acceptor->open(boost::asio::ip::tcp::v4(), ec);
 		if (ec)
 		{
 			return ec;
 		}
 
-		acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080), ec);
+		acceptor->bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080), ec);
 		if (ec)
 		{
 			return ec;
 		}
 
-		acceptor.listen(boost::asio::ip::tcp::acceptor::max_connections, ec);
+		acceptor->listen(boost::asio::ip::tcp::acceptor::max_connections, ec);
 		if (ec)
 		{
 			return ec;

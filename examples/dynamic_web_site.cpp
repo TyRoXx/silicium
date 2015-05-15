@@ -81,7 +81,8 @@ int main()
 	Si::spawn_observable(
 		Si::transform(
 			Si::asio::make_tcp_acceptor(
-				boost::asio::ip::tcp::acceptor(
+				//use a unique_ptr to support older versions of Boost where acceptor was not movable
+				Si::make_unique<boost::asio::ip::tcp::acceptor>(
 					io,
 					boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080)
 				)

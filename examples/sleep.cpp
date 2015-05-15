@@ -2,7 +2,6 @@
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/ref.hpp>
 #include <iostream>
-#include <chrono>
 
 template <class YieldContext, class Duration>
 void sleep(boost::asio::io_service &io, YieldContext &&yield, Duration duration)
@@ -21,7 +20,7 @@ int main()
 	Si::spawn_coroutine([&io](Si::spawn_context yield)
 	{
 		std::cout << "Going to sleep" << std::endl;
-		sleep(io, yield, std::chrono::seconds(1));
+		sleep(io, yield, boost::chrono::seconds(1));
 		std::cout << "Waking up\n";
 	});
 	io.run();

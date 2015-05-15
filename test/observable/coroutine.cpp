@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(spawn_coroutine_get_one)
 	{
 		BOOST_REQUIRE(!elapsed);
 		auto timer = Si::asio::make_timer(io);
-		timer.expires_from_now(std::chrono::microseconds(1));
+		timer.expires_from_now(boost::chrono::microseconds(1));
 		Si::optional<Si::asio::timer_elapsed> e = yield.get_one(Si::ref(timer));
 		BOOST_CHECK(e);
 		BOOST_REQUIRE(!elapsed);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(spawn_observable)
 			Si::make_limited_observable([&io]()
 			{
 				auto timer = Si::asio::make_timer(io);
-				timer.expires_from_now(std::chrono::microseconds(1));
+				timer.expires_from_now(boost::chrono::microseconds(1));
 				return timer;
 			}(), 1ull),
 			[&elapsed](Si::asio::timer_elapsed)
