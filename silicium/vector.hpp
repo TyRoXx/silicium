@@ -32,7 +32,8 @@ namespace Si
 		SILICIUM_DISABLE_COPY(vector)
 
 		vector(std::initializer_list<Element> elements)
-			: m_impl(elements)
+			//Boost 1.56 is missing the initializer_list ctor
+			: m_impl(elements.begin(), elements.end())
 		{
 		}
 
