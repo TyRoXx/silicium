@@ -11,19 +11,6 @@
 namespace Si
 {
 	template <class Element>
-	struct source
-	{
-		typedef Element element_type;
-
-		virtual ~source()
-		{
-		}
-
-		virtual iterator_range<element_type const *> map_next(std::size_t size) = 0;
-		virtual element_type *copy_next(iterator_range<element_type *> destination) = 0;
-	};
-
-	template <class Element>
 	SILICIUM_TRAIT_WITH_TYPEDEFS(
 		Source,
 		typedef Element element_type;
@@ -31,6 +18,9 @@ namespace Si
 		((map_next, (1, (std::size_t)), iterator_range<element_type const *>))
 		((copy_next, (1, (iterator_range<element_type *>)), element_type *))
 	)
+
+	template <class Element>
+	using source = typename Source<Element>::interface;
 
 	template <class Source>
 	Si::optional<typename Source::element_type> get(Source &from)

@@ -19,7 +19,7 @@ namespace
 			Si::asio::socket_source receiver(*client, yield);
 			Si::asio::socket_sink sender(*client, yield);
 			auto buffered_sender = Si::make_buffering_sink(Si::ref_sink(sender));
-			auto buffered_receiver = receiver | Si::buffered(4096);
+			auto buffered_receiver = Si::make_buffer<char>(receiver, 4096);
 			Si::optional<Si::http::request> const header = Si::http::parse_request(buffered_receiver);
 			if (!header)
 			{
@@ -62,7 +62,7 @@ int main()
 	boost::asio::spawn(io, [&acceptor](boost::asio::yield_context yield)
 	{
 		Si::asio::accepting_source clients(acceptor, yield);
-		for (auto client : clients | Si::buffered(1))
+		for (auto client : Si::make_buffer<Si::asio::accepting_source::element_type>(clients, 1))
 		{
 			boost::asio::spawn(acceptor.get_io_service(), std::bind(serve_client, client, std::placeholders::_1));
 		}

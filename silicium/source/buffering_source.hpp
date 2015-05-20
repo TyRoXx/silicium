@@ -103,25 +103,6 @@ namespace Si
 		return buffering_source<Element>(buffered, capacity);
 	}
 
-	namespace detail
-	{
-		struct buffered_options
-		{
-			std::size_t capacity;
-		};
-	}
-
-	inline detail::buffered_options buffered(std::size_t capacity)
-	{
-		return detail::buffered_options{capacity};
-	}
-
-	template <class Element>
-	buffering_source<Element> operator | (source<Element> &buffered, detail::buffered_options options)
-	{
-		return make_buffer(buffered, options.capacity);
-	}
-
 	template <class Element>
 	struct mutable_source_iterator SILICIUM_FINAL : boost::iterator_facade<mutable_source_iterator<Element>, Element, std::input_iterator_tag>
 	{

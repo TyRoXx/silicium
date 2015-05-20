@@ -104,7 +104,7 @@ namespace Si
 		{
 			return next++;
 		}));
-		auto buffer = Si::make_buffer(source, 2);
+		auto buffer = Si::make_buffer<int>(source, 2);
 		for (int i = 0; i < 10; ++i)
 		{
 			BOOST_REQUIRE(i == Si::get(buffer));
