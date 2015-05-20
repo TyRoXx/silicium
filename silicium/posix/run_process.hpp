@@ -15,12 +15,12 @@ namespace Si
 {
 	namespace detail
 	{
-		template <class Error>
-		inline void copy_all(int source, sink<char, Error> &destination)
+		template <class CharSink>
+		inline void copy_all(int source, CharSink &&destination)
 		{
 			for (;;)
 			{
-				auto buffer_helper = make_buffering_sink(ref_sink(destination));
+				auto buffer_helper = make_buffering_sink(std::forward<CharSink>(destination));
 				auto const buffer = buffer_helper.make_append_space(std::numeric_limits<std::size_t>::max());
 				assert(!buffer.empty());
 				auto const rc = read(source, buffer.begin(), buffer.size());
@@ -144,7 +144,7 @@ namespace Si
 			if (parameters.out)
 			{
 				stdout.write.close();
-				detail::copy_all(stdout.read.handle, *parameters.out);
+				detail::copy_all(stdout.read.handle, ref_sink(*parameters.out));
 			}
 			stdin.read.close();
 

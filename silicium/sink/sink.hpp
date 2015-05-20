@@ -17,19 +17,6 @@
 
 namespace Si
 {
-	template <class Element, class Error = boost::system::error_code>
-	struct sink
-	{
-		typedef Element element_type;
-		typedef Error error_type;
-
-		virtual ~sink()
-		{
-		}
-
-		virtual error_type append(iterator_range<element_type const *> data) = 0;
-	};
-
 	template <class Element, class Error>
 	SILICIUM_TRAIT_WITH_TYPEDEFS(
 		Sink,
@@ -38,6 +25,9 @@ namespace Si
 		,
 		((append, (1, (iterator_range<element_type const *>)), error_type))
 	)
+
+	template <class Element, class Error = boost::system::error_code>
+	using sink = typename Sink<Element, Error>::interface;
 
 	template <class Element, class Error = boost::system::error_code>
 	struct null_sink
