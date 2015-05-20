@@ -1,7 +1,8 @@
-#ifndef SILICIUM_REACTIVE_CONSUME_HPP
-#define SILICIUM_REACTIVE_CONSUME_HPP
+#ifndef SILICIUM_CONSUME_HPP
+#define SILICIUM_CONSUME_HPP
 
 #include <silicium/observable/observable.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <utility>
 

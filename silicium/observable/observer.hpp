@@ -1,5 +1,5 @@
-#ifndef SILICIUM_REACTIVE_OBSERVER_HPP
-#define SILICIUM_REACTIVE_OBSERVER_HPP
+#ifndef SILICIUM_OBSERVER_HPP
+#define SILICIUM_OBSERVER_HPP
 
 #include <utility>
 #include <cassert>

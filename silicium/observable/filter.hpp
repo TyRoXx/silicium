@@ -2,6 +2,7 @@
 #define SILICIUM_FILTER_OBSERVABLE_HPP
 
 #include <silicium/observable/observable.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/proper_value_function.hpp>
 #include <cassert>
