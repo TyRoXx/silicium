@@ -138,6 +138,7 @@
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>
 #include <silicium/utility.hpp>
+#include <silicium/vector.hpp>
 #include <silicium/version.hpp>
 #include <silicium/win32/directory_changes.hpp>
 #include <silicium/win32/dynamic_library_impl.hpp>

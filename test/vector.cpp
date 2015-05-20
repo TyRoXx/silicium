@@ -23,14 +23,14 @@ BOOST_AUTO_TEST_CASE(vector_emplace_back)
 {
 	Si::vector<int> v;
 	v.emplace_back(2);
-	BOOST_CHECK_EQUAL(1, v.size());
+	BOOST_CHECK_EQUAL(1u, v.size());
 }
 
 BOOST_AUTO_TEST_CASE(vector_copy)
 {
 	Si::vector<int> v{1, 2, 3};
 	Si::vector<int> w = v.copy();
-	BOOST_CHECK_EQUAL(3, w.size());
+	BOOST_CHECK_EQUAL(3u, w.size());
 	BOOST_CHECK(v == w);
 }
 
