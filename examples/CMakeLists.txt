@@ -25,3 +25,6 @@ target_link_libraries(dynamic_web_site ${Boost_LIBRARIES})
 
 add_executable(variant "variant.cpp")
 target_link_libraries(variant ${Boost_LIBRARIES})
+
+add_executable(silicium_build_tester "silicium_build_tester.cpp")
+target_link_libraries(silicium_build_tester ${Boost_LIBRARIES})
