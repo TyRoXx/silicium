@@ -41,7 +41,7 @@ namespace Si
 	};
 
 	template <class Input, class Handler>
-	auto on_first(Input &&input, Handler &&handle_element)
+	SILICIUM_DEPRECATED auto on_first(Input &&input, Handler &&handle_element)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>
 #endif

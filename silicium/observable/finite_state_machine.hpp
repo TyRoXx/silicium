@@ -9,7 +9,7 @@
 namespace Si
 {
 	template <class In, class State, class Step>
-	struct finite_state_machine
+	struct SILICIUM_DEPRECATED finite_state_machine
 		: private observer<typename In::element_type>
 	{
 		typedef State element_type;

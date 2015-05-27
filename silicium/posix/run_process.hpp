@@ -38,6 +38,7 @@ namespace Si
 		}
 	}
 
+	SILICIUM_DEPRECATED
 	inline int run_process(process_parameters const &parameters)
 	{
 		auto executable = parameters.executable.string();

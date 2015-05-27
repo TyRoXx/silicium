@@ -35,9 +35,6 @@ if(MSVC)
 	#we want more warnings
 	add_definitions("/W4")
 
-	#disable "'std::_Copy_n': Function call with parameters that may be unsafe"
-	add_definitions("/wd4996")
-
 	add_definitions("-DBOOST_ALL_NO_LIB")
 	
 	#Boost Asio uses deprecated Winsock APIs, but we are not interested in warnings about that
