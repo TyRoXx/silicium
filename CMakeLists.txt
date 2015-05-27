@@ -39,6 +39,18 @@ if(MSVC)
 	add_definitions("/wd4996")
 
 	add_definitions("-DBOOST_ALL_NO_LIB")
+	
+	#Boost Asio uses deprecated Winsock APIs, but we are not interested in warnings about that
+	add_definitions("-D_WINSOCK_DEPRECATED_NO_WARNINGS")
+
+	#SILICIUM_TRAIT triggers warnings about missing arguments for the macro BOOST_PP_EXPAND_I (maybe a VC++ 2013 bug?)
+	add_definitions("/wd4003")
+
+	#Boost future has unreachable code for no reason
+	add_definitions("/wd4702")
+	
+	#Boost in_place triggers /W4 warning about an assignment operator that could not be generated
+	add_definitions("/wd4512")
 
 	#workaround for Boost 1.55 Context error LNK2026
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
