@@ -28,3 +28,10 @@ target_link_libraries(variant ${Boost_LIBRARIES})
 
 add_executable(silicium_build_tester "silicium_build_tester.cpp")
 target_link_libraries(silicium_build_tester ${Boost_LIBRARIES})
+
+if(SILICIUM_HAS_WEBSOCKETPP)
+	add_executable(websocketpp "websocketpp.cpp")
+	target_compile_options(websocketpp PRIVATE "-Wno-conversion")
+	target_compile_options(websocketpp PRIVATE "-Wno-unused-parameter")
+	target_link_libraries(websocketpp ${Boost_LIBRARIES})
+endif()

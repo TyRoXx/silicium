@@ -1,0 +1,3 @@
+[submodule "dependencies/websocketpp"]
+	path = dependencies/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
