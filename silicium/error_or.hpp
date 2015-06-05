@@ -204,8 +204,11 @@ namespace Si
 
 		Error error() const BOOST_NOEXCEPT
 		{
-			assert(is_error());
-			return Error(code, *category);
+			if (is_error())
+			{
+				return Error(code, *category);
+			}
+			return {};
 		}
 
 		void throw_if_error() const

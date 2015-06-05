@@ -12,6 +12,7 @@ BOOST_AUTO_TEST_CASE(error_or_from_value)
 	Si::error_or<int> value(2);
 	BOOST_CHECK(!value.is_error());
 	BOOST_REQUIRE(value.get_ptr());
+	BOOST_CHECK_EQUAL(boost::system::error_code(), value.error());
 	BOOST_CHECK_EQUAL(2, *value.get_ptr());
 	BOOST_CHECK_EQUAL(2, value.get());
 }
@@ -41,6 +42,7 @@ BOOST_AUTO_TEST_CASE(error_or_movable_only)
 	std::unique_ptr<int> v = std::move(value.get());
 	BOOST_CHECK(!value.get());
 	BOOST_CHECK(!value.is_error());
+	BOOST_CHECK_EQUAL(boost::system::error_code(), value.error());
 	BOOST_CHECK_EQUAL(2, *v);
 }
 
