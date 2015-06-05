@@ -143,7 +143,7 @@ namespace Si
 		Si::absolute_path const test_file = watched_dir / "test.txt";
 		
 		boost::filesystem::create_directories(watched_dir.to_boost_path());
-		Si::file_handle file = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::overwrite_file(test_file.to_boost_path()).get());
+		Si::file_handle file = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::overwrite_file(Si::native_path_string(test_file.c_str())).get());
 
 		test_single_event(
 			watched_dir,

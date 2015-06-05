@@ -36,7 +36,13 @@ namespace Si
 			reinterpret_cast<DestType *>(end)
 		);
 	}
-	
+
+	template <class Byte>
+	auto make_memory_range(Byte *data, std::size_t size)
+	{
+		return make_memory_range(data, data + size);
+	}
+
 	template <class ContiguousRange>
 	auto make_memory_range(ContiguousRange &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE

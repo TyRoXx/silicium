@@ -1,24 +1,22 @@
 #ifndef SILICIUM_WRITE_FILE_HPP
 #define SILICIUM_WRITE_FILE_HPP
 
-#include <silicium/config.hpp>
-#include <boost/filesystem/path.hpp>
-#include <fstream>
+#include <silicium/open.hpp>
+#include <silicium/c_string.hpp>
+#include <silicium/sink/file_sink.hpp>
 
 namespace Si
 {
-	inline void write_file(boost::filesystem::path const &name, char const *data, std::size_t size)
+	SILICIUM_USE_RESULT
+	boost::system::error_code write_file(native_path_string name, char const *data, std::size_t size)
 	{
-		std::ofstream file(name.string(), std::ios::binary);
-		if (!file)
+		Si::error_or<Si::file_handle> const file = Si::overwrite_file(name);
+		if (file.is_error())
 		{
-			throw std::runtime_error("Could not open file " + name.string() + " for writing");
+			return file.error();
 		}
-		file.write(data, size);
-		if (!file)
-		{
-			throw std::runtime_error("Could not write to file " + name.string());
-		}
+		Si::file_sink sink(file.get().handle);
+		return Si::append(sink, Si::file_sink_element{Si::make_memory_range(data, size)});
 	}
 }
 

@@ -15,14 +15,14 @@ namespace
 BOOST_AUTO_TEST_CASE(file_size_empty)
 {
 	auto const file = test_root() / "file_size_empty.txt";
-	Si::file_handle handle = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::overwrite_file(file).get());
+	Si::file_handle handle = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::overwrite_file(Si::native_path_string(file.c_str())).get());
 	BOOST_CHECK_EQUAL(Si::make_optional<boost::uintmax_t>(0), Si::file_size(handle.handle).get());
 }
 
 BOOST_AUTO_TEST_CASE(file_size_non_empty)
 {
 	auto const file = test_root() / "file_size_non_empty.txt";
-	Si::file_handle handle = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::overwrite_file(file).get());
+	Si::file_handle handle = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::overwrite_file(Si::native_path_string(file.c_str())).get());
 	{
 		Si::file_sink sink(handle.handle);
 		Si::append(sink, Si::file_sink::element_type{Si::make_c_str_range("Test")});
