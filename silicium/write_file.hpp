@@ -7,7 +7,7 @@
 
 namespace Si
 {
-	SILICIUM_DEPRECATED inline void write_file(boost::filesystem::path const &name, char const *data, std::size_t size)
+	inline void write_file(boost::filesystem::path const &name, char const *data, std::size_t size)
 	{
 		std::ofstream file(name.string(), std::ios::binary);
 		if (!file)

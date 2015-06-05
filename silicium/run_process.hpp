@@ -9,7 +9,6 @@
 
 namespace Si
 {
-	SILICIUM_DEPRECATED
 	inline int run_process(
 		boost::filesystem::path executable,
 		std::vector<std::string> arguments,
