@@ -94,6 +94,11 @@ namespace Si
 		{
 			return make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor)));
 		}
+
+		inline auto make_tcp_acceptor(boost::asio::io_service &io, boost::asio::ip::tcp::endpoint endpoint)
+		{
+			return make_tcp_acceptor(make_unique<boost::asio::ip::tcp::acceptor>(io, endpoint));
+		}
 	}
 }
 
