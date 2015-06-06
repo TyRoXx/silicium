@@ -9,6 +9,7 @@
 #include <iostream>
 #include <array>
 #include <boost/program_options.hpp>
+#include <boost/asio/spawn.hpp>
 
 namespace
 {
@@ -184,6 +185,13 @@ namespace
 			serve_web_client(*client, repository, repository_cache, yield);
 		});
 	}
+
+	std::shared_ptr<boost::asio::ip::tcp::socket> async_accept(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context yield)
+	{
+		auto client = std::make_shared<boost::asio::ip::tcp::socket>(acceptor.get_io_service());
+		acceptor.async_accept(*client, yield);
+		return client;
+	}
 }
 
 int main(int argc, char **argv)
@@ -231,12 +239,12 @@ int main(int argc, char **argv)
 	Si::absolute_path const absolute_cache = *Si::absolute_path::create(boost::filesystem::absolute(cache));
 
 	boost::asio::io_service io;
-	Si::spawn_coroutine([&io, listen_port, &repository, &absolute_cache](Si::spawn_context yield)
+	boost::asio::spawn(io, [&io, listen_port, &repository, &absolute_cache](boost::asio::yield_context yield)
 	{
-		auto acceptor = Si::asio::make_tcp_acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
+		boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
 		for (;;)
 		{
-			std::shared_ptr<boost::asio::ip::tcp::socket> client = (*yield.get_one(Si::ref(acceptor))).get();
+			std::shared_ptr<boost::asio::ip::tcp::socket> client = async_accept(acceptor, yield);
 			handle_client(std::move(client), repository, absolute_cache);
 		}
 	});
