@@ -4,8 +4,8 @@
 #include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
-#include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/absolute_path.hpp>
+#include <silicium/asio/socket_source.hpp>
 #include <iostream>
 #include <array>
 #include <boost/program_options.hpp>
@@ -13,8 +13,16 @@
 
 namespace
 {
-	void respond(boost::asio::ip::tcp::socket &client, Si::memory_range status, Si::memory_range status_text, Si::memory_range content, Si::spawn_context &yield)
+	template <class YieldContext>
+	void respond(boost::asio::ip::tcp::socket &client, Si::memory_range status, Si::memory_range status_text, Si::memory_range content, YieldContext yield)
 	{
+		boost::system::error_code error;
+		auto const remote_endpoint = client.remote_endpoint(error);
+		if (!!error)
+		{
+			std::cerr << "Client disconnected\n";
+			return;
+		}
 		std::vector<char> response;
 		auto const response_sink = Si::make_container_sink(response);
 		Si::http::generate_status_line(response_sink, "HTTP/1.1", status, status_text);
@@ -22,16 +30,16 @@ namespace
 		Si::http::generate_header(response_sink, "Content-Type", "text/html");
 		Si::http::finish_headers(response_sink);
 		Si::append(response_sink, content);
-		boost::system::error_code error = Si::asio::write(client, Si::make_memory_range(response), yield);
+		boost::asio::async_write(client, boost::asio::buffer(response), yield[error]);
 		if (!!error)
 		{
-			std::cerr << "Could not respond to " << client.remote_endpoint() << ": " << error << '\n';
+			std::cerr << "Could not respond to " << remote_endpoint << ": " << error << '\n';
 			return;
 		}
 		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 		if (!!error)
 		{
-			std::cerr << "Could not shutdown connection to " << client.remote_endpoint() << ": " << error << '\n';
+			std::cerr << "Could not shutdown connection to " << remote_endpoint << ": " << error << '\n';
 		}
 	}
 
@@ -128,20 +136,35 @@ namespace
 		}
 	}
 
+	template <class YieldContext>
 	void serve_web_client(
 		boost::asio::ip::tcp::socket &client,
 		std::string const &repository,
 		Si::absolute_path const &repository_cache,
-		Si::spawn_context &yield)
+		YieldContext yield)
 	{
-		Si::error_or<Si::optional<Si::http::request>> const received = Si::http::receive_request(client, yield);
-		if (received.is_error())
+		Si::asio::basic_socket_source<YieldContext> receiver(client, yield);
+		Si::optional<Si::http::request> maybe_request;
+		boost::system::error_code error;
+		auto const remote_endpoint = client.remote_endpoint(error);
+		if (!!error)
 		{
-			std::cerr << "Error when receiving request from " << client.remote_endpoint() << ": " << received.error() << '\n';
+			std::cerr << "Client disconnected\n";
 			return;
 		}
 
-		Si::optional<Si::http::request> const &maybe_request = received.get();
+		//TODO: do this without an exception
+		try
+		{
+			//TODO: virtualize_source should not be necessary here
+			maybe_request = Si::http::parse_request(Si::virtualize_source(Si::ref_source(receiver)));
+		}
+		catch (boost::system::system_error const &ex)
+		{
+			std::cerr << "Error when receiving request from " << remote_endpoint << ": " << ex.code() << '\n';
+			return;
+		}
+
 		if (!maybe_request)
 		{
 			return respond(client, Si::make_c_str_range("400"), Si::make_c_str_range("Bad Request"), Si::make_c_str_range("the server could not parse the request"), yield);
@@ -180,10 +203,16 @@ namespace
 		Si::absolute_path const &repository_cache)
 	{
 		assert(client);
-		Si::spawn_coroutine([client = std::move(client), &repository, &repository_cache](Si::spawn_context yield)
+		auto on_exit = []()
 		{
-			serve_web_client(*client, repository, repository_cache, yield);
-		});
+		};
+		boost::asio::spawn(
+			on_exit,
+			[client = std::move(client), &repository, &repository_cache](boost::asio::basic_yield_context<decltype(on_exit) &> yield)
+			{
+				serve_web_client(*client, repository, repository_cache, yield);
+			}
+		);
 	}
 
 	std::shared_ptr<boost::asio::ip::tcp::socket> async_accept(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context yield)
