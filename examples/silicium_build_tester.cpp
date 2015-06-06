@@ -24,14 +24,21 @@ namespace
 			std::cerr << "Client disconnected\n";
 			return;
 		}
+
 		std::vector<char> response;
 		auto const response_sink = Si::make_container_sink(response);
 		Si::http::generate_status_line(response_sink, "HTTP/1.1", status, status_text);
 		Si::http::generate_header(response_sink, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
 		Si::http::generate_header(response_sink, "Content-Type", "text/html");
 		Si::http::finish_headers(response_sink);
-		Si::append(response_sink, content);
-		boost::asio::async_write(client, boost::asio::buffer(response), yield[error]);
+
+		std::array<boost::asio::const_buffer, 2> const write_data =
+		{{
+			boost::asio::buffer(response),
+			boost::asio::buffer(content.begin(), content.size())
+		}};
+
+		boost::asio::async_write(client, write_data, yield[error]);
 		if (!!error)
 		{
 			std::cerr << "Could not respond to " << remote_endpoint << ": " << error << '\n';
