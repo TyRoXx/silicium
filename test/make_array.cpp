@@ -48,7 +48,11 @@ BOOST_AUTO_TEST_CASE(make_array_explicit_type)
 		BOOST_CHECK_EQUAL(3, d[2]);
 	}
 	{
-		std::array<long long, 1> a = Si::make_array<long long>(1);
-		BOOST_CHECK_EQUAL(1, a[0]);
+		std::array<long long, 1> e = Si::make_array<long long>(1);
+		BOOST_CHECK_EQUAL(1, e[0]);
+	}
+	{
+		std::array<int, 0> f = Si::make_array<int>();
+		BOOST_CHECK_EQUAL(0, f.size());
 	}
 }
