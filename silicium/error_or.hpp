@@ -263,16 +263,6 @@ namespace Si
 			return value_ptr();
 		}
 
-		Value *operator -> ()
-		{
-			return &get();
-		}
-
-		Value const *operator -> () const
-		{
-			return &get();
-		}
-
 		optional<Value> get_optional()
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 			&&
