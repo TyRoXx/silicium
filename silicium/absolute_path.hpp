@@ -3,6 +3,7 @@
 
 #include <silicium/relative_path.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/error_or.hpp>
 #include <silicium/is_handle.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <iostream>
@@ -238,6 +239,20 @@ namespace Si
 		boost::system::error_code ec;
 		boost::filesystem::remove(name.to_boost_path(), ec);
 		return ec;
+	}
+
+	inline boost::system::error_code create_directories(absolute_path const &directories)
+	{
+		boost::system::error_code ec;
+		boost::filesystem::create_directories(directories.to_boost_path(), ec);
+		return ec;
+	}
+
+	inline bool file_exists(absolute_path const &file)
+	{
+		boost::system::error_code ec;
+		bool exists = boost::filesystem::exists(file.to_boost_path(), ec);
+		return exists;
 	}
 }
 

@@ -5,7 +5,9 @@
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/absolute_path.hpp>
 #include <iostream>
+#include <array>
 #include <boost/program_options.hpp>
 
 namespace
@@ -34,9 +36,77 @@ namespace
 		}
 	}
 
-	void trigger_build()
+	bool handle_error(boost::system::error_code error, char const *message)
 	{
-		std::cerr << "Build triggered (TODO)\n";
+		if (error)
+		{
+			std::cerr << message << ": " << error << '\n';
+			return true;
+		}
+		return false;
+	}
+
+	void clone(
+		std::string const &repository,
+		Si::absolute_path const &repository_cache)
+	{
+		Si::async_process_parameters parameters;
+		parameters.executable = *Si::absolute_path::create("/usr/bin/git");
+		parameters.arguments.emplace_back("clone");
+		parameters.arguments.emplace_back(repository.c_str());
+		parameters.arguments.emplace_back(repository_cache.c_str());
+		parameters.current_path = repository_cache;
+		auto output = Si::make_pipe().get();
+		auto input = Si::make_pipe().get();
+		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle);
+		if (handle_error(maybe_process.error(), "Could not create git process"))
+		{
+			return;
+		}
+		input.read.close();
+		output.write.close();
+		Si::async_process &process = maybe_process.get();
+		for (;;)
+		{
+			std::array<char, 8192> read_buffer;
+			ssize_t const read_result = read(output.read.handle, read_buffer.data(), read_buffer.size());
+			if (read_result < 0)
+			{
+				int errno_ = errno;
+				boost::system::error_code error(errno_, boost::system::get_system_category());
+				std::cerr << "Reading the output of the process failed with " << error << '\n';
+				break;
+			}
+			if (read_result == 0)
+			{
+				//end of output
+				break;
+			}
+			std::cerr.write(read_buffer.data(), read_result);
+		}
+		int const result = process.wait_for_exit().get();
+		if (result != 0)
+		{
+			std::cerr << "Git clone failed\n";
+			return;
+		}
+	}
+
+	void trigger_build(
+		std::string const &repository,
+		Si::absolute_path const &repository_cache)
+	{
+		if (handle_error(Si::create_directories(repository_cache), "Could not create repository cache directory"))
+		{
+			return;
+		}
+
+		if (!Si::file_exists(repository_cache / Si::relative_path(".git")))
+		{
+			std::cerr << "The cache does not exist. Doing an initial clone of " << repository << "\n";
+			clone(repository, repository_cache);
+			std::cerr << "Created initial clone of the repository\n";
+		}
 	}
 }
 
@@ -82,15 +152,17 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	Si::absolute_path const absolute_cache = *Si::absolute_path::create(boost::filesystem::absolute(cache));
+
 	boost::asio::io_service io;
-	Si::spawn_coroutine([&io, listen_port](Si::spawn_context yield)
+	Si::spawn_coroutine([&io, listen_port, &repository, &absolute_cache](Si::spawn_context yield)
 	{
 		auto acceptor = Si::asio::make_tcp_acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
 		for (;;)
 		{
 			std::shared_ptr<boost::asio::ip::tcp::socket> client = (*yield.get_one(Si::ref(acceptor))).get();
 			assert(client);
-			Si::spawn_coroutine([client = std::move(client)](Si::spawn_context yield)
+			Si::spawn_coroutine([client = std::move(client), &repository, &absolute_cache](Si::spawn_context yield)
 			{
 				Si::error_or<Si::optional<Si::http::request>> const received = Si::http::receive_request(*client, yield);
 				if (received.is_error())
@@ -118,7 +190,7 @@ int main(int argc, char **argv)
 
 				if (request.method == "POST")
 				{
-					trigger_build();
+					trigger_build(repository, absolute_cache);
 				}
 
 				char const * const page =
