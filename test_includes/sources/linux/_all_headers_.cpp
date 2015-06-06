@@ -51,6 +51,7 @@
 #include <silicium/linux/inotify_watch_descriptor.hpp>
 #include <silicium/linux/process_handle.hpp>
 #include <silicium/linux/single_directory_watcher.hpp>
+#include <silicium/make_array.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/move.hpp>
 #include <silicium/move_if_noexcept.hpp>

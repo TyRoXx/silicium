@@ -7,6 +7,7 @@
 #include <silicium/absolute_path.hpp>
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/html.hpp>
+#include <silicium/make_array.hpp>
 #include <iostream>
 #include <array>
 #include <boost/program_options.hpp>
@@ -32,11 +33,10 @@ namespace
 		Si::http::generate_header(response_sink, "Content-Type", "text/html");
 		Si::http::finish_headers(response_sink);
 
-		std::array<boost::asio::const_buffer, 2> const write_data =
-		{{
+		auto const write_data = Si::make_array<boost::asio::const_buffer>(
 			boost::asio::buffer(response),
 			boost::asio::buffer(content.begin(), content.size())
-		}};
+		);
 
 		boost::asio::async_write(client, write_data, yield[error]);
 		if (!!error)
