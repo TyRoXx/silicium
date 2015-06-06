@@ -6,6 +6,7 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <iostream>
+#include <boost/program_options.hpp>
 
 namespace
 {
@@ -39,12 +40,52 @@ namespace
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
-	boost::asio::io_service io;
-	Si::spawn_coroutine([&io](Si::spawn_context yield)
+	std::string repository;
+	std::string cache;
+	boost::uint16_t listen_port = 8080;
+
+	boost::program_options::options_description options("options");
+	options.add_options()
+		("help,h", "produce help message")
+		("repository,r", boost::program_options::value(&repository), "the Git URI to clone from")
+		("cache,c", boost::program_options::value(&cache), "the directory to use as a cache for the repository")
+		("port,p", boost::program_options::value(&listen_port), "the port to listen on for HTTP requests")
+		;
+	boost::program_options::positional_options_description positional;
+	positional.add("repository", 1);
+	positional.add("cache", 1);
+	boost::program_options::variables_map variables;
+	try
 	{
-		auto acceptor = Si::asio::make_tcp_acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
+		boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(options).positional(positional).run(), variables);
+		boost::program_options::notify(variables);
+	}
+	catch (boost::program_options::error const &ex)
+	{
+		std::cerr << options << '\n';
+		std::cerr << ex.what() << '\n';
+		return 1;
+	}
+
+	if (variables.count("help"))
+	{
+		std::cerr << options << '\n';
+		return 0;
+	}
+
+	if (repository.empty() || cache.empty())
+	{
+		std::cerr << options << '\n';
+		std::cerr << "Missing option\n";
+		return 1;
+	}
+
+	boost::asio::io_service io;
+	Si::spawn_coroutine([&io, listen_port](Si::spawn_context yield)
+	{
+		auto acceptor = Si::asio::make_tcp_acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
 		for (;;)
 		{
 			std::shared_ptr<boost::asio::ip::tcp::socket> client = (*yield.get_one(Si::ref(acceptor))).get();
