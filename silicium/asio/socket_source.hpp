@@ -12,36 +12,42 @@ namespace Si
 {
 	namespace asio
 	{
-		struct socket_source : Si::source<char>
+		template <class YieldContext>
+		struct basic_socket_source : Si::source<char>
 		{
-			explicit socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
+			explicit basic_socket_source(boost::asio::ip::tcp::socket &socket, YieldContext &yield);
 			virtual iterator_range<char const *> map_next(std::size_t size) SILICIUM_OVERRIDE;
 			virtual char *copy_next(iterator_range<char *> destination) SILICIUM_OVERRIDE;
 
 		private:
 
 			boost::asio::ip::tcp::socket *m_socket;
-			boost::asio::yield_context *m_yield;
+			YieldContext *m_yield;
 		};
 
-		inline socket_source::socket_source(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield)
+		template <class YieldContext>
+		basic_socket_source<YieldContext>::basic_socket_source(boost::asio::ip::tcp::socket &socket, YieldContext &yield)
 			: m_socket(&socket)
 			, m_yield(&yield)
 		{
 		}
 
-		inline iterator_range<char const *> socket_source::map_next(std::size_t)
+		template <class YieldContext>
+		iterator_range<char const *> basic_socket_source<YieldContext>::map_next(std::size_t)
 		{
 			return iterator_range<char const *>();
 		}
 
-		inline char *socket_source::copy_next(iterator_range<char *> destination)
+		template <class YieldContext>
+		char *basic_socket_source<YieldContext>::copy_next(iterator_range<char *> destination)
 		{
 			assert(m_socket);
 			assert(m_yield);
 			size_t const read = m_socket->async_read_some(boost::asio::buffer(destination.begin(), destination.size()), *m_yield);
 			return destination.begin() + read;
 		}
+
+		typedef basic_socket_source<boost::asio::yield_context> socket_source;
 	}
 }
 #endif
