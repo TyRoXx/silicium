@@ -6,6 +6,7 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/asio/socket_source.hpp>
+#include <silicium/html.hpp>
 #include <iostream>
 #include <array>
 #include <boost/program_options.hpp>
@@ -43,6 +44,7 @@ namespace
 		}
 	}
 
+	SILICIUM_USE_RESULT
 	bool handle_error(boost::system::error_code error, char const *message)
 	{
 		if (error)
@@ -59,6 +61,7 @@ namespace
 		finished
 	};
 
+	SILICIUM_USE_RESULT
 	output_chunk_result handle_output_chunk(Si::native_file_descriptor readable_output)
 	{
 		std::array<char, 8192> read_buffer;
@@ -79,7 +82,14 @@ namespace
 		return output_chunk_result::more;
 	}
 
-	void clone(
+	enum class clone_result
+	{
+		success,
+		failure
+	};
+
+	SILICIUM_USE_RESULT
+	clone_result clone(
 		std::string const &repository,
 		Si::absolute_path const &repository_cache)
 	{
@@ -94,7 +104,7 @@ namespace
 		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle);
 		if (handle_error(maybe_process.error(), "Could not create git process"))
 		{
-			return;
+			return clone_result::failure;
 		}
 		input.read.close();
 		output.write.close();
@@ -115,25 +125,43 @@ namespace
 		if (result != 0)
 		{
 			std::cerr << "Git clone failed\n";
-			return;
+			return clone_result::failure;
 		}
+
+		return clone_result::success;
 	}
 
-	void trigger_build(
+	enum class build_trigger_result
+	{
+		success,
+		failure
+	};
+
+	SILICIUM_USE_RESULT
+	build_trigger_result trigger_build(
 		std::string const &repository,
 		Si::absolute_path const &repository_cache)
 	{
 		if (handle_error(Si::create_directories(repository_cache), "Could not create repository cache directory"))
 		{
-			return;
+			return build_trigger_result::failure;
 		}
 
 		if (!Si::file_exists(repository_cache / Si::relative_path(".git")))
 		{
 			std::cerr << "The cache does not exist. Doing an initial clone of " << repository << "\n";
-			clone(repository, repository_cache);
-			std::cerr << "Created initial clone of the repository\n";
+			switch (clone(repository, repository_cache))
+			{
+			case clone_result::success:
+				std::cerr << "Created initial clone of the repository\n";
+				break;
+
+			case clone_result::failure:
+				return build_trigger_result::failure;
+			}
 		}
+
+		return build_trigger_result::success;
 	}
 
 	template <class YieldContext>
@@ -181,20 +209,54 @@ namespace
 			return respond(client, Si::make_c_str_range("404"), Si::make_c_str_range("Not Found"), Si::make_c_str_range("unknown path"), yield);
 		}
 
-		if (request.method == "POST")
+		std::vector<char> page;
+		auto html = Si::html::make_generator(Si::make_container_sink(page));
+		html("html", [&]
 		{
-			trigger_build(repository, repository_cache);
-		}
+			html("head", [&]
+			{
+				html("title", [&]
+				{
+					html.write("Silicium build tester");
+				});
+			});
+			html("body", [&]
+			{
+				if (request.method == "POST")
+				{
+					switch (trigger_build(repository, repository_cache))
+					{
+					case build_trigger_result::success:
+						html.write("build success");
+						break;
 
-		char const * const page =
-			"<html>"
-				"<body>"
-					"<form action=\"/\" method=\"POST\">"
-						"<input type=\"submit\" value=\"Trigger build\"/>"
-					"</form>"
-				"</body>"
-			"</html>";
-		return respond(client, Si::make_c_str_range("200"), Si::make_c_str_range("OK"), Si::make_c_str_range(page), yield);
+					case build_trigger_result::failure:
+						html.write("build failure");
+						break;
+					}
+				}
+				html("form",
+					[&]
+				{
+					html.attribute("action", "/");
+					html.attribute("method", "POST");
+				},
+					[&]
+				{
+					html("input",
+						[&]
+					{
+						html.attribute("type", "submit");
+						html.attribute("value", "Trigger build");
+					},
+						[&]
+					{
+					});
+				});
+			});
+
+		});
+		return respond(client, Si::make_c_str_range("200"), Si::make_c_str_range("OK"), Si::make_memory_range(page), yield);
 	}
 
 	void handle_client(

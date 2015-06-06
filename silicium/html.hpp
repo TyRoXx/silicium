@@ -148,7 +148,6 @@ namespace Si
 				close_element(m_out, name);
 			}
 
-
 			template <class KeyStringLike, class ValueStringLike>
 			void attribute(
 				KeyStringLike const &key,
