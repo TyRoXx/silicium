@@ -86,6 +86,7 @@ namespace Si
 			m_value.swap(other.m_value);
 		}
 
+		SILICIUM_USE_RESULT
 		boost::filesystem::path
 #ifdef _WIN32
 		const &
@@ -95,6 +96,7 @@ namespace Si
 			return m_value.to_boost_path();
 		}
 
+		SILICIUM_USE_RESULT
 #ifdef _WIN32
 		boost::filesystem::path const &
 #else
@@ -105,11 +107,13 @@ namespace Si
 			return m_value.underlying();
 		}
 
+		SILICIUM_USE_RESULT
 		char_type const *c_str() const BOOST_NOEXCEPT
 		{
 			return m_value.c_str();
 		}
 
+		SILICIUM_USE_RESULT
 		bool empty() const BOOST_NOEXCEPT
 		{
 			return underlying().empty();
@@ -128,67 +132,79 @@ namespace Si
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator == (relative_path const &left, ComparableToPath const &right)
 	{
 		return left.underlying() == right;
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator == (ComparableToPath const &left, relative_path const &right)
 	{
 		return left == right.underlying();
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator == (relative_path const &left, boost::filesystem::path const &right)
 	{
 		return right == left.c_str();
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator == (boost::filesystem::path const &left, relative_path const &right)
 	{
 		return left == right.c_str();
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator == (relative_path const &left, relative_path const &right)
 	{
 		return left.underlying() == right.underlying();
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator != (relative_path const &left, ComparableToPath const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator != (ComparableToPath const &left, relative_path const &right)
 	{
 		return !(left == right);
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator < (relative_path const &left, relative_path const &right)
 	{
 		return left.underlying() < right.underlying();
 	}
 
+	SILICIUM_USE_RESULT
 	inline std::size_t hash_value(relative_path const &value)
 	{
 		using boost::hash_value;
 		return hash_value(value.underlying());
 	}
 
+	SILICIUM_USE_RESULT
 	inline relative_path leaf(relative_path const &whole)
 	{
 		//TODO: do this efficiently
 		return relative_path(whole.to_boost_path().leaf());
 	}
 
+	SILICIUM_USE_RESULT
 	inline relative_path parent(relative_path const &whole)
 	{
 		//TODO: do this efficiently
 		return relative_path(whole.to_boost_path().parent_path());
 	}
 
+	SILICIUM_USE_RESULT
 	inline relative_path operator / (relative_path const &front, relative_path const &back)
 	{
 		//TODO: do this efficiently
@@ -201,6 +217,7 @@ namespace std
 	template <>
 	struct hash< ::Si::relative_path>
 	{
+		SILICIUM_USE_RESULT
 		std::size_t operator()(Si::relative_path const &value) const
 		{
 			return hash_value(value);

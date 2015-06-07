@@ -12,6 +12,7 @@ namespace Si
 	{
 		struct dynamic_library_impl
 		{
+			SILICIUM_USE_RESULT
 			static void *open(native_path_string file, boost::system::error_code &ec)
 			{
 				HMODULE const handle = LoadLibraryW(file.c_str());
@@ -31,6 +32,7 @@ namespace Si
 				FreeLibrary(static_cast<HMODULE>(handle));
 			}
 
+			SILICIUM_USE_RESULT
 			static void *find_symbol(void *handle, c_string name)
 			{
 				return GetProcAddress(static_cast<HMODULE>(handle), name.c_str());

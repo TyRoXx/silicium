@@ -6,6 +6,7 @@
 namespace Si
 {
 	template <class Observable, class Element = typename Observable::element_type>
+	SILICIUM_USE_RESULT
 	auto ref(Observable &identity)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> ptr_observable<Element, Observable *>

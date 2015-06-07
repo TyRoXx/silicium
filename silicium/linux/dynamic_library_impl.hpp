@@ -11,6 +11,7 @@ namespace Si
 	{
 		struct dynamic_library_impl
 		{
+			SILICIUM_USE_RESULT
 			static void *open(c_string file, boost::system::error_code &ec)
 			{
 				void * const handle = dlopen(file.c_str(), RTLD_LAZY);
@@ -30,6 +31,7 @@ namespace Si
 				dlclose(handle);
 			}
 
+			SILICIUM_USE_RESULT
 			static void *find_symbol(void *handle, c_string const &name)
 			{
 				return dlsym(handle, name.c_str());

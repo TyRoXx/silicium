@@ -21,18 +21,21 @@ namespace Si
 		{
 			assert(m_begin);
 		}
-		
+
+		SILICIUM_USE_RESULT
 		bool is_set() const BOOST_NOEXCEPT
 		{
 			return m_begin != nullptr;
 		}
 
+		SILICIUM_USE_RESULT
 		bool empty() const BOOST_NOEXCEPT
 		{
 			assert(is_set());
 			return (*m_begin == '\0');
 		}
 
+		SILICIUM_USE_RESULT
 		char_type const *c_str() const BOOST_NOEXCEPT
 		{
 			assert(is_set());

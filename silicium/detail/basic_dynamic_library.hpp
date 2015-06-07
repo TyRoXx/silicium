@@ -59,11 +59,13 @@ namespace Si
 				}
 			}
 
+			SILICIUM_USE_RESULT
 			void *find_symbol(c_string name) const
 			{
 				return DynamicLibraryImpl::find_symbol(handle.get(), name);
 			}
 
+			SILICIUM_USE_RESULT
 			bool empty() const BOOST_NOEXCEPT
 			{
 				return !handle;

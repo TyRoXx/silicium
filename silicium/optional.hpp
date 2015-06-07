@@ -189,36 +189,42 @@ namespace Si
 			return m_is_set;
 		}
 
+		SILICIUM_USE_RESULT
 		bool operator !() const BOOST_NOEXCEPT
 		{
 			return !m_is_set;
 		}
 
 #if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+		SILICIUM_USE_RESULT
 		T &operator * () BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *data();
 		}
 
+		SILICIUM_USE_RESULT
 		T const &operator * () const BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *data();
 		}
 #else
+		SILICIUM_USE_RESULT
 		T &operator * () & BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *data();
 		}
 
+		SILICIUM_USE_RESULT
 		T &&operator * () && BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return std::move(*data());
 		}
 
+		SILICIUM_USE_RESULT
 		T const &operator * () const & BOOST_NOEXCEPT
 		{
 			assert(*this);
@@ -271,6 +277,7 @@ namespace Si
 	BOOST_STATIC_ASSERT(is_handle<optional<nothing>>::value);
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	bool operator == (optional<T> const &left, optional<T> const &right)
 	{
 		if (left && right)
@@ -281,6 +288,7 @@ namespace Si
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	bool operator == (optional<T> const &left, T const &right)
 	{
 		if (left)
@@ -291,30 +299,35 @@ namespace Si
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	bool operator == (T const &left, optional<T> const &right)
 	{
 		return (right == left);
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	bool operator == (none_t const &, optional<T> const &right)
 	{
 		return !right;
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	bool operator == (optional<T> const &left, none_t const &)
 	{
 		return !left;
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	bool operator != (optional<T> const &left, optional<T> const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	bool operator < (optional<T> const &left, optional<T> const &right)
 	{
 		if (left)
@@ -342,6 +355,7 @@ namespace Si
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	Si::optional<typename std::decay<T>::type> make_optional(T &&value)
 	{
 		return Si::optional<typename std::decay<T>::type>(std::forward<T>(value));
@@ -368,6 +382,7 @@ namespace Si
 	}
 
 	template <class T>
+	SILICIUM_USE_RESULT
 	std::size_t hash_value(optional<T> const &value)
 	{
 		if (value)
@@ -389,6 +404,7 @@ namespace std
 	template <class T>
 	struct hash<Si::optional<T>>
 	{
+		SILICIUM_USE_RESULT
 		std::size_t operator()(Si::optional<T> const &value) const
 		{
 			return hash_value(value);

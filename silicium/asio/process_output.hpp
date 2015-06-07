@@ -65,6 +65,7 @@ namespace Si
 	};
 
 	template <class AsioFileStream>
+	SILICIUM_USE_RESULT
 	AsioFileStream make_asio_file_stream(boost::asio::io_service &io, file_handle file)
 	{
 		return AsioFileStream(io, file.release());

@@ -47,6 +47,7 @@ namespace Si
 			m_value.swap(other.m_value);
 		}
 
+		SILICIUM_USE_RESULT
 		boost::filesystem::path
 #ifdef _WIN32
 		const &
@@ -56,6 +57,7 @@ namespace Si
 			return m_value.to_boost_path();
 		}
 
+		SILICIUM_USE_RESULT
 #ifdef _WIN32
 		boost::filesystem::path const &
 #else
@@ -66,11 +68,13 @@ namespace Si
 			return m_value.underlying();
 		}
 
+		SILICIUM_USE_RESULT
 		char_type const *c_str() const BOOST_NOEXCEPT
 		{
 			return m_value.c_str();
 		}
 
+		SILICIUM_USE_RESULT
 		native_path_string safe_c_str() const BOOST_NOEXCEPT
 		{
 			return native_path_string(c_str());
@@ -82,11 +86,13 @@ namespace Si
 			*this = absolute_path(to_boost_path() / back.to_boost_path());
 		}
 
+		SILICIUM_USE_RESULT
 		bool empty() const BOOST_NOEXCEPT
 		{
 			return underlying().empty();
 		}
 
+		SILICIUM_USE_RESULT
 		static optional<absolute_path> create(boost::filesystem::path const &maybe_absolute)
 		{
 			if (maybe_absolute.is_absolute())
@@ -96,16 +102,19 @@ namespace Si
 			return none;
 		}
 
+		SILICIUM_USE_RESULT
 		static optional<absolute_path> create(noexcept_string const &maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute.c_str()));
 		}
 
+		SILICIUM_USE_RESULT
 		static optional<absolute_path> create(char const *maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute));
 		}
 
+		SILICIUM_USE_RESULT
 		static optional<absolute_path> create(wchar_t const *maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute));
@@ -147,61 +156,72 @@ namespace Si
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator == (absolute_path const &left, ComparableToPath const &right)
 	{
 		return left.underlying() == right;
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator == (ComparableToPath const &left, absolute_path const &right)
 	{
 		return left == right.underlying();
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator == (absolute_path const &left, boost::filesystem::path const &right)
 	{
 		return right == left.c_str();
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator == (boost::filesystem::path const &left, absolute_path const &right)
 	{
 		return left == right.c_str();
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator == (absolute_path const &left, absolute_path const &right)
 	{
 		return left.underlying() == right.underlying();
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator != (absolute_path const &left, ComparableToPath const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class ComparableToPath>
+	SILICIUM_USE_RESULT
 	inline bool operator != (ComparableToPath const &left, absolute_path const &right)
 	{
 		return !(left == right);
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool operator < (absolute_path const &left, absolute_path const &right)
 	{
 		return left.underlying() < right.underlying();
 	}
 
+	SILICIUM_USE_RESULT
 	inline std::size_t hash_value(absolute_path const &value)
 	{
 		using boost::hash_value;
 		return hash_value(value.underlying());
 	}
 
+	SILICIUM_USE_RESULT
 	inline relative_path leaf(absolute_path const &whole)
 	{
 		//TODO: do this efficiently
 		return relative_path(whole.to_boost_path().leaf());
 	}
 
+	SILICIUM_USE_RESULT
 	inline optional<absolute_path> parent(absolute_path const &whole)
 	{
 		//TODO: do this efficiently
@@ -213,6 +233,7 @@ namespace Si
 		return none;
 	}
 
+	SILICIUM_USE_RESULT
 	inline absolute_path operator / (absolute_path const &front, relative_path const &back)
 	{
 		//TODO: do this efficiently
@@ -222,6 +243,7 @@ namespace Si
 	}
 
 	template <std::size_t N>
+	SILICIUM_USE_RESULT
 	inline absolute_path operator / (absolute_path const &front, absolute_path::char_type const (&literal)[N])
 	{
 		return front / relative_path(boost::filesystem::path(&literal[0]));
@@ -229,17 +251,20 @@ namespace Si
 
 #ifdef _WIN32
 	template <std::size_t N>
+	SILICIUM_USE_RESULT
 	inline absolute_path operator / (absolute_path const &front, char const (&literal)[N])
 	{
 		return front / relative_path(boost::filesystem::path(&literal[0]));
 	}
 #endif
 
+	SILICIUM_USE_RESULT
 	inline absolute_path get_current_working_directory()
 	{
 		return *absolute_path::create(boost::filesystem::current_path());
 	}
 
+	SILICIUM_USE_RESULT
 	inline boost::system::error_code remove_file(absolute_path const &name)
 	{
 		boost::system::error_code ec;
@@ -247,6 +272,7 @@ namespace Si
 		return ec;
 	}
 
+	SILICIUM_USE_RESULT
 	inline boost::system::error_code create_directories(absolute_path const &directories)
 	{
 		boost::system::error_code ec;
@@ -254,6 +280,7 @@ namespace Si
 		return ec;
 	}
 
+	SILICIUM_USE_RESULT
 	inline bool file_exists(absolute_path const &file)
 	{
 		boost::system::error_code ec;
@@ -267,6 +294,7 @@ namespace std
 	template <>
 	struct hash< ::Si::absolute_path>
 	{
+		SILICIUM_USE_RESULT
 		std::size_t operator()(Si::absolute_path const &value) const
 		{
 			return hash_value(value);

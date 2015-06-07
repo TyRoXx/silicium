@@ -62,6 +62,7 @@ namespace Si
 		};
 
 		template <class CharSource>
+		SILICIUM_USE_RESULT
 		optional<response> parse_response(CharSource &&in)
 		{
 			Si::detail::line_source lines(in);

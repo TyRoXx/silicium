@@ -46,6 +46,7 @@ namespace Si
 			boost::swap(m_id, other.m_id);
 		}
 
+		SILICIUM_USE_RESULT
 		error_or<int> wait_for_exit() BOOST_NOEXCEPT
 		{
 			WaitForSingleObject(m_id, INFINITE);
