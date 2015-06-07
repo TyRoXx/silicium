@@ -1,6 +1,7 @@
 #ifndef SILICIUM_FILE_SINK_HPP
 #define SILICIUM_FILE_SINK_HPP
 
+#include <silicium/write.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/fast_variant.hpp>
 #include <silicium/file_handle.hpp>
@@ -78,24 +79,12 @@ namespace Si
 			},
 				[this](memory_range const &content) -> error_type
 			{
-				ptrdiff_t written = 0;
-				while (written < content.size())
+				error_or<std::size_t> written = write(m_destination, content);
+				if (!written.is_error())
 				{
-					ptrdiff_t const remaining = content.size() - written;
-					DWORD const max_write_size = std::min<DWORD>(
-						(std::numeric_limits<DWORD>::max)(),
-						static_cast<DWORD>((std::numeric_limits<ptrdiff_t>::max)())
-						);
-					DWORD const write_now = std::min<ptrdiff_t>(remaining, static_cast<ptrdiff_t>(max_write_size));
-					DWORD written_now = 0;
-					if (!WriteFile(m_destination, content.begin(), write_now, &written_now, nullptr))
-					{
-						return error_type(GetLastError(), boost::system::system_category());
-					}
-					assert(written_now > 0);
-					written += static_cast<ptrdiff_t>(written_now);
+					assert(written.get() == static_cast<std::size_t>(content.size()));
 				}
-				return error_type();
+				return written.error();
 			},
 				[this](seek_set const request) -> error_type
 			{
@@ -216,17 +205,12 @@ namespace Si
 
 		error_type write_piece(memory_range const &content)
 		{
-			ptrdiff_t written = 0;
-			while (written < content.size())
+			error_or<std::size_t> written = write(m_destination, content);
+			if (!written.is_error())
 			{
-				ssize_t rc = ::write(m_destination, content.begin() + written, content.size() - written);
-				if (rc < 0)
-				{
-					return error_type(errno, boost::system::system_category());
-				}
-				written += static_cast<ptrdiff_t>(rc);
+				assert(written.get() == content.size());
 			}
-			return error_type();
+			return written.error();
 		}
 
 		error_type write_vector(element_type const *begin, element_type const *end)

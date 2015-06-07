@@ -153,6 +153,7 @@
 #include <silicium/win32/run_process.hpp>
 #include <silicium/win32/single_directory_watcher.hpp>
 #include <silicium/win32/win32.hpp>
+#include <silicium/write.hpp>
 #include <silicium/write_file.hpp>
 #include <silicium/zlib/deflating_sink.hpp>
 #include <silicium/zlib/inflating_sink.hpp>
