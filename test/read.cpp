@@ -3,14 +3,14 @@
 #include <silicium/posix/pipe.hpp>
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(read_file_invalid)
+BOOST_AUTO_TEST_CASE(read_invalid)
 {
 	std::array<char, 1024> buffer;
 	Si::error_or<std::size_t> result = Si::read(Si::no_file_handle, Si::make_memory_range(buffer));
 	BOOST_CHECK(result.is_error());
 }
 
-BOOST_AUTO_TEST_CASE(read_file_pipe)
+BOOST_AUTO_TEST_CASE(read_write_pipe)
 {
 	std::array<char, 1024> buffer;
 	auto pipe = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
