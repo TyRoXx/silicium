@@ -5,6 +5,7 @@
 #include <silicium/optional.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/is_handle.hpp>
+#include <silicium/c_string.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <iostream>
 
@@ -68,6 +69,11 @@ namespace Si
 		char_type const *c_str() const BOOST_NOEXCEPT
 		{
 			return m_value.c_str();
+		}
+
+		native_path_string safe_c_str() const BOOST_NOEXCEPT
+		{
+			return native_path_string(c_str());
 		}
 
 		void combine(relative_path const &back)

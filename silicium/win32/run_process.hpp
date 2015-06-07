@@ -87,7 +87,6 @@ namespace Si
 		}
 	}
 
-	SILICIUM_DEPRECATED
 	inline int run_process(process_parameters const &parameters)
 	{
 		win32::winapi_string const &executable = parameters.executable.wstring();

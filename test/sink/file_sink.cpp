@@ -3,6 +3,7 @@
 #include <silicium/open.hpp>
 #include <silicium/source/file_source.hpp>
 #include <silicium/posix/pipe.hpp>
+#include <silicium/absolute_path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread/future.hpp>
@@ -43,15 +44,15 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 
 namespace
 {
-	boost::filesystem::path get_readonly_file()
+	Si::absolute_path get_readonly_file()
 	{
 #ifdef __linux__
 		return "/proc/cpuinfo";
 #endif
 #ifdef _WIN32
-		boost::filesystem::path file_name = boost::filesystem::temp_directory_path() / "silicium_file_sink_readonly.txt";
+		Si::absolute_path file_name = *Si::absolute_path::create(boost::filesystem::temp_directory_path()) / Si::relative_path("silicium_file_sink_readonly.txt");
 		{
-			Si::error_or<Si::file_handle> file = Si::create_file(file_name);
+			Si::error_or<Si::file_handle> file = Si::create_file(file_name.safe_c_str());
 			if (file.is_error() && (file.error() != boost::system::error_code(ERROR_FILE_EXISTS, boost::system::get_system_category())))
 			{
 				file.throw_if_error();

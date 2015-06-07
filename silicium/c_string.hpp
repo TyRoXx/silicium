@@ -21,7 +21,7 @@ namespace Si
 		{
 			assert(m_begin);
 		}
-
+		
 		bool is_set() const BOOST_NOEXCEPT
 		{
 			return m_begin != nullptr;
@@ -57,6 +57,12 @@ namespace Si
 		c_string
 #endif
 		native_path_string;
+
+#ifdef _WIN32
+#	define SILICIUM_SYSTEM_LITERAL(x) L ## x
+#else
+#	define SILICIUM_SYSTEM_LITERAL(x) x
+#endif
 }
 
 #endif

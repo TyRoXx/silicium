@@ -6,13 +6,13 @@
 
 namespace
 {
-	Si::noexcept_string const absolute_root =
+	std::basic_string<Si::native_path_char> const absolute_root(
 #ifdef _WIN32
-		"C:/"
+		L"C:/"
 #else
 		"/"
 #endif
-		;
+	);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_empty)
@@ -24,45 +24,45 @@ BOOST_AUTO_TEST_CASE(absolute_path_empty)
 
 BOOST_AUTO_TEST_CASE(absolute_path_copy_construction)
 {
-	Si::absolute_path b = *Si::absolute_path::create(absolute_root + "b");
+	Si::absolute_path b = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
 	Si::absolute_path a(b);
 	BOOST_CHECK_EQUAL(a, b);
-	BOOST_CHECK_EQUAL(absolute_root + "b", a);
-	BOOST_CHECK_EQUAL(absolute_root + "b", b);
+	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
+	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_copy_assignment)
 {
-	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + "b");
+	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
 	BOOST_CHECK_NE(a, b);
 	a = b;
 	BOOST_CHECK_EQUAL(a, b);
-	BOOST_CHECK_EQUAL(absolute_root + "b", a);
-	BOOST_CHECK_EQUAL(absolute_root + "b", b);
+	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
+	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_move_construction)
 {
-	Si::absolute_path b = *Si::absolute_path::create(absolute_root + "b");
+	Si::absolute_path b = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
 	Si::absolute_path a(std::move(b));
 	BOOST_CHECK_NE(a, b);
-	BOOST_CHECK_EQUAL(absolute_root + "b", a);
+	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
 	BOOST_CHECK_EQUAL("", b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_move_assignment)
 {
-	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + "b");
+	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
 	BOOST_CHECK_NE(a, b);
 	a = std::move(b);
 	BOOST_CHECK_NE(a, b);
-	BOOST_CHECK_EQUAL(absolute_root + "b", a);
+	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
 	BOOST_CHECK_EQUAL("", b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_equality)
 {
-	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + "b"), c = *Si::absolute_path::create(absolute_root + "c"), c2 = *Si::absolute_path::create(absolute_root + "c");
+	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b")), c = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c")), c2 = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c"));
 	BOOST_CHECK_EQUAL(a, a);
 	BOOST_CHECK_EQUAL(b, b);
 	BOOST_CHECK_EQUAL(c, c);
@@ -78,11 +78,11 @@ BOOST_AUTO_TEST_CASE(absolute_path_equality)
 
 BOOST_AUTO_TEST_CASE(absolute_path_equality_with_other_types)
 {
-	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + "b");
+	Si::absolute_path a, b = *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
 	BOOST_CHECK_EQUAL(a, "");
 	BOOST_CHECK_EQUAL(a, boost::filesystem::path());
-	BOOST_CHECK_EQUAL(b, absolute_root + "b");
-	BOOST_CHECK_EQUAL(b, boost::filesystem::path((absolute_root + "b").c_str()));
+	BOOST_CHECK(b == absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
+	BOOST_CHECK(b == boost::filesystem::path((absolute_root + SILICIUM_SYSTEM_LITERAL("b")).c_str()));
 	BOOST_CHECK_NE(a, "x");
 	BOOST_CHECK_NE(a, boost::filesystem::path("x"));
 }
@@ -92,13 +92,13 @@ namespace
 	template <class Map>
 	void test_map(Map &m)
 	{
-		m[*Si::absolute_path::create(absolute_root + "a")] = 1;
-		m[*Si::absolute_path::create(absolute_root + "b")] = 2;
-		m[*Si::absolute_path::create(absolute_root + "c")] = 3;
+		m[*Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a"))] = 1;
+		m[*Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"))] = 2;
+		m[*Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c"))] = 3;
 		BOOST_CHECK_EQUAL(3u, m.size());
-		BOOST_CHECK_EQUAL(1, m[*Si::absolute_path::create(absolute_root + "a")]);
-		BOOST_CHECK_EQUAL(2, m[*Si::absolute_path::create(absolute_root + "b")]);
-		BOOST_CHECK_EQUAL(3, m[*Si::absolute_path::create(absolute_root + "c")]);
+		BOOST_CHECK_EQUAL(1, m[*Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a"))]);
+		BOOST_CHECK_EQUAL(2, m[*Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"))]);
+		BOOST_CHECK_EQUAL(3, m[*Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c"))]);
 	}
 }
 
@@ -122,5 +122,33 @@ BOOST_AUTO_TEST_CASE(absolute_path_boost_hash)
 
 BOOST_AUTO_TEST_CASE(absolute_path_combine)
 {
-	BOOST_CHECK_EQUAL(*Si::absolute_path::create(absolute_root + "a/b"), *Si::absolute_path::create(absolute_root + "a") / Si::relative_path("b"));
+	BOOST_CHECK_EQUAL(*Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a/b")), *Si::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a")) / Si::relative_path("b"));
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_c_str_empty)
+{
+	Si::absolute_path p;
+	Si::native_path_char const *c_str = p.c_str();
+	BOOST_CHECK(std::basic_string<Si::native_path_char>(SILICIUM_SYSTEM_LITERAL("")) == c_str);
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_c_str_non_empty)
+{
+	Si::absolute_path p = *Si::absolute_path::create(absolute_root);
+	Si::native_path_char const *c_str = p.c_str();
+	BOOST_CHECK(absolute_root == c_str);
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_empty)
+{
+	Si::absolute_path p;
+	Si::native_path_string const str = p.safe_c_str();
+	BOOST_CHECK(std::basic_string<Si::native_path_char>(SILICIUM_SYSTEM_LITERAL("")) == str.c_str());
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_non_empty)
+{
+	Si::absolute_path p = *Si::absolute_path::create(absolute_root);
+	Si::native_path_string const str = p.safe_c_str();
+	BOOST_CHECK(absolute_root == str.c_str());
 }

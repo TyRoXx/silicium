@@ -8,6 +8,7 @@
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/html.hpp>
 #include <silicium/make_array.hpp>
+#include <silicium/source/file_source.hpp>
 #include <iostream>
 #include <array>
 #include <boost/program_options.hpp>
@@ -72,20 +73,19 @@ namespace
 	output_chunk_result handle_output_chunk(Si::native_file_descriptor readable_output)
 	{
 		std::array<char, 8192> read_buffer;
-		ssize_t const read_result = read(readable_output, read_buffer.data(), read_buffer.size());
-		if (read_result < 0)
+		Si::error_or<std::size_t> const read_result = Si::read(readable_output, Si::make_memory_range(read_buffer));
+		if (read_result.is_error())
 		{
-			int errno_ = errno;
-			boost::system::error_code error(errno_, boost::system::get_system_category());
-			std::cerr << "Reading the output of the process failed with " << error << '\n';
+			std::cerr << "Reading the output of the process failed with " << read_result.error() << '\n';
 			return output_chunk_result::finished;
 		}
-		if (read_result == 0)
+		if (read_result.get() == 0)
 		{
 			//end of output
 			return output_chunk_result::finished;
 		}
-		std::cerr.write(read_buffer.data(), read_result);
+		assert(read_result.get() <= read_buffer.size());
+		std::cerr.write(read_buffer.data(), read_result.get());
 		return output_chunk_result::more;
 	}
 
@@ -95,19 +95,27 @@ namespace
 		failure
 	};
 
+	Si::absolute_path const git_exe = *Si::absolute_path::create(
+#ifdef _WIN32
+		L"C:\\Program Files (x86)\\Git\\bin\\git.exe"
+#else
+		"/usr/bin/git"
+#endif
+		);
+
 	SILICIUM_USE_RESULT
 	clone_result clone(
 		std::string const &repository,
 		Si::absolute_path const &repository_cache)
 	{
 		Si::async_process_parameters parameters;
-		parameters.executable = *Si::absolute_path::create("/usr/bin/git");
-		parameters.arguments.emplace_back("clone");
-		parameters.arguments.emplace_back(repository.c_str());
+		parameters.executable = git_exe;
+		parameters.arguments.emplace_back(Si::to_os_string("clone"));
+		parameters.arguments.emplace_back(Si::to_os_string(repository));
 		parameters.arguments.emplace_back(repository_cache.c_str());
 		parameters.current_path = repository_cache;
-		auto output = Si::make_pipe().get();
-		auto input = Si::make_pipe().get();
+		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
+		auto input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle);
 		if (handle_error(maybe_process.error(), "Could not create git process"))
 		{
@@ -277,7 +285,11 @@ namespace
 		};
 		boost::asio::spawn(
 			on_exit,
-			[client = std::move(client), &repository, &repository_cache](boost::asio::basic_yield_context<decltype(on_exit) &> yield)
+			[
+				SILICIUM_MOVE_CAPTURE(client, std::move(client)),
+				&repository,
+				&repository_cache
+			](boost::asio::basic_yield_context<decltype(on_exit) &> yield)
 			{
 				serve_web_client(*client, repository, repository_cache, yield);
 			}

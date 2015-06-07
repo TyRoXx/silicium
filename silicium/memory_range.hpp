@@ -39,6 +39,7 @@ namespace Si
 
 	template <class Byte>
 	auto make_memory_range(Byte *data, std::size_t size)
+		-> iterator_range<Byte *>
 	{
 		return make_memory_range(data, data + size);
 	}

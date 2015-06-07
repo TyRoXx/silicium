@@ -96,6 +96,9 @@ namespace Si
 		}
 
 		inline auto make_tcp_acceptor(boost::asio::io_service &io, boost::asio::ip::tcp::endpoint endpoint)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> decltype(make_tcp_acceptor(make_unique<boost::asio::ip::tcp::acceptor>(io, endpoint)))
+#endif
 		{
 			return make_tcp_acceptor(make_unique<boost::asio::ip::tcp::acceptor>(io, endpoint));
 		}

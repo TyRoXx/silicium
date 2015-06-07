@@ -12,7 +12,7 @@ namespace
 	{
 		Si::native_path_string const name(
 #ifdef _WIN32
-			"C:/Windows/system.ini"
+			L"C:/Windows/system.ini"
 #else
 			"/dev/zero"
 #endif
@@ -33,8 +33,8 @@ BOOST_AUTO_TEST_CASE(file_source)
 
 BOOST_AUTO_TEST_CASE(file_source_enumerate)
 {
-	BOOST_REQUIRE(!Si::write_file(Si::native_path_string("test.txt"), Si::make_memory_range("Test", 4)));
-	auto f = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::open_reading(Si::native_path_string("test.txt")).get());
+	BOOST_REQUIRE(!Si::write_file(Si::native_path_string(SILICIUM_SYSTEM_LITERAL("test.txt")), Si::make_memory_range("Test", 4)));
+	auto f = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::open_reading(Si::native_path_string(SILICIUM_SYSTEM_LITERAL("test.txt"))).get());
 	std::array<char, 100> buffer;
 	auto s = Si::make_enumerating_source(Si::make_throwing_source(Si::make_file_source(f.handle, Si::make_iterator_range(buffer.data(), buffer.data() + buffer.size()))));
 	BOOST_CHECK_EQUAL('T', Si::get(s));
