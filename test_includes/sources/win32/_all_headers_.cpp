@@ -46,9 +46,11 @@
 #include <silicium/http/uri.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
+#include <silicium/make_array.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/move.hpp>
 #include <silicium/move_if_noexcept.hpp>
+#include <silicium/native_file_descriptor.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
 #include <silicium/observable/cache.hpp>
@@ -102,6 +104,7 @@
 #include <silicium/process_parameters.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
+#include <silicium/read_file.hpp>
 #include <silicium/relative_path.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/single_directory_watcher.hpp>

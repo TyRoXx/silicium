@@ -1,12 +1,7 @@
 #ifndef SILICIUM_FILE_HANDLE_HPP
 #define SILICIUM_FILE_HANDLE_HPP
 
-#ifdef _WIN32
-#	include <silicium/win32/native_file_descriptor.hpp>
-#else
-#	include <silicium/posix/native_file_descriptor.hpp>
-#endif
-
+#include <silicium/native_file_descriptor.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/is_handle.hpp>
 

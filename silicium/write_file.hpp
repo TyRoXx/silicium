@@ -8,7 +8,7 @@
 namespace Si
 {
 	SILICIUM_USE_RESULT
-	boost::system::error_code write_file(native_path_string name, memory_range data)
+	inline boost::system::error_code write_file(native_path_string name, memory_range data)
 	{
 		Si::error_or<Si::file_handle> const file = Si::overwrite_file(name);
 		if (file.is_error())
