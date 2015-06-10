@@ -281,11 +281,19 @@ namespace Si
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool file_exists(absolute_path const &file)
+	inline error_or<bool> file_exists(absolute_path const &file)
 	{
 		boost::system::error_code ec;
-		bool exists = boost::filesystem::exists(file.to_boost_path(), ec);
-		return exists;
+		boost::filesystem::file_status status = boost::filesystem::status(file.to_boost_path(), ec);
+		if (status.type() == boost::filesystem::file_not_found)
+		{
+			return false;
+		}
+		if (ec)
+		{
+			return ec;
+		}
+		return true;
 	}
 }
 
