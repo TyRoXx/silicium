@@ -162,7 +162,15 @@ namespace
 			return build_trigger_result::failure;
 		}
 
-		if (!Si::file_exists(repository_cache / Si::relative_path(".git")))
+		auto const cache_git_dir = repository_cache / Si::relative_path(".git");
+		Si::error_or<bool> const cached = Si::file_exists(cache_git_dir);
+		if (cached.is_error())
+		{
+			std::cerr << "Could not determine whether " << cache_git_dir << " exists\n";
+			return build_trigger_result::failure;
+		}
+
+		if (!cached.get())
 		{
 			std::cerr << "The cache does not exist. Doing an initial clone of " << repository << "\n";
 			switch (clone(repository, repository_cache))
