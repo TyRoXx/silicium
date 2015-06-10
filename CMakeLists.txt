@@ -51,6 +51,17 @@ if(MSVC)
 
 	#workaround for Boost 1.55 Context error LNK2026
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+
+	if(MSVC14)
+		#Boost 1.58 Asio has a macro redefinition on Visual Studio 2015
+		add_definitions("/wd4005")
+
+		#unrestricted union bug
+		add_definitions("/wd4624")
+
+		#Boost 1.58 Coroutine warning about throw in a noexcept function
+		add_definitions("/wd4297")
+	endif()
 endif()
 
 if(MSVC)

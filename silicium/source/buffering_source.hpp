@@ -90,7 +90,7 @@ namespace Si
 			{
 				auto two = m_buffer.array_two();
 				assert(m_next);
-				auto copied = m_next->copy_next(make_iterator_range(two.first, two.first + two.second));
+				copied = m_next->copy_next(make_iterator_range(two.first, two.first + two.second));
 				new_buffer_size += std::distance(two.first, copied);
 			}
 			m_buffer.resize(new_buffer_size);
