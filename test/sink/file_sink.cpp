@@ -47,7 +47,7 @@ namespace
 	Si::absolute_path get_readonly_file()
 	{
 #ifdef __linux__
-		return "/proc/cpuinfo";
+		return *Si::absolute_path::create("/proc/cpuinfo");
 #endif
 #ifdef _WIN32
 		Si::absolute_path file_name = *Si::absolute_path::create(boost::filesystem::temp_directory_path()) / Si::relative_path("silicium_file_sink_readonly.txt");

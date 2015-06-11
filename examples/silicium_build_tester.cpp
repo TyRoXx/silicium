@@ -105,13 +105,13 @@ namespace
 
 	SILICIUM_USE_RESULT
 	clone_result clone(
-		std::string const &repository,
+		Si::os_string const &repository,
 		Si::absolute_path const &repository_cache)
 	{
 		Si::async_process_parameters parameters;
 		parameters.executable = git_exe;
 		parameters.arguments.emplace_back(Si::to_os_string("clone"));
-		parameters.arguments.emplace_back(Si::to_os_string(repository));
+		parameters.arguments.emplace_back(repository);
 		parameters.arguments.emplace_back(repository_cache.c_str());
 		parameters.current_path = repository_cache;
 		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
@@ -154,7 +154,7 @@ namespace
 
 	SILICIUM_USE_RESULT
 	build_trigger_result trigger_build(
-		std::string const &repository,
+		Si::os_string const &repository,
 		Si::absolute_path const &repository_cache)
 	{
 		if (handle_error(Si::create_directories(repository_cache), "Could not create repository cache directory"))
@@ -190,7 +190,7 @@ namespace
 	template <class YieldContext>
 	void serve_web_client(
 		boost::asio::ip::tcp::socket &client,
-		std::string const &repository,
+		Si::os_string const &repository,
 		Si::absolute_path const &repository_cache,
 		YieldContext yield)
 	{
@@ -284,7 +284,7 @@ namespace
 
 	void handle_client(
 		std::shared_ptr<boost::asio::ip::tcp::socket> client,
-		std::string const &repository,
+		Si::os_string const &repository,
 		Si::absolute_path const &repository_cache)
 	{
 		assert(client);
@@ -355,15 +355,16 @@ int main(int argc, char **argv)
 	}
 
 	Si::absolute_path const absolute_cache = *Si::absolute_path::create(boost::filesystem::absolute(cache));
+	Si::os_string const repository_as_os_string = Si::to_os_string(repository);
 
 	boost::asio::io_service io;
-	boost::asio::spawn(io, [&io, listen_port, &repository, &absolute_cache](boost::asio::yield_context yield)
+	boost::asio::spawn(io, [&io, listen_port, &repository_as_os_string, &absolute_cache](boost::asio::yield_context yield)
 	{
 		boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
 		for (;;)
 		{
 			std::shared_ptr<boost::asio::ip::tcp::socket> client = async_accept(acceptor, yield);
-			handle_client(std::move(client), repository, absolute_cache);
+			handle_client(std::move(client), repository_as_os_string, absolute_cache);
 		}
 	});
 	io.run();

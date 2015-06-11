@@ -1,4 +1,5 @@
 #include <silicium/absolute_path.hpp>
+#include <silicium/os_string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
@@ -6,7 +7,7 @@
 
 namespace
 {
-	std::basic_string<Si::native_path_char> const absolute_root(
+	Si::os_string const absolute_root(
 #ifdef _WIN32
 		L"C:/"
 #else

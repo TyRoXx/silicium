@@ -32,6 +32,16 @@ namespace Si
 		return original;
 	}
 
+	inline os_string to_os_string(std::string const &original)
+	{
+		return os_string(original.begin(), original.end());
+	}
+
+	inline os_string to_os_string(char const *original)
+	{
+		return original;
+	}
+
 #ifdef _WIN32
 	namespace win32
 	{

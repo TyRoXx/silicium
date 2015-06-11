@@ -208,7 +208,7 @@ namespace Si
 			error_or<std::size_t> written = write(m_destination, content);
 			if (!written.is_error())
 			{
-				assert(written.get() == content.size());
+				assert(written.get() == static_cast<size_t>(content.size()));
 			}
 			return written.error();
 		}
