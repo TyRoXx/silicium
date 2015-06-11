@@ -55,6 +55,7 @@
 #include <silicium/memory_range.hpp>
 #include <silicium/move.hpp>
 #include <silicium/move_if_noexcept.hpp>
+#include <silicium/native_file_descriptor.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <silicium/observable/bridge.hpp>
 #include <silicium/observable/cache.hpp>
@@ -107,11 +108,11 @@
 #include <silicium/posix/native_file_descriptor.hpp>
 #include <silicium/posix/open.hpp>
 #include <silicium/posix/pipe.hpp>
-#include <silicium/posix/run_process.hpp>
 #include <silicium/process_handle.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
+#include <silicium/read_file.hpp>
 #include <silicium/relative_path.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/single_directory_watcher.hpp>
@@ -150,6 +151,7 @@
 #include <silicium/utility.hpp>
 #include <silicium/vector.hpp>
 #include <silicium/version.hpp>
+#include <silicium/write.hpp>
 #include <silicium/write_file.hpp>
 #include <silicium/zlib/deflating_sink.hpp>
 #include <silicium/zlib/inflating_sink.hpp>

@@ -12,7 +12,6 @@
 #include <silicium/observable/ref.hpp>
 #include <silicium/asio/process_output.hpp>
 #include <silicium/absolute_path.hpp>
-#include <silicium/run_process.hpp>
 #include <silicium/asio/posting_observable.hpp>
 
 #ifndef _WIN32
