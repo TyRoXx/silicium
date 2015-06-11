@@ -3,6 +3,7 @@
 
 #include <silicium/source/source.hpp>
 #include <boost/range/value_type.hpp>
+#include <boost/concept_check.hpp>
 
 namespace Si
 {
@@ -55,6 +56,7 @@ namespace Si
 
 		iterator_range<element_type const *> map_next_impl(std::size_t size, std::true_type)
 		{
+			boost::ignore_unused_variable_warning(size);
 			if (m_range.empty())
 			{
 				return {};

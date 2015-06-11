@@ -117,6 +117,7 @@ namespace Si
 				}
 				assert(written.get() == 1);
 			}
+			input.write.close();
 		});
 
 		io.run();

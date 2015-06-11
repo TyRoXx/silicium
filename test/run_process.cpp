@@ -2,6 +2,7 @@
 #include <silicium/to_unique.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/virtualized_sink.hpp>
+#include <silicium/source/range_source.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/operations.hpp>
 
@@ -60,5 +61,20 @@ namespace Si
 		{
 			return e.code() == boost::system::error_code(ENOENT, boost::system::system_category());
 		});
+	}
+
+	BOOST_AUTO_TEST_CASE(run_process_standard_input)
+	{
+		process_parameters parameters;
+		parameters.executable = "/bin/cat";
+		parameters.current_path = boost::filesystem::current_path();
+		auto message = Si::make_c_str_range("Hello, cat");
+		auto input = Si::Source<char>::erase(Si::make_range_source(message));
+		parameters.in = &input;
+		std::vector<char> output_buffer;
+		auto output = Si::Sink<char>::erase(Si::make_container_sink(output_buffer));
+		parameters.out = &output;
+		BOOST_CHECK_EQUAL(0, run_process(parameters));
+		BOOST_CHECK_EQUAL_COLLECTIONS(message.begin(), message.end(), output_buffer.begin(), output_buffer.end());
 	}
 }

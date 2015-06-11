@@ -5,6 +5,7 @@
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/utility.hpp>
+#include <silicium/success.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
 #if BOOST_VERSION >= 105300
@@ -17,7 +18,7 @@
 
 namespace Si
 {
-	template <class Element, class Error>
+	template <class Element, class Error = success>
 	SILICIUM_TRAIT_WITH_TYPEDEFS(
 		Sink,
 		typedef Element element_type;
