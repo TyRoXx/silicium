@@ -35,3 +35,8 @@ if(SILICIUM_HAS_WEBSOCKETPP)
 	target_compile_options(websocketpp PRIVATE "-Wno-unused-parameter")
 	target_link_libraries(websocketpp ${Boost_LIBRARIES})
 endif()
+
+if(UNIX) #TODO: Windows
+	add_executable(run_process "run_process.cpp")
+	target_link_libraries(run_process ${Boost_LIBRARIES})
+endif()
