@@ -3,6 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <silicium/is_handle.hpp>
+#include <silicium/explicit_operator_bool.hpp>
 #include <ostream>
 #include <type_traits>
 #include <boost/static_assert.hpp>
@@ -273,8 +274,80 @@ namespace Si
 		}
 	};
 
+	template <class T>
+	struct optional<T &>
+	{
+		optional() BOOST_NOEXCEPT
+			: m_data(nullptr)
+		{
+		}
+
+		optional(T &data) BOOST_NOEXCEPT
+			: m_data(&data)
+		{
+		}
+
+		optional(some_t, T &data) BOOST_NOEXCEPT
+			: m_data(&data)
+		{
+		}
+
+		optional(none_t) BOOST_NOEXCEPT
+			: m_data(nullptr)
+		{
+		}
+
+		void emplace(T &data) BOOST_NOEXCEPT
+		{
+			m_data = &data;
+		}
+
+		SILICIUM_USE_RESULT
+		bool operator !() const BOOST_NOEXCEPT
+		{
+			return m_data == nullptr;
+		}
+
+		SILICIUM_EXPLICIT_OPERATOR_BOOL()
+
+		SILICIUM_USE_RESULT
+		T &operator * () BOOST_NOEXCEPT
+		{
+			assert(*this);
+			return *m_data;
+		}
+
+		SILICIUM_USE_RESULT
+		T const &operator * () const BOOST_NOEXCEPT
+		{
+			assert(*this);
+			return *m_data;
+		}
+
+		T *operator -> () BOOST_NOEXCEPT
+		{
+			assert(*this);
+			return m_data;
+		}
+
+		T const *operator -> () const BOOST_NOEXCEPT
+		{
+			assert(*this);
+			return m_data;
+		}
+
+	private:
+
+		T *m_data;
+	};
+
 	BOOST_STATIC_ASSERT(is_handle<optional<int>>::value);
+	BOOST_STATIC_ASSERT(is_handle<optional<int *>>::value);
+	BOOST_STATIC_ASSERT(is_handle<optional<int const *>>::value);
+	BOOST_STATIC_ASSERT(is_handle<optional<int volatile>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<nothing>>::value);
+	BOOST_STATIC_ASSERT(is_handle<optional<int &>>::value);
+	BOOST_STATIC_ASSERT(is_handle<optional<int const &>>::value);
 
 	template <class T>
 	SILICIUM_USE_RESULT
@@ -397,6 +470,7 @@ namespace Si
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int16_t>) == 4);
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
 	BOOST_STATIC_ASSERT(sizeof(optional<char *>) == (alignment_of<char *>::value + sizeof(char *)));
+	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t &>) == sizeof(boost::int8_t *));
 }
 
 namespace std

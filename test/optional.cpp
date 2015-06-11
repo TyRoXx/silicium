@@ -168,3 +168,25 @@ BOOST_AUTO_TEST_CASE(optional_emplace_multiple_parameters)
 	BOOST_CHECK(p);
 	BOOST_CHECK(std::make_pair(2, 3.5f) == p);
 }
+
+BOOST_AUTO_TEST_CASE(optional_reference)
+{
+	Si::optional<int &> ref;
+	BOOST_CHECK(!ref);
+	int i = 0;
+	ref.emplace(i);
+	BOOST_REQUIRE(ref);
+	BOOST_CHECK_EQUAL(i, *ref);
+	i = 3;
+	BOOST_CHECK_EQUAL(i, *ref);
+	auto copy = ref;
+	i = 5;
+	BOOST_CHECK_EQUAL(i, *copy);
+	BOOST_CHECK_EQUAL(i, *ref);
+	BOOST_CHECK_EQUAL(copy, ref);
+	BOOST_CHECK_NE(copy, Si::none);
+
+	std::vector<Si::optional<int &>> container;
+	container.emplace_back(copy);
+	BOOST_CHECK_EQUAL(ref, container.front());
+}
