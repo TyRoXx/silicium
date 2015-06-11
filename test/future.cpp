@@ -12,6 +12,21 @@ namespace Si
 		template <class T, class ThreadingAPI>
 		struct background_task
 		{
+			background_task()
+			{
+			}
+
+			background_task(background_task &&other) BOOST_NOEXCEPT
+				: m_handle(other.m_handle)
+			{
+			}
+
+			background_task &operator = (background_task &&other) BOOST_NOEXCEPT
+			{
+				m_handle = std::move(other.m_handle);
+				return *this;
+			}
+
 			template <class F, class CompletionToken>
 			auto async_call(F &&function, CompletionToken &&token)
 			{
@@ -36,6 +51,8 @@ namespace Si
 		private:
 
 			typename ThreadingAPI::template future<void>::type m_handle;
+
+			SILICIUM_DISABLE_COPY(background_task)
 		};
 	}
 }
