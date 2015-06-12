@@ -27,12 +27,15 @@ namespace Si
 				return *this;
 			}
 
-			template <class F, class CompletionToken>
+			template <class F, class CompletionToken,
+				class Handler = typename boost::asio::handler_type<CompletionToken, void(T)>::type>
 			auto async_call(F &&function, CompletionToken &&token)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+				-> typename boost::asio::async_result<Handler>::type
+#endif
 			{
-				typedef typename boost::asio::handler_type<CompletionToken, void(T)>::type handler_type;
-				handler_type handler(std::forward<CompletionToken>(token));
-				boost::asio::async_result<handler_type> result(handler);
+				Handler handler(std::forward<CompletionToken>(token));
+				boost::asio::async_result<Handler> result(handler);
 				m_handle = ThreadingAPI::launch_async([
 					SILICIUM_MOVE_CAPTURE(function, std::forward<F>(function)),
 					SILICIUM_MOVE_CAPTURE(handler, std::move(handler))

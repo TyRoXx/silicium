@@ -35,10 +35,11 @@ namespace Si
 		{
 			return to_os_string(argument);
 		});
-		auto input = make_pipe().get();
-		auto std_output = make_pipe().get();
-		auto std_error = make_pipe().get();
-		async_process process = launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle).get();
+		auto input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(make_pipe().get());
+		auto std_output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(make_pipe().get());
+		auto std_error = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(make_pipe().get());
+		async_process process = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(
+			launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle).get());
 
 		boost::asio::io_service io;
 

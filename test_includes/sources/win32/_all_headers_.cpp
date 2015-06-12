@@ -111,7 +111,9 @@
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>
+#include <silicium/sink/function_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/multi_sink.hpp>
 #include <silicium/sink/ostream_sink.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/sink.hpp>
@@ -137,6 +139,7 @@
 #include <silicium/std_threading.hpp>
 #include <silicium/success.hpp>
 #include <silicium/then.hpp>
+#include <silicium/throw_last_error.hpp>
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>
@@ -150,7 +153,6 @@
 #include <silicium/win32/open.hpp>
 #include <silicium/win32/overlapped_directory_changes.hpp>
 #include <silicium/win32/process_handle.hpp>
-#include <silicium/win32/run_process.hpp>
 #include <silicium/win32/single_directory_watcher.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/write.hpp>

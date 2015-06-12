@@ -9,10 +9,14 @@
 #include <silicium/posix/pipe.hpp>
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
+#include <silicium/observable/spawn_observable.hpp>
+#include <silicium/observable/thread.hpp>
 #include <silicium/observable/ref.hpp>
-#include <silicium/asio/process_output.hpp>
+#include <silicium/sink/buffering_sink.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/asio/posting_observable.hpp>
+#include <silicium/asio/process_output.hpp>
+#include <silicium/std_threading.hpp>
 
 #ifndef _WIN32
 #	include <fcntl.h>
@@ -255,6 +259,68 @@ namespace Si
 	}
 #endif
 
+#ifdef _WIN32
+	namespace win32
+	{
+		template <class ByteSink>
+		void copy_whole_pipe(HANDLE pipe_in, ByteSink &&sink_out)
+		{
+			auto buffered_out = make_buffering_sink(std::forward<ByteSink>(sink_out));
+			for (;;)
+			{
+				auto buffer = buffered_out.make_append_space((std::numeric_limits<DWORD>::max)());
+				DWORD read_bytes = 0;
+				DWORD available = 0;
+				DWORD left = 0;
+				BOOL const peeked = PeekNamedPipe(pipe_in, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, &available, &left);
+				if (!peeked)
+				{
+					auto error = ::GetLastError();
+					if (error == ERROR_BROKEN_PIPE)
+					{
+						buffered_out.make_append_space(read_bytes);
+						buffered_out.flush_append_space();
+						break;
+					}
+					throw boost::system::system_error(error, boost::system::native_ecat);
+				}
+				if (available == 0)
+				{
+					auto buffer = buffered_out.make_append_space(1);
+					DWORD read_bytes = 0;
+					BOOL const read_result = ReadFile(pipe_in, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, nullptr);
+					if (read_result)
+					{
+						buffered_out.flush_append_space();
+						continue;
+					}
+					else
+					{
+						auto error = ::GetLastError();
+						if (error == ERROR_BROKEN_PIPE)
+						{
+							buffered_out.make_append_space(read_bytes);
+							buffered_out.flush_append_space();
+							break;
+						}
+						throw boost::system::system_error(error, boost::system::native_ecat);
+					}
+				}
+				if (ReadFile(pipe_in, buffer.begin(), available, &read_bytes, nullptr))
+				{
+					assert(available == read_bytes);
+					buffered_out.make_append_space(read_bytes);
+					buffered_out.flush_append_space();
+				}
+				else
+				{
+					throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+				}
+			}
+			buffered_out.flush();
+		}
+	}
+#endif
 	namespace experimental
 	{
 		//TODO: find a more generic API for reading from a pipe portably

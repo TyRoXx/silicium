@@ -172,7 +172,7 @@ namespace
 
 		if (!cached.get())
 		{
-			std::cerr << "The cache does not exist. Doing an initial clone of " << repository << "\n";
+			std::cerr << "The cache does not exist. Doing an initial clone of " << Si::to_utf8_string(repository) << "\n";
 			switch (clone(repository, repository_cache))
 			{
 			case clone_result::success:

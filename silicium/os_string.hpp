@@ -2,6 +2,7 @@
 #define SILICIUM_OS_STRING_HPP
 
 #include <silicium/noexcept_string.hpp>
+#include <silicium/throw_last_error.hpp>
 #ifdef _WIN32
 #	include <silicium/win32/win32.hpp>
 #endif
@@ -32,6 +33,7 @@ namespace Si
 		return original;
 	}
 
+#ifndef _WIN32
 	inline os_string to_os_string(std::string const &original)
 	{
 		return os_string(original.begin(), original.end());
@@ -41,6 +43,7 @@ namespace Si
 	{
 		return original;
 	}
+#endif
 
 #ifdef _WIN32
 	namespace win32
@@ -76,6 +79,38 @@ namespace Si
 	inline os_string to_os_string(noexcept_string const &original)
 	{
 		return win32::utf8_to_winapi_string(original.data(), original.size());
+	}
+#endif
+
+#ifdef _WIN32
+	inline std::string to_utf8_string(os_string const &str)
+	{
+		if (str.empty())
+		{
+			//because WideCharToMultiByte fails for empty input
+			return {};
+		}
+		if (str.length() > static_cast<size_t>((std::numeric_limits<int>::max)()))
+		{
+			throw std::invalid_argument("Input string is too long for WinAPI");
+		}
+		int destination_length = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str.length(), nullptr, 0, 0, FALSE);
+		if (!destination_length)
+		{
+			throw_last_error();
+		}
+		std::string result;
+		result.resize(destination_length);
+		if (!WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str.length(), &result.front(), destination_length, 0, FALSE))
+		{
+			throw_last_error();
+		}
+		return result;
+	}
+#else
+	inline std::string to_utf8_string(os_string str)
+	{
+		return str;
 	}
 #endif
 }
