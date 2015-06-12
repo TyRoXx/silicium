@@ -47,13 +47,7 @@ namespace bf
 	{
 		return Si::transform_if_initialized(std::forward<Source>(source), detect_command);
 	}
-
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-#	define SILICIUM_CAPTURE(x) = (x)
-#else
-#	define SILICIUM_CAPTURE(x)
-#endif
-
+	
 	template <class CommandRange>
 	typename CommandRange::const_iterator find_loop_begin(
 		CommandRange const &program,
@@ -132,7 +126,7 @@ namespace bf
 #endif
 	{
 		return Si::make_coroutine_generator<boost::uint8_t>([
-			input SILICIUM_CAPTURE(std::forward<Input>(input)),
+			SILICIUM_MOVE_CAPTURE(input, std::forward<Input>(input)),
 			program,
 			&memory,
 			original_pointer
