@@ -104,22 +104,18 @@ namespace
 		);
 
 	SILICIUM_USE_RESULT
-	clone_result clone(
-		Si::os_string const &repository,
-		Si::absolute_path const &repository_cache)
+	Si::optional<int> execute_process(Si::absolute_path executable, std::vector<Si::os_string> arguments, Si::absolute_path working_directory)
 	{
 		Si::async_process_parameters parameters;
 		parameters.executable = git_exe;
-		parameters.arguments.emplace_back(Si::to_os_string("clone"));
-		parameters.arguments.emplace_back(repository);
-		parameters.arguments.emplace_back(repository_cache.c_str());
-		parameters.current_path = repository_cache;
+		parameters.current_path = working_directory;
+		parameters.arguments = std::move(arguments);
 		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		auto input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle);
 		if (handle_error(maybe_process.error(), "Could not create git process"))
 		{
-			return clone_result::failure;
+			return Si::none;
 		}
 		input.read.close();
 		output.write.close();
@@ -137,13 +133,53 @@ namespace
 			}
 		}
 		int const result = process.wait_for_exit().get();
-		if (result != 0)
+		return result;
+	}
+
+	SILICIUM_USE_RESULT
+	clone_result clone(
+		Si::os_string const &repository,
+		Si::absolute_path const &repository_cache)
+	{
+		std::vector<Si::os_string> arguments;
+		arguments.emplace_back(Si::to_os_string("clone"));
+		arguments.emplace_back(repository);
+		arguments.emplace_back(repository_cache.c_str());
+		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository_cache);
+		if (!result)
 		{
-			std::cerr << "Git clone failed\n";
 			return clone_result::failure;
 		}
-
+		if (*result != 0)
+		{
+			std::cerr << "Git clone failed with " << *result << "\n";
+			return clone_result::failure;
+		}
 		return clone_result::success;
+	}
+
+	enum class fetch_result
+	{
+		success,
+		failure
+	};
+
+	SILICIUM_USE_RESULT
+	fetch_result fetch(Si::absolute_path const &repository)
+	{
+		std::vector<Si::os_string> arguments;
+		arguments.emplace_back(Si::to_os_string("fetch"));
+		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository);
+		if (!result)
+		{
+			return fetch_result::failure;
+		}
+		if (*result != 0)
+		{
+			std::cerr << "Git fetch failed with " << *result << "\n";
+			return fetch_result::failure;
+		}
+		return fetch_result::success;
 	}
 
 	enum class build_trigger_result
@@ -170,7 +206,20 @@ namespace
 			return build_trigger_result::failure;
 		}
 
-		if (!cached.get())
+		if (cached.get())
+		{
+			std::cerr << "Fetching the cached repository " << Si::to_utf8_string(repository) << "\n";
+			switch (fetch(repository_cache))
+			{
+			case fetch_result::success:
+				std::cerr << "Fetched the repository\n";
+				break;
+
+			case fetch_result::failure:
+				return build_trigger_result::failure;
+			}
+		}
+		else
 		{
 			std::cerr << "The cache does not exist. Doing an initial clone of " << Si::to_utf8_string(repository) << "\n";
 			switch (clone(repository, repository_cache))
