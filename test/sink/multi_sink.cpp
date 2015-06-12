@@ -24,8 +24,8 @@ BOOST_AUTO_TEST_CASE(multi_sink_multiple)
 		return sinks;
 	});
 	BOOST_CHECK(!Si::append(sink, 23));
-	BOOST_REQUIRE_EQUAL(a.size(), 1);
-	BOOST_REQUIRE_EQUAL(b.size(), 1);
+	BOOST_REQUIRE_EQUAL(a.size(), 1u);
+	BOOST_REQUIRE_EQUAL(b.size(), 1u);
 	BOOST_CHECK_EQUAL(a[0], 23);
 	BOOST_CHECK_EQUAL(b[0], 23);
 }

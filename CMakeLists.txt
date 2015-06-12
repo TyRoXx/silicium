@@ -49,6 +49,9 @@ if(MSVC)
 	#Boost in_place triggers /W4 warning about an assignment operator that could not be generated
 	add_definitions("/wd4512")
 
+	#stupid warning about std::copy
+	add_definitions("/wd4996")
+
 	#workaround for Boost 1.55 Context error LNK2026
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 

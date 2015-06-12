@@ -53,6 +53,6 @@ BOOST_AUTO_TEST_CASE(make_array_explicit_type)
 	}
 	{
 		std::array<int, 0> f = Si::make_array<int>();
-		BOOST_CHECK_EQUAL(0, f.size());
+		BOOST_CHECK_EQUAL(0u, f.size());
 	}
 }
