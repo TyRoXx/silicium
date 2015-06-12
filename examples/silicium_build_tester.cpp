@@ -294,7 +294,7 @@ namespace
 		boost::asio::spawn(
 			on_exit,
 			[
-				SILICIUM_MOVE_CAPTURE(client, std::move(client)),
+				SILICIUM_CAPTURE_EXPRESSION(client, std::move(client)),
 				&repository,
 				&repository_cache
 			](boost::asio::basic_yield_context<decltype(on_exit) &> yield)

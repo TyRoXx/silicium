@@ -126,7 +126,7 @@ namespace bf
 #endif
 	{
 		return Si::make_coroutine_generator<boost::uint8_t>([
-			SILICIUM_MOVE_CAPTURE(input, std::forward<Input>(input)),
+			SILICIUM_CAPTURE_EXPRESSION(input, std::forward<Input>(input)),
 			program,
 			&memory,
 			original_pointer

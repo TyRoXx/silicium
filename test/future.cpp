@@ -37,8 +37,8 @@ namespace Si
 				Handler handler(std::forward<CompletionToken>(token));
 				boost::asio::async_result<Handler> result(handler);
 				m_handle = ThreadingAPI::launch_async([
-					SILICIUM_MOVE_CAPTURE(function, std::forward<F>(function)),
-					SILICIUM_MOVE_CAPTURE(handler, std::move(handler))
+					SILICIUM_CAPTURE_EXPRESSION(function, std::forward<F>(function)),
+					SILICIUM_CAPTURE_EXPRESSION(handler, std::move(handler))
 				]() mutable
 				{
 					std::move(handler)(std::forward<F>(function)());

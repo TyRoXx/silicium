@@ -76,9 +76,9 @@
 #endif
 
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-#	define SILICIUM_MOVE_CAPTURE(name, value) name = value
+#	define SILICIUM_CAPTURE_EXPRESSION(name, value) name = value
 #else
-#	define SILICIUM_MOVE_CAPTURE(name, value) name
+#	define SILICIUM_CAPTURE_EXPRESSION(name, value) name
 #endif
 
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
