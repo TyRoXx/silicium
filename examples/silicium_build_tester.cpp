@@ -89,12 +89,6 @@ namespace
 		return output_chunk_result::more;
 	}
 
-	enum class clone_result
-	{
-		success,
-		failure
-	};
-
 	Si::absolute_path const git_exe = *Si::absolute_path::create(
 #ifdef _WIN32
 		L"C:\\Program Files (x86)\\Git\\bin\\git.exe"
@@ -136,8 +130,13 @@ namespace
 		return result;
 	}
 
-	SILICIUM_USE_RESULT
-	clone_result clone(
+	enum class success_or_failure
+	{
+		success,
+		failure
+	};
+
+	success_or_failure clone(
 		Si::os_string const &repository,
 		Si::absolute_path const &repository_cache)
 	{
@@ -148,54 +147,40 @@ namespace
 		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository_cache);
 		if (!result)
 		{
-			return clone_result::failure;
+			return success_or_failure::failure;
 		}
 		if (*result != 0)
 		{
 			std::cerr << "Git clone failed with " << *result << "\n";
-			return clone_result::failure;
+			return success_or_failure::failure;
 		}
-		return clone_result::success;
+		return success_or_failure::success;
 	}
 
-	enum class fetch_result
-	{
-		success,
-		failure
-	};
-
-	SILICIUM_USE_RESULT
-	fetch_result fetch(Si::absolute_path const &repository)
+	success_or_failure fetch(Si::absolute_path const &repository)
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(Si::to_os_string("fetch"));
 		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository);
 		if (!result)
 		{
-			return fetch_result::failure;
+			return success_or_failure::failure;
 		}
 		if (*result != 0)
 		{
 			std::cerr << "Git fetch failed with " << *result << "\n";
-			return fetch_result::failure;
+			return success_or_failure::failure;
 		}
-		return fetch_result::success;
+		return success_or_failure::success;
 	}
-
-	enum class build_trigger_result
-	{
-		success,
-		failure
-	};
-
-	SILICIUM_USE_RESULT
-	build_trigger_result trigger_build(
-		Si::os_string const &repository,
+	
+	success_or_failure update_repository(
+		Si::os_string const &origin,
 		Si::absolute_path const &repository_cache)
 	{
 		if (handle_error(Si::create_directories(repository_cache), "Could not create repository cache directory"))
 		{
-			return build_trigger_result::failure;
+			return success_or_failure::failure;
 		}
 
 		auto const cache_git_dir = repository_cache / Si::relative_path(".git");
@@ -203,37 +188,69 @@ namespace
 		if (cached.is_error())
 		{
 			std::cerr << "Could not determine whether " << cache_git_dir << " exists\n";
-			return build_trigger_result::failure;
+			return success_or_failure::failure;
 		}
 
 		if (cached.get())
 		{
-			std::cerr << "Fetching the cached repository " << Si::to_utf8_string(repository) << "\n";
+			std::cerr << "Fetching the cached repository " << Si::to_utf8_string(origin) << "\n";
 			switch (fetch(repository_cache))
 			{
-			case fetch_result::success:
+			case success_or_failure::success:
 				std::cerr << "Fetched the repository\n";
 				break;
 
-			case fetch_result::failure:
-				return build_trigger_result::failure;
+			case success_or_failure::failure:
+				return success_or_failure::failure;
 			}
 		}
 		else
 		{
-			std::cerr << "The cache does not exist. Doing an initial clone of " << Si::to_utf8_string(repository) << "\n";
-			switch (clone(repository, repository_cache))
+			std::cerr << "The cache does not exist. Doing an initial clone of " << Si::to_utf8_string(origin) << "\n";
+			switch (clone(origin, repository_cache))
 			{
-			case clone_result::success:
+			case success_or_failure::success:
 				std::cerr << "Created initial clone of the repository\n";
 				break;
 
-			case clone_result::failure:
-				return build_trigger_result::failure;
+			case success_or_failure::failure:
+				return success_or_failure::failure;
 			}
 		}
+		return success_or_failure::success;
+	}
 
-		return build_trigger_result::success;
+	success_or_failure checkout(Si::absolute_path const &repository)
+	{
+		std::vector<Si::os_string> arguments;
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("checkout"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("origin/master"));
+		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository);
+		if (!result)
+		{
+			return success_or_failure::failure;
+		}
+		if (*result != 0)
+		{
+			std::cerr << "Git checkout failed with " << *result << "\n";
+			return success_or_failure::failure;
+		}
+		return success_or_failure::success;
+	}
+
+	success_or_failure trigger_build(
+		Si::os_string const &origin,
+		Si::absolute_path const &repository_cache)
+	{
+		if (update_repository(origin, repository_cache) != success_or_failure::success)
+		{
+			return success_or_failure::failure;
+		}
+		if (checkout(repository_cache) != success_or_failure::success)
+		{
+			return success_or_failure::failure;
+		}
+		return success_or_failure::success;
 	}
 
 	template <class YieldContext>
@@ -298,11 +315,11 @@ namespace
 				{
 					switch (trigger_build(repository, repository_cache))
 					{
-					case build_trigger_result::success:
+					case success_or_failure::success:
 						html.write("build success");
 						break;
 
-					case build_trigger_result::failure:
+					case success_or_failure::failure:
 						html.write("build failure");
 						break;
 					}
