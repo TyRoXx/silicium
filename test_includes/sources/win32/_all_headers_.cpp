@@ -45,6 +45,7 @@
 #include <silicium/http/receive_request.hpp>
 #include <silicium/http/request_parser_sink.hpp>
 #include <silicium/http/uri.hpp>
+#include <silicium/identity.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/make_array.hpp>
