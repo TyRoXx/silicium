@@ -65,6 +65,8 @@ if(MSVC)
 		#Boost 1.58 Coroutine warning about throw in a noexcept function
 		add_definitions("/wd4297")
 	endif()
+
+	add_definitions("-DBOOST_ASIO_NO_DEPRECATED")
 endif()
 
 if(MSVC)
