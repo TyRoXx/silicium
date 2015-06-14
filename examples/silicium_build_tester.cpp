@@ -313,6 +313,27 @@ namespace
 		return success_or_failure::success;
 	}
 
+	SILICIUM_USE_RESULT
+	success_or_failure run_silicium_tests(Si::absolute_path const &build)
+	{
+		Si::absolute_path const test_dir = build / Si::relative_path("test");
+		Si::absolute_path const test_exe = test_dir / Si::relative_path("unit_test");
+		std::vector<Si::os_string> arguments;
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("--progress=yes"));
+		Si::optional<int> const result = execute_process(test_exe, std::move(arguments), test_dir);
+		if (!result)
+		{
+			std::cerr << "Could not start unit test process process " << test_exe << '\n';
+			return success_or_failure::failure;
+		}
+		if (*result != 0)
+		{
+			std::cerr << "Tests failed with " << *result << "\n";
+			return success_or_failure::failure;
+		}
+		return success_or_failure::success;
+	}
+
 	void build_silicium(
 		Si::os_string const &origin,
 		Si::absolute_path const &workspace)
@@ -361,6 +382,16 @@ namespace
 
 		case success_or_failure::failure:
 			std::cerr << "CMake build failed\n";
+			return;
+		}
+
+		switch (run_silicium_tests(build_directory))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "Silicium tests failed\n";
 			return;
 		}
 	}
