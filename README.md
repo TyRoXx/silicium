@@ -54,3 +54,14 @@ to do
 * static analysis
 * move the web server stuff to a separate library (including the uriparser dependency)
 * move the zlib wrapper to a separate library
+* rename fast_variant to either flat_variant or variant
+* allow for recursive variants
+* reduce sizeof(fast_variant<T>) to sizeof(T)
+* reduce sizeof(fast_variant<char>) to (sizeof(char) * 2)
+* check whether fast_variant<T &> makes sense
+* Asio-style async_wait for the end of a child process
+* async read and write for anonymous pipes on Win32
+* further investigation of container wrappers like Si::vector
+* move everything HTTP into a separate library
+* Asio-style websockets
+* investigate async read and write for files
