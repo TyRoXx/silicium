@@ -27,4 +27,16 @@ namespace Si
 	}
 }
 
+namespace std
+{
+	template <>
+	struct hash<Si::byte>
+	{
+		std::size_t operator()(Si::byte value) const
+		{
+			return hash_value(value);
+		}
+	};
+}
+
 #endif
