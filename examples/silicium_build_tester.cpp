@@ -101,7 +101,7 @@ namespace
 	Si::optional<int> execute_process(Si::absolute_path executable, std::vector<Si::os_string> arguments, Si::absolute_path working_directory)
 	{
 		Si::async_process_parameters parameters;
-		parameters.executable = git_exe;
+		parameters.executable = executable;
 		parameters.current_path = working_directory;
 		parameters.arguments = std::move(arguments);
 		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
@@ -238,18 +238,38 @@ namespace
 		return success_or_failure::success;
 	}
 
+	struct build_state
+	{
+		Si::optional<std::future<void>> current_build_process;
+	};
+
 	success_or_failure trigger_build(
+		boost::asio::io_service &synchronizer,
+		build_state &state,
 		Si::os_string const &origin,
 		Si::absolute_path const &repository_cache)
 	{
-		if (update_repository(origin, repository_cache) != success_or_failure::success)
+		if (state.current_build_process)
 		{
-			return success_or_failure::failure;
+			std::cerr << "We are already building\n";
+			return success_or_failure::success;
 		}
-		if (checkout(repository_cache) != success_or_failure::success)
+		std::cerr << "Starting build thread\n";
+		state.current_build_process = std::async(
+			std::launch::async,
+			[origin, repository_cache, &synchronizer, &state]
 		{
-			return success_or_failure::failure;
-		}
+			if (update_repository(origin, repository_cache) == success_or_failure::success)
+			{
+				checkout(repository_cache);
+			}
+			synchronizer.post([&state]
+			{
+				std::cerr << "Build thread finished\n";
+				state.current_build_process->get();
+				state.current_build_process = Si::none;
+			});
+		});
 		return success_or_failure::success;
 	}
 
@@ -258,6 +278,7 @@ namespace
 		boost::asio::ip::tcp::socket &client,
 		Si::os_string const &repository,
 		Si::absolute_path const &repository_cache,
+		build_state &state,
 		YieldContext yield)
 	{
 		Si::asio::basic_socket_source<YieldContext> receiver(client, yield);
@@ -313,7 +334,7 @@ namespace
 			{
 				if (request.method == "POST")
 				{
-					switch (trigger_build(repository, repository_cache))
+					switch (trigger_build(client.get_io_service(), state, repository, repository_cache))
 					{
 					case success_or_failure::success:
 						html.write("build success");
@@ -351,7 +372,8 @@ namespace
 	void handle_client(
 		std::shared_ptr<boost::asio::ip::tcp::socket> client,
 		Si::os_string const &repository,
-		Si::absolute_path const &repository_cache)
+		Si::absolute_path const &repository_cache,
+		build_state &state)
 	{
 		assert(client);
 		auto on_exit = []()
@@ -362,10 +384,11 @@ namespace
 			[
 				SILICIUM_CAPTURE_EXPRESSION(client, std::move(client)),
 				&repository,
-				&repository_cache
+				&repository_cache,
+				&state
 			](boost::asio::basic_yield_context<decltype(on_exit) &> yield)
 			{
-				serve_web_client(*client, repository, repository_cache, yield);
+				serve_web_client(*client, repository, repository_cache, state, yield);
 			}
 		);
 	}
@@ -423,14 +446,16 @@ int main(int argc, char **argv)
 	Si::absolute_path const absolute_cache = *Si::absolute_path::create(boost::filesystem::absolute(cache));
 	Si::os_string const repository_as_os_string = Si::to_os_string(repository);
 
+	build_state state;
+
 	boost::asio::io_service io;
-	boost::asio::spawn(io, [&io, listen_port, &repository_as_os_string, &absolute_cache](boost::asio::yield_context yield)
+	boost::asio::spawn(io, [&io, listen_port, &repository_as_os_string, &absolute_cache, &state](boost::asio::yield_context yield)
 	{
 		boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
 		for (;;)
 		{
 			std::shared_ptr<boost::asio::ip::tcp::socket> client = async_accept(acceptor, yield);
-			handle_client(std::move(client), repository_as_os_string, absolute_cache);
+			handle_client(std::move(client), repository_as_os_string, absolute_cache, state);
 		}
 	});
 	io.run();
