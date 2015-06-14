@@ -281,6 +281,47 @@ namespace Si
 	}
 
 	SILICIUM_USE_RESULT
+	inline error_or<boost::uint64_t> remove_all(absolute_path const &directories)
+	{
+		boost::system::error_code ec;
+		auto count = boost::filesystem::remove_all(directories.to_boost_path(), ec);
+		if (!!ec)
+		{
+			return ec;
+		}
+		return count;
+	}
+
+	SILICIUM_USE_RESULT
+	inline boost::system::error_code recreate_directories(absolute_path const &directories)
+	{
+		boost::system::error_code error = create_directories(directories);
+		if (!!error)
+		{
+			return error;
+		}
+		boost::filesystem::directory_iterator i(directories.to_boost_path(), error);
+		if (!!error)
+		{
+			return error;
+		}
+		for (; i != boost::filesystem::directory_iterator{}; )
+		{
+			boost::filesystem::remove_all(i->path(), error);
+			if (!!error)
+			{
+				return error;
+			}
+			i.increment(error);
+			if (!!error)
+			{
+				return error;
+			}
+		}
+		return error;
+	}
+
+	SILICIUM_USE_RESULT
 	inline error_or<bool> file_exists(absolute_path const &file)
 	{
 		boost::system::error_code ec;

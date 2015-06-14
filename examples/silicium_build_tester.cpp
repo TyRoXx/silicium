@@ -98,6 +98,14 @@ namespace
 #endif
 		);
 
+	Si::absolute_path const cmake_exe = *Si::absolute_path::create(
+#ifdef _WIN32
+		L"C:\\Program Files (x86)\\CMake\\cmake.exe"
+#else
+		"/usr/bin/cmake"
+#endif
+		);
+
 	SILICIUM_USE_RESULT
 	Si::optional<int> execute_process(Si::absolute_path executable, std::vector<Si::os_string> arguments, Si::absolute_path working_directory)
 	{
@@ -260,10 +268,56 @@ namespace
 		std::forward<Finalizer>(finalize)();
 	}
 
+	SILICIUM_USE_RESULT
+	success_or_failure cmake_generate(
+		Si::absolute_path const &source,
+		Si::absolute_path const &build)
+	{
+		std::vector<Si::os_string> arguments;
+		arguments.emplace_back(source.c_str());
+		Si::optional<int> const result = execute_process(cmake_exe, std::move(arguments), build);
+		if (!result)
+		{
+			std::cerr << "Could not start CMake process " << cmake_exe << '\n';
+			return success_or_failure::failure;
+		}
+		if (*result != 0)
+		{
+			std::cerr << "CMake failed with " << *result << "\n";
+			return success_or_failure::failure;
+		}
+		return success_or_failure::success;
+	}
+
+	SILICIUM_USE_RESULT
+	success_or_failure cmake_build(Si::absolute_path const &build)
+	{
+		std::vector<Si::os_string> arguments;
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("--build"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("."));
+#ifndef _WIN32
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("--"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-j12"));
+#endif
+		Si::optional<int> const result = execute_process(cmake_exe, std::move(arguments), build);
+		if (!result)
+		{
+			std::cerr << "Could not start CMake process " << cmake_exe << '\n';
+			return success_or_failure::failure;
+		}
+		if (*result != 0)
+		{
+			std::cerr << "CMake build failed with " << *result << "\n";
+			return success_or_failure::failure;
+		}
+		return success_or_failure::success;
+	}
+
 	void build_silicium(
 		Si::os_string const &origin,
-		Si::absolute_path const &repository_cache)
+		Si::absolute_path const &workspace)
 	{
+		Si::absolute_path const repository_cache = workspace / Si::relative_path("cache.git");
 		switch (update_repository(origin, repository_cache))
 		{
 		case success_or_failure::success:
@@ -283,13 +337,39 @@ namespace
 			std::cerr << "Git checkout failed\n";
 			return;
 		}
+
+		Si::absolute_path const build_directory = workspace / Si::relative_path("build");
+		if (handle_error(Si::recreate_directories(build_directory), "Could not clear the build directory"))
+		{
+			return;
+		}
+
+		switch (cmake_generate(repository_cache, build_directory))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "CMake generate failed\n";
+			return;
+		}
+
+		switch (cmake_build(build_directory))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "CMake build failed\n";
+			return;
+		}
 	}
 
 	void trigger_build(
 		boost::asio::io_service &synchronizer,
 		build_state &state,
 		Si::os_string const &origin,
-		Si::absolute_path const &repository_cache)
+		Si::absolute_path const &workspace)
 	{
 		if (state.current_build_process)
 		{
@@ -299,12 +379,12 @@ namespace
 		std::cerr << "Starting build thread\n";
 		state.current_build_process = std::async(
 			std::launch::async,
-			[origin, repository_cache, &synchronizer, &state]
+			[origin, workspace, &synchronizer, &state]
 		{
 			finally(
-				[&origin, &repository_cache]()
+				[&origin, &workspace]()
 				{
-					build_silicium(origin, repository_cache);
+					build_silicium(origin, workspace);
 				},
 				[&state, &synchronizer]
 				{
@@ -331,7 +411,7 @@ namespace
 	void serve_web_client(
 		boost::asio::ip::tcp::socket &client,
 		Si::os_string const &repository,
-		Si::absolute_path const &repository_cache,
+		Si::absolute_path const &workspace,
 		build_state &state,
 		YieldContext yield)
 	{
@@ -395,7 +475,7 @@ namespace
 			{
 				if (request.method == "POST")
 				{
-					trigger_build(client.get_io_service(), state, repository, repository_cache);
+					trigger_build(client.get_io_service(), state, repository, workspace);
 					html.write("build was triggered");
 				}
 				html("form",
@@ -425,7 +505,7 @@ namespace
 	void handle_client(
 		std::shared_ptr<boost::asio::ip::tcp::socket> client,
 		Si::os_string const &repository,
-		Si::absolute_path const &repository_cache,
+		Si::absolute_path const &workspace,
 		build_state &state)
 	{
 		assert(client);
@@ -437,11 +517,11 @@ namespace
 			[
 				SILICIUM_CAPTURE_EXPRESSION(client, std::move(client)),
 				&repository,
-				&repository_cache,
+				&workspace,
 				&state
 			](boost::asio::basic_yield_context<decltype(on_exit) &> yield)
 			{
-				serve_web_client(*client, repository, repository_cache, state, yield);
+				serve_web_client(*client, repository, workspace, state, yield);
 			}
 		);
 	}
@@ -457,19 +537,19 @@ namespace
 int main(int argc, char **argv)
 {
 	std::string repository;
-	std::string cache;
+	std::string workspace;
 	boost::uint16_t listen_port = 8080;
 
 	boost::program_options::options_description options("options");
 	options.add_options()
 		("help,h", "produce help message")
 		("repository,r", boost::program_options::value(&repository), "the Git URI to clone from")
-		("cache,c", boost::program_options::value(&cache), "the directory to use as a cache for the repository")
+		("workspace,w", boost::program_options::value(&workspace), "the directory for temporary files (git cache, build output)")
 		("port,p", boost::program_options::value(&listen_port), "the port to listen on for HTTP requests")
 		;
 	boost::program_options::positional_options_description positional;
 	positional.add("repository", 1);
-	positional.add("cache", 1);
+	positional.add("workspace", 1);
 	boost::program_options::variables_map variables;
 	try
 	{
@@ -489,26 +569,26 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	if (repository.empty() || cache.empty())
+	if (repository.empty() || workspace.empty())
 	{
 		std::cerr << options << '\n';
 		std::cerr << "Missing option\n";
 		return 1;
 	}
 
-	Si::absolute_path const absolute_cache = *Si::absolute_path::create(boost::filesystem::absolute(cache));
+	Si::absolute_path const absolute_workspace = *Si::absolute_path::create(boost::filesystem::absolute(workspace));
 	Si::os_string const repository_as_os_string = Si::to_os_string(repository);
 
 	build_state state;
 
 	boost::asio::io_service io;
-	boost::asio::spawn(io, [&io, listen_port, &repository_as_os_string, &absolute_cache, &state](boost::asio::yield_context yield)
+	boost::asio::spawn(io, [&io, listen_port, &repository_as_os_string, &absolute_workspace, &state](boost::asio::yield_context yield)
 	{
 		boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
 		for (;;)
 		{
 			std::shared_ptr<boost::asio::ip::tcp::socket> client = async_accept(acceptor, yield);
-			handle_client(std::move(client), repository_as_os_string, absolute_cache, state);
+			handle_client(std::move(client), repository_as_os_string, absolute_workspace, state);
 		}
 	});
 	io.run();
