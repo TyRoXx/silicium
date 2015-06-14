@@ -1,6 +1,7 @@
 #include <silicium/async_process.hpp>
 #include <silicium/http/generate_response.hpp>
 #include <silicium/http/receive_request.hpp>
+#include <silicium/http/uri.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
@@ -359,7 +360,14 @@ namespace
 			return respond(client, Si::make_c_str_range("405"), Si::make_c_str_range("Method Not Allowed"), Si::make_c_str_range("this HTTP method is not supported by this server"), yield);
 		}
 
-		if (request.path != "/")
+		Si::optional<Si::http::uri> const maybe_parsed_path = Si::http::parse_uri(Si::make_contiguous_range(request.path));
+		if (!maybe_parsed_path)
+		{
+			return respond(client, Si::make_c_str_range("400"), Si::make_c_str_range("Bad Request"), Si::make_c_str_range("the requested path has an unknown format"), yield);
+		}
+		Si::http::uri const &parsed_path = *maybe_parsed_path;
+
+		if (!parsed_path.path.empty())
 		{
 			return respond(client, Si::make_c_str_range("404"), Si::make_c_str_range("Not Found"), Si::make_c_str_range("unknown path"), yield);
 		}
