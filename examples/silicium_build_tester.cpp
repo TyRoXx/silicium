@@ -157,7 +157,7 @@ namespace
 		return success_or_failure::success;
 	}
 
-	success_or_failure fetch(Si::absolute_path const &repository)
+	SILICIUM_USE_RESULT success_or_failure fetch(Si::absolute_path const &repository)
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(Si::to_os_string("fetch"));
@@ -174,7 +174,7 @@ namespace
 		return success_or_failure::success;
 	}
 	
-	success_or_failure update_repository(
+	SILICIUM_USE_RESULT success_or_failure update_repository(
 		Si::os_string const &origin,
 		Si::absolute_path const &repository_cache)
 	{
@@ -220,7 +220,7 @@ namespace
 		return success_or_failure::success;
 	}
 
-	success_or_failure checkout(Si::absolute_path const &repository)
+	SILICIUM_USE_RESULT success_or_failure checkout(Si::absolute_path const &repository)
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("checkout"));
@@ -228,6 +228,7 @@ namespace
 		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository);
 		if (!result)
 		{
+			std::cerr << "Could not start Git process " << git_exe << '\n';
 			return success_or_failure::failure;
 		}
 		if (*result != 0)
@@ -243,7 +244,22 @@ namespace
 		Si::optional<std::future<void>> current_build_process;
 	};
 
-	success_or_failure trigger_build(
+	template <class Body, class Finalizer>
+	void finally(Body &&body, Finalizer &&finalize)
+	{
+		try
+		{
+			std::forward<Body>(body)();
+		}
+		catch (...)
+		{
+			std::forward<Finalizer>(finalize)();
+			throw;
+		}
+		std::forward<Finalizer>(finalize)();
+	}
+
+	void trigger_build(
 		boost::asio::io_service &synchronizer,
 		build_state &state,
 		Si::os_string const &origin,
@@ -252,25 +268,54 @@ namespace
 		if (state.current_build_process)
 		{
 			std::cerr << "We are already building\n";
-			return success_or_failure::success;
+			return;
 		}
 		std::cerr << "Starting build thread\n";
 		state.current_build_process = std::async(
 			std::launch::async,
 			[origin, repository_cache, &synchronizer, &state]
 		{
-			if (update_repository(origin, repository_cache) == success_or_failure::success)
-			{
-				checkout(repository_cache);
-			}
-			synchronizer.post([&state]
-			{
-				std::cerr << "Build thread finished\n";
-				state.current_build_process->get();
-				state.current_build_process = Si::none;
-			});
+			finally(
+				[&origin, &repository_cache]()
+				{
+					switch (update_repository(origin, repository_cache))
+					{
+					case success_or_failure::success:
+						switch (checkout(repository_cache))
+						{
+						case success_or_failure::success:
+							break;
+
+						case success_or_failure::failure:
+							std::cerr << "Git checkout failed\n";
+							break;
+						}
+						break;
+
+					case success_or_failure::failure:
+						std::cerr << "Could not update the repository\n";
+						break;
+					}
+				},
+				[&state, &synchronizer]
+				{
+					synchronizer.post([&state]
+					{
+						std::cerr << "Build thread finished\n";
+						std::future<void> result = std::move(*state.current_build_process);
+						state.current_build_process = Si::none;
+						try
+						{
+							result.get();
+						}
+						catch (std::exception const &ex)
+						{
+							std::cerr << "The build thread failed with an exception: " << ex.what() << '\n';
+						}
+					});
+				}
+			);
 		});
-		return success_or_failure::success;
 	}
 
 	template <class YieldContext>
@@ -334,16 +379,8 @@ namespace
 			{
 				if (request.method == "POST")
 				{
-					switch (trigger_build(client.get_io_service(), state, repository, repository_cache))
-					{
-					case success_or_failure::success:
-						html.write("build success");
-						break;
-
-					case success_or_failure::failure:
-						html.write("build failure");
-						break;
-					}
+					trigger_build(client.get_io_service(), state, repository, repository_cache);
+					html.write("build was triggered");
 				}
 				html("form",
 					[&]
