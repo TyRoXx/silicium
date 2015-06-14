@@ -260,6 +260,31 @@ namespace
 		std::forward<Finalizer>(finalize)();
 	}
 
+	void build_silicium(
+		Si::os_string const &origin,
+		Si::absolute_path const &repository_cache)
+	{
+		switch (update_repository(origin, repository_cache))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "Could not update the repository\n";
+			return;
+		}
+
+		switch (checkout(repository_cache))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "Git checkout failed\n";
+			return;
+		}
+	}
+
 	void trigger_build(
 		boost::asio::io_service &synchronizer,
 		build_state &state,
@@ -279,24 +304,7 @@ namespace
 			finally(
 				[&origin, &repository_cache]()
 				{
-					switch (update_repository(origin, repository_cache))
-					{
-					case success_or_failure::success:
-						switch (checkout(repository_cache))
-						{
-						case success_or_failure::success:
-							break;
-
-						case success_or_failure::failure:
-							std::cerr << "Git checkout failed\n";
-							break;
-						}
-						break;
-
-					case success_or_failure::failure:
-						std::cerr << "Could not update the repository\n";
-						break;
-					}
+					build_silicium(origin, repository_cache);
 				},
 				[&state, &synchronizer]
 				{
