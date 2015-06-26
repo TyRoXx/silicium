@@ -327,8 +327,8 @@ namespace Si
 		template <class CharSink>
 		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file)
 		{
-			auto copyable_file = Si::to_shared(std::move(file));
 #ifdef _WIN32
+			auto copyable_file = Si::to_shared(std::move(file));
 			auto work = std::make_shared<boost::asio::io_service::work>(io);
 			Si::spawn_observable(
 				Si::asio::make_posting_observable(
@@ -340,7 +340,8 @@ namespace Si
 					})
 				)
 			);
-#else
+#elif SILICIUM_HAS_SPAWN_COROUTINE
+			auto copyable_file = Si::to_shared(std::move(file));
 			Si::spawn_coroutine([&io, destination, copyable_file](Si::spawn_context yield)
 			{
 				Si::process_output output_reader(Si::make_unique<Si::process_output::stream>(io, copyable_file->handle));
@@ -361,6 +362,44 @@ namespace Si
 					Si::append(destination, data);
 				}
 			});
+#else
+			typedef typename std::decay<CharSink>::type clean_destination;
+			struct pipe_reader : std::enable_shared_from_this<pipe_reader>
+			{
+				pipe_reader(boost::asio::io_service &io, Si::file_handle file, clean_destination destination)
+					: m_output(Si::make_unique<Si::process_output::stream>(io, file.handle))
+					, m_destination(std::move(destination))
+				{
+					file.release();
+				}
+
+				void start()
+				{
+					auto this_ = this->shared_from_this();
+					m_output.async_get_one(Si::make_function_observer([this_](optional<error_or<memory_range>> piece)
+					{
+						assert(piece);
+						if (piece->is_error())
+						{
+							return;
+						}
+						Si::memory_range data = piece->get();
+						if (data.empty())
+						{
+							return;
+						}
+						Si::append(this_->m_destination, data);
+						this_->start();
+					}));
+				}
+
+			private:
+
+				Si::process_output m_output;
+				clean_destination m_destination;
+			};
+			auto reader = std::make_shared<pipe_reader>(io, std::move(file), std::forward<CharSink>(destination));
+			reader->start();
 #endif
 		}
 	}
