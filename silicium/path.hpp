@@ -2,6 +2,7 @@
 #define SILICIUM_PATH_HPP
 
 #include <silicium/path_char.hpp>
+#include <boost/functional/hash.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <boost/filesystem/path.hpp>
 
