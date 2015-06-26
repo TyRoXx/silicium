@@ -107,12 +107,12 @@ namespace Si
 
 	inline bool operator == (path_segment const &left, boost::filesystem::path const &right)
 	{
-		return left.underlying() == right;
+		return left.underlying().c_str() == right;
 	}
 
 	inline bool operator == (boost::filesystem::path const &left, path_segment const &right)
 	{
-		return left == right.underlying();
+		return left == right.underlying().c_str();
 	}
 
 	inline bool operator == (path_segment const &left, path_segment const &right)

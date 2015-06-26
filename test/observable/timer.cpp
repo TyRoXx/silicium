@@ -5,7 +5,7 @@
 #include <boost/test/unit_test.hpp>
 #include <memory>
 
-#if SILICIUM_HAS_COROUTINE_GENERATOR
+#if SILICIUM_HAS_COROUTINE_OBSERVABLE
 BOOST_AUTO_TEST_CASE(asio_timer)
 {
 	boost::asio::io_service io;

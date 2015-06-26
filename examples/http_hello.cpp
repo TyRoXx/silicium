@@ -8,7 +8,7 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <iostream>
 
-#if SILICIUM_HAS_COROUTINE_OBSERVABLE
+#if SILICIUM_HAS_SPAWN_COROUTINE
 namespace
 {
 	template <class YieldContext>
@@ -94,7 +94,7 @@ namespace
 int main()
 {
 	boost::asio::io_service io;
-#if SILICIUM_HAS_COROUTINE_OBSERVABLE
+#if SILICIUM_HAS_SPAWN_COROUTINE
 	boost::system::error_code ec = spawn_server(io);
 	if (ec)
 	{
