@@ -13,6 +13,8 @@
 #include <iostream>
 #include <array>
 #include <boost/program_options.hpp>
+
+#if BOOST_VERSION >= 105400
 #include <boost/asio/spawn.hpp>
 
 namespace
@@ -624,3 +626,9 @@ int main(int argc, char **argv)
 	});
 	io.run();
 }
+#else
+int main()
+{
+	std::cerr << "This example requires boost::asio::spawn (Boost 1.54+)\n";
+}
+#endif

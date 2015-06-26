@@ -6,6 +6,7 @@
 #include <silicium/to_unique.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 namespace Si
 {
 	BOOST_AUTO_TEST_CASE(reactive_coroutine_generate)
@@ -63,6 +64,7 @@ namespace Si
 		BOOST_CHECK(expected == generated);
 	}
 }
+#endif
 
 #if 0 //TODO: make this one not crash on Windows
 BOOST_AUTO_TEST_CASE(coroutine_generator_self_destruct)

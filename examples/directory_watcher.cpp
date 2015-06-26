@@ -13,7 +13,13 @@ int main()
 	Si::single_directory_watcher notifier(io, watched_dir);
 	auto all = Si::for_each(Si::ref(notifier), [](Si::file_notification const &event)
 	{
-		std::cerr << boost::underlying_cast<int>(event.type) << " " << event.name << '\n';
+		std::cerr <<
+#if BOOST_VERSION >= 105000
+			boost::underlying_cast
+#else
+			static_cast
+#endif
+			<int>(event.type) << " " << event.name << '\n';
 	});
 	all.start();
 

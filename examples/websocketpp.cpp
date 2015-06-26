@@ -1,3 +1,7 @@
+#include <iostream>
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 105000
+
 #include <websocketpp/server.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 
@@ -40,3 +44,9 @@ int main()
 	server.start_accept();
 	server.run();
 }
+#else
+int main()
+{
+	std::cerr << "websocketpp requires a recent version of Boost\n";
+}
+#endif

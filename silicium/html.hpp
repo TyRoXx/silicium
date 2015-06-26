@@ -4,7 +4,12 @@
 #include <silicium/source/source.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/config.hpp>
+
+#if BOOST_VERSION >= 105300
 #include <boost/utility/string_ref.hpp>
+#else
+#include <silicium/noexcept_string.hpp>
+#endif
 
 namespace Si
 {
@@ -121,6 +126,14 @@ namespace Si
 		template <class CharSink>
 		struct generator
 		{
+			typedef
+#if BOOST_VERSION >= 105300
+				boost::string_ref
+#else
+				noexcept_string
+#endif
+				name_type;
+
 			generator()
 			{
 			}
@@ -131,7 +144,7 @@ namespace Si
 			}
 
 			template <class ContentMaker>
-			void element(boost::string_ref const &name, ContentMaker make_content)
+			void element(name_type const &name, ContentMaker make_content)
 			{
 				open_element(m_out, name);
 				make_content();
@@ -139,7 +152,7 @@ namespace Si
 			}
 
 			template <class AttributeMaker, class ContentMaker>
-			void element(boost::string_ref const &name, AttributeMaker make_attributes, ContentMaker make_content)
+			void element(name_type const &name, AttributeMaker make_attributes, ContentMaker make_content)
 			{
 				open_attributed_element(m_out, name);
 				make_attributes();
@@ -156,7 +169,7 @@ namespace Si
 				add_attribute(m_out, key, value);
 			}
 
-			void element(boost::string_ref const &name)
+			void element(name_type const &name)
 			{
 				unpaired_element(m_out, name);
 			}
@@ -168,7 +181,7 @@ namespace Si
 			}
 
 			template <class StringLike>
-			void element_with_text(boost::string_ref const &name, StringLike const &text)
+			void element_with_text(name_type const &name, StringLike const &text)
 			{
 				open_element(m_out, name);
 				write(text);

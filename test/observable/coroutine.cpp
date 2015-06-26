@@ -16,6 +16,8 @@
 #include <boost/asio/io_service.hpp>
 #include <functional>
 
+#if SILICIUM_HAS_COROUTINE_OBSERVABLE
+
 BOOST_AUTO_TEST_CASE(coroutine_trivial)
 {
 	auto coro = Si::make_coroutine([](Si::yield_context)
@@ -133,3 +135,5 @@ BOOST_AUTO_TEST_CASE(spawn_observable)
 	io.run();
 	BOOST_CHECK(elapsed);
 }
+
+#endif

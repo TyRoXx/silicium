@@ -5,6 +5,8 @@
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/std_threading.hpp>
 #include <boost/test/unit_test.hpp>
+
+#if BOOST_VERSION >= 105300
 #include <boost/atomic.hpp>
 
 BOOST_AUTO_TEST_CASE(asio_posting_observable)
@@ -32,3 +34,5 @@ BOOST_AUTO_TEST_CASE(asio_posting_observable)
 	io.run();
 	BOOST_CHECK(got_result.load());
 }
+
+#endif

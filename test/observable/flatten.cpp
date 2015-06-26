@@ -7,6 +7,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/interprocess/sync/null_mutex.hpp>
 
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 BOOST_AUTO_TEST_CASE(flatten_trivial)
 {
 	Si::bridge<int> a, b, c;
@@ -32,3 +33,4 @@ BOOST_AUTO_TEST_CASE(flatten_trivial)
 	std::vector<int> const expected{2, 3, 4, 5};
 	BOOST_CHECK(expected == generated);
 }
+#endif

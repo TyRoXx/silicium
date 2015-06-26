@@ -1,6 +1,7 @@
 #include "silicium.h"
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/coroutine.hpp>
+#include <silicium/observable/observer.hpp>
 
 struct silicium_receiver : Si::observer<void *>
 {
@@ -63,11 +64,13 @@ struct silicium_yield_context : Si::yield_context
 	{
 	}
 };
+#endif
 
 extern "C"
 silicium_observable *silicium_make_coroutine(silicium_coroutine_function action, void *user_data)
 {
 	assert(action);
+#if SILICIUM_HAS_COROUTINE_OBSERVABLE
 	try
 	{
 		auto result = Si::make_unique<silicium_coroutine>([action, user_data](Si::yield_context yield) -> void *
@@ -81,8 +84,10 @@ silicium_observable *silicium_make_coroutine(silicium_coroutine_function action,
 	{
 		return nullptr;
 	}
-}
+#else
+	return nullptr;
 #endif
+}
 
 extern "C"
 void silicium_async_get_one(silicium_observable *observable, silicium_observer_function callback, void *user_data)
@@ -99,9 +104,11 @@ void silicium_free_observable(silicium_observable *observable)
 	std::unique_ptr<silicium_observable>{observable};
 }
 
-#if SILICIUM_HAS_COROUTINE_OBSERVABLE
 void *silicium_yield_get_one(silicium_yield_context *yield, silicium_observable *from)
 {
+#if SILICIUM_HAS_COROUTINE_OBSERVABLE
 	return yield->get_one(Si::ref(*from)).get_value_or(nullptr);
-}
+#else
+	return nullptr;
 #endif
+}

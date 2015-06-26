@@ -3,7 +3,9 @@
 #include <silicium/observable/total_consumer.hpp>
 #include <silicium/observable/coroutine.hpp>
 #include <boost/test/unit_test.hpp>
+#include <memory>
 
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 BOOST_AUTO_TEST_CASE(asio_timer)
 {
 	boost::asio::io_service io;
@@ -26,6 +28,7 @@ BOOST_AUTO_TEST_CASE(asio_timer)
 	io.run();
 	BOOST_CHECK_EQUAL(loop_count, elapsed_count);
 }
+#endif
 
 namespace
 {

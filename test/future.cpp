@@ -1,3 +1,6 @@
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 105400
+
 #include <boost/asio/async_result.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/spawn.hpp>
@@ -98,3 +101,4 @@ BOOST_AUTO_TEST_CASE(background_task_async_call_into_coroutine)
 	BOOST_CHECK_NE(background_thread, boost::thread::id());
 	BOOST_CHECK_NE(background_thread, test_thread);
 }
+#endif

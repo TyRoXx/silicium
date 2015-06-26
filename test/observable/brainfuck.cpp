@@ -9,6 +9,7 @@
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
 
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 namespace bf
 {
 	enum class command
@@ -264,3 +265,4 @@ BOOST_AUTO_TEST_CASE(bf_hello_world)
 	done.start();
 	BOOST_CHECK_EQUAL("Hello World!\n", printed);
 }
+#endif

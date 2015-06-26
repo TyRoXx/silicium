@@ -320,6 +320,7 @@ namespace Si
 	}
 #endif
 
+#if SILICIUM_HAS_SPAWN_COROUTINE
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_in_dir)
 	{
 		Si::absolute_path const watched_dir = Si::get_current_working_directory();
@@ -371,4 +372,5 @@ namespace Si
 
 		BOOST_CHECK(got_something);
 	}
+#endif
 }

@@ -1,6 +1,7 @@
 #include <silicium/vector.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if BOOST_VERSION >= 105000
 BOOST_AUTO_TEST_CASE(vector_default_constructor)
 {
 	Si::vector<int> v;
@@ -45,3 +46,4 @@ BOOST_AUTO_TEST_CASE(vector_for)
 	}
 	BOOST_CHECK_EQUAL(4, expected);
 }
+#endif

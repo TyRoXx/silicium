@@ -1,6 +1,10 @@
 #ifndef SILICIUM_REACTIVE_COROUTINE_GENERATOR_HPP
 #define SILICIUM_REACTIVE_COROUTINE_GENERATOR_HPP
 
+#include <boost/version.hpp>
+
+#define SILICIUM_HAS_COROUTINE_GENERATOR (BOOST_VERSION >= 105300)
+
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/fast_variant.hpp>
@@ -9,6 +13,8 @@
 //because Asio wants to be first.
 #	include <silicium/win32/win32.hpp>
 #endif
+
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 #include <boost/coroutine/all.hpp>
 
 namespace Si
@@ -236,5 +242,6 @@ namespace Si
 		return coroutine_generator_observable<Element>(std::forward<Action>(action));
 	}
 }
+#endif
 
 #endif

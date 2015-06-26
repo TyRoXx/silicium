@@ -2,6 +2,12 @@
 #define SILICIUM_ASIO_CONNECTING_SOURCE_HPP
 
 #include <silicium/source/source.hpp>
+
+#if BOOST_VERSION < 105300
+//for Asio
+#include <algorithm>
+#endif
+
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/variant.hpp>
 #include <memory>

@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(make_thread_generator_nesting)
 {
 	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
 	{
-		auto b = Si::make_thread_generator<int, Si::boost_threading>([](Si::push_context<int> &yield)
+		auto b = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
 		{
 			yield(1);
 			yield(2);

@@ -178,6 +178,7 @@ namespace
 
 	typedef Si::shared_observable<Si::nothing> events;
 
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 	struct coroutine_web_server
 	{
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
@@ -265,12 +266,14 @@ namespace
 		Si::asio::tcp_acceptor<boost::asio::ip::tcp::acceptor *> clients;
 		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
 	};
+#endif
 }
 
 int main()
 {
 	boost::asio::io_service io;
 
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 	coroutine_web_server coroutined(io, 8080);
 	coroutined.start();
 
@@ -291,5 +294,8 @@ int main()
 	{
 		worker.get();
 	});
+#else
+	std::cerr << "This example requires coroutine support\n";
+#endif
 	io.run();
 }

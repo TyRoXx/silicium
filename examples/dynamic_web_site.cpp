@@ -9,6 +9,7 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 
+#if SILICIUM_HAS_SPAWN_COROUTINE
 namespace
 {
 	template <class YieldContext>
@@ -74,10 +75,12 @@ namespace
 		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 	}
 }
+#endif
 
 int main()
 {
 	boost::asio::io_service io;
+#if SILICIUM_HAS_SPAWN_COROUTINE
 	Si::spawn_observable(
 		Si::transform(
 			Si::asio::make_tcp_acceptor(
@@ -98,5 +101,8 @@ int main()
 			}
 		)
 	);
+#else
+	std::cerr << "This example requires coroutine support\n";
+#endif
 	io.run();
 }

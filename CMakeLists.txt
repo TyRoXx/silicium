@@ -122,7 +122,11 @@ else()
 endif()
 
 include_directories(".")
-add_subdirectory("c_binding")
+
+if(NOT (Boost_VERSION LESS 105300))
+	add_subdirectory("c_binding")
+endif()
+
 add_subdirectory("test")
 add_subdirectory("test_includes")
 add_subdirectory("examples")
