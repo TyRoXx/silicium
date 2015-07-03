@@ -149,6 +149,12 @@
 
 #define SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(should_be_rvalue) BOOST_PP_IF(SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER, (should_be_rvalue), std::move((should_be_rvalue)))
 
+#ifdef BOOST_NO_EXCEPTIONS
+#	define SILICIUM_HAS_EXCEPTIONS 0
+#else
+#	define SILICIUM_HAS_EXCEPTIONS 1
+#endif
+
 namespace Si
 {
 	struct nothing

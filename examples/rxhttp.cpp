@@ -14,6 +14,7 @@
 #include <silicium/observable/erase_shared.hpp>
 #include <silicium/observable/erase_unique.hpp>
 #include <silicium/asio/reading_observable.hpp>
+#include <silicium/terminate_on_exception.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
 #include <thread>

@@ -1,6 +1,7 @@
 #include <silicium/asio/timer.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/ref.hpp>
+#include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 
 template <class YieldContext, class Duration>

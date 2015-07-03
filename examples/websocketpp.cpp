@@ -1,3 +1,4 @@
+#include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 #include <boost/version.hpp>
 #if BOOST_VERSION >= 105000

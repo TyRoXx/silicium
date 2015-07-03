@@ -1,3 +1,4 @@
+#include <silicium/terminate_on_exception.hpp>
 #include <silicium/fast_variant.hpp>
 #include <ctime>
 

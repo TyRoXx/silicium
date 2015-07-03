@@ -10,6 +10,7 @@
 #include <silicium/html.hpp>
 #include <silicium/make_array.hpp>
 #include <silicium/source/file_source.hpp>
+#include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 #include <array>
 #include <boost/program_options.hpp>

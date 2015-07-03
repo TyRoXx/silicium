@@ -1,3 +1,4 @@
+#include <silicium/terminate_on_exception.hpp>
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>

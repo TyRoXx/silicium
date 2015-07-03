@@ -1,3 +1,4 @@
+#include <silicium/terminate_on_exception.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <fstream>

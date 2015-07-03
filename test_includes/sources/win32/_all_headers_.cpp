@@ -140,6 +140,7 @@
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/success.hpp>
+#include <silicium/terminate_on_exception.hpp>
 #include <silicium/then.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <silicium/to_shared.hpp>

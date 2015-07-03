@@ -6,6 +6,7 @@
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 
 #if SILICIUM_HAS_SPAWN_COROUTINE

@@ -121,6 +121,14 @@ else()
 	set(SILICIUM_HAS_WEBSOCKETPP OFF)
 endif()
 
+option(SILICIUM_NO_EXCEPTIONS "silicium may use try/catch and throw" OFF)
+if(SILICIUM_NO_EXCEPTIONS)
+	add_definitions("-DSILICIUM_NO_EXCEPTIONS")
+	if(MSVC)
+		add_definitions("-D_HAS_EXCEPTIONS=0")
+	endif()
+endif()
+
 include_directories(".")
 
 if(NOT (Boost_VERSION LESS 105300))

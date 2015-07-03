@@ -8,6 +8,7 @@
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/ptr_sink.hpp>
+#include <silicium/terminate_on_exception.hpp>
 
 #if SILICIUM_HAS_SPAWN_COROUTINE
 namespace

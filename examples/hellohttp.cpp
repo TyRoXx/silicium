@@ -6,6 +6,7 @@
 #include <silicium/config.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/buffering_sink.hpp>
+#include <silicium/terminate_on_exception.hpp>
 #include <boost/format.hpp>
 
 namespace
