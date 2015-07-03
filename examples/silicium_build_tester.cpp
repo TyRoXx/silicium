@@ -398,6 +398,21 @@ namespace
 		}
 	}
 
+	template <class Action>
+	auto async_call(boost::asio::io_service &io, Action &&action)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> std::future<decltype(std::forward<Action>(action)())>
+#endif
+	{
+		auto keep_io_running = std::make_shared<boost::asio::io_service::work>(io);
+		return std::async(std::launch::async, [
+			SILICIUM_CAPTURE_EXPRESSION(action, std::forward<Action>(action)),
+			SILICIUM_CAPTURE_EXPRESSION(keep_io_running, std::move(keep_io_running))]() mutable
+		{
+			return std::forward<Action>(action)();
+		});
+	}
+
 	void trigger_build(
 		boost::asio::io_service &synchronizer,
 		build_state &state,
@@ -410,8 +425,8 @@ namespace
 			return;
 		}
 		std::cerr << "Starting build thread\n";
-		state.current_build_process = std::async(
-			std::launch::async,
+		state.current_build_process = async_call(
+			synchronizer,
 			[origin, workspace, &synchronizer, &state]
 		{
 			finally(
@@ -609,22 +624,30 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	Si::absolute_path const absolute_workspace = *Si::absolute_path::create(boost::filesystem::absolute(workspace));
-	Si::os_string const repository_as_os_string = Si::to_os_string(repository);
-
-	build_state state;
-
-	boost::asio::io_service io;
-	boost::asio::spawn(io, [&io, listen_port, &repository_as_os_string, &absolute_workspace, &state](boost::asio::yield_context yield)
+	try
 	{
-		boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
-		for (;;)
+		Si::absolute_path const absolute_workspace = *Si::absolute_path::create(boost::filesystem::absolute(workspace));
+		Si::os_string const repository_as_os_string = Si::to_os_string(repository);
+
+		boost::asio::io_service io;
+		build_state state;
+
+		boost::asio::spawn(io, [&io, listen_port, &repository_as_os_string, &absolute_workspace, &state](boost::asio::yield_context yield)
 		{
-			std::shared_ptr<boost::asio::ip::tcp::socket> client = async_accept(acceptor, yield);
-			handle_client(std::move(client), repository_as_os_string, absolute_workspace, state);
-		}
-	});
-	io.run();
+			boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), listen_port));
+			for (;;)
+			{
+				std::shared_ptr<boost::asio::ip::tcp::socket> client = async_accept(acceptor, yield);
+				handle_client(std::move(client), repository_as_os_string, absolute_workspace, state);
+			}
+		});
+		io.run();
+	}
+	catch (std::exception const &ex)
+	{
+		std::cerr << ex.what() << '\n';
+		return 1;
+	}
 }
 #else
 int main()
