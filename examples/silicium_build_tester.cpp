@@ -102,7 +102,7 @@ namespace
 
 	Si::absolute_path const cmake_exe = *Si::absolute_path::create(
 #ifdef _WIN32
-		L"C:\\Program Files (x86)\\CMake\\cmake.exe"
+		L"C:\\Program Files (x86)\\CMake\\bin\\cmake.exe"
 #else
 		"/usr/bin/cmake"
 #endif
@@ -118,7 +118,7 @@ namespace
 		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		auto input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle);
-		if (handle_error(maybe_process.error(), "Could not create git process"))
+		if (handle_error(maybe_process.error(), "Could not create process"))
 		{
 			return Si::none;
 		}
