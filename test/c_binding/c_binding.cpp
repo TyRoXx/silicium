@@ -2,6 +2,7 @@
 #include <boost/concept_check.hpp>
 #include <boost/cstdint.hpp>
 #include <silicium/config.hpp>
+#include <silicium/observable/coroutine.hpp>
 #include <c_binding/silicium.h>
 
 BOOST_AUTO_TEST_CASE(c_binding_coroutine_immediate_destruction)
