@@ -2,6 +2,7 @@
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/coroutine.hpp>
 #include <silicium/observable/observer.hpp>
+#include <boost/concept_check.hpp>
 
 struct silicium_receiver : Si::observer<void *>
 {
@@ -85,6 +86,7 @@ silicium_observable *silicium_make_coroutine(silicium_coroutine_function action,
 		return nullptr;
 	}
 #else
+	boost::ignore_unused_variable_warning(user_data);
 	return nullptr;
 #endif
 }
@@ -109,6 +111,8 @@ void *silicium_yield_get_one(silicium_yield_context *yield, silicium_observable 
 #if SILICIUM_HAS_COROUTINE_OBSERVABLE
 	return yield->get_one(Si::ref(*from)).get_value_or(nullptr);
 #else
+	boost::ignore_unused_variable_warning(yield);
+	boost::ignore_unused_variable_warning(from);
 	return nullptr;
 #endif
 }

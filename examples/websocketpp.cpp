@@ -1,7 +1,7 @@
 #include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 #include <boost/version.hpp>
-#if BOOST_VERSION >= 105000
+#if BOOST_VERSION >= 105000 && SILICIUM_HAS_EXCEPTIONS
 
 #include <websocketpp/server.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
@@ -48,6 +48,6 @@ int main()
 #else
 int main()
 {
-	std::cerr << "websocketpp requires a recent version of Boost\n";
+	std::cerr << "websocketpp requires a recent version of Boost and exception support\n";
 }
 #endif

@@ -71,6 +71,7 @@ struct throws_on_copy_construction
 	throws_on_copy_construction &operator = (throws_on_copy_construction const &) = delete;
 };
 
+#if SILICIUM_HAS_EXCEPTIONS
 BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_value_throws)
 {
 	BOOST_CHECK_EXCEPTION(
@@ -164,6 +165,7 @@ BOOST_AUTO_TEST_CASE(error_or_std)
 		return ex.code() == ec;
 	});
 }
+#endif
 
 struct base
 {

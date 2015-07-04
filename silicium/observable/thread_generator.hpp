@@ -6,10 +6,14 @@
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/observable/erased_observer.hpp>
-#include <future>
 #include <boost/thread/future.hpp>
 #include <boost/optional.hpp>
 #include <boost/concept_check.hpp>
+
+#define SILICIUM_HAS_THREAD_GENERATOR SILICIUM_HAS_EXCEPTIONS
+
+#if SILICIUM_HAS_THREAD_GENERATOR
+#include <future>
 
 namespace Si
 {
@@ -200,5 +204,7 @@ namespace Si
 		return thread_generator_observable<Element, ThreadingAPI>(std::forward<Action>(action));
 	}
 }
+
+#endif
 
 #endif

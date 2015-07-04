@@ -8,6 +8,7 @@
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/terminate_on_exception.hpp>
 #include <boost/format.hpp>
+#include <iostream>
 
 #if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
 

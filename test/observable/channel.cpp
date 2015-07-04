@@ -134,7 +134,7 @@ namespace Si
 	};
 }
 
-#if SILICIUM_HAS_COROUTINE_GENERATOR
+#if SILICIUM_HAS_COROUTINE_GENERATOR && SILICIUM_HAS_THREAD_GENERATOR
 BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 {
 	Si::channel<int> channel;
@@ -168,6 +168,7 @@ BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 }
 #endif
 
+#if SILICIUM_HAS_THREAD_GENERATOR
 BOOST_AUTO_TEST_CASE(channel_with_thread)
 {
 	Si::channel<int> channel;
@@ -245,4 +246,5 @@ BOOST_AUTO_TEST_CASE(channel_select)
 	s.wait();
 	BOOST_CHECK(got);
 }
+#endif
 #endif

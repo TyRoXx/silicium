@@ -200,22 +200,30 @@ namespace Si
 }
 #include <boost/type_traits/is_copy_constructible.hpp>
 #include <boost/type_traits/is_convertible.hpp>
-#include <future>
+
+#if SILICIUM_HAS_EXCEPTIONS
+#	include <future>
+#endif
+
 namespace Si
 {
 	using boost::is_copy_constructible;
+#if SILICIUM_HAS_EXCEPTIONS
 	template <class T>
 	struct is_copy_constructible<std::future<T>> : std::false_type
 	{
 	};
+#endif
 	template <class T>
 	struct is_copy_assignable : std::true_type
 	{
 	};
+#if SILICIUM_HAS_EXCEPTIONS
 	template <class T>
 	struct is_copy_assignable<std::future<T>> : std::false_type
 	{
 	};
+#endif
 	template <class T, class D>
 	struct is_copy_assignable<std::unique_ptr<T, D>> : std::false_type
 	{

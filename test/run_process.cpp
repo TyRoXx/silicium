@@ -8,6 +8,7 @@
 
 namespace Si
 {
+#if SILICIUM_HAS_RUN_PROCESS
 #ifndef _WIN32
 	BOOST_AUTO_TEST_CASE(run_process_1_unix_which)
 	{
@@ -78,5 +79,7 @@ namespace Si
 		BOOST_CHECK_EQUAL(0, run_process(parameters));
 		BOOST_CHECK_EQUAL_COLLECTIONS(message.begin(), message.end(), output_buffer.begin(), output_buffer.end());
 	}
+#endif
+
 #endif
 }

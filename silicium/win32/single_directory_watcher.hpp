@@ -11,9 +11,11 @@
 #include <silicium/optional.hpp>
 #include <boost/ref.hpp>
 
+#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER SILICIUM_HAS_ABSOLUTE_PATH
+
 namespace Si
 {
-#ifdef _WIN32
+#if defined(_WIN32) && SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace win32
 	{
 		inline optional<file_notification_type> to_portable_file_notification_type(DWORD action)

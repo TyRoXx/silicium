@@ -12,6 +12,7 @@ namespace Si
 {
 	namespace win32
 	{
+#if SILICIUM_HAS_ABSOLUTE_PATH
 		struct overlapped_directory_changes
 		{
 			using element_type = std::vector<file_notification>;
@@ -133,6 +134,7 @@ namespace Si
 
 			SILICIUM_DISABLE_COPY(overlapped_directory_changes)
 		};
+#endif
 	}
 }
 

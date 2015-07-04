@@ -7,6 +7,7 @@
 #include <silicium/to_unique.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_THREAD_GENERATOR
 BOOST_AUTO_TEST_CASE(make_thread_generator_empty)
 {
 	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &)
@@ -100,3 +101,4 @@ BOOST_AUTO_TEST_CASE(make_thread_generator_nesting)
 	a.wait();
 	BOOST_CHECK(expected == produced);
 }
+#endif

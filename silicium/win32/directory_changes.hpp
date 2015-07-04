@@ -11,6 +11,8 @@
 #include <silicium/exchange.hpp>
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
+
+#if SILICIUM_HAS_EXCEPTIONS
 #include <future>
 
 namespace Si
@@ -152,5 +154,6 @@ namespace Si
 		}
 	}
 }
+#endif
 
 #endif

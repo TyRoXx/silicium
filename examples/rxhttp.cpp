@@ -17,8 +17,10 @@
 #include <silicium/terminate_on_exception.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/future.hpp>
-#include <thread>
 #include <cassert>
+
+#if SILICIUM_HAS_EXCEPTIONS
+#include <thread>
 
 namespace
 {
@@ -269,6 +271,7 @@ namespace
 	};
 #endif
 }
+#endif
 
 int main()
 {

@@ -25,7 +25,9 @@
 #include <boost/thread.hpp>
 #include <boost/mpl/list.hpp>
 #include <unordered_map>
-#include <future>
+#if SILICIUM_HAS_EXCEPTIONS
+#	include <future>
+#endif
 
 namespace Si
 {

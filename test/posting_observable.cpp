@@ -6,7 +6,7 @@
 #include <silicium/std_threading.hpp>
 #include <boost/test/unit_test.hpp>
 
-#if BOOST_VERSION >= 105300
+#if BOOST_VERSION >= 105300 && SILICIUM_HAS_THREAD_OBSERVABLE
 #include <boost/atomic.hpp>
 
 BOOST_AUTO_TEST_CASE(asio_posting_observable)

@@ -7,8 +7,13 @@
 #include <silicium/is_handle.hpp>
 #include <silicium/c_string.hpp>
 
-#if !SILICIUM_NO_EXCEPTIONS //Boost filesystem requires exceptions
-#include <boost/filesystem/operations.hpp>
+//Boost filesystem requires exceptions
+#define SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS !SILICIUM_NO_EXCEPTIONS
+
+#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#	include <boost/filesystem/operations.hpp>
+#endif
+
 #include <iostream>
 
 namespace Si
@@ -260,6 +265,7 @@ namespace Si
 	}
 #endif
 
+#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 	SILICIUM_USE_RESULT
 	inline absolute_path get_current_working_directory()
 	{
@@ -338,6 +344,7 @@ namespace Si
 		}
 		return true;
 	}
+#endif
 }
 
 namespace std
@@ -352,7 +359,5 @@ namespace std
 		}
 	};
 }
-
-#endif
 
 #endif

@@ -323,6 +323,9 @@ namespace Si
 #endif
 	namespace experimental
 	{
+#define SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE SILICIUM_HAS_THREAD_OBSERVABLE
+
+#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
 		//TODO: find a more generic API for reading from a pipe portably
 		template <class CharSink>
 		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file)
@@ -402,6 +405,7 @@ namespace Si
 			reader->start();
 #endif
 		}
+#endif
 	}
 }
 

@@ -13,6 +13,7 @@
 
 namespace Si
 {
+#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace
 	{
 		void touch(Si::absolute_path const &name)
@@ -372,5 +373,6 @@ namespace Si
 
 		BOOST_CHECK(got_something);
 	}
+#endif
 #endif
 }

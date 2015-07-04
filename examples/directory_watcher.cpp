@@ -8,6 +8,7 @@ int main()
 {
 	boost::asio::io_service io;
 
+#if SILICIUM_HAS_ABSOLUTE_PATH
 	auto const watched_dir = Si::get_current_working_directory();
 	std::cerr << "Watching " << watched_dir << '\n';
 
@@ -23,6 +24,9 @@ int main()
 			<int>(event.type) << " " << event.name << '\n';
 	});
 	all.start();
+#else
+	std::cerr << "This example requires Boost filesystem support\n";
+#endif
 
 	io.run();
 }

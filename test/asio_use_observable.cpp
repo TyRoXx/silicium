@@ -8,7 +8,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 
-#if BOOST_VERSION >= 105400
+#if BOOST_VERSION >= 105400 && SILICIUM_HAS_SPAWN_COROUTINE
 
 BOOST_AUTO_TEST_CASE(asio_use_observable_with_timer)
 {

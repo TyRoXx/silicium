@@ -9,6 +9,7 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/terminate_on_exception.hpp>
+#include <iostream>
 
 #if SILICIUM_HAS_SPAWN_COROUTINE
 namespace

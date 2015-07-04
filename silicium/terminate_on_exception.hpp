@@ -7,7 +7,7 @@
 namespace boost
 {
 #ifdef BOOST_NO_EXCEPTIONS
-	inline void throw_exception(std::exception const &e)
+	void throw_exception(std::exception const &e)
 	{
 		boost::ignore_unused_variable_warning(e);
 		std::terminate();

@@ -5,7 +5,6 @@
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
 #include <map>
-#include <future>
 
 BOOST_AUTO_TEST_CASE(optional_default_ctor)
 {
@@ -131,7 +130,7 @@ BOOST_AUTO_TEST_CASE(optional_less)
 
 BOOST_AUTO_TEST_CASE(optional_movable_only)
 {
-	Si::optional<std::future<int>> f{std::promise<int>().get_future()};
+	Si::optional<std::unique_ptr<int>> f{Si::make_unique<int>(5)};
 	BOOST_CHECK(f);
 	f = std::move(f);
 	BOOST_CHECK(f);

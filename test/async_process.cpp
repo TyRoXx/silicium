@@ -17,6 +17,7 @@ namespace
 		std::string output, error;
 	};
 
+#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
 	process_output run_process(Si::async_process_parameters parameters)
 	{
 		Si::pipe standard_input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
@@ -47,6 +48,7 @@ namespace
 		result.exit_code = process.wait_for_exit().get();
 		return result;
 	}
+#endif
 }
 
 #ifndef _WIN32
@@ -65,7 +67,7 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 }
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 BOOST_AUTO_TEST_CASE(async_process_win32_where)
 {
 	Si::async_process_parameters parameters;
@@ -92,6 +94,7 @@ namespace
 	);
 }
 
+#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 {
 	Si::async_process_parameters parameters;
@@ -103,3 +106,4 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 		return ex.code() == boost::system::errc::no_such_file_or_directory;
 	});
 }
+#endif

@@ -3,9 +3,11 @@
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
 #include <memory>
-#include <thread>
 #include <array>
 #include <iostream>
+
+#if SILICIUM_HAS_EXCEPTIONS
+#include <thread>
 
 int main()
 {
@@ -60,3 +62,9 @@ int main()
 		}).detach();
 	}
 }
+#else
+int main()
+{
+	std::cerr << "This example requires exception support\n";
+}
+#endif

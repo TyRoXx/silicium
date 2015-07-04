@@ -5,7 +5,6 @@
 #include <silicium/write.hpp>
 #include <silicium/sink/multi_sink.hpp>
 #include <boost/range/algorithm/transform.hpp>
-#include <future>
 
 namespace Si
 {
@@ -19,7 +18,15 @@ namespace Si
 		}
 		return false;
 	}
+}
 
+#define SILICIUM_HAS_RUN_PROCESS SILICIUM_HAS_EXCEPTIONS
+
+#if SILICIUM_HAS_RUN_PROCESS
+#include <future>
+
+namespace Si
+{
 	inline int run_process(process_parameters const &parameters)
 	{
 		async_process_parameters async_parameters;
@@ -103,5 +110,6 @@ namespace Si
 		return Si::run_process(parameters);
 	}
 }
+#endif
 
 #endif

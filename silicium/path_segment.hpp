@@ -155,12 +155,14 @@ namespace Si
 		return front / relative_path(back.to_boost_path());
 	}
 
+#if SILICIUM_HAS_ABSOLUTE_PATH
 	inline absolute_path operator / (absolute_path const &front, path_segment const &back)
 	{
 		absolute_path result = front;
 		result.combine(relative_path(back.to_boost_path()));
 		return result;
 	}
+#endif
 }
 
 namespace std

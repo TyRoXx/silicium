@@ -5,6 +5,7 @@
 #include <boost/thread/future.hpp>
 #include <boost/asio/io_service.hpp>
 
+#ifndef BOOST_NO_EXCEPTIONS
 namespace Si
 {
 	template <class Observable>
@@ -68,6 +69,7 @@ namespace Si
 		return blocking_observable<typename std::decay<Action>::type>(act);
 	}
 }
+#endif
 
 namespace
 {

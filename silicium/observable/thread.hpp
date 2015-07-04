@@ -4,8 +4,10 @@
 #include <silicium/config.hpp>
 #include <functional>
 
+#define SILICIUM_HAS_THREAD_OBSERVABLE SILICIUM_HAS_EXCEPTIONS
 namespace Si
 {
+#if SILICIUM_HAS_THREAD_OBSERVABLE
 	template <class SuccessElement, class ThreadingAPI>
 	struct thread_observable
 	{
@@ -97,6 +99,7 @@ namespace Si
 	{
 		return thread_observable<decltype(action()), ThreadingAPI>(std::forward<Action>(action));
 	}
+#endif
 }
 
 #endif
