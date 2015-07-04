@@ -1,5 +1,5 @@
 #include <boost/version.hpp>
-#if BOOST_VERSION >= 105400
+#if BOOST_VERSION >= 105400 && !SILICIUM_NO_EXCEPTIONS
 
 #include <boost/asio/async_result.hpp>
 #include <boost/test/unit_test.hpp>

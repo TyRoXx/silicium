@@ -6,6 +6,8 @@
 #include <silicium/error_or.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/c_string.hpp>
+
+#if !SILICIUM_NO_EXCEPTIONS //Boost filesystem requires exceptions
 #include <boost/filesystem/operations.hpp>
 #include <iostream>
 
@@ -350,5 +352,7 @@ namespace std
 		}
 	};
 }
+
+#endif
 
 #endif

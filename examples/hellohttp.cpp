@@ -9,6 +9,8 @@
 #include <silicium/terminate_on_exception.hpp>
 #include <boost/format.hpp>
 
+#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
+
 namespace
 {
 	void serve_client(
@@ -56,10 +58,13 @@ namespace
 	}
 }
 
+#endif
+
 int main()
 {
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
+#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
 	boost::asio::spawn(io, [&acceptor](boost::asio::yield_context yield)
 	{
 		Si::asio::accepting_source clients(acceptor, yield);
@@ -68,5 +73,8 @@ int main()
 			boost::asio::spawn(acceptor.get_io_service(), std::bind(serve_client, client, std::placeholders::_1));
 		}
 	});
+#else
+	std::cerr << "This example requires boost::asio::spawn\n";
+#endif
 	io.run();
 }

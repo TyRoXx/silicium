@@ -28,7 +28,7 @@
 #	define SILICIUM_COMPILER_CXX14 0
 #endif
 
-#ifdef NDEBUG
+#if defined(NDEBUG) || SILICIUM_NO_EXCEPTIONS
 #	ifdef _MSC_VER
 #		define SILICIUM_UNREACHABLE() __assume(false)
 #	else

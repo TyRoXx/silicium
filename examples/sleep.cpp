@@ -4,6 +4,8 @@
 #include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 
+#if SILICIUM_HAS_SPAWN_COROUTINE
+
 template <class YieldContext, class Duration>
 void sleep(boost::asio::io_service &io, YieldContext &&yield, Duration duration)
 {
@@ -15,14 +17,20 @@ void sleep(boost::asio::io_service &io, YieldContext &&yield, Duration duration)
 	assert(result);
 }
 
+#endif
+
 int main()
 {
 	boost::asio::io_service io;
+#if SILICIUM_HAS_SPAWN_COROUTINE
 	Si::spawn_coroutine([&io](Si::spawn_context yield)
 	{
 		std::cout << "Going to sleep" << std::endl;
 		sleep(io, yield, boost::chrono::seconds(1));
 		std::cout << "Waking up\n";
 	});
+#else
+	std::cerr << "This example requires coroutine support\n";
+#endif
 	io.run();
 }

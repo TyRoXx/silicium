@@ -6,7 +6,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/write.hpp>
 
-#if BOOST_VERSION >= 105400
+#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
 #include <boost/asio/spawn.hpp>
 
 namespace Si

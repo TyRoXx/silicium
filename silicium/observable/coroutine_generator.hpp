@@ -3,7 +3,7 @@
 
 #include <boost/version.hpp>
 
-#define SILICIUM_HAS_COROUTINE_GENERATOR (BOOST_VERSION >= 105300)
+#define SILICIUM_HAS_COROUTINE_GENERATOR ((BOOST_VERSION >= 105300) && !SILICIUM_NO_EXCEPTIONS)
 
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>

@@ -126,6 +126,8 @@ if(SILICIUM_NO_EXCEPTIONS)
 	add_definitions("-DSILICIUM_NO_EXCEPTIONS")
 	if(MSVC)
 		add_definitions("-D_HAS_EXCEPTIONS=0")
+	else()
+		add_definitions("-fno-exceptions")
 	endif()
 endif()
 
