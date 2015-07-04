@@ -4,7 +4,9 @@
 #include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/source/range_source.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem/operations.hpp>
+#if SILICIUM_HAS_RUN_PROCESS
+#	include <boost/filesystem/operations.hpp>
+#endif
 
 namespace Si
 {

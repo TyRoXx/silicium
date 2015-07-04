@@ -28,7 +28,13 @@
 #	define SILICIUM_COMPILER_CXX14 0
 #endif
 
-#if defined(NDEBUG) || SILICIUM_NO_EXCEPTIONS
+#ifdef BOOST_NO_EXCEPTIONS
+#	define SILICIUM_HAS_EXCEPTIONS 0
+#else
+#	define SILICIUM_HAS_EXCEPTIONS 1
+#endif
+
+#if defined(NDEBUG) || !SILICIUM_HAS_EXCEPTIONS
 #	ifdef _MSC_VER
 #		define SILICIUM_UNREACHABLE() __assume(false)
 #	else
@@ -148,12 +154,6 @@
 #define SILICIUM_IF_NOT(condition, value) BOOST_PP_IF(condition, BOOST_PP_EMPTY(), value)
 
 #define SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(should_be_rvalue) BOOST_PP_IF(SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER, (should_be_rvalue), std::move((should_be_rvalue)))
-
-#ifdef BOOST_NO_EXCEPTIONS
-#	define SILICIUM_HAS_EXCEPTIONS 0
-#else
-#	define SILICIUM_HAS_EXCEPTIONS 1
-#endif
 
 namespace Si
 {

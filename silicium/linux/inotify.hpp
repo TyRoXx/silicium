@@ -13,10 +13,13 @@
 #include <boost/ref.hpp>
 #include <dirent.h>
 
+#define SILICIUM_HAS_INOTIFY_OBSERVABLE SILICIUM_HAS_EXCEPTIONS
+
 namespace Si
 {
 	namespace linux
 	{
+#if SILICIUM_HAS_INOTIFY_OBSERVABLE
 		struct file_notification
 		{
 			boost::uint32_t mask;
@@ -116,6 +119,7 @@ namespace Si
 			std::unique_ptr<boost::asio::posix::stream_descriptor> notifier;
 			std::vector<char> read_buffer;
 		};
+#endif
 	}
 }
 

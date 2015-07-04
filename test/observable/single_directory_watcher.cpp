@@ -4,12 +4,14 @@
 #include <silicium/open.hpp>
 #include <silicium/sink/file_sink.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <fstream>
 #include <chrono>
+#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
+#	include <boost/filesystem/operations.hpp>
+#endif
 
 namespace Si
 {

@@ -2,7 +2,7 @@
 #define SILICIUM_OBSERVABLE_ON_FIRST_HPP
 
 #include <silicium/observable/observer.hpp>
-#include <silicium/config.hpp>
+#include <silicium/optional.hpp>
 
 namespace Si
 {
@@ -36,7 +36,7 @@ namespace Si
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			std::move(m_handler)(boost::optional<typename Input::element_type>());
+			std::move(m_handler)(optional<typename Input::element_type>());
 		}
 	};
 

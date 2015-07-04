@@ -2,6 +2,8 @@
 #include <silicium/open.hpp>
 #include <silicium/sink/file_sink.hpp>
 #include <boost/test/unit_test.hpp>
+
+#if SILICIUM_HAS_EXCEPTIONS
 #include <boost/filesystem/operations.hpp>
 
 namespace
@@ -50,3 +52,5 @@ BOOST_AUTO_TEST_CASE(file_size_error)
 	BOOST_CHECK_EQUAL(Si::none, size.get());
 #endif
 }
+
+#endif

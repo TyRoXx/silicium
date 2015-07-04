@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(coroutine_self_destruct)
 		return {};
 	}));
 	BOOST_REQUIRE_EQUAL(0u, steps_done);
-	auto handler = Si::on_first(Si::ref(*coro), [&coro, &steps_done](boost::optional<Si::nothing> value)
+	auto handler = Si::on_first(Si::ref(*coro), [&coro, &steps_done](Si::optional<Si::nothing> value)
 	{
 		BOOST_CHECK(value);
 		//this function is called in the coroutine

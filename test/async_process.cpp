@@ -7,7 +7,10 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/std_threading.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem/operations.hpp>
+
+#if SILICIUM_HAS_EXCEPTIONS
+#	include <boost/filesystem/operations.hpp>
+#endif
 
 namespace
 {
@@ -51,7 +54,7 @@ namespace
 #endif
 }
 
-#ifndef _WIN32
+#if !defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 BOOST_AUTO_TEST_CASE(async_process_unix_which)
 {
 	Si::async_process_parameters parameters;

@@ -82,7 +82,8 @@ namespace Si
 			skipped += rest_skipped;
 			if (count > 0)
 			{
-				throw std::logic_error("to do");
+				//TODO
+				SILICIUM_UNREACHABLE();
 			}
 			return skipped;
 		}

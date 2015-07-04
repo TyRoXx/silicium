@@ -4,7 +4,6 @@
 #include <silicium/source/file_source.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/absolute_path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread/future.hpp>
 #include <array>
@@ -19,6 +18,7 @@ namespace
 	}
 }
 
+#if SILICIUM_HAS_EXCEPTIONS //for Boost filesystem
 BOOST_AUTO_TEST_CASE(file_sink_success)
 {
 	boost::filesystem::path const file_name = boost::filesystem::temp_directory_path() / "silicium_file_sink_success.txt";
@@ -41,6 +41,7 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 	std::string const expected = "tesaaabbbbccccc";
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), content.begin(), content.end());
 }
+#endif
 
 namespace
 {

@@ -1,5 +1,10 @@
 #include <silicium/terminate_on_exception.hpp>
-#include <boost/filesystem.hpp>
+#include <silicium/config.hpp>
+#include <iostream>
+
+#if SILICIUM_HAS_EXCEPTIONS
+
+#include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <fstream>
 #include <set>
@@ -113,3 +118,9 @@ int main()
 		all_headers_file << "#include " << header_name << '\n';
 	}
 }
+#else
+int main()
+{
+	std::cerr << "This tool requires exception support\n";
+}
+#endif

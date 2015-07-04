@@ -24,6 +24,9 @@
 #	include <sys/prctl.h>
 #endif
 
+//TODO: avoid the Boost filesystem operations that require exceptions
+#define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
+
 namespace Si
 {
 	struct async_process_parameters
@@ -110,6 +113,8 @@ namespace Si
 		}
 	};
 	
+#if SILICIUM_HAS_LAUNCH_PROCESS
+
 #ifdef _WIN32
 	namespace detail
 	{
@@ -257,6 +262,8 @@ namespace Si
 			return async_process(process_handle(forked), std::move(child_error.read));
 		}
 	}
+#endif
+
 #endif
 
 #ifdef _WIN32

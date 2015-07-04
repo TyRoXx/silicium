@@ -8,7 +8,7 @@ int main()
 {
 	boost::asio::io_service io;
 
-#if SILICIUM_HAS_ABSOLUTE_PATH
+#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
 	auto const watched_dir = Si::get_current_working_directory();
 	std::cerr << "Watching " << watched_dir << '\n';
 

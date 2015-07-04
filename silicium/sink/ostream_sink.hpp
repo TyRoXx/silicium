@@ -79,7 +79,7 @@ namespace Si
 		std::unique_ptr<std::ostream> file(new std::ofstream(name.string(), std::ios::binary));
 		if (!*file)
 		{
-			throw std::runtime_error("Cannot open file for writing: " + name.string());
+			boost::throw_exception(std::runtime_error("Cannot open file for writing: " + name.string()));
 		}
 		return to_unique(virtualize_sink(ostream_sink(std::move(file))));
 	}

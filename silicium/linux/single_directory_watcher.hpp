@@ -10,9 +10,11 @@
 #include <silicium/observable/function_observer.hpp>
 #include <boost/optional.hpp>
 
+#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER SILICIUM_HAS_INOTIFY_OBSERVABLE
+
 namespace Si
 {
-#ifdef __linux__
+#if defined(__linux__) && SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace linux
 	{
 		namespace detail

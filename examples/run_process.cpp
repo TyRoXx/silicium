@@ -4,6 +4,7 @@
 int main(int argc, char **argv)
 {
 	boost::ignore_unused_variable_warning(argc);
+#if SILICIUM_HAS_RUN_PROCESS
 	Si::process_parameters parameters;
 	parameters.executable = "/usr/bin/file";
 	parameters.current_path = boost::filesystem::current_path();
@@ -20,4 +21,8 @@ int main(int argc, char **argv)
 	parameters.out = &output;
 	std::cerr << "This executable is:\n";
 	return Si::run_process(parameters);
+#else
+	boost::ignore_unused_variable_warning(argv);
+	std::cerr << "This example requires Si::run_process to be available\n";
+#endif
 }

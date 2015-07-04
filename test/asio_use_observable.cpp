@@ -5,10 +5,11 @@
 #include <boost/asio/basic_waitable_timer.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <boost/chrono/system_clocks.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 
 #if BOOST_VERSION >= 105400 && SILICIUM_HAS_SPAWN_COROUTINE
+
+#include <boost/filesystem/operations.hpp>
 
 BOOST_AUTO_TEST_CASE(asio_use_observable_with_timer)
 {

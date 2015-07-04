@@ -2,6 +2,7 @@
 #define SILICIUM_ZLIB_ZLIB_HPP
 
 #include <boost/system/system_error.hpp>
+#include <boost/throw_exception.hpp>
 #include <zlib.h>
 
 namespace Si
@@ -43,7 +44,7 @@ namespace Si
 		{
 			return;
 		}
-		throw boost::system::system_error(status, zlib_category());
+		boost::throw_exception(boost::system::system_error(status, zlib_category()));
 	}
 }
 

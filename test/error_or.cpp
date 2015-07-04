@@ -46,6 +46,7 @@ BOOST_AUTO_TEST_CASE(error_or_movable_only)
 	BOOST_CHECK_EQUAL(2, *v);
 }
 
+#if SILICIUM_HAS_EXCEPTIONS
 struct expected_exception : std::exception
 {
 };
@@ -71,7 +72,6 @@ struct throws_on_copy_construction
 	throws_on_copy_construction &operator = (throws_on_copy_construction const &) = delete;
 };
 
-#if SILICIUM_HAS_EXCEPTIONS
 BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_value_throws)
 {
 	BOOST_CHECK_EXCEPTION(

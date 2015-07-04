@@ -8,7 +8,7 @@
 #include <silicium/c_string.hpp>
 
 //Boost filesystem requires exceptions
-#define SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS !SILICIUM_NO_EXCEPTIONS
+#define SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS SILICIUM_HAS_EXCEPTIONS
 
 #if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 #	include <boost/filesystem/operations.hpp>
