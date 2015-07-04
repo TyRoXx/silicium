@@ -38,11 +38,8 @@ namespace Si
 			{
 				stream->async_read_some(
 					boost::asio::buffer(buffer.begin(), buffer.size()),
-					[this, receiver
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-						= std::forward<Observer>(receiver)
-#endif
-					](boost::system::error_code ec, std::size_t bytes_received) mutable
+					[this, SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))]
+						(boost::system::error_code ec, std::size_t bytes_received) mutable
 				{
 					if (ec)
 					{

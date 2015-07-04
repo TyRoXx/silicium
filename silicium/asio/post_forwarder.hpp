@@ -17,9 +17,9 @@ namespace Si
 			typedef typename std::decay<Observable>::type clean_observable;
 			return for_each(
 				std::forward<Observable>(from),
-				[&io, handler = std::forward<Callback>(handler)](typename clean_observable::element_type element)
+				[&io, SILICIUM_CAPTURE_EXPRESSION(handler, std::forward<Callback>(handler))](typename clean_observable::element_type element)
 			{
-				io.post([element = std::move(element), handler]() mutable
+				io.post([SILICIUM_CAPTURE_EXPRESSION(element, std::move(element)), handler]() mutable
 				{
 					handler(std::move(element));
 				});

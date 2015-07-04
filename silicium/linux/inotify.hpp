@@ -87,7 +87,7 @@ namespace Si
 				assert(notifier);
 				notifier->async_read_some(
 					boost::asio::buffer(read_buffer),
-					[this, receiver = std::forward<Observer>(receiver)](boost::system::error_code error, std::size_t bytes_read) mutable
+					[this, SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](boost::system::error_code error, std::size_t bytes_read) mutable
 				{
 					if (error)
 					{

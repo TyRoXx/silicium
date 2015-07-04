@@ -36,15 +36,8 @@ namespace Si
 			optional<typename std::decay<Observer>::type> maybe_observer{std::forward<Observer>(observer)};
 			m_worker = ThreadingAPI::launch_async([
 				this,
-				maybe_observer
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-					= std::move(maybe_observer)
-#endif
-				,
-				action
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-					= std::move(action)
-#endif
+				SILICIUM_CAPTURE_EXPRESSION(maybe_observer, std::move(maybe_observer)),
+				SILICIUM_CAPTURE_EXPRESSION(action, std::move(action))
 				]() mutable
 			{
 				m_has_finished = true;

@@ -42,11 +42,8 @@ namespace Si
 				boost::asio::async_write(
 					*stream,
 					boost::asio::buffer(m_buffer.begin(), m_buffer.size()),
-					[receiver
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-						= std::forward<Observer>(receiver)
-#endif
-					](boost::system::error_code ec, std::size_t bytes_sent) mutable
+					[SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))]
+						(boost::system::error_code ec, std::size_t bytes_sent) mutable
 				{
 					(void)bytes_sent;
 					std::forward<Observer>(receiver).got_element(ec);

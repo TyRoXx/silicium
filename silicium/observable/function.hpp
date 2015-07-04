@@ -57,11 +57,8 @@ namespace Si
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			std::function<void(ptr_observer<observer<element_type>>)>
 #endif
-			([generate
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-			= std::forward<GenerateElement>(generate)
-#endif
-			](ptr_observer<observer<element_type>> observer_) mutable
+			([SILICIUM_CAPTURE_EXPRESSION(generate, std::forward<GenerateElement>(generate))]
+				(ptr_observer<observer<element_type>> observer_) mutable
 			{
 				Si::optional<element_type> element = std::forward<GenerateElement>(generate)();
 				if (element)

@@ -25,6 +25,7 @@ if(UNIX)
 	option(SILICIUM_PEDANTIC "pass -pedantic to the compiler (may generate useless warnings)" OFF)
 	if(SILICIUM_PEDANTIC)
 		add_definitions("-Wpedantic")
+		add_definitions("-DSILICIUM_PEDANTIC")
 	endif()
 endif()
 

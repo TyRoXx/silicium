@@ -86,15 +86,15 @@ namespace Si
 		{
 			impl.async_get_one(
 				function_observer<std::function<void (optional<file_notification>)>>(
-					[observer = std::forward<Observer>(receiver)](optional<file_notification> element) mutable
+					[SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](optional<file_notification> element) mutable
 					{
 						if (element)
 						{
-							std::move(observer).got_element(std::move(*element));
+							std::move(receiver).got_element(std::move(*element));
 						}
 						else
 						{
-							std::move(observer).ended();
+							std::move(receiver).ended();
 						}
 					}
 				)

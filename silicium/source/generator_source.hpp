@@ -94,11 +94,7 @@ namespace Si
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			std::function<Si::optional<decltype(generate_one())>()>
 #endif
-			([has_generated, generate_one
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-				= std::forward<OneShotGenerator>(generate_one)
-#endif
-			]() mutable -> Si::optional<decltype(generate_one())>
+			([has_generated, SILICIUM_CAPTURE_EXPRESSION(generate_one, std::forward<OneShotGenerator>(generate_one))]() mutable -> Si::optional<decltype(generate_one())>
 		{
 			if (has_generated)
 			{

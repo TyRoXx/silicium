@@ -53,14 +53,9 @@ namespace Si
 				//nonsense compiler error about a generated posting_observable copy operator)
 				auto *io = m_io;
 				m_next.async_get_one(
-					make_function_observer([io, keep_io_running
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-					= std::move(keep_io_running)
-#endif
-					, observer_
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-					= std::forward<Observer>(observer_)
-#endif
+					make_function_observer([io,
+					SILICIUM_CAPTURE_EXPRESSION(keep_io_running, std::move(keep_io_running)),
+					SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))
 					](Si::optional<element_type> element) mutable
 				{
 					if (element)
@@ -72,8 +67,8 @@ namespace Si
 							//TODO: do this only when necessary
 							function<void ()>
 							([
-								element = std::move(element),
-								observer_ = std::forward<Observer>(observer_)
+								SILICIUM_CAPTURE_EXPRESSION(element, std::move(element)),
+								SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))
 							]() mutable
 							{
 								std::forward<Observer>(observer_).got_element(std::move(*element));
@@ -92,11 +87,7 @@ namespace Si
 					}
 					else
 					{
-						io->post([observer_
-#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-							= std::forward<Observer>(observer_)
-#endif
-						]() mutable
+						io->post([SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))]() mutable
 						{
 							std::forward<Observer>(observer_).ended();
 						});
