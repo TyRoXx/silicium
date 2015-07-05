@@ -2,7 +2,7 @@
 #include <silicium/config.hpp>
 #include <iostream>
 #include <boost/version.hpp>
-#if BOOST_VERSION >= 105000 && SILICIUM_HAS_EXCEPTIONS
+#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
 
 #include <websocketpp/server.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>

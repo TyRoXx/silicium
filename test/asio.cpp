@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(asio_make_tcp_acceptor)
 {
 	//make sure that all overloads still compile
 	boost::asio::io_service io;
-#if BOOST_VERSION >= 105000
+#if BOOST_VERSION >= 105400
 	auto a = Si::asio::make_tcp_acceptor(boost::asio::ip::tcp::acceptor(io));
 #endif
 	auto b = Si::asio::make_tcp_acceptor(io, boost::asio::ip::tcp::endpoint());
