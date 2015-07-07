@@ -14,6 +14,7 @@
 #include <iostream>
 #include <boost/unordered_map.hpp>
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string/find.hpp>
 
 #if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
 #include <boost/asio/spawn.hpp>
@@ -74,7 +75,7 @@ namespace
 	};
 
 	SILICIUM_USE_RESULT
-	output_chunk_result handle_output_chunk(Si::native_file_descriptor readable_output)
+	output_chunk_result handle_output_chunk(Si::native_file_descriptor readable_output, std::ostream &destination)
 	{
 		std::array<char, 8192> read_buffer;
 		Si::error_or<std::size_t> const read_result = Si::read(readable_output, Si::make_memory_range(read_buffer));
@@ -89,7 +90,7 @@ namespace
 			return output_chunk_result::finished;
 		}
 		assert(read_result.get() <= read_buffer.size());
-		std::cerr.write(read_buffer.data(), read_result.get());
+		destination.write(read_buffer.data(), read_result.get());
 		return output_chunk_result::more;
 	}
 
@@ -110,7 +111,7 @@ namespace
 		);
 
 	SILICIUM_USE_RESULT
-	Si::optional<int> execute_process(Si::absolute_path executable, std::vector<Si::os_string> arguments, Si::absolute_path working_directory)
+	Si::error_or<int> execute_process(Si::absolute_path executable, std::vector<Si::os_string> arguments, Si::absolute_path working_directory, std::ostream &all_output)
 	{
 		Si::async_process_parameters parameters;
 		parameters.executable = executable;
@@ -118,17 +119,24 @@ namespace
 		parameters.arguments = std::move(arguments);
 		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		auto input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
-		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle);
-		if (handle_error(maybe_process.error(), "Could not create process"))
+		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment;
+
+		//Do not inherit the locale from the parent because we do not want command line tool output to be translated into random languages.
+		environment.emplace_back(std::make_pair(SILICIUM_SYSTEM_LITERAL("LC_ALL"), SILICIUM_SYSTEM_LITERAL("C")));
+
+		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle, environment);
+		if (maybe_process.is_error())
 		{
-			return Si::none;
+			std::cerr << "Could not create process " << executable << ": " << maybe_process.error() << '\n';
+			return maybe_process.error();
 		}
+
 		input.read.close();
 		output.write.close();
 		Si::async_process &process = maybe_process.get();
 		for (bool more = true; more;)
 		{
-			switch (handle_output_chunk(output.read.handle))
+			switch (handle_output_chunk(output.read.handle, all_output))
 			{
 			case output_chunk_result::more:
 				break;
@@ -138,8 +146,18 @@ namespace
 				break;
 			}
 		}
-		int const result = process.wait_for_exit().get();
-		return result;
+		return process.wait_for_exit();
+	}
+
+	template <class T>
+	Si::optional<T> log_error(Si::error_or<T> result, char const *description)
+	{
+		if (result.is_error())
+		{
+			std::cerr << description << ", error " << result.error() << '\n';
+			return Si::none;
+		}
+		return std::move(result.get());
 	}
 
 	enum class success_or_failure
@@ -150,13 +168,14 @@ namespace
 
 	success_or_failure clone(
 		Si::os_string const &repository,
-		Si::absolute_path const &repository_cache)
+		Si::absolute_path const &repository_cache,
+		Si::absolute_path const &working_directory)
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(Si::to_os_string("clone"));
 		arguments.emplace_back(repository);
 		arguments.emplace_back(repository_cache.c_str());
-		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository_cache);
+		Si::optional<int> const result = log_error(execute_process(git_exe, std::move(arguments), working_directory, std::cerr), "Could not git clone");
 		if (!result)
 		{
 			return success_or_failure::failure;
@@ -173,7 +192,7 @@ namespace
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(Si::to_os_string("fetch"));
-		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository);
+		Si::optional<int> const result = log_error(execute_process(git_exe, std::move(arguments), repository, std::cerr), "Could not git fetch");
 		if (!result)
 		{
 			return success_or_failure::failure;
@@ -185,25 +204,56 @@ namespace
 		}
 		return success_or_failure::success;
 	}
+
+	SILICIUM_USE_RESULT
+	bool is_git_remote_correct(
+		Si::os_string const &expected_origin,
+		Si::absolute_path const &repository_cache)
+	{
+		std::ostringstream output;
+		std::vector<Si::os_string> arguments;
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("remote"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("show"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-n"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("origin"));
+		Si::optional<int> const result = log_error(execute_process(git_exe, std::move(arguments), repository_cache, output), "Could not git remote show");
+		if (!result)
+		{
+			return false;
+		}
+		if (*result != 0)
+		{
+			std::cerr << "Git remote show failed with " << *result << "\n";
+			return false;
+		}
+
+		//TODO: tee this properly
+		std::string const shown = output.str();
+		std::cerr << shown << '\n';
+
+		auto const fetch_url_key = boost::algorithm::find_first(shown, "Fetch URL: ");
+		if (fetch_url_key.begin() == shown.end())
+		{
+			std::cerr << "Git remote show output did not include the expected fetch URL. Something seems to be wrong with Git\n";
+			return false;
+		}
+
+		auto end_of_line = std::find(fetch_url_key.end(), shown.end(), '\n');
+		Si::noexcept_string const fetch_uri(fetch_url_key.end(), end_of_line);
+		if (fetch_uri == expected_origin)
+		{
+			return true;
+		}
+		std::cerr << "The expected origin was " << expected_origin << ", but found " << fetch_uri << '\n';
+		return false;
+	}
 	
 	SILICIUM_USE_RESULT success_or_failure update_repository(
 		Si::os_string const &origin,
 		Si::absolute_path const &repository_cache)
 	{
-		if (handle_error(Si::create_directories(repository_cache), "Could not create repository cache directory"))
-		{
-			return success_or_failure::failure;
-		}
-
-		auto const cache_git_dir = repository_cache / Si::relative_path(".git");
-		Si::error_or<bool> const cached = Si::file_exists(cache_git_dir);
-		if (cached.is_error())
-		{
-			std::cerr << "Could not determine whether " << cache_git_dir << " exists\n";
-			return success_or_failure::failure;
-		}
-
-		if (cached.get())
+		bool const cached = is_git_remote_correct(origin, repository_cache);
+		if (cached)
 		{
 			std::cerr << "Fetching the cached repository " << Si::to_utf8_string(origin) << "\n";
 			switch (fetch(repository_cache))
@@ -218,8 +268,20 @@ namespace
 		}
 		else
 		{
-			std::cerr << "The cache does not exist. Doing an initial clone of " << Si::to_utf8_string(origin) << "\n";
-			switch (clone(origin, repository_cache))
+			std::cerr << "The cache does not exist or points to the wrong remote. Doing an initial clone of " << Si::to_utf8_string(origin) << "\n";
+			{
+				Si::error_or<boost::uint64_t> const removed = Si::remove_all(repository_cache);
+				if (removed.is_error())
+				{
+					std::cerr << "Could not remove the repository cache at " << repository_cache << "\n";
+					return success_or_failure::failure;
+				}
+			}
+			if (handle_error(Si::create_directories(repository_cache), "Could not create repository cache directory"))
+			{
+				return success_or_failure::failure;
+			}
+			switch (clone(origin, repository_cache, repository_cache))
 			{
 			case success_or_failure::success:
 				std::cerr << "Created initial clone of the repository\n";
@@ -237,7 +299,7 @@ namespace
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("checkout"));
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("origin/master"));
-		Si::optional<int> const result = execute_process(git_exe, std::move(arguments), repository);
+		Si::optional<int> const result = log_error(execute_process(git_exe, std::move(arguments), repository, std::cerr), "Could not git checkout");
 		if (!result)
 		{
 			std::cerr << "Could not start Git process " << git_exe << '\n';
@@ -297,10 +359,9 @@ namespace
 		arguments.emplace_back(source.c_str());
 		arguments.emplace_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DCMAKE_BUILD_TYPE=")) + get_build_type_name_in_cmake(build_type));
 		arguments.emplace_back("-DSILICIUM_TEST_INCLUDES=OFF");
-		Si::optional<int> const result = execute_process(cmake_exe, std::move(arguments), build);
+		Si::optional<int> const result = log_error(execute_process(cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake generator");
 		if (!result)
 		{
-			std::cerr << "Could not start CMake process " << cmake_exe << '\n';
 			return success_or_failure::failure;
 		}
 		if (*result != 0)
@@ -321,10 +382,9 @@ namespace
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("--"));
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-j12"));
 #endif
-		Si::optional<int> const result = execute_process(cmake_exe, std::move(arguments), build);
+		Si::optional<int> const result = log_error(execute_process(cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake to build");
 		if (!result)
 		{
-			std::cerr << "Could not start CMake process " << cmake_exe << '\n';
 			return success_or_failure::failure;
 		}
 		if (*result != 0)
@@ -342,10 +402,9 @@ namespace
 		Si::absolute_path const test_exe = test_dir / Si::relative_path("unit_test");
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("--progress=yes"));
-		Si::optional<int> const result = execute_process(test_exe, std::move(arguments), test_dir);
+		Si::optional<int> const result = log_error(execute_process(test_exe, std::move(arguments), test_dir, std::cerr), "Could not run the tests");
 		if (!result)
 		{
-			std::cerr << "Could not start unit test process process " << test_exe << '\n';
 			return success_or_failure::failure;
 		}
 		if (*result != 0)

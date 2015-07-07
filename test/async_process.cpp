@@ -32,7 +32,8 @@ namespace
 				parameters,
 				standard_input.read.handle,
 				standard_output.write.handle,
-				standard_error.write.handle
+				standard_error.write.handle,
+				{}
 			).get()
 		);
 		standard_input.read.close();
