@@ -12,7 +12,7 @@
 #include <silicium/source/file_source.hpp>
 #include <silicium/terminate_on_exception.hpp>
 #include <iostream>
-#include <array>
+#include <boost/unordered_map.hpp>
 #include <boost/program_options.hpp>
 
 #if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
@@ -271,13 +271,32 @@ namespace
 		std::forward<Finalizer>(finalize)();
 	}
 
+	enum class cmake_build_type
+	{
+		debug,
+		release
+	};
+
+	char const *get_build_type_name_in_cmake(cmake_build_type type)
+	{
+		switch (type)
+		{
+		case cmake_build_type::debug: return "DEBUG";
+		case cmake_build_type::release: return "RELEASE";
+		}
+		SILICIUM_UNREACHABLE();
+	}
+
 	SILICIUM_USE_RESULT
 	success_or_failure cmake_generate(
 		Si::absolute_path const &source,
-		Si::absolute_path const &build)
+		Si::absolute_path const &build,
+		cmake_build_type build_type)
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(source.c_str());
+		arguments.emplace_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DCMAKE_BUILD_TYPE=")) + get_build_type_name_in_cmake(build_type));
+		arguments.emplace_back("-DSILICIUM_TEST_INCLUDES=OFF");
 		Si::optional<int> const result = execute_process(cmake_exe, std::move(arguments), build);
 		if (!result)
 		{
@@ -337,6 +356,50 @@ namespace
 		return success_or_failure::success;
 	}
 
+	SILICIUM_USE_RESULT
+	success_or_failure build_silicium_configuration(
+		Si::absolute_path const &build_directory,
+		Si::absolute_path const &repository_cache,
+		cmake_build_type build_type)
+	{
+		if (handle_error(Si::recreate_directories(build_directory), "Could not clear the build directory"))
+		{
+			return success_or_failure::failure;
+		}
+
+		switch (cmake_generate(repository_cache, build_directory, build_type))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "CMake generate failed\n";
+			return success_or_failure::failure;
+		}
+
+		switch (cmake_build(build_directory))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "CMake build failed\n";
+			return success_or_failure::failure;
+		}
+
+		switch (run_silicium_tests(build_directory))
+		{
+		case success_or_failure::success:
+			break;
+
+		case success_or_failure::failure:
+			std::cerr << "Silicium tests failed\n";
+			return success_or_failure::failure;
+		}
+
+		return success_or_failure::success;
+	}
+
 	void build_silicium(
 		Si::os_string const &origin,
 		Si::absolute_path const &workspace)
@@ -362,40 +425,19 @@ namespace
 			return;
 		}
 
+		auto const build_types = Si::make_array(cmake_build_type::debug, cmake_build_type::release);
+		boost::unordered_map<cmake_build_type, success_or_failure> build_types_ok;
+
 		Si::absolute_path const build_directory = workspace / Si::relative_path("build");
-		if (handle_error(Si::recreate_directories(build_directory), "Could not clear the build directory"))
+		for (cmake_build_type const build_type : build_types)
 		{
-			return;
+			success_or_failure result = build_silicium_configuration(build_directory, repository_cache, build_type);
+			build_types_ok.insert(std::make_pair(build_type, result));
 		}
 
-		switch (cmake_generate(repository_cache, build_directory))
+		for (auto const &result : build_types_ok)
 		{
-		case success_or_failure::success:
-			break;
-
-		case success_or_failure::failure:
-			std::cerr << "CMake generate failed\n";
-			return;
-		}
-
-		switch (cmake_build(build_directory))
-		{
-		case success_or_failure::success:
-			break;
-
-		case success_or_failure::failure:
-			std::cerr << "CMake build failed\n";
-			return;
-		}
-
-		switch (run_silicium_tests(build_directory))
-		{
-		case success_or_failure::success:
-			break;
-
-		case success_or_failure::failure:
-			std::cerr << "Silicium tests failed\n";
-			return;
+			std::cerr << get_build_type_name_in_cmake(result.first) << ": " << (result.second == success_or_failure::success ? "OK" : "FAILURE") << '\n';
 		}
 	}
 
