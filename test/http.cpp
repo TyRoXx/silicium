@@ -97,7 +97,7 @@ namespace Si
 	namespace http
 	{
 		template <class ErrorOrMemoryRangeObservable>
-		struct request_parser_observable : private sink<request, success>, private observer<error_or<memory_range>>
+		struct request_parser_observable : private Sink<request, success>::interface, private observer<error_or<memory_range>>
 		{
 			typedef error_or<request> element_type;
 

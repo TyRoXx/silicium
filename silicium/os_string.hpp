@@ -80,9 +80,12 @@ namespace Si
 	{
 		return win32::utf8_to_winapi_string(original.data(), original.size());
 	}
-#endif
 
-#ifdef _WIN32
+	inline os_string to_os_string(char const *begin, char const *end)
+	{
+		return win32::utf8_to_winapi_string(begin, end - begin);
+	}
+
 	inline std::string to_utf8_string(os_string const &str)
 	{
 		if (str.empty())

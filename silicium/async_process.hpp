@@ -137,7 +137,8 @@ namespace Si
 		async_process_parameters parameters,
 		native_file_descriptor standard_input,
 		native_file_descriptor standard_output,
-		native_file_descriptor standard_error)
+		native_file_descriptor standard_error,
+		std::vector<std::pair<os_char const *, os_char const *>> environment)
 	{
 		std::vector<os_string> all_arguments;
 		all_arguments.emplace_back(L"\"" + parameters.executable.underlying().wstring() + L"\"");
@@ -154,8 +155,24 @@ namespace Si
 		startup.hStdError = standard_error;
 		startup.hStdInput = standard_input;
 		startup.hStdOutput = standard_output;
+
+		typedef std::pair<os_char const *, os_char const *> environment_entry;
+		std::sort(environment.begin(), environment.end(), [](environment_entry const &left, environment_entry const &right)
+		{
+			return (wcscmp(left.first, right.first) < 0);
+		});
+		std::vector<WCHAR> environment_block;
+		for (environment_entry const &entry : environment)
+		{
+			environment_block.insert(environment_block.end(), entry.first, entry.first + wcslen(entry.first));
+			environment_block.emplace_back('=');
+			std::size_t const zero_terminated = 1;
+			environment_block.insert(environment_block.end(), entry.second, entry.second + wcslen(entry.second) + zero_terminated);
+		}
+		environment_block.emplace_back(L'\0');
+
 		PROCESS_INFORMATION process{};
-		if (!CreateProcessW(parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, parameters.current_path.c_str(), &startup, &process))
+		if (!CreateProcessW(parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT, environment_block.data(), parameters.current_path.c_str(), &startup, &process))
 		{
 			return boost::system::error_code(::GetLastError(), boost::system::native_ecat);
 		}

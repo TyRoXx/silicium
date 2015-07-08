@@ -231,20 +231,21 @@ namespace
 		std::string const shown = output.str();
 		std::cerr << shown << '\n';
 
-		auto const fetch_url_key = boost::algorithm::find_first(shown, "Fetch URL: ");
-		if (fetch_url_key.begin() == shown.end())
+		auto const shown_raw = Si::make_memory_range(shown);
+		auto const fetch_url_key = boost::algorithm::find_first(shown_raw, "Fetch URL: ");
+		if (fetch_url_key.begin() == shown_raw.end())
 		{
 			std::cerr << "Git remote show output did not include the expected fetch URL. Something seems to be wrong with Git\n";
 			return false;
 		}
 
-		auto end_of_line = std::find(fetch_url_key.end(), shown.end(), '\n');
-		Si::noexcept_string const fetch_uri(fetch_url_key.end(), end_of_line);
+		auto end_of_line = std::find(fetch_url_key.end(), shown_raw.end(), '\n');
+		Si::os_string const fetch_uri = Si::to_os_string(fetch_url_key.end(), end_of_line);
 		if (fetch_uri == expected_origin)
 		{
 			return true;
 		}
-		std::cerr << "The expected origin was " << expected_origin << ", but found " << fetch_uri << '\n';
+		std::cerr << "The expected origin was " << Si::to_utf8_string(expected_origin) << ", but found " << Si::to_utf8_string(fetch_uri) << '\n';
 		return false;
 	}
 	
@@ -339,12 +340,12 @@ namespace
 		release
 	};
 
-	char const *get_build_type_name_in_cmake(cmake_build_type type)
+	Si::os_char const *get_build_type_name_in_cmake(cmake_build_type type)
 	{
 		switch (type)
 		{
-		case cmake_build_type::debug: return "DEBUG";
-		case cmake_build_type::release: return "RELEASE";
+		case cmake_build_type::debug: return SILICIUM_SYSTEM_LITERAL("DEBUG");
+		case cmake_build_type::release: return SILICIUM_SYSTEM_LITERAL("RELEASE");
 		}
 		SILICIUM_UNREACHABLE();
 	}
@@ -358,7 +359,7 @@ namespace
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(source.c_str());
 		arguments.emplace_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DCMAKE_BUILD_TYPE=")) + get_build_type_name_in_cmake(build_type));
-		arguments.emplace_back("-DSILICIUM_TEST_INCLUDES=OFF");
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DSILICIUM_TEST_INCLUDES=OFF"));
 		Si::optional<int> const result = log_error(execute_process(cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake generator");
 		if (!result)
 		{

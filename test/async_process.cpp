@@ -21,7 +21,7 @@ namespace
 	};
 
 #if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
-	process_output run_process(Si::async_process_parameters parameters)
+	process_output run_process(Si::async_process_parameters parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment_variables = {})
 	{
 		Si::pipe standard_input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		Si::pipe standard_output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
@@ -33,7 +33,7 @@ namespace
 				standard_input.read.handle,
 				standard_output.write.handle,
 				standard_error.write.handle,
-				{}
+				std::move(environment_variables)
 			).get()
 		);
 		standard_input.read.close();
@@ -111,3 +111,20 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 	});
 }
 #endif
+
+BOOST_AUTO_TEST_CASE(async_process_environment_variables)
+{
+	Si::async_process_parameters parameters;
+	parameters.executable = *Si::absolute_path::create(SILICIUM_SYSTEM_LITERAL("C:\\Windows\\System32\\cmd.exe"));
+	parameters.current_path = Si::get_current_working_directory();
+	parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("/C"));
+	parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("set"));
+
+	std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const environment_variables
+	{
+		{L"key", L"value"}
+	};
+	process_output const output = run_process(parameters, environment_variables);
+	BOOST_CHECK_EQUAL(0, output.exit_code);
+	BOOST_CHECK_NE(std::string::npos, output.output.find(std::string("key=value\0", 10)));
+}

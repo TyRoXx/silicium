@@ -13,7 +13,7 @@ namespace Si
 	namespace asio
 	{
 		template <class YieldContext>
-		struct basic_socket_source : Si::source<char>
+		struct basic_socket_source : Si::Source<char>::interface
 		{
 			explicit basic_socket_source(boost::asio::ip::tcp::socket &socket, YieldContext &yield);
 			virtual iterator_range<char const *> map_next(std::size_t size) SILICIUM_OVERRIDE;
