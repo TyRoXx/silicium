@@ -112,6 +112,12 @@ namespace Si
 			return process.wait_for_exit();
 		}
 	};
+
+	enum class environment_inheritance
+	{
+		inherit,
+		no_inherit
+	};
 	
 #if SILICIUM_HAS_LAUNCH_PROCESS
 
@@ -195,7 +201,8 @@ namespace Si
 		native_file_descriptor standard_input,
 		native_file_descriptor standard_output,
 		native_file_descriptor standard_error,
-		std::vector<std::pair<os_char const *, os_char const *>> environment)
+		std::vector<std::pair<os_char const *, os_char const *>> environment,
+		environment_inheritance inheritance)
 	{
 		auto executable = parameters.executable.underlying();
 		auto arguments = parameters.arguments;
@@ -278,17 +285,44 @@ namespace Si
 				fail();
 			}
 
-			for (auto const &var : environment)
+
+			switch (inheritance)
 			{
-				int result = setenv(var.first, var.second, 1);
-				if (result != 0)
+			case environment_inheritance::inherit:
+				for (auto const &var : environment)
 				{
-					fail_with_error(errno);
+					int result = setenv(var.first, var.second, 1);
+					if (result != 0)
+					{
+						fail_with_error(errno);
+					}
+				}
+				execvp(parameters.executable.c_str(), argument_pointers.data());
+				fail();
+				break;
+
+			case environment_inheritance::no_inherit:
+				{
+					std::vector<char *> environment_for_exec;
+					for (auto const &entry : environment)
+					{
+						auto const first_length = std::strlen(entry.first);
+						auto const second_length = std::strlen(entry.second);
+						char * const formatted = new char[first_length + 1 + second_length + 1];
+						std::copy_n(entry.first, first_length, formatted);
+						formatted[first_length] = '=';
+						std::copy_n(entry.second, second_length, formatted + first_length + 1);
+						formatted[first_length + 1 + second_length] = '\0';
+						environment_for_exec.emplace_back(formatted);
+					}
+					environment_for_exec.emplace_back(nullptr);
+					execvpe(parameters.executable.c_str(), argument_pointers.data(), environment_for_exec.data());
+					fail();
+					break;
 				}
 			}
 
-			execvp(parameters.executable.c_str(), argument_pointers.data());
-			fail();
+			SILICIUM_UNREACHABLE();
 		}
 
 		//parent

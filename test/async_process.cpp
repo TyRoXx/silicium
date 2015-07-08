@@ -21,7 +21,10 @@ namespace
 	};
 
 #if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
-	process_output run_process(Si::async_process_parameters parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment_variables = {})
+	process_output run_process(
+		Si::async_process_parameters parameters,
+		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment_variables,
+		Si::environment_inheritance inheritance)
 	{
 		Si::pipe standard_input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
 		Si::pipe standard_output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
@@ -33,7 +36,8 @@ namespace
 				standard_input.read.handle,
 				standard_output.write.handle,
 				standard_error.write.handle,
-				std::move(environment_variables)
+				std::move(environment_variables),
+				inheritance
 			).get()
 		);
 		standard_input.read.close();
@@ -63,7 +67,7 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 	parameters.arguments.emplace_back("which");
 	parameters.current_path = Si::get_current_working_directory();
 
-	process_output result = run_process(parameters);
+	process_output result = run_process(parameters, {}, Si::environment_inheritance::inherit);
 
 	BOOST_CHECK_EQUAL("/usr/bin/which\n", result.output);
 	BOOST_CHECK_EQUAL("", result.error);
@@ -105,28 +109,61 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 	parameters.executable = arbitrary_root_dir / "does-not-exist";
 	parameters.current_path = Si::get_current_working_directory();
 
-	BOOST_CHECK_EXCEPTION(run_process(parameters), boost::system::system_error, [](boost::system::system_error const &ex)
+	BOOST_CHECK_EXCEPTION(run_process(parameters, {}, Si::environment_inheritance::no_inherit), boost::system::system_error, [](boost::system::system_error const &ex)
 	{
 		return ex.code() == boost::system::errc::no_such_file_or_directory;
 	});
 }
 #endif
 
-#ifdef _WIN32
-BOOST_AUTO_TEST_CASE(async_process_environment_variables)
+namespace
 {
-	Si::async_process_parameters parameters;
-	parameters.executable = *Si::absolute_path::create(SILICIUM_SYSTEM_LITERAL("C:\\Windows\\System32\\cmd.exe"));
-	parameters.current_path = Si::get_current_working_directory();
-	parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("/C"));
-	parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("set"));
-
-	std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const environment_variables
+	void test_environment_variables(Si::environment_inheritance const tested_inheritance)
 	{
-		{L"key", L"value"}
-	};
-	process_output const output = run_process(parameters, environment_variables);
-	BOOST_CHECK_EQUAL(0, output.exit_code);
-	BOOST_CHECK_NE(std::string::npos, output.output.find("key=value\r\n"));
-}
+		Si::async_process_parameters parameters;
+		parameters.executable = *Si::absolute_path::create(
+#ifdef _WIN32
+			SILICIUM_SYSTEM_LITERAL("C:\\Windows\\System32\\cmd.exe")
+#else
+			"/usr/bin/env"
 #endif
+			);
+		parameters.current_path = Si::get_current_working_directory();
+#ifdef _WIN32
+		parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("/C"));
+		parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("set"));
+#endif
+
+		BOOST_REQUIRE_EQUAL(0, setenv("silicium_parent_key", "parent_value", 1));
+
+		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const environment_variables
+		{
+			{SILICIUM_SYSTEM_LITERAL("key"), SILICIUM_SYSTEM_LITERAL("value")}
+		};
+		process_output const output = run_process(parameters, environment_variables, tested_inheritance);
+		BOOST_CHECK_EQUAL(0, output.exit_code);
+		BOOST_CHECK_NE(std::string::npos, output.output.find("key=value"));
+
+		auto const parent_key_found = output.output.find("silicium_parent_key=parent_value");
+		switch (tested_inheritance)
+		{
+		case Si::environment_inheritance::inherit:
+			BOOST_CHECK_NE(std::string::npos, parent_key_found);
+			break;
+
+		case Si::environment_inheritance::no_inherit:
+			BOOST_CHECK_EQUAL(std::string::npos, parent_key_found);
+			break;
+		}
+	}
+}
+
+BOOST_AUTO_TEST_CASE(async_process_environment_variables_inherit)
+{
+	test_environment_variables(Si::environment_inheritance::inherit);
+}
+
+BOOST_AUTO_TEST_CASE(async_process_environment_variables_no_inherit)
+{
+	test_environment_variables(Si::environment_inheritance::no_inherit);
+}

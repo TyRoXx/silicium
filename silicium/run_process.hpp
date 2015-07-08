@@ -46,7 +46,7 @@ namespace Si
 		auto std_output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(make_pipe().get());
 		auto std_error = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(make_pipe().get());
 		async_process process = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(
-			launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle, {}).get());
+			launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle, {}, environment_inheritance::inherit).get());
 
 		boost::asio::io_service io;
 

@@ -124,7 +124,7 @@ namespace
 		//Do not inherit the locale from the parent because we do not want command line tool output to be translated into random languages.
 		environment.emplace_back(std::make_pair(SILICIUM_SYSTEM_LITERAL("LC_ALL"), SILICIUM_SYSTEM_LITERAL("C")));
 
-		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle, environment);
+		Si::error_or<Si::async_process> maybe_process = Si::launch_process(parameters, input.read.handle, output.write.handle, output.write.handle, environment, Si::environment_inheritance::inherit);
 		if (maybe_process.is_error())
 		{
 			std::cerr << "Could not create process " << executable << ": " << maybe_process.error() << '\n';
