@@ -112,6 +112,7 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 }
 #endif
 
+#ifdef _WIN32
 BOOST_AUTO_TEST_CASE(async_process_environment_variables)
 {
 	Si::async_process_parameters parameters;
@@ -128,3 +129,4 @@ BOOST_AUTO_TEST_CASE(async_process_environment_variables)
 	BOOST_CHECK_EQUAL(0, output.exit_code);
 	BOOST_CHECK_NE(std::string::npos, output.output.find(std::string("key=value\0", 10)));
 }
+#endif

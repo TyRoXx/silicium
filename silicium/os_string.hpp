@@ -43,6 +43,11 @@ namespace Si
 	{
 		return original;
 	}
+
+	inline os_string to_os_string(char const *begin, char const *end)
+	{
+		return os_string(begin, end);
+	}
 #endif
 
 #ifdef _WIN32
