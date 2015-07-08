@@ -127,6 +127,6 @@ BOOST_AUTO_TEST_CASE(async_process_environment_variables)
 	};
 	process_output const output = run_process(parameters, environment_variables);
 	BOOST_CHECK_EQUAL(0, output.exit_code);
-	BOOST_CHECK_NE(std::string::npos, output.output.find(std::string("key=value\0", 10)));
+	BOOST_CHECK_NE(std::string::npos, output.output.find("key=value\r\n"));
 }
 #endif

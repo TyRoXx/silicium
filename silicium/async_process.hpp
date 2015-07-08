@@ -156,23 +156,31 @@ namespace Si
 		startup.hStdInput = standard_input;
 		startup.hStdOutput = standard_output;
 
-		typedef std::pair<os_char const *, os_char const *> environment_entry;
-		std::sort(environment.begin(), environment.end(), [](environment_entry const &left, environment_entry const &right)
-		{
-			return (wcscmp(left.first, right.first) < 0);
-		});
+		DWORD flags = CREATE_NO_WINDOW;
 		std::vector<WCHAR> environment_block;
-		for (environment_entry const &entry : environment)
+		if (!environment.empty())
 		{
-			environment_block.insert(environment_block.end(), entry.first, entry.first + wcslen(entry.first));
-			environment_block.emplace_back('=');
-			std::size_t const zero_terminated = 1;
-			environment_block.insert(environment_block.end(), entry.second, entry.second + wcslen(entry.second) + zero_terminated);
+			flags |= CREATE_UNICODE_ENVIRONMENT;
+			typedef std::pair<os_char const *, os_char const *> environment_entry;
+			std::sort(environment.begin(), environment.end(), [](environment_entry const &left, environment_entry const &right)
+			{
+				return (wcscmp(left.first, right.first) < 0);
+			});
+			for (environment_entry const &entry : environment)
+			{
+				environment_block.insert(environment_block.end(), entry.first, entry.first + wcslen(entry.first));
+				environment_block.emplace_back('=');
+				std::size_t const zero_terminated = 1;
+				environment_block.insert(environment_block.end(), entry.second, entry.second + wcslen(entry.second) + zero_terminated);
+			}
+			environment_block.emplace_back(L'\0');
 		}
-		environment_block.emplace_back(L'\0');
 
 		PROCESS_INFORMATION process{};
-		if (!CreateProcessW(parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE, CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT, environment_block.data(), parameters.current_path.c_str(), &startup, &process))
+		if (!CreateProcessW(
+			parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE,
+			flags, environment_block.empty() ? NULL : environment_block.data(),
+			parameters.current_path.c_str(), &startup, &process))
 		{
 			return boost::system::error_code(::GetLastError(), boost::system::native_ecat);
 		}
