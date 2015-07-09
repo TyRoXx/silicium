@@ -26,11 +26,11 @@ namespace
 		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment_variables,
 		Si::environment_inheritance inheritance)
 	{
-		Si::pipe standard_input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
-		Si::pipe standard_output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
-		Si::pipe standard_error = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
+		Si::pipe standard_input = Si::make_pipe().move_value();
+		Si::pipe standard_output = Si::make_pipe().move_value();
+		Si::pipe standard_error = Si::make_pipe().move_value();
 
-		Si::async_process process = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(
+		Si::async_process process =
 			Si::launch_process(
 				parameters,
 				standard_input.read.handle,
@@ -38,8 +38,7 @@ namespace
 				standard_error.write.handle,
 				std::move(environment_variables),
 				inheritance
-			).get()
-		);
+			).move_value();
 		standard_input.read.close();
 		standard_output.write.close();
 		standard_error.write.close();

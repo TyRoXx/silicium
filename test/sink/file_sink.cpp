@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(file_sink_error)
 #if BOOST_VERSION >= 105000 && SILICIUM_HAS_EXCEPTIONS //boost::async
 BOOST_AUTO_TEST_CASE(file_sink_writev)
 {
-	Si::pipe buffer = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
+	Si::pipe buffer = Si::make_pipe().move_value();
 	Si::file_sink sink(buffer.write.handle);
 	std::array<char, 9001> read_buffer;
 	auto source = Si::make_file_source(buffer.read.handle, Si::make_contiguous_range(read_buffer));

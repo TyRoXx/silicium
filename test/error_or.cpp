@@ -394,3 +394,12 @@ BOOST_AUTO_TEST_CASE(error_or_as_std_map_key)
 		std::unordered_map<Si::error_or<int>, long>
 		>();
 }
+
+BOOST_AUTO_TEST_CASE(error_or_move_value)
+{
+	Si::error_or<std::unique_ptr<int>> e = Si::make_unique<int>(42);
+	std::unique_ptr<int> moved = std::move(e).move_value();
+	BOOST_CHECK(!e.get());
+	BOOST_REQUIRE(moved);
+	BOOST_CHECK_EQUAL(42, *moved);
+}

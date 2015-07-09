@@ -117,8 +117,8 @@ namespace
 		parameters.executable = executable;
 		parameters.current_path = working_directory;
 		parameters.arguments = std::move(arguments);
-		auto output = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
-		auto input = SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(Si::make_pipe().get());
+		auto output = Si::make_pipe().move_value();
+		auto input = Si::make_pipe().move_value();
 		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment;
 
 		//Do not inherit the locale from the parent because we do not want command line tool output to be translated into random languages.

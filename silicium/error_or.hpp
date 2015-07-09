@@ -247,6 +247,15 @@ namespace Si
 			return *value_ptr();
 		}
 
+		Value &&move_value()
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+			&&
+#endif
+		{
+			throw_if_error();
+			return std::move(*value_ptr());
+		}
+
 		Value *get_ptr() BOOST_NOEXCEPT
 		{
 			if (is_error())
