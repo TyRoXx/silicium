@@ -15,6 +15,14 @@ BOOST_AUTO_TEST_CASE(c_string_set)
 	BOOST_CHECK_EQUAL(std::string("hello"), str.c_str());
 }
 
+BOOST_AUTO_TEST_CASE(c_string_construct_from_literal)
+{
+	Si::c_string str = "hello";
+	BOOST_CHECK(str.is_set());
+	BOOST_CHECK(!str.empty());
+	BOOST_CHECK_EQUAL(std::string("hello"), str.c_str());
+}
+
 BOOST_AUTO_TEST_CASE(c_string_empty)
 {
 	Si::c_string str("");

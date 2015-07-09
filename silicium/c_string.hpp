@@ -22,6 +22,12 @@ namespace Si
 			assert(m_begin);
 		}
 
+		template <size_t N>
+		basic_c_string(char_type const (&literal)[N])
+			: m_begin(&literal[0])
+		{
+		}
+
 		SILICIUM_USE_RESULT
 		bool is_set() const BOOST_NOEXCEPT
 		{
@@ -59,7 +65,9 @@ namespace Si
 #else
 		c_string
 #endif
-		native_path_string;
+		os_c_string;
+
+	typedef os_c_string native_path_string;
 
 #ifdef _WIN32
 #	define SILICIUM_SYSTEM_LITERAL(x) L ## x
