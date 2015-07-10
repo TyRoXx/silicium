@@ -4,6 +4,7 @@
 #include <silicium/error_or.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/c_string.hpp>
+#include <silicium/get_last_error.hpp>
 
 namespace Si
 {
@@ -13,7 +14,7 @@ namespace Si
 		native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
-			return boost::system::error_code(GetLastError(), boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}
@@ -24,7 +25,7 @@ namespace Si
 		native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_NEW, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
-			return boost::system::error_code(GetLastError(), boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}
@@ -35,7 +36,7 @@ namespace Si
 		native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
-			return boost::system::error_code(GetLastError(), boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}
@@ -46,7 +47,7 @@ namespace Si
 		native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_WRITE, nullptr, CREATE_NEW, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
-			return boost::system::error_code(GetLastError(), boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}

@@ -3,6 +3,7 @@
 
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/get_last_error.hpp>
 #include <sys/wait.h>
 #include <boost/swap.hpp>
 
@@ -54,7 +55,7 @@ namespace Si
 			assert(wait_id >= 1);
 			if (waitpid(wait_id, &status, 0) < 0)
 			{
-				return boost::system::error_code(errno, boost::system::system_category());
+				return get_last_error();
 			}
 			int const exit_status = WEXITSTATUS(status);
 			return exit_status;

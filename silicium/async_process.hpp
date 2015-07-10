@@ -101,7 +101,7 @@ namespace Si
 			ssize_t read_error = read(child_error.handle, &error, sizeof(error));
 			if (read_error < 0)
 			{
-				return boost::system::error_code(errno, boost::system::system_category());
+				return get_last_error();
 			}
 			if (read_error != 0)
 			{
@@ -258,7 +258,7 @@ namespace Si
 			flags, environment_block.empty() ? NULL : environment_block.data(),
 			parameters.current_path.c_str(), &startup, &process))
 		{
-			return boost::system::error_code(::GetLastError(), boost::system::native_ecat);
+			return get_last_error();
 		}
 
 		win32::unique_handle thread_closer(process.hThread);
@@ -460,7 +460,7 @@ namespace Si
 				}
 				else
 				{
-					throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+					return get_last_error();
 				}
 			}
 			buffered_out.flush();

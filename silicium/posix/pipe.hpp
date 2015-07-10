@@ -1,6 +1,7 @@
 #ifndef SILICIUM_POSIX_PIPE_HPP
 #define SILICIUM_POSIX_PIPE_HPP
 
+#include <silicium/get_last_error.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/error_or.hpp>
 #ifdef _WIN32
@@ -18,7 +19,7 @@ namespace Si
 		{
 			if (fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC) < 0)
 			{
-				return boost::system::error_code(errno, boost::system::native_ecat);
+				return get_last_error();
 			}
 			return {};
 		}
@@ -72,7 +73,7 @@ namespace Si
 		HANDLE read, write;
 		if (!CreatePipe(&read, &write, &security, 0))
 		{
-			return boost::system::error_code(::GetLastError(), boost::system::native_ecat);
+			return get_last_error();
 		}
 		pipe result;
 		result.read = file_handle(read);
@@ -82,7 +83,7 @@ namespace Si
 		std::array<int, 2> fds;
 		if (::pipe(fds.data()) < 0)
 		{
-			return boost::system::error_code(errno, boost::system::system_category());
+			return get_last_error();
 		}
 		pipe result;
 		result.read = file_handle(fds[0]);

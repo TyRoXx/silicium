@@ -1,10 +1,9 @@
 #ifndef SILICIUM_WIN32_NATIVE_FILE_DESCRIPTOR_HPP
 #define SILICIUM_WIN32_NATIVE_FILE_DESCRIPTOR_HPP
 
+#include <silicium/throw_last_error.hpp>
 #include <silicium/win32/win32.hpp>
 #include <boost/config.hpp>
-#include <boost/system/system_error.hpp>
-#include <boost/throw_exception.hpp>
 
 namespace Si
 {
@@ -16,7 +15,7 @@ namespace Si
 	{
 		if (!CloseHandle(file))
 		{
-			boost::throw_exception(boost::system::system_error(GetLastError(), boost::system::system_category()));
+			throw_last_error();
 		}
 	}
 }

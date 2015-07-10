@@ -61,7 +61,7 @@ namespace
 		}
 		if (!SetFileAttributesW(file_name.c_str(), FILE_ATTRIBUTE_READONLY))
 		{
-			boost::throw_exception(boost::system::system_error(GetLastError(), boost::system::get_system_category()));
+			throw_last_error();
 		}
 		return file_name;
 #endif

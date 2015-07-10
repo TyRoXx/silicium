@@ -1,9 +1,8 @@
 #ifndef SILICIUM_LINUX_NATIVE_FILE_DESCRIPTOR_HPP
 #define SILICIUM_LINUX_NATIVE_FILE_DESCRIPTOR_HPP
 
+#include <silicium/throw_last_error.hpp>
 #include <boost/config.hpp>
-#include <boost/system/system_error.hpp>
-#include <boost/throw_exception.hpp>
 #include <unistd.h>
 
 namespace Si
@@ -17,7 +16,7 @@ namespace Si
 		if (close(file) < 0)
 		{
 			//it is intended that this will terminate the process because of noexcept
-			boost::throw_exception(boost::system::system_error(errno, boost::system::system_category()));
+			throw_last_error();
 		}
 	}
 }

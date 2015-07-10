@@ -53,7 +53,7 @@ namespace Si
 			DWORD exit_code = 1;
 			if (!GetExitCodeProcess(m_id, &exit_code))
 			{
-				return boost::system::error_code(::GetLastError(), boost::system::native_ecat);
+				return get_last_error();
 			}
 			CloseHandle(m_id);
 			m_id = INVALID_HANDLE_VALUE;

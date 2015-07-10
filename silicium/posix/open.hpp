@@ -16,7 +16,7 @@ namespace Si
 		native_file_descriptor const fd = ::open(name.c_str(), O_RDONLY);
 		if (fd < 0)
 		{
-			return boost::system::error_code(errno, boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}
@@ -26,7 +26,7 @@ namespace Si
 		native_file_descriptor const fd = ::open(name.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
 		if (fd < 0)
 		{
-			return boost::system::error_code(errno, boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}
@@ -36,7 +36,7 @@ namespace Si
 		native_file_descriptor const fd = ::open(name.c_str(), O_RDWR | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
 		if (fd < 0)
 		{
-			return boost::system::error_code(errno, boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}
@@ -46,7 +46,7 @@ namespace Si
 		native_file_descriptor const fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
 		if (fd < 0)
 		{
-			return boost::system::error_code(errno, boost::system::system_category());
+			return get_last_error();
 		}
 		return file_handle(fd);
 	}

@@ -3,6 +3,7 @@
 
 #include <silicium/file_handle.hpp>
 #include <silicium/error_or.hpp>
+#include <silicium/get_last_error.hpp>
 
 #ifndef _WIN32
 #	include <sys/stat.h>
@@ -18,7 +19,7 @@ namespace Si
 		LARGE_INTEGER size;
 		if (!GetFileSizeEx(file, &size))
 		{
-			return boost::system::error_code(GetLastError(), boost::system::system_category());
+			return get_last_error();
 		}
 		assert(size.QuadPart >= 0);
 		return static_cast<boost::uint64_t>(size.QuadPart);
@@ -26,7 +27,7 @@ namespace Si
 		struct stat buffer;
 		if (fstat(file, &buffer) < 0)
 		{
-			return boost::system::error_code(errno, boost::system::system_category());
+			return get_last_error();
 		}
 		if ((buffer.st_mode & S_IFMT) != S_IFREG)
 		{

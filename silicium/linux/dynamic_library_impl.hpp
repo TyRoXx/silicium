@@ -2,7 +2,7 @@
 #define SILICIUM_LINUX_DYNAMIC_LIBRARY_IMPL_HPP
 
 #include <silicium/c_string.hpp>
-#include <boost/system/error_code.hpp>
+#include <silicium/get_last_error.hpp>
 #include <dlfcn.h>
 
 namespace Si
@@ -21,7 +21,7 @@ namespace Si
 				}
 				else
 				{
-					ec = boost::system::error_code(errno, boost::system::system_category());
+					ec = get_last_error();
 				}
 				return handle;
 			}

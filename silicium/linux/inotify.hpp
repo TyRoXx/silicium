@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/throw_last_error.hpp>
 #include <silicium/linux/inotify_watch_descriptor.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/path_segment.hpp>
@@ -54,7 +55,7 @@ namespace Si
 				int fd = inotify_init();
 				if (fd < 0)
 				{
-					throw boost::system::system_error(errno, boost::system::posix_category);
+					throw_last_error();
 				}
 				try
 				{
@@ -73,7 +74,7 @@ namespace Si
 				int const wd = inotify_add_watch(notifier->native_handle(), target.c_str(), mask);
 				if (wd < 0)
 				{
-					return boost::system::error_code(errno, boost::system::posix_category);
+					return get_last_error();
 				}
 				return watch_descriptor(notifier->native_handle(), wd);
 			}

@@ -22,7 +22,7 @@ namespace Si
 				}
 				else
 				{
-					ec = boost::system::error_code(GetLastError(), boost::system::system_category());
+					ec = get_last_error();
 				}
 				return handle;
 			}

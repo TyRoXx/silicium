@@ -75,7 +75,7 @@ namespace Si
 				{
 					return error_type();
 				}
-				return error_type(GetLastError(), boost::system::system_category());
+				return get_last_error();
 			},
 				[this](memory_range const &content) -> error_type
 			{
@@ -94,7 +94,7 @@ namespace Si
 				{
 					return error_type();
 				}
-				return error_type(GetLastError(), boost::system::system_category());
+				return get_last_error();
 			},
 				[this](seek_add const request) -> error_type
 			{
@@ -104,7 +104,7 @@ namespace Si
 				{
 					return error_type();
 				}
-				return error_type(GetLastError(), boost::system::system_category());
+				return get_last_error();
 			}
 			);
 		}
@@ -178,7 +178,7 @@ namespace Si
 					{
 						return error_type();
 					}
-					return error_type(errno, boost::system::system_category());
+					return get_last_error();
 				},
 				[this](memory_range const &content) -> error_type
 				{
@@ -188,7 +188,7 @@ namespace Si
 				{
 					if (lseek64(m_destination, request.from_beginning, SEEK_SET) == static_cast<off_t>(-1))
 					{
-						return error_type(errno, boost::system::system_category());
+						return get_last_error();
 					}
 					return error_type();
 				},
@@ -196,7 +196,7 @@ namespace Si
 				{
 					if (lseek64(m_destination, request.from_current, SEEK_CUR) == static_cast<off_t>(-1))
 					{
-						return error_type(errno, boost::system::system_category());
+						return get_last_error();
 					}
 					return error_type();
 				}
@@ -226,7 +226,7 @@ namespace Si
 			ssize_t rc = ::writev(m_destination, vector.data(), static_cast<int>(vector.size()));
 			if (rc < 0)
 			{
-				return error_type(errno, boost::system::system_category());
+				return get_last_error();
 			}
 			//assume that everything has been written
 			return error_type();

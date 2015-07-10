@@ -26,7 +26,7 @@ namespace Si
 		ssize_t const read_bytes = ::read(file, destination.begin(), destination.size());
 		if (read_bytes < 0)
 		{
-			return boost::system::error_code(errno, boost::system::system_category());
+			return get_last_error();
 		}
 #endif
 		if (read_bytes == 0)

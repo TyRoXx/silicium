@@ -2,6 +2,7 @@
 #define SILICIUM_WRITE_HPP
 
 #include <silicium/error_or.hpp>
+#include <silicium/get_last_error.hpp>
 #include <silicium/native_file_descriptor.hpp>
 #include <silicium/memory_range.hpp>
 #include <limits>
@@ -23,13 +24,13 @@ namespace Si
 			));
 			if (!WriteFile(file, data.begin() + total_written, piece, &written, nullptr))
 			{
-				return boost::system::error_code(GetLastError(), boost::system::system_category());
+				return get_last_error();
 			}
 #else
 			ssize_t const written = ::write(file, data.begin() + total_written, data.size() - total_written);
 			if (written < 0)
 			{
-				return boost::system::error_code(errno, boost::system::system_category());
+				return get_last_error();
 			}
 #endif
 			if (written == 0)

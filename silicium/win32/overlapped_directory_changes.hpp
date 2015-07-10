@@ -5,6 +5,7 @@
 #include <boost/asio.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/throw_last_error.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/win32/file_notification.hpp>
 
@@ -48,7 +49,7 @@ namespace Si
 			{
 				if (watch_file.get() == INVALID_HANDLE_VALUE)
 				{
-					throw boost::system::system_error(::GetLastError(), boost::system::native_ecat);
+					throw_last_error();
 				}
 				auto &service = boost::asio::use_service<boost::asio::detail::win_iocp_io_service>(io);
 				boost::system::error_code ec;
