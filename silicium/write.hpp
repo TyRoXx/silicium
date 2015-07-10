@@ -12,7 +12,7 @@ namespace Si
 	inline error_or<std::size_t> write(native_file_descriptor file, memory_range data)
 	{
 		std::size_t total_written = 0;
-		while (total_written < static_cast<std::size_t>(data.size()))
+		do
 		{
 #ifdef _WIN32
 			DWORD written = 0;
@@ -26,7 +26,7 @@ namespace Si
 				return boost::system::error_code(GetLastError(), boost::system::system_category());
 			}
 #else
-			ssize_t const written = ::write(file, data.begin(), data.size());
+			ssize_t const written = ::write(file, data.begin() + total_written, data.size() - total_written);
 			if (written < 0)
 			{
 				return boost::system::error_code(errno, boost::system::system_category());
@@ -38,6 +38,7 @@ namespace Si
 			}
 			total_written += written;
 		}
+		while (total_written < static_cast<std::size_t>(data.size()));
 		return total_written;
 	}
 }

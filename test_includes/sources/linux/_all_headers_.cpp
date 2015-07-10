@@ -15,6 +15,7 @@
 #include <silicium/async_process.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
+#include <silicium/byte.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>
@@ -24,6 +25,7 @@
 #include <silicium/detail/line_source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
 #include <silicium/dynamic_library.hpp>
+#include <silicium/environment_variables.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
@@ -34,6 +36,7 @@
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/function.hpp>
+#include <silicium/get_last_error.hpp>
 #include <silicium/html.hpp>
 #include <silicium/http/generate_header.hpp>
 #include <silicium/http/generate_request.hpp>
@@ -44,6 +47,7 @@
 #include <silicium/http/receive_request.hpp>
 #include <silicium/http/request_parser_sink.hpp>
 #include <silicium/http/uri.hpp>
+#include <silicium/identity.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/linux/dynamic_library_impl.hpp>
@@ -119,6 +123,7 @@
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>
+#include <silicium/sink/function_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/multi_sink.hpp>
 #include <silicium/sink/ostream_sink.hpp>
@@ -145,7 +150,9 @@
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/success.hpp>
+#include <silicium/terminate_on_exception.hpp>
 #include <silicium/then.hpp>
+#include <silicium/throw_last_error.hpp>
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>

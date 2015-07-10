@@ -2,7 +2,10 @@
 #define SILICIUM_DYNAMIC_LIBRARY_HPP
 
 #include <silicium/c_string.hpp>
-#include <silicium/win32/win32.hpp>
+#include <silicium/get_last_error.hpp>
+#ifdef _WIN32
+#	include <silicium/win32/win32.hpp>
+#endif
 
 namespace Si
 {
@@ -12,13 +15,12 @@ namespace Si
 #ifdef _WIN32
 		if (!SetEnvironmentVariableW(key.c_str(), value.c_str()))
 		{
-			return boost::system::error_code(GetLastError(), boost::system::system_category());
+			return get_last_error();
 		}
 #else
 		if (setenv(key.c_str(), value.c_str(), 1) != 0)
 		{
-			int err = errno;
-			return boost::system::error_code(err, boost::system::system_category());
+			return get_last_error();
 		}
 #endif
 		return{};
