@@ -66,7 +66,7 @@ namespace Si
 		-> iterator_range<C const *>
 #endif
 	{
-		return make_memory_range(str, str + std::char_traits<C>::length(str));
+		return make_iterator_range(str, str + std::char_traits<C>::length(str));
 	}
 }
 

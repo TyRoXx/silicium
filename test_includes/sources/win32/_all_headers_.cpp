@@ -25,6 +25,7 @@
 #include <silicium/detail/line_source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
 #include <silicium/dynamic_library.hpp>
+#include <silicium/environment_variables.hpp>
 #include <silicium/error_code.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>

@@ -6,6 +6,7 @@
 #include <silicium/observable/thread.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/std_threading.hpp>
+#include <silicium/environment_variables.hpp>
 #include <boost/test/unit_test.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
@@ -81,7 +82,7 @@ BOOST_AUTO_TEST_CASE(async_process_win32_where)
 	parameters.executable = *Si::absolute_path::create(L"C:\\Windows\\System32\\where.exe");
 	parameters.current_path = Si::get_current_working_directory();
 
-	process_output result = run_process(parameters);
+	process_output result = run_process(parameters, {}, Si::environment_inheritance::no_inherit);
 
 	std::size_t const windows7whereHelpSize = 1830;
 	BOOST_CHECK_EQUAL(windows7whereHelpSize, result.output.size());
@@ -117,7 +118,9 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 
 namespace
 {
-	void test_environment_variables(Si::environment_inheritance const tested_inheritance)
+	void test_environment_variables(
+		Si::environment_inheritance const tested_inheritance,
+		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const additional_variables)
 	{
 		Si::async_process_parameters parameters;
 		parameters.executable = *Si::absolute_path::create(
@@ -133,15 +136,15 @@ namespace
 		parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("set"));
 #endif
 
-		BOOST_REQUIRE_EQUAL(0, setenv("silicium_parent_key", "parent_value", 1));
+		BOOST_REQUIRE(!Si::set_environment_variable(SILICIUM_SYSTEM_LITERAL("silicium_parent_key"), SILICIUM_SYSTEM_LITERAL("parent_value")));
 
-		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const environment_variables
-		{
-			{SILICIUM_SYSTEM_LITERAL("key"), SILICIUM_SYSTEM_LITERAL("value")}
-		};
-		process_output const output = run_process(parameters, environment_variables, tested_inheritance);
+		process_output const output = run_process(parameters, additional_variables, tested_inheritance);
 		BOOST_CHECK_EQUAL(0, output.exit_code);
-		BOOST_CHECK_NE(std::string::npos, output.output.find("key=value"));
+
+		for (auto const &variable : additional_variables)
+		{
+			BOOST_CHECK_NE(std::string::npos, output.output.find(Si::to_utf8_string(variable.first) + '=' + Si::to_utf8_string(variable.second)));
+		}
 
 		auto const parent_key_found = output.output.find("silicium_parent_key=parent_value");
 		switch (tested_inheritance)
@@ -157,12 +160,31 @@ namespace
 	}
 }
 
+namespace
+{
+	std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const additional_variables
+	{
+		{SILICIUM_SYSTEM_LITERAL("key"), SILICIUM_SYSTEM_LITERAL("value")}
+	};
+}
+
+BOOST_AUTO_TEST_CASE(async_process_environment_variables_inherit_additional_vars)
+{
+	test_environment_variables(Si::environment_inheritance::inherit, additional_variables);
+}
+
+BOOST_AUTO_TEST_CASE(async_process_environment_variables_no_inherit_additional_vars)
+{
+	test_environment_variables(Si::environment_inheritance::no_inherit, additional_variables);
+}
+
 BOOST_AUTO_TEST_CASE(async_process_environment_variables_inherit)
 {
-	test_environment_variables(Si::environment_inheritance::inherit);
+	test_environment_variables(Si::environment_inheritance::inherit, {});
 }
 
 BOOST_AUTO_TEST_CASE(async_process_environment_variables_no_inherit)
 {
-	test_environment_variables(Si::environment_inheritance::no_inherit);
+	test_environment_variables(Si::environment_inheritance::no_inherit, {});
 }
+
