@@ -5,15 +5,15 @@
 #include <unordered_map>
 #include <map>
 
+#ifdef _WIN32
+#	define SILICIUM_TEST_ROOT L"C:/"
+#else
+#	define SILICIUM_TEST_ROOT "/"
+#endif
+
 namespace
 {
-	Si::os_string const absolute_root(
-#ifdef _WIN32
-		L"C:/"
-#else
-		"/"
-#endif
-	);
+	Si::os_string const absolute_root(SILICIUM_TEST_ROOT);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_empty)
@@ -153,3 +153,50 @@ BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_non_empty)
 	Si::native_path_string const str = p.safe_c_str();
 	BOOST_CHECK(absolute_root == str.c_str());
 }
+
+BOOST_AUTO_TEST_CASE(absolute_path_create_literal_ok)
+{
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create(SILICIUM_TEST_ROOT);
+	BOOST_REQUIRE(p);
+	BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_create_literal_not_ok)
+{
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create("not root");
+	BOOST_CHECK(!p);
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_create_noexcept_string_ok)
+{
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create(Si::noexcept_string(SILICIUM_TEST_ROOT));
+	BOOST_REQUIRE(p);
+	BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_create_noexcept_string_not_ok)
+{
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create(Si::noexcept_string("not root"));
+	BOOST_CHECK(!p);
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_create_boost_path_ok)
+{
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create(boost::filesystem::path(SILICIUM_TEST_ROOT));
+	BOOST_REQUIRE(p);
+	BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
+}
+
+BOOST_AUTO_TEST_CASE(absolute_path_create_boost_path_not_ok)
+{
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create(boost::filesystem::path("not root"));
+	BOOST_CHECK(!p);
+}
+
+#ifdef _WIN32
+BOOST_AUTO_TEST_CASE(absolute_path_create_wchar_not_ok)
+{
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create(L"not root"));
+	BOOST_CHECK(!p);
+}
+#endif

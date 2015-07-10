@@ -121,11 +121,13 @@ namespace Si
 			return create(boost::filesystem::path(maybe_absolute));
 		}
 
+#ifdef _WIN32
 		SILICIUM_USE_RESULT
 		static optional<absolute_path> create(wchar_t const *maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute));
 		}
+#endif
 
 	private:
 
