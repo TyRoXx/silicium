@@ -3,6 +3,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
 #include <unordered_map>
+#include <set>
 
 BOOST_AUTO_TEST_CASE(byte_zero)
 {
@@ -32,4 +33,14 @@ BOOST_AUTO_TEST_CASE(byte_ostream)
 	BOOST_CHECK_EQUAL("1", boost::lexical_cast<std::string>(Si::byte::one));
 	BOOST_CHECK_EQUAL("0", boost::lexical_cast<std::string>(Si::byte::minimum));
 	BOOST_CHECK_EQUAL("255", boost::lexical_cast<std::string>(Si::byte::maximum));
+}
+
+BOOST_AUTO_TEST_CASE(byte_relational)
+{
+	std::set<Si::byte> s;
+	s.emplace(Si::byte::zero);
+	s.emplace(Si::byte::one);
+	BOOST_CHECK_EQUAL(1, s.count(Si::byte::zero));
+	BOOST_CHECK_EQUAL(1, s.count(Si::byte::one));
+	BOOST_CHECK_EQUAL(0, s.count(Si::byte::maximum));
 }
