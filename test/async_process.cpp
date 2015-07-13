@@ -116,6 +116,7 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 }
 #endif
 
+#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 namespace
 {
 	void test_environment_variables(
@@ -187,4 +188,4 @@ BOOST_AUTO_TEST_CASE(async_process_environment_variables_no_inherit)
 {
 	test_environment_variables(Si::environment_inheritance::no_inherit, {});
 }
-
+#endif
