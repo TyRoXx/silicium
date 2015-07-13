@@ -114,6 +114,11 @@ if(URIPARSER_FOUND)
 	include_directories(SYSTEM ${URIPARSER_INCLUDE_DIR})
 endif()
 
+find_package(SQLite3)
+if(SQLITE3_FOUND)
+	include_directories(SYSTEM ${SQLITE3_INCLUDE_DIR})
+endif()
+
 option(SILICIUM_USE_WEBSOCKETPP "use websocketpp if the submodule has been checked out" ON)
 if(SILICIUM_USE_WEBSOCKETPP AND (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/websocketpp/.git"))
 	set(SILICIUM_HAS_WEBSOCKETPP ON)

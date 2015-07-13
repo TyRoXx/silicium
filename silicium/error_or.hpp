@@ -248,9 +248,6 @@ namespace Si
 		}
 
 		Value &&move_value()
-#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-			&&
-#endif
 		{
 			throw_if_error();
 			return std::move(*value_ptr());

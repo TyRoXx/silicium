@@ -16,7 +16,7 @@ add_executable(unit_test ${sources} ${luaSources} ${zlibSources} ${uriSources} $
 if(NOT (Boost_VERSION LESS 105300))
 	target_link_libraries(unit_test siliciumc)
 endif()
-target_link_libraries(unit_test ${ZLIB_LIBRARY} ${URIPARSER_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(unit_test ${ZLIB_LIBRARY} ${URIPARSER_LIBRARIES} ${Boost_LIBRARIES} ${SQLITE3_LIBRARIES})
 if(SILICIUM_LINUX)
 	target_link_libraries(unit_test dl)
 endif()
