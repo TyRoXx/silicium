@@ -68,7 +68,7 @@ namespace Si
 		template <class Element>
 		struct make_command
 		{
-			typedef Si::fast_variant<result<Element *>, yield> type;
+			typedef Si::variant<result<Element *>, yield> type;
 		};
 
 		template <class Element>

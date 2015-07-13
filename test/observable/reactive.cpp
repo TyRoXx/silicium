@@ -122,7 +122,7 @@ namespace Si
 		Si::bridge<string> second;
 		auto variants = make_variant(Si::ref(first), Si::ref(second));
 
-		typedef Si::fast_variant<int, string> variant;
+		typedef Si::variant<int, string> variant;
 		std::vector<variant> produced;
 		auto consumer = Si::consume<variant>([&produced](variant element)
 		{

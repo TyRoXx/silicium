@@ -142,7 +142,7 @@ namespace Si
 		-> variant_observable<Si::fast_variant, Lockable, typename std::decay<Parts>::type...>
 #endif
 	{
-		return variant_observable<Si::fast_variant, Lockable, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
+		return variant_observable<Si::variant, Lockable, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);
 	}
 
 	template <template <class ...T> class variant, class Lockable = boost::recursive_mutex, class ...Parts>

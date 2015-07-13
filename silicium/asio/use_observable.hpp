@@ -72,7 +72,7 @@ namespace Si
 
 			private:
 
-				fast_variant<nothing, erased_observer<Element>, Element> m_waiting_or_storing;
+				variant<nothing, erased_observer<Element>, Element> m_waiting_or_storing;
 			};
 
 			template <class Element>

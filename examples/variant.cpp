@@ -4,7 +4,7 @@
 
 int main()
 {
-	Si::fast_variant<int, std::time_t, double> r(std::time(nullptr));
+	Si::variant<int, std::time_t, double> r(std::time(nullptr));
 	return Si::visit<int>(
 		r,
 		[](int v)

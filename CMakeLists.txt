@@ -132,6 +132,11 @@ if(SILICIUM_NO_EXCEPTIONS)
 	endif()
 endif()
 
+option(SILICIUM_NO_DEPRECATED "disable deprecated silicium APIs" OFF)
+if(SILICIUM_NO_DEPRECATED)
+	add_definitions("-DSILICIUM_NO_DEPRECATED")
+endif()
+
 include_directories(".")
 
 if(NOT (Boost_VERSION LESS 105300))

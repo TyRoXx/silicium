@@ -5,10 +5,12 @@
 
 namespace Si
 {
+#ifndef SILICIUM_NO_DEPRECATED
 	//The name fast_variant is deprecated. You should use
 	//variant instead.
 	template <class ...T>
 	using fast_variant = variant<T...>;
+#endif
 }
 
 #endif

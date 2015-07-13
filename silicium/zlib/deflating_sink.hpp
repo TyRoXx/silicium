@@ -74,7 +74,7 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(zlib_deflate_stream &operator = (zlib_deflate_stream const &))
 	};
 
-	typedef fast_variant<flush, memory_range> zlib_sink_element;
+	typedef variant<flush, memory_range> zlib_sink_element;
 
 	template <class Next>
 	struct zlib_deflating_sink

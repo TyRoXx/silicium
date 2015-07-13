@@ -64,9 +64,9 @@ namespace Si
 		a = b;
 	}
 
-	BOOST_AUTO_TEST_CASE(response_header_compatible_with_fast_variant)
+	BOOST_AUTO_TEST_CASE(response_header_compatible_with_variant)
 	{
-		fast_variant<http::response> v;
+		variant<http::response> v;
 		auto w = v;
 		w = std::move(v);
 		auto u = std::move(w);

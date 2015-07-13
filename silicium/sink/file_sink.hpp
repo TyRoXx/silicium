@@ -26,7 +26,7 @@ namespace Si
 		boost::int64_t from_current;
 	};
 
-	typedef fast_variant<flush, memory_range, seek_set, seek_add> file_sink_element;
+	typedef variant<flush, memory_range, seek_set, seek_add> file_sink_element;
 
 	struct file_sink
 	{

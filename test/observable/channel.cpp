@@ -216,9 +216,9 @@ BOOST_AUTO_TEST_CASE(channel_select)
 	auto s = Si::make_thread_generator<long, Si::std_threading>([&](Si::push_context<long> &yield)
 	{
 		auto both = Si::make_variant(Si::ref(channel_1.receiver()), Si::ref(channel_2.receiver()));
-		boost::optional<Si::fast_variant<int, long>> a = yield.get_one(both);
+		boost::optional<Si::variant<int, long>> a = yield.get_one(both);
 		BOOST_REQUIRE(a);
-		boost::optional<Si::fast_variant<int, long>> b = yield.get_one(both);
+		boost::optional<Si::variant<int, long>> b = yield.get_one(both);
 		BOOST_REQUIRE(b);
 		long const result = Si::visit<long>(
 			*a,
