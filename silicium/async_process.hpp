@@ -355,7 +355,6 @@ namespace Si
 				fail();
 			}
 
-
 			switch (inheritance)
 			{
 			case environment_inheritance::inherit:
