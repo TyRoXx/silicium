@@ -77,6 +77,16 @@ namespace Si
 			}
 			return statement_handle(statement);
 		}
+
+		inline boost::system::error_code bind(sqlite3_stmt &statement, int zero_based_index, sqlite3_int64 value)
+		{
+			return make_error_code(sqlite3_bind_int64(&statement, zero_based_index, value));
+		}
+
+		inline boost::system::error_code bind(sqlite3_stmt &statement, int zero_based_index, char const *begin, int length)
+		{
+			return make_error_code(sqlite3_bind_text(&statement, zero_based_index, begin, length, nullptr));
+		}
 	}
 }
 
