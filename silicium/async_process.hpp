@@ -459,7 +459,7 @@ namespace Si
 				}
 				else
 				{
-					return get_last_error();
+					throw_last_error();
 				}
 			}
 			buffered_out.flush();

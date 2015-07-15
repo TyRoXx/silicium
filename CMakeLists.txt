@@ -115,9 +115,13 @@ if(URIPARSER_FOUND)
 endif()
 
 find_package(SQLite3)
-if(SQLITE3_FOUND)
-	include_directories(SYSTEM ${SQLITE3_INCLUDE_DIR})
+if(NOT SQLITE3_FOUND)
+	set(SQLITE3_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sqlite-amalgamation-3081002")
+	add_library(sqlite3 "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sqlite-amalgamation-3081002/sqlite3.c")
+	set(SQLITE3_LIBRARIES sqlite3)
 endif()
+
+include_directories(SYSTEM ${SQLITE3_INCLUDE_DIR})
 
 option(SILICIUM_USE_WEBSOCKETPP "use websocketpp if the submodule has been checked out" ON)
 if(SILICIUM_USE_WEBSOCKETPP AND (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/websocketpp/.git"))

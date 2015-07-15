@@ -15,10 +15,10 @@
 namespace Si
 {
 #if SILICIUM_RX_VARIANT_AVAILABLE
-	template <template <class ...T> class variant, class Lockable, class ...Parts>
+	template <template <class ...T> class Variant, class Lockable, class ...Parts>
 	struct variant_observable
 	{
-		typedef variant<typename Parts::element_type...> element_type;
+		typedef Variant<typename Parts::element_type...> element_type;
 
 		template <class ...P>
 		explicit variant_observable(P &&...parts)
@@ -139,7 +139,7 @@ namespace Si
 	template <class Lockable = boost::recursive_mutex, class ...Parts>
 	auto make_variant(Parts &&...parts)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> variant_observable<Si::fast_variant, Lockable, typename std::decay<Parts>::type...>
+		-> variant_observable<Si::variant, Lockable, typename std::decay<Parts>::type...>
 #endif
 	{
 		return variant_observable<Si::variant, Lockable, typename std::decay<Parts>::type...>(std::forward<Parts>(parts)...);

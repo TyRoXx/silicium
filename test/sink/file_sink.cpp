@@ -4,6 +4,7 @@
 #include <silicium/source/file_source.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/absolute_path.hpp>
+#include <silicium/throw_last_error.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread/future.hpp>
 #include <array>
@@ -61,7 +62,7 @@ namespace
 		}
 		if (!SetFileAttributesW(file_name.c_str(), FILE_ATTRIBUTE_READONLY))
 		{
-			throw_last_error();
+			Si::throw_last_error();
 		}
 		return file_name;
 #endif

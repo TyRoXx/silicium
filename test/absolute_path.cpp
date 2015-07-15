@@ -167,6 +167,7 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_literal_not_ok)
 	BOOST_CHECK(!p);
 }
 
+#ifndef _WIN32
 BOOST_AUTO_TEST_CASE(absolute_path_create_noexcept_string_ok)
 {
 	Si::optional<Si::absolute_path> p = Si::absolute_path::create(Si::noexcept_string(SILICIUM_TEST_ROOT));
@@ -179,6 +180,7 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_noexcept_string_not_ok)
 	Si::optional<Si::absolute_path> p = Si::absolute_path::create(Si::noexcept_string("not root"));
 	BOOST_CHECK(!p);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(absolute_path_create_boost_path_ok)
 {
@@ -196,7 +198,7 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_boost_path_not_ok)
 #ifdef _WIN32
 BOOST_AUTO_TEST_CASE(absolute_path_create_wchar_not_ok)
 {
-	Si::optional<Si::absolute_path> p = Si::absolute_path::create(L"not root"));
+	Si::optional<Si::absolute_path> p = Si::absolute_path::create(L"not root");
 	BOOST_CHECK(!p);
 }
 #endif

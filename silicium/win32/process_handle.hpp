@@ -3,7 +3,7 @@
 
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
-#include <silicium/win32/win32.hpp>
+#include <silicium/get_last_error.hpp>
 #include <boost/swap.hpp>
 
 namespace Si
