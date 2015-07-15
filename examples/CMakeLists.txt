@@ -20,6 +20,9 @@ endif()
 add_executable(http_hello "http_hello.cpp")
 target_link_libraries(http_hello ${Boost_LIBRARIES})
 
+add_executable(http_proxy "http_proxy.cpp")
+target_link_libraries(http_proxy ${Boost_LIBRARIES})
+
 add_executable(dynamic_web_site "dynamic_web_site.cpp")
 target_link_libraries(dynamic_web_site ${Boost_LIBRARIES})
 
