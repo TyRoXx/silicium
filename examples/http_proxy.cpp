@@ -51,6 +51,7 @@ namespace
 
 			//you can handle the error if you want
 			boost::system::error_code error = Si::asio::write(client, Si::make_memory_range(response), yield);
+			boost::ignore_unused_variable_warning(error);
 		}
 
 		//ignore shutdown failures, they do not matter here
