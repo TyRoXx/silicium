@@ -92,6 +92,26 @@ namespace Si
 	}
 
 	template <class Policy>
+	bool operator == (compact_optional<Policy> const &left, typename Policy::value_type const &right)
+	{
+		if (left)
+		{
+			return *left == right;
+		}
+		return false;
+	}
+
+	template <class Policy>
+	bool operator == (typename Policy::value_type const &left, compact_optional<Policy> const &right)
+	{
+		if (right)
+		{
+			return left == *right;
+		}
+		return false;
+	}
+
+	template <class Policy>
 	bool operator == (compact_optional<Policy> const &left, none_t)
 	{
 		return !left;
@@ -159,11 +179,34 @@ namespace Si
 		}
 	};
 
+	template <class Pointee>
+	struct pointer
+	{
+		typedef Pointee *value_type;
+		static bool is_none(value_type value)
+		{
+			return (value == get_none());
+		}
+		static value_type get_none()
+		{
+			static union
+			{
+				Pointee a, b;
+			}
+			none_dummy;
+			return &none_dummy.a;
+		}
+	};
+
 	typedef compact_optional<positive_number<boost::int32_t>> optional_int31;
 	BOOST_STATIC_ASSERT(sizeof(optional_int31) == sizeof(boost::uint32_t));
 
 	typedef compact_optional<non_empty_string<noexcept_string>> optional_non_empty_string;
 	BOOST_STATIC_ASSERT(sizeof(optional_non_empty_string) == sizeof(noexcept_string));
+
+	template <class Pointee>
+	using optional_ptr = compact_optional<pointer<Pointee>>;
+	BOOST_STATIC_ASSERT(sizeof(optional_ptr<int>) == sizeof(int *));
 }
 
 BOOST_AUTO_TEST_CASE(compact_optional_none_equal)
@@ -173,6 +216,8 @@ BOOST_AUTO_TEST_CASE(compact_optional_none_equal)
 	BOOST_CHECK_EQUAL(a, Si::none);
 	BOOST_CHECK_EQUAL(Si::none, b);
 	BOOST_CHECK_EQUAL(Si::none, Si::none);
+	BOOST_CHECK_NE(a, std::numeric_limits<boost::int32_t>::max());
+	BOOST_CHECK_NE(std::numeric_limits<boost::int32_t>::max(), a);
 }
 
 BOOST_AUTO_TEST_CASE(compact_optional_construct)
@@ -192,4 +237,17 @@ BOOST_AUTO_TEST_CASE(compact_optional_construct)
 	BOOST_CHECK_NE(a, d);
 	BOOST_CHECK_EQUAL(c, e);
 	BOOST_CHECK_EQUAL(a, f);
+}
+
+BOOST_AUTO_TEST_CASE(optional_ptr)
+{
+	Si::optional_ptr<long> a, b;
+	BOOST_CHECK_EQUAL(a, b);
+	BOOST_CHECK_EQUAL(b, Si::none);
+	long pointee = 2;
+	b = &pointee;
+	BOOST_CHECK_EQUAL(a, Si::none);
+	BOOST_CHECK_NE(b, Si::none);
+	**b = 3;
+	BOOST_CHECK_EQUAL(3, pointee);
 }
