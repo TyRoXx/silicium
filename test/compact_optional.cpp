@@ -1,4 +1,5 @@
 #include <silicium/optional.hpp>
+#include <silicium/noexcept_string.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace Si
@@ -25,6 +26,12 @@ namespace Si
 			: m_storage(Policy::get_none())
 		{
 			assert(!*this);
+		}
+
+		compact_optional(value_type value)
+			: m_storage(std::move(value))
+		{
+			assert(*this);
 		}
 
 		bool operator !() const BOOST_NOEXCEPT
@@ -97,6 +104,24 @@ namespace Si
 	}
 
 	template <class Policy>
+	bool operator != (compact_optional<Policy> const &left, compact_optional<Policy> const &right)
+	{
+		return !(left == right);
+	}
+
+	template <class Policy>
+	bool operator != (compact_optional<Policy> const &left, none_t)
+	{
+		return !!left;
+	}
+
+	template <class Policy>
+	bool operator != (none_t, compact_optional<Policy> const &right)
+	{
+		return !!right;
+	}
+
+	template <class Policy>
 	std::ostream &operator << (std::ostream &out, compact_optional<Policy> const &value)
 	{
 		if (value)
@@ -120,9 +145,25 @@ namespace Si
 		}
 	};
 
-	typedef compact_optional<positive_number<boost::int32_t>> optional_int31;
+	template <class String>
+	struct non_empty_string
+	{
+		typedef String value_type;
+		static bool is_none(value_type const &value)
+		{
+			return value.empty();
+		}
+		static value_type get_none()
+		{
+			return {};
+		}
+	};
 
+	typedef compact_optional<positive_number<boost::int32_t>> optional_int31;
 	BOOST_STATIC_ASSERT(sizeof(optional_int31) == sizeof(boost::uint32_t));
+
+	typedef compact_optional<non_empty_string<noexcept_string>> optional_non_empty_string;
+	BOOST_STATIC_ASSERT(sizeof(optional_non_empty_string) == sizeof(noexcept_string));
 }
 
 BOOST_AUTO_TEST_CASE(compact_optional_none_equal)
@@ -132,4 +173,23 @@ BOOST_AUTO_TEST_CASE(compact_optional_none_equal)
 	BOOST_CHECK_EQUAL(a, Si::none);
 	BOOST_CHECK_EQUAL(Si::none, b);
 	BOOST_CHECK_EQUAL(Si::none, Si::none);
+}
+
+BOOST_AUTO_TEST_CASE(compact_optional_construct)
+{
+	Si::optional_non_empty_string a;
+	Si::optional_non_empty_string b("1");
+	BOOST_CHECK_EQUAL(b, b);
+	Si::optional_non_empty_string c(Si::noexcept_string("2"));
+	BOOST_CHECK_EQUAL(c, c);
+	Si::optional_non_empty_string d(Si::some, "3");
+	BOOST_CHECK_EQUAL(d, d);
+	Si::optional_non_empty_string e(Si::some, Si::noexcept_string("2"));
+	Si::optional_non_empty_string f(Si::none);
+	BOOST_CHECK_EQUAL(e, e);
+	BOOST_CHECK_NE(a, b);
+	BOOST_CHECK_NE(a, c);
+	BOOST_CHECK_NE(a, d);
+	BOOST_CHECK_EQUAL(c, e);
+	BOOST_CHECK_EQUAL(a, f);
 }
