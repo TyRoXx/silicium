@@ -26,6 +26,11 @@ namespace Si
 
 	static none_t BOOST_CONSTEXPR_OR_CONST none;
 
+	inline bool operator == (none_t, none_t)
+	{
+		return true;
+	}
+
 	struct some_t {};
 
 	static some_t BOOST_CONSTEXPR_OR_CONST some;
