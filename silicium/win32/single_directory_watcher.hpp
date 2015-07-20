@@ -3,6 +3,7 @@
 
 #include <silicium/win32/overlapped_directory_changes.hpp>
 #include <silicium/file_notification.hpp>
+#include <silicium/absolute_path.hpp>
 #include <silicium/observable/enumerate.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/transform_if_initialized.hpp>
@@ -11,7 +12,7 @@
 #include <silicium/optional.hpp>
 #include <boost/ref.hpp>
 
-#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER SILICIUM_HAS_ABSOLUTE_PATH
+#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER 1
 
 namespace Si
 {

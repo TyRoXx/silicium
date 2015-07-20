@@ -67,9 +67,9 @@ BOOST_AUTO_TEST_CASE(trait_noexcept_method)
 {
 	auto container = Container<int>::erase(std::vector<int>{});
 	auto const &const_ref = container;
-	BOOST_CHECK_EQUAL(0, const_ref.size());
+	BOOST_CHECK_EQUAL(0u, const_ref.size());
 	container.original.resize(3);
-	BOOST_CHECK_EQUAL(3, const_ref.size());
+	BOOST_CHECK_EQUAL(3u, const_ref.size());
 	BOOST_STATIC_ASSERT(BOOST_NOEXCEPT_EXPR(const_ref.size()));
 }
 #endif
