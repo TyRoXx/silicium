@@ -1,3 +1,4 @@
+include_directories(.)
 file(GLOB sources "*.hpp" "*.cpp" "observable/*" "source/*" "sink/*")
 file(GLOB_RECURSE headers "../silicium/*.hpp")
 if(LUA51_FOUND)

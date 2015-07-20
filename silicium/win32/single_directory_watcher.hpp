@@ -11,6 +11,7 @@
 #include <silicium/absolute_path.hpp>
 #include <silicium/optional.hpp>
 #include <boost/ref.hpp>
+#include <boost/utility/in_place_factory.hpp>
 
 #define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER 1
 

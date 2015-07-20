@@ -9,8 +9,8 @@
 #include <silicium/path.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
-#include <boost/optional.hpp>
 #include <boost/ref.hpp>
+#include <boost/utility/in_place_factory.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #include <future>
@@ -39,16 +39,16 @@ namespace Si
 			{
 				boost::asio::io_service read_dispatcher;
 				std::future<void> read_runner;
-				boost::optional<boost::asio::io_service::work> read_active;
+				optional<boost::asio::io_service::work> read_active;
 
 				immovable_state()
-					: read_active(boost::in_place(boost::ref(read_dispatcher)))
+					: read_active(some, read_dispatcher)
 				{
 				}
 
 				~immovable_state()
 				{
-					read_active.reset();
+					read_active = none;
 					read_dispatcher.stop();
 					read_runner.get();
 				}

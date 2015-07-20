@@ -1,3 +1,4 @@
+#include "workaround.hpp"
 #include <silicium/http/uri.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/test/unit_test.hpp>

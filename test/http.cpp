@@ -10,6 +10,7 @@
 #include <silicium/observable/consume.hpp>
 #include <silicium/error_or.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/utility/in_place_factory.hpp>
 
 namespace Si
 {

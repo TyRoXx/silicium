@@ -1,3 +1,4 @@
+#include "workaround.hpp"
 #include <silicium/error_or.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <boost/test/unit_test.hpp>
