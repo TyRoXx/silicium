@@ -14,10 +14,11 @@ socket.onerror = function (e) {
     alert(e);
 };
 socket.onmessage = function (e) {
-    alert(e.data);
 };
 socket.onclose = function (e) {
     alert("Goodbye server");
 };
+
+hljs.initHighlightingOnLoad();
 
 )QQQ""

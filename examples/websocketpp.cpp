@@ -30,6 +30,9 @@ namespace
 				{
 					doc.write("Silicium websocketpp experiment");
 				});
+				doc.raw(
+					R"QQQ(<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">)QQQ"
+					R"QQQ(<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>)QQQ");
 				doc("script", [&]
 				{
 					doc.raw(
@@ -44,6 +47,19 @@ namespace
 					doc.write("Hello, world!");
 				});
 				doc.write(request.get_header("User-Agent"));
+				doc("pre", [&]
+				{
+					doc("code", [&]
+					{
+						doc.attribute("class", "javascript");
+					},
+						[&]
+					{
+						doc.raw(
+#include "websocketpp.hpp.js"
+						);
+					});
+				});
 			});
 		});
 	}
