@@ -123,6 +123,8 @@ namespace Si
 			append(sink, '>');
 		}
 
+		struct empty_t {} empty;
+
 		template <class CharSink>
 		struct generator
 		{
@@ -151,6 +153,11 @@ namespace Si
 				close_element(m_out, name);
 			}
 
+			void element(name_type const &name, empty_t)
+			{
+				unpaired_element(m_out, name);
+			}
+
 			template <class AttributeMaker, class ContentMaker>
 			void element(name_type const &name, AttributeMaker make_attributes, ContentMaker make_content)
 			{
@@ -159,6 +166,15 @@ namespace Si
 				finish_attributes(m_out);
 				make_content();
 				close_element(m_out, name);
+			}
+
+			template <class AttributeMaker>
+			void element(name_type const &name, AttributeMaker make_attributes, empty_t)
+			{
+				open_attributed_element(m_out, name);
+				make_attributes();
+				using Si::append;
+				append(m_out, "/>");
 			}
 
 			template <class KeyStringLike, class ValueStringLike>

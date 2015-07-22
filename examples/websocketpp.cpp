@@ -25,10 +25,7 @@ namespace
 				doc("meta", [&]
 				{
 					doc.attribute("charset", "utf-8");
-				},
-					[&]
-				{
-				});
+				}, Si::html::empty);
 				doc("title", [&]
 				{
 					doc.write("Silicium websocketpp experiment");
