@@ -36,7 +36,7 @@ namespace
 				doc("script", [&]
 				{
 					doc.raw(
-#include "websocketpp.js"
+#include "websocketpp.hpp.js"
 					);
 				});
 			});
