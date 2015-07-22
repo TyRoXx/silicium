@@ -194,6 +194,12 @@ namespace Si
 				write_string(m_out, text);
 			}
 
+			template <class StringLike>
+			void raw(StringLike const &text)
+			{
+				append(m_out, text);
+			}
+
 		private:
 
 			CharSink m_out;
