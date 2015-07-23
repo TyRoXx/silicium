@@ -32,7 +32,9 @@ namespace
 				});
 				doc.raw(
 					R"QQQ(<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">)QQQ"
-					R"QQQ(<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>)QQQ");
+					R"QQQ(<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>)QQQ"
+					R"QQQ(<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">)QQQ"
+				);
 				doc("script", [&]
 				{
 					doc.raw(
@@ -60,6 +62,17 @@ namespace
 						);
 					});
 				});
+				doc.raw(
+R"QQQ(
+<form class="pure-form" action="#" method="post">
+	<fieldset class="pure-group">
+		<input type="text" class="pure-input-1-2" name="username" placeholder="username">
+		<input type="text" class="pure-input-1-2" name="password" placeholder="password">
+	</fieldset>
+	<button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Log in</button>
+</form>
+)QQQ"
+				);
 			});
 		});
 	}
@@ -83,22 +96,36 @@ namespace
 			server_type::connection_ptr const strong_connection = server.get_con_from_hdl(weak_connection);
 			assert(strong_connection);
 
-			if (strong_connection->get_request().get_method() != "GET")
-			{
-				strong_connection->set_status(websocketpp::http::status_code::method_not_allowed);
-				return;
-			}
-
-			strong_connection->set_status(websocketpp::http::status_code::ok);
-
-			{
-				std::string body;
-				auto body_writer = Si::make_container_sink(body);
-				generate_html_landing_page(body_writer, strong_connection->get_request());
-				strong_connection->set_body(std::move(body));
-			}
 			strong_connection->append_header("Connection", "close");
 			strong_connection->append_header("Content-Type", "text/html; charset=utf-8");
+
+			websocketpp::http::parser::request const &request = strong_connection->get_request();
+
+			if (request.get_method() == "GET")
+			{
+				strong_connection->set_status(websocketpp::http::status_code::ok);
+
+				std::string body;
+				auto body_writer = Si::make_container_sink(body);
+				generate_html_landing_page(body_writer, request);
+				strong_connection->set_body(std::move(body));
+			}
+
+			else if (request.get_method() == "POST")
+			{
+				websocketpp::http::parameter_list parameters;
+				request.parse_parameter_list(request.get_body(), parameters);
+
+				strong_connection->set_status(websocketpp::http::status_code::ok);
+
+				std::string body = "logged in";
+				strong_connection->set_body(std::move(body));
+			}
+
+			else
+			{
+				strong_connection->set_status(websocketpp::http::status_code::method_not_allowed);
+			}
 		});
 
 		server.set_open_handler([&server](websocketpp::connection_hdl weak_connection)
