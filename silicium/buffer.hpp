@@ -16,7 +16,7 @@ namespace Si
 		typedef Element element_type;
 
 		buffer_observable()
-			: receiver(nullptr)
+			: receiver_(nullptr)
 			, fetching(false)
 		{
 		}
@@ -24,7 +24,7 @@ namespace Si
 		explicit buffer_observable(Original from, std::size_t size)
 			: from(std::move(from))
 			, elements(size)
-			, receiver(nullptr)
+			, receiver_(nullptr)
 			, fetching(false)
 		{
 		}
@@ -33,7 +33,7 @@ namespace Si
 		buffer_observable(buffer_observable &&other)
 			: from(std::move(other.from))
 			, elements(std::move(other.elements))
-			, receiver(nullptr)
+			, receiver_(nullptr)
 			, fetching(false)
 		{
 		}
@@ -43,7 +43,7 @@ namespace Si
 			//TODO: exception safety
 			from = std::move(other.from);
 			elements = std::move(other.elements);
-			receiver = std::move(other.receiver);
+			receiver_ = std::move(other.receiver);
 			fetching = std::move(other.fetching);
 			return *this;
 		}
@@ -54,8 +54,8 @@ namespace Si
 
 		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
-			assert(!this->receiver);
-			this->receiver = receiver.get();
+			assert(!this->receiver_);
+			this->receiver_ = receiver.get();
 			if (elements.empty())
 			{
 				return check_fetch();
@@ -75,7 +75,7 @@ namespace Si
 
 		Original from;
 		boost::circular_buffer<Element> elements;
-		observer<element_type> *receiver;
+		observer<element_type> *receiver_;
 		bool fetching;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
@@ -84,13 +84,13 @@ namespace Si
 			assert(fetching);
 			fetching = false;
 			if (elements.empty() &&
-				receiver)
+				receiver_)
 			{
-				exchange(receiver, nullptr)->got_element(std::move(value));
+				exchange(receiver_, nullptr)->got_element(std::move(value));
 				return check_fetch();
 			}
 			elements.push_back(std::move(value));
-			if (!receiver)
+			if (!receiver_)
 			{
 				return check_fetch();
 			}
@@ -101,15 +101,15 @@ namespace Si
 		virtual void ended() SILICIUM_OVERRIDE
 		{
 			assert(fetching);
-			assert(receiver);
-			exchange(receiver, nullptr)->ended();
+			assert(receiver_);
+			exchange(receiver_, nullptr)->ended();
 		}
 
 		void deliver_front()
 		{
 			auto front = std::move(elements.front());
 			elements.pop_front();
-			exchange(receiver, nullptr)->got_element(std::move(front));
+			exchange(receiver_, nullptr)->got_element(std::move(front));
 		}
 
 		void check_fetch()
