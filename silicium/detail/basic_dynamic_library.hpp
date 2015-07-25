@@ -75,10 +75,10 @@ namespace Si
 
 			struct deleter
 			{
-				void operator()(void *handle) const BOOST_NOEXCEPT
+				void operator()(void *handle_) const BOOST_NOEXCEPT
 				{
-					assert(handle);
-					DynamicLibraryImpl::close(handle);
+					assert(handle_);
+					DynamicLibraryImpl::close(handle_);
 				}
 			};
 

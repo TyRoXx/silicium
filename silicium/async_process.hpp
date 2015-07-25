@@ -431,9 +431,9 @@ namespace Si
 				}
 				if (available == 0)
 				{
-					auto buffer = buffered_out.make_append_space(1);
-					DWORD read_bytes = 0;
-					BOOL const read_result = ReadFile(pipe_in, buffer.begin(), static_cast<DWORD>(buffer.size()), &read_bytes, nullptr);
+					auto buffer1 = buffered_out.make_append_space(1);
+					DWORD read_bytes1 = 0;
+					BOOL const read_result = ReadFile(pipe_in, buffer1.begin(), static_cast<DWORD>(buffer1.size()), &read_bytes1, nullptr);
 					if (read_result)
 					{
 						buffered_out.flush_append_space();
@@ -444,7 +444,7 @@ namespace Si
 						auto error = ::GetLastError();
 						if (error == ERROR_BROKEN_PIPE)
 						{
-							buffered_out.make_append_space(read_bytes);
+							buffered_out.make_append_space(read_bytes1);
 							buffered_out.flush_append_space();
 							break;
 						}
