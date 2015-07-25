@@ -123,7 +123,9 @@ namespace Si
 			append(sink, '>');
 		}
 
-		struct empty_t {} empty;
+		struct empty_t {};
+
+		static BOOST_CONSTEXPR_OR_CONST empty_t empty;
 
 		template <class CharSink>
 		struct generator
