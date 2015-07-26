@@ -112,15 +112,6 @@ namespace Si
 			}, 0);
 		}
 
-		template <std::size_t Length>
-		auto raw(char const (&content)[Length])
-		{
-			return detail::make_element([&content](sink<char, success> &destination)
-			{
-				Si::append(destination, content);
-			}, (Length - 1));
-		}
-
 		auto sequence()
 		{
 			return detail::make_element([](sink<char, success> &)
@@ -147,6 +138,15 @@ namespace Si
 		auto dynamic(ContentGenerator &&generate, std::size_t min_size = 0)
 		{
 			return detail::make_element(std::forward<ContentGenerator>(generate), min_size);
+		}
+
+		template <std::size_t Length>
+		auto raw(char const (&content)[Length])
+		{
+			return dynamic([&content](sink<char, success> &destination)
+			{
+				Si::append(destination, content);
+			}, (Length - 1));
 		}
 
 		namespace detail
