@@ -39,3 +39,32 @@ BOOST_AUTO_TEST_CASE(html_generator_tags_with_attributes)
 	);
 	BOOST_CHECK_EQUAL("<b a=\"1\" b=\"&quot;\">abc</b>", html);
 }
+
+BOOST_AUTO_TEST_CASE(html_raw)
+{
+	std::string html;
+	auto gen = Si::html::make_generator(Si::make_container_sink(html));
+	auto const content = "<tag attribute=\"1\">";
+	gen.raw(content);
+	BOOST_CHECK_EQUAL(content, html);
+}
+
+BOOST_AUTO_TEST_CASE(html_empty)
+{
+	std::string html;
+	auto gen = Si::html::make_generator(Si::make_container_sink(html));
+	gen.element("tag", Si::html::empty);
+	BOOST_CHECK_EQUAL("<tag/>", html);
+}
+
+BOOST_AUTO_TEST_CASE(html_empty_with_attribute)
+{
+	std::string html;
+	auto gen = Si::html::make_generator(Si::make_container_sink(html));
+	gen.element("tag", [&]
+	{
+		gen.attribute("attribute", "2");
+	},
+		Si::html::empty);
+	BOOST_CHECK_EQUAL("<tag attribute=\"2\"/>", html);
+}
