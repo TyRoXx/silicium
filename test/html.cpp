@@ -95,11 +95,11 @@ namespace Si
 			std::size_t const content_min_length = content.min_length;
 			return detail::make_element([
 				&name,
-				SILICIUM_CAPTURE_EXPRESSION(content, std::forward<Element>(content))
+				SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(content.generate))
 			] (sink<char, success> &destination)
 			{
 				html::open_element(destination, name);
-				content.generate(destination);
+				generate_content(destination);
 				html::close_element(destination, name);
 			}, 1 + (NameLength - 1) + 1 + content_min_length + 2 + (NameLength - 1) + 1);
 		}
@@ -133,15 +133,14 @@ namespace Si
 		{
 			using html2::sequence;
 			auto tail_elements = sequence(std::forward<Tail>(tail)...);
-			std::size_t const min_length = head.min_length + tail_elements.min_length;
 			return detail::make_element([
-				SILICIUM_CAPTURE_EXPRESSION(head, std::forward<Head>(head)),
-				SILICIUM_CAPTURE_EXPRESSION(tail_elements, std::move(tail_elements))
+				SILICIUM_CAPTURE_EXPRESSION(generate_head, std::move(head.generate)),
+				SILICIUM_CAPTURE_EXPRESSION(generate_tail_elements, std::move(tail_elements.generate))
 				] (sink<char, success> &destination)
 			{
-				head.generate(destination);
-				tail_elements.generate(destination);
-			}, min_length);
+				generate_head(destination);
+				generate_tail_elements(destination);
+			}, head.min_length + tail_elements.min_length);
 		}
 
 		namespace detail
