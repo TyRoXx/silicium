@@ -143,6 +143,12 @@ namespace Si
 			}, head.min_length + tail_elements.min_length);
 		}
 
+		template <class ContentGenerator>
+		auto dynamic(ContentGenerator &&generate, std::size_t min_size = 0)
+		{
+			return detail::make_element(std::forward<ContentGenerator>(generate), min_size);
+		}
+
 		namespace detail
 		{
 			template <class ContentGenerator1, class ContentGenerator2>
@@ -154,7 +160,7 @@ namespace Si
 	}
 }
 
-BOOST_AUTO_TEST_CASE(html2_shorter_syntax_experiments)
+BOOST_AUTO_TEST_CASE(html2_generate)
 {
 	using namespace Si::html2;
 	auto document =
@@ -166,12 +172,15 @@ BOOST_AUTO_TEST_CASE(html2_shorter_syntax_experiments)
 			)
 			+
 			tag("body",
-				text("Hello, ") + raw("<b>world</b>")
+				text("Hello, ") + raw("<b>world</b>") + dynamic([](Si::sink<char, Si::success> &destination)
+				{
+					Si::html::unpaired_element(destination, "br");
+				})
 			)
 		);
 	std::string generated;
 	auto sink = Si::Sink<char, Si::success>::erase(Si::make_container_sink(generated));
 	BOOST_CHECK_EQUAL(std::strlen("<html><head><title>Title</title></head><body>Hello, </body></html>"), document.min_length);
 	document.generate(sink);
-	BOOST_CHECK_EQUAL("<html><head><title>Title</title></head><body>Hello, <b>world</b></body></html>", generated);
+	BOOST_CHECK_EQUAL("<html><head><title>Title</title></head><body>Hello, <b>world</b><br/></body></html>", generated);
 }
