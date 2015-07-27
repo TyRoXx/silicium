@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(html_empty_with_attribute)
 
 namespace Si
 {
-	namespace html2
+	namespace html
 	{
 		namespace detail
 		{
@@ -122,7 +122,6 @@ namespace Si
 		template <class Head, class ...Tail>
 		auto sequence(Head &&head, Tail &&...tail)
 		{
-			using html2::sequence;
 			auto tail_elements = sequence(std::forward<Tail>(tail)...);
 			return detail::make_element([
 				SILICIUM_CAPTURE_EXPRESSION(generate_head, std::move(head.generate)),
@@ -160,9 +159,9 @@ namespace Si
 	}
 }
 
-BOOST_AUTO_TEST_CASE(html2_generate)
+BOOST_AUTO_TEST_CASE(html_generate)
 {
-	using namespace Si::html2;
+	using namespace Si::html;
 	auto document =
 		tag("html",
 			tag("head",
