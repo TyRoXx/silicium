@@ -1,6 +1,6 @@
 #include <silicium/terminate_on_exception.hpp>
 #include <silicium/config.hpp>
-#include <silicium/html.hpp>
+#include <silicium/html/generator.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <iostream>
 #include <boost/version.hpp>

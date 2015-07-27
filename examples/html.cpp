@@ -1,4 +1,4 @@
-#include <silicium/html.hpp>
+#include <silicium/html/generator.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <vector>
 #include <iostream>

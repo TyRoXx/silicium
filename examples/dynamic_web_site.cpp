@@ -1,6 +1,6 @@
 #include <silicium/http/receive_request.hpp>
 #include <silicium/http/generate_response.hpp>
-#include <silicium/html.hpp>
+#include <silicium/html/generator.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/asio/tcp_acceptor.hpp>
 #include <silicium/observable/transform.hpp>

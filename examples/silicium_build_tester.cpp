@@ -7,7 +7,7 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/asio/socket_source.hpp>
-#include <silicium/html.hpp>
+#include <silicium/html/generator.hpp>
 #include <silicium/make_array.hpp>
 #include <silicium/source/file_source.hpp>
 #include <silicium/terminate_on_exception.hpp>

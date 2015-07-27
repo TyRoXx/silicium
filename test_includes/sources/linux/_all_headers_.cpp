@@ -37,7 +37,7 @@
 #include <silicium/flush.hpp>
 #include <silicium/function.hpp>
 #include <silicium/get_last_error.hpp>
-#include <silicium/html.hpp>
+#include <silicium/html/generator.hpp>
 #include <silicium/http/generate_header.hpp>
 #include <silicium/http/generate_request.hpp>
 #include <silicium/http/generate_response.hpp>
@@ -148,6 +148,7 @@
 #include <silicium/source/throwing_source.hpp>
 #include <silicium/source/transforming_source.hpp>
 #include <silicium/source/virtualized_source.hpp>
+#include <silicium/sqlite3.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/success.hpp>
 #include <silicium/terminate_on_exception.hpp>
