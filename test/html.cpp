@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(html_generate)
 			)
 			+
 			tag("body",
-				text("Hello, ") + raw("<b>world</b>") + dynamic([](Si::sink<char, Si::success> &destination)
+				text("Hello, ") + raw("<b>world</b>") + dynamic<detail::min_length<0>>([](Si::sink<char, Si::success> &destination)
 				{
 					Si::html::unpaired_element(destination, "br");
 				})
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(html_generate)
 		);
 	std::string generated;
 	auto sink = Si::Sink<char, Si::success>::erase(Si::make_container_sink(generated));
-	BOOST_CHECK_EQUAL(std::strlen("<html><head><title>Title</title></head><body>Hello, </body></html>"), document.min_length);
+	BOOST_STATIC_ASSERT(std::is_same<decltype(document)::length_type, detail::min_length<78>>::value);
 	document.generate(sink);
 	BOOST_CHECK_EQUAL("<html><head><title>Title</title></head><body>Hello, <b>world</b><br/></body></html>", generated);
 }
