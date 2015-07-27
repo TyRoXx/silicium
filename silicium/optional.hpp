@@ -22,7 +22,15 @@ namespace Si
 	{
 	};
 
-	struct none_t {};
+	struct none_t
+	{
+		BOOST_CONSTEXPR bool operator !() const BOOST_NOEXCEPT
+		{
+			return true;
+		}
+
+		SILICIUM_EXPLICIT_OPERATOR_BOOL()
+	};
 
 	static none_t BOOST_CONSTEXPR_OR_CONST none;
 
@@ -476,6 +484,46 @@ namespace Si
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
 	BOOST_STATIC_ASSERT(sizeof(optional<char *>) == (alignment_of<char *>::value + sizeof(char *)));
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t &>) == sizeof(boost::int8_t *));
+
+	template <class T, class Transformation>
+	auto fmap(optional<T> const &value, Transformation &&transform)
+		-> optional<decltype(std::forward<Transformation>(transform)(*value))>
+	{
+		if (value)
+		{
+			return std::forward<Transformation>(transform)(*value);
+		}
+		return none;
+	}
+
+	namespace detail
+	{
+		inline bool all_of()
+		{
+			return true;
+		}
+
+		template <class Head, class ...Tail>
+		bool all_of(Head const &head, Tail const &...tail)
+		{
+			if (!head)
+			{
+				return false;
+			}
+			return all_of(tail...);
+		}
+	}
+
+	template <class Transformation, class ...Optionals>
+	auto variadic_fmap(Transformation &&transform, Optionals const &...values)
+		-> optional<decltype(std::forward<Transformation>(transform)((*values)...))>
+	{
+		if (detail::all_of(values...))
+		{
+			return std::forward<Transformation>(transform)((*values)...);
+		}
+		return none;
+	}
 }
 
 namespace std

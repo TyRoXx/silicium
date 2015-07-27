@@ -189,3 +189,33 @@ BOOST_AUTO_TEST_CASE(optional_reference)
 	container.emplace_back(copy);
 	BOOST_CHECK_EQUAL(ref, container.front());
 }
+
+BOOST_AUTO_TEST_CASE(optional_variadic_fmap_zero)
+{
+	BOOST_CHECK_EQUAL(Si::optional<int>(23), Si::variadic_fmap([]() { return 23; }));
+}
+
+BOOST_AUTO_TEST_CASE(optional_variadic_fmap_one_some)
+{
+	BOOST_CHECK_EQUAL(Si::optional<int>(10), Si::variadic_fmap([](int first) { return first + 3; }, Si::optional<int>(7)));
+}
+
+BOOST_AUTO_TEST_CASE(optional_variadic_fmap_one_none)
+{
+	BOOST_CHECK_EQUAL(Si::optional<int>(), Si::variadic_fmap([](int) { BOOST_FAIL("unreachable"); return 0; }, Si::optional<int>()));
+}
+
+BOOST_AUTO_TEST_CASE(optional_variadic_fmap_two_both)
+{
+	BOOST_CHECK_EQUAL(Si::optional<long>(7), Si::variadic_fmap([](int first, long second) { return first + second - 1; }, Si::optional<int>(3), Si::optional<long>(5)));
+}
+
+BOOST_AUTO_TEST_CASE(optional_variadic_fmap_two_either)
+{
+	BOOST_CHECK_EQUAL(Si::optional<long>(), Si::variadic_fmap([](int, long) { BOOST_FAIL("unreachable"); return 0L; }, Si::optional<int>(3), Si::optional<long>()));
+}
+
+BOOST_AUTO_TEST_CASE(optional_variadic_fmap_two_neither)
+{
+	BOOST_CHECK_EQUAL(Si::optional<long>(), Si::variadic_fmap([](int, long) { BOOST_FAIL("unreachable"); return 0L; }, Si::optional<int>(), Si::optional<long>()));
+}
