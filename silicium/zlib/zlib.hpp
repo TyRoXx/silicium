@@ -1,6 +1,7 @@
 #ifndef SILICIUM_ZLIB_ZLIB_HPP
 #define SILICIUM_ZLIB_ZLIB_HPP
 
+#include <silicium/config.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
 #include <zlib.h>

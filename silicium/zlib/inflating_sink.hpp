@@ -4,6 +4,7 @@
 #include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
 #include <silicium/iterator_range.hpp>
+#include <boost/optional.hpp>
 
 namespace Si
 {

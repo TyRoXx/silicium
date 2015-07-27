@@ -1,7 +1,7 @@
 #ifndef SILICIUM_THREAD_HPP
 #define SILICIUM_THREAD_HPP
 
-#include <silicium/config.hpp>
+#include <silicium/optional.hpp>
 #include <functional>
 
 #define SILICIUM_HAS_THREAD_OBSERVABLE SILICIUM_HAS_EXCEPTIONS

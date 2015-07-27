@@ -2,6 +2,7 @@
 #define SILICIUM_REACTIVE_CACHE_HPP
 
 #include <silicium/observable/observable.hpp>
+#include <silicium/observable/observer.hpp>
 #include <boost/optional.hpp>
 #include <silicium/config.hpp>
 

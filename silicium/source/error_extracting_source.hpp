@@ -2,6 +2,7 @@
 #define SILICIUM_ERROR_EXTRACTING_SOURCE_HPP
 
 #include <silicium/source/source.hpp>
+#include <silicium/error_or.hpp>
 #include <boost/concept_check.hpp>
 
 namespace Si
