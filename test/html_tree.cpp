@@ -20,9 +20,7 @@ BOOST_AUTO_TEST_CASE(html_generate)
 				})
 			)
 		);
-	std::string generated;
-	auto sink = Si::Sink<char, Si::success>::erase(Si::make_container_sink(generated));
 	BOOST_STATIC_ASSERT(std::is_same<decltype(document)::length_type, min_length<78>>::value);
-	document.generate(sink);
+	std::string generated = generate<std::string>(document);
 	BOOST_CHECK_EQUAL("<html><head><title>Title</title></head><body>Hello, <b>world</b><br/></body></html>", generated);
 }

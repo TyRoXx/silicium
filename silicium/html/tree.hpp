@@ -2,6 +2,7 @@
 #define SILICIUM_HTML_TREE_HPP
 
 #include <silicium/html/generator.hpp>
+#include <silicium/sink/iterator_sink.hpp>
 
 namespace Si
 {
@@ -135,6 +136,15 @@ namespace Si
 			{
 				return sequence(std::move(left), std::move(right));
 			}
+		}
+
+		template <class ContiguousContainer, class A, class B>
+		ContiguousContainer generate(detail::element<A, B> const &tree)
+		{
+			ContiguousContainer generated;
+			auto sink = Sink<char, success>::erase(make_container_sink(generated));
+			tree.generate(sink);
+			return generated;
 		}
 	}
 }
