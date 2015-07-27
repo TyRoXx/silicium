@@ -230,18 +230,18 @@ namespace Si
 			return generator<typename std::decay<CharSink>::type>(std::forward<CharSink>(sink));
 		}
 
+		template <std::size_t Length>
+		struct exact_length
+		{
+		};
+
+		template <std::size_t Length>
+		struct min_length
+		{
+		};
+
 		namespace detail
 		{
-			template <std::size_t Length>
-			struct exact_length
-			{
-			};
-
-			template <std::size_t Length>
-			struct min_length
-			{
-			};
-
 			template <class FirstLength, class SecondLength>
 			struct concatenate;
 
@@ -288,7 +288,7 @@ namespace Si
 		{
 			typedef typename detail::concatenate<
 				typename std::decay<Element>::type::length_type,
-				detail::exact_length<1 + (NameLength - 1) + 1 + 2 + (NameLength - 1) + 1>
+				exact_length<1 + (NameLength - 1) + 1 + 2 + (NameLength - 1) + 1>
 			>::type length;
 			return detail::make_element<length>([
 				&name,
@@ -304,7 +304,7 @@ namespace Si
 		template <std::size_t Length>
 		auto text(char const (&content)[Length])
 		{
-			typedef detail::min_length<Length - 1> length;
+			typedef min_length<Length - 1> length;
 			return detail::make_element<length>([content](sink<char, success> &destination)
 			{
 				html::write_string(destination, content);
@@ -313,7 +313,7 @@ namespace Si
 
 		auto sequence()
 		{
-			return detail::make_element<detail::exact_length<0>>([](sink<char, success> &)
+			return detail::make_element<exact_length<0>>([](sink<char, success> &)
 			{
 			});
 		}
@@ -345,7 +345,7 @@ namespace Si
 		template <std::size_t Length>
 		auto raw(char const (&content)[Length])
 		{
-			return dynamic<detail::exact_length<Length - 1>>([&content](sink<char, success> &destination)
+			return dynamic<exact_length<Length - 1>>([&content](sink<char, success> &destination)
 			{
 				Si::append(destination, content);
 			});
