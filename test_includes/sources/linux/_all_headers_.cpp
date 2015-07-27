@@ -38,6 +38,7 @@
 #include <silicium/function.hpp>
 #include <silicium/get_last_error.hpp>
 #include <silicium/html/generator.hpp>
+#include <silicium/html/tree.hpp>
 #include <silicium/http/generate_header.hpp>
 #include <silicium/http/generate_request.hpp>
 #include <silicium/http/generate_response.hpp>
