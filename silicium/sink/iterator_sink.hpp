@@ -51,10 +51,20 @@ namespace Si
 		}
 #endif
 
-		success append(iterator_range<Element const *> data) const
+		success append(iterator_range<Element const *> data)
 		{
-			boost::range::copy(data, m_out);
+			m_out = boost::range::copy(data, m_out);
 			return {};
+		}
+
+		OutputIterator &position()
+		{
+			return m_out;
+		}
+
+		OutputIterator const &position() const
+		{
+			return m_out;
 		}
 
 	private:
@@ -70,10 +80,37 @@ namespace Si
 	}
 
 	template <class Container>
-	auto make_container_sink(Container &destination)
-		-> iterator_sink<typename Container::value_type, std::back_insert_iterator<Container>>
+	struct container_sink
 	{
-		return make_iterator_sink<typename Container::value_type>(std::back_inserter(destination));
+		typedef typename Container::value_type element_type;
+		typedef success error_type;
+
+		container_sink()
+			: m_destination(nullptr)
+		{
+		}
+
+		explicit container_sink(Container &destination)
+			: m_destination(&destination)
+		{
+		}
+
+		success append(iterator_range<element_type const *> data) const
+		{
+			assert(m_destination);
+			m_destination->insert(m_destination->end(), data.begin(), data.end());
+			return {};
+		}
+
+	private:
+
+		Container *m_destination;
+	};
+
+	template <class Container>
+	auto make_container_sink(Container &destination)
+	{
+		return container_sink<Container>(destination);
 	}
 }
 
