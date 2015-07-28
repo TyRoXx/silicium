@@ -57,6 +57,9 @@ namespace Si
 
 			template <class Length, class ContentGenerator>
 			auto make_element(ContentGenerator &&generate)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+				-> element<typename std::decay<ContentGenerator>::type, Length>
+#endif
 			{
 				return element<typename std::decay<ContentGenerator>::type, Length>{std::forward<ContentGenerator>(generate)};
 			}
@@ -74,6 +77,9 @@ namespace Si
 
 		template <class Length, class ContentGenerator>
 		auto dynamic(ContentGenerator &&generate)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> decltype(detail::make_element<Length>(std::forward<ContentGenerator>(generate)))
+#endif
 		{
 			return detail::make_element<Length>(std::forward<ContentGenerator>(generate));
 		}

@@ -74,7 +74,9 @@ namespace Si
 
 	template <class Element, class OutputIterator>
 	auto make_iterator_sink(OutputIterator out)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> iterator_sink<Element, typename std::decay<OutputIterator>::type>
+#endif
 	{
 		return iterator_sink<Element, typename std::decay<OutputIterator>::type>(std::move(out));
 	}
@@ -109,6 +111,9 @@ namespace Si
 
 	template <class Container>
 	auto make_container_sink(Container &destination)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> container_sink<Container>
+#endif
 	{
 		return container_sink<Container>(destination);
 	}
