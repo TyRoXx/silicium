@@ -671,19 +671,17 @@ namespace
 					text("build was triggered").generate(destination);
 				})+
 				tag("form",
-					[](Si::sink<char, Si::success> &destination)
+					detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
 					{
 						Si::html::add_attribute(destination, "action", "/");
 						Si::html::add_attribute(destination, "method", "POST");
-					},
-					min_length<0>{},
+					}),
 					tag("input",
-						[](Si::sink<char, Si::success> &destination)
+						detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
 						{
 							Si::html::add_attribute(destination, "type", "submit");
 							Si::html::add_attribute(destination, "value", "Trigger build");
-						},
-						min_length<0>{},
+						}),
 						empty
 					)
 				)

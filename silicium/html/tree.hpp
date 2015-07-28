@@ -76,44 +76,44 @@ namespace Si
 			});
 		}
 
-		template <std::size_t NameLength, class AttributeGenerator, class AttributesLength, class Element>
-		auto tag(char const (&name)[NameLength], AttributeGenerator &&generate_attributes, AttributesLength, Element &&content)
+		template <std::size_t NameLength, class Attributes, class Element>
+		auto tag(char const (&name)[NameLength], Attributes &&attributes, Element &&content)
 		{
 			typedef typename detail::concatenate<
 				typename std::decay<Element>::type::length_type,
 				typename detail::concatenate<
-					AttributesLength,
+					typename std::decay<Attributes>::type::length_type,
 					exact_length<1 + (NameLength - 1) + 1 + 2 + (NameLength - 1) + 1>
 				>::type
 			>::type length;
 			return detail::make_element<length>([
 				&name,
 				SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(content.generate)),
-				SILICIUM_CAPTURE_EXPRESSION(generate_attributes, std::forward<AttributeGenerator>(generate_attributes))
+				SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
 			] (sink<char, success> &destination)
 			{
 				html::open_attributed_element(destination, name);
-				generate_attributes(destination);
+				attributes.generate(destination);
 				html::finish_attributes(destination);
 				generate_content(destination);
 				html::close_element(destination, name);
 			});
 		}
 
-		template <std::size_t NameLength, class AttributeGenerator, class AttributesLength>
-		auto tag(char const (&name)[NameLength], AttributeGenerator &&generate_attributes, AttributesLength, empty_t)
+		template <std::size_t NameLength, class Attributes>
+		auto tag(char const (&name)[NameLength], Attributes &&attributes, empty_t)
 		{
 			typedef typename detail::concatenate<
 				min_length<1 + (NameLength - 1) + 2>,
-				AttributesLength
+				typename std::decay<Attributes>::type::length_type
 			>::type length;
 			return detail::make_element<length>([
 				&name,
-				SILICIUM_CAPTURE_EXPRESSION(generate_attributes, std::forward<AttributeGenerator>(generate_attributes))
+				SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
 			] (sink<char, success> &destination)
 			{
 				html::open_attributed_element(destination, name);
-				generate_attributes(destination);
+				attributes.generate(destination);
 				finish_attributes_of_unpaired_tag(destination);
 			});
 		}
@@ -122,7 +122,7 @@ namespace Si
 		auto tag(char const (&name)[NameLength], Element &&content)
 		{
 			auto no_attributes = [](sink<char, success> &) {};
-			return tag(name, no_attributes, exact_length<0>{}, std::forward<Element>(content));
+			return tag(name, detail::make_element<exact_length<0>>(no_attributes), std::forward<Element>(content));
 		}
 
 		template <std::size_t Length>

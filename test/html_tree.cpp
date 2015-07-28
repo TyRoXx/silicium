@@ -18,11 +18,10 @@ BOOST_AUTO_TEST_CASE(html_tree)
 				{
 					Si::html::unpaired_element(destination, "br");
 				})+
-				tag("input", [](Si::sink<char, Si::success> &destination)
+				tag("input", detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
 					{
 						Si::html::add_attribute(destination, "key", "value");
-					},
-					min_length<0>{},
+					}),
 					empty
 				)
 			)
@@ -36,11 +35,10 @@ BOOST_AUTO_TEST_CASE(html_tree_attributes_of_unpaired_tag)
 {
 	using namespace Si::html;
 	auto document =
-		tag("input", [](Si::sink<char, Si::success> &destination)
+		tag("input", detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
 			{
 				Si::html::add_attribute(destination, "key", "value");
-			},
-			min_length<0>{},
+			}),
 			empty
 		);
 	BOOST_CHECK_EQUAL(8u, decltype(document)::length_type::value);
@@ -52,11 +50,10 @@ BOOST_AUTO_TEST_CASE(html_tree_attributes)
 {
 	using namespace Si::html;
 	auto document =
-		tag("input", [](Si::sink<char, Si::success> &destination)
+		tag("input", detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
 			{
 				Si::html::add_attribute(destination, "key", "value");
-			},
-			min_length<0>{},
+			}),
 			text("content")
 		);
 	BOOST_CHECK_EQUAL(22u, decltype(document)::length_type::value);
