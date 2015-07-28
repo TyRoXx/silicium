@@ -7,7 +7,7 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/absolute_path.hpp>
 #include <silicium/asio/socket_source.hpp>
-#include <silicium/html/generator.hpp>
+#include <silicium/html/tree.hpp>
 #include <silicium/make_array.hpp>
 #include <silicium/source/file_source.hpp>
 #include <silicium/terminate_on_exception.hpp>
@@ -611,8 +611,8 @@ namespace
 			return respond(client, Si::make_c_str_range("404"), Si::make_c_str_range("Not Found"), Si::make_c_str_range("unknown path"), yield);
 		}
 
-		std::vector<char> page;
-		auto html = Si::html::make_generator(Si::make_container_sink(page));
+		std::vector<char> old_style_generated;
+		auto html = Si::html::make_generator(Si::make_container_sink(old_style_generated));
 		html("html", [&]
 		{
 			html("head", [&]
@@ -643,14 +643,52 @@ namespace
 						html.attribute("type", "submit");
 						html.attribute("value", "Trigger build");
 					},
-						[&]
-					{
-					});
+						Si::html::empty);
 				});
 			});
 
 		});
-		return respond(client, Si::make_c_str_range("200"), Si::make_c_str_range("OK"), Si::make_memory_range(page), yield);
+
+		using namespace Si::html;
+		auto document = tag("html",
+			tag("head",
+				tag("title",
+					text("Silicium build tester")
+				)
+			)+
+			tag("body",
+				dynamic<min_length<0>>([&request, &client, &state, &repository, &workspace](Si::sink<char, Si::success> &destination)
+				{
+					if (request.method != "POST")
+					{
+						return;
+					}
+					trigger_build(client.get_io_service(), state, repository, workspace);
+					text("build was triggered").generate(destination);
+				})+
+				tag("form",
+					[](Si::sink<char, Si::success> &destination)
+					{
+						Si::html::add_attribute(destination, "action", "/");
+						Si::html::add_attribute(destination, "method", "POST");
+					},
+					min_length<0>{},
+					tag("input",
+						[](Si::sink<char, Si::success> &destination)
+						{
+							Si::html::add_attribute(destination, "type", "submit");
+							Si::html::add_attribute(destination, "value", "Trigger build");
+						},
+						min_length<0>{},
+						empty
+					)
+				)
+			)
+		);
+		std::vector<char> new_style_generated = Si::html::generate<std::vector<char>>(document);
+
+		assert(old_style_generated == new_style_generated);
+		return respond(client, Si::make_c_str_range("200"), Si::make_c_str_range("OK"), Si::make_memory_range(new_style_generated), yield);
 	}
 
 	void handle_client(

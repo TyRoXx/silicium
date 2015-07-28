@@ -71,10 +71,15 @@ namespace Si
 		}
 
 		template <class CharSink>
-		void finish_attributes(
-			CharSink &&sink)
+		void finish_attributes(CharSink &&sink)
 		{
 			append(sink, '>');
+		}
+
+		template <class CharSink>
+		void finish_attributes_of_unpaired_tag(CharSink &&sink)
+		{
+			append(sink, "/>");
 		}
 
 		template <class CharSink, class KeyStringLike, class ValueStringLike>

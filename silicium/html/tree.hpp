@@ -9,12 +9,12 @@ namespace Si
 	namespace html
 	{
 		template <std::size_t Length>
-		struct exact_length
+		struct exact_length : std::integral_constant<std::size_t, Length>
 		{
 		};
 
 		template <std::size_t Length>
-		struct min_length
+		struct min_length : std::integral_constant<std::size_t, Length>
 		{
 		};
 
@@ -61,22 +61,68 @@ namespace Si
 			}
 		}
 
-		template <std::size_t NameLength, class Element>
-		auto tag(char const (&name)[NameLength], Element &&content)
+		template <class Length, class ContentGenerator>
+		auto dynamic(ContentGenerator &&generate)
+		{
+			return detail::make_element<Length>(std::forward<ContentGenerator>(generate));
+		}
+
+		template <std::size_t Length>
+		auto raw(char const (&content)[Length])
+		{
+			return dynamic<exact_length<Length - 1>>([&content](sink<char, success> &destination)
+			{
+				Si::append(destination, content);
+			});
+		}
+
+		template <std::size_t NameLength, class AttributeGenerator, class AttributesLength, class Element>
+		auto tag(char const (&name)[NameLength], AttributeGenerator &&generate_attributes, AttributesLength, Element &&content)
 		{
 			typedef typename detail::concatenate<
 				typename std::decay<Element>::type::length_type,
-				exact_length<1 + (NameLength - 1) + 1 + 2 + (NameLength - 1) + 1>
+				typename detail::concatenate<
+					AttributesLength,
+					exact_length<1 + (NameLength - 1) + 1 + 2 + (NameLength - 1) + 1>
+				>::type
 			>::type length;
 			return detail::make_element<length>([
 				&name,
-				SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(content.generate))
+				SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(content.generate)),
+				SILICIUM_CAPTURE_EXPRESSION(generate_attributes, std::forward<AttributeGenerator>(generate_attributes))
 			] (sink<char, success> &destination)
 			{
-				html::open_element(destination, name);
+				html::open_attributed_element(destination, name);
+				generate_attributes(destination);
+				html::finish_attributes(destination);
 				generate_content(destination);
 				html::close_element(destination, name);
 			});
+		}
+
+		template <std::size_t NameLength, class AttributeGenerator, class AttributesLength>
+		auto tag(char const (&name)[NameLength], AttributeGenerator &&generate_attributes, AttributesLength, empty_t)
+		{
+			typedef typename detail::concatenate<
+				min_length<1 + (NameLength - 1) + 2>,
+				AttributesLength
+			>::type length;
+			return detail::make_element<length>([
+				&name,
+				SILICIUM_CAPTURE_EXPRESSION(generate_attributes, std::forward<AttributeGenerator>(generate_attributes))
+			] (sink<char, success> &destination)
+			{
+				html::open_attributed_element(destination, name);
+				generate_attributes(destination);
+				finish_attributes_of_unpaired_tag(destination);
+			});
+		}
+
+		template <std::size_t NameLength, class Element>
+		auto tag(char const (&name)[NameLength], Element &&content)
+		{
+			auto no_attributes = [](sink<char, success> &) {};
+			return tag(name, no_attributes, exact_length<0>{}, std::forward<Element>(content));
 		}
 
 		template <std::size_t Length>
@@ -111,21 +157,6 @@ namespace Si
 			{
 				generate_head(destination);
 				generate_tail_elements(destination);
-			});
-		}
-
-		template <class Length, class ContentGenerator>
-		auto dynamic(ContentGenerator &&generate)
-		{
-			return detail::make_element<Length>(std::forward<ContentGenerator>(generate));
-		}
-
-		template <std::size_t Length>
-		auto raw(char const (&content)[Length])
-		{
-			return dynamic<exact_length<Length - 1>>([&content](sink<char, success> &destination)
-			{
-				Si::append(destination, content);
 			});
 		}
 
