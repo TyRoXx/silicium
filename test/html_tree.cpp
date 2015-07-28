@@ -61,3 +61,11 @@ BOOST_AUTO_TEST_CASE(html_tree_attributes)
 	BOOST_CHECK_EQUAL("<input key=\"value\">content</input>", generated);
 }
 
+BOOST_AUTO_TEST_CASE(html_tree_trait)
+{
+	Si::html::Element<>::box const erased = Si::html::Element<>::make_box(Si::html::tag("test", Si::html::text("Hello")));
+	std::string generated;
+	auto sink = Si::Sink<char, Si::success>::erase(Si::make_container_sink(generated));
+	erased.generate(sink);
+	BOOST_CHECK_EQUAL("<test>Hello</test>", generated);
+}

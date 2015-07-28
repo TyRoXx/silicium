@@ -3,6 +3,7 @@
 
 #include <silicium/html/generator.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/trait.hpp>
 
 namespace Si
 {
@@ -60,6 +61,16 @@ namespace Si
 				return element<typename std::decay<ContentGenerator>::type, Length>{std::forward<ContentGenerator>(generate)};
 			}
 		}
+
+		typedef sink<char, success> destination_sink;
+
+		template <class Length = min_length<0>>
+		SILICIUM_TRAIT_WITH_TYPEDEFS(
+			Element,
+			typedef Length length_type;
+			,
+			((generate, (1, (destination_sink &)), void, const))
+		)
 
 		template <class Length, class ContentGenerator>
 		auto dynamic(ContentGenerator &&generate)
