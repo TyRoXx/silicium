@@ -61,6 +61,32 @@ BOOST_AUTO_TEST_CASE(html_tree_attributes)
 	BOOST_CHECK_EQUAL("<input key=\"value\">content</input>", generated);
 }
 
+BOOST_AUTO_TEST_CASE(html_tree_one_attribute)
+{
+	using namespace Si::html;
+	auto document =
+		tag("i",
+			attribute("key", "value"),
+			empty
+		);
+	BOOST_CHECK_EQUAL(16u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<i key=\"value\"/>", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_two_attributes)
+{
+	using namespace Si::html;
+	auto document =
+		tag("i",
+			attribute("key", "value") + attribute("key2", "value2"),
+			empty
+		);
+	BOOST_CHECK_EQUAL(30u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<i key=\"value\" key2=\"value2\"/>", generated);
+}
+
 BOOST_AUTO_TEST_CASE(html_tree_trait)
 {
 	Si::html::Element<>::box const erased = Si::html::Element<>::make_box(Si::html::tag("test", Si::html::text("Hello")));

@@ -136,6 +136,20 @@ namespace Si
 			return tag(name, detail::make_element<exact_length<0>>(no_attributes), std::forward<Element>(content));
 		}
 
+		template <std::size_t KeyLength, std::size_t ValueLength>
+		auto attribute(char const (&key)[KeyLength], char const (&value)[ValueLength])
+		{
+			static BOOST_CONSTEXPR_OR_CONST std::size_t const space = 1;
+			static BOOST_CONSTEXPR_OR_CONST std::size_t const assign = 1;
+			static BOOST_CONSTEXPR_OR_CONST std::size_t const quote = 1;
+			static BOOST_CONSTEXPR_OR_CONST std::size_t length = space + (KeyLength - 1) + assign + quote + (ValueLength - 1) + quote;
+			return detail::make_element<min_length<length>>(
+				[&key, &value](sink<char, success> &destination)
+			{
+				add_attribute(destination, key, value);
+			});
+		}
+
 		template <std::size_t Length>
 		auto text(char const (&content)[Length])
 		{
