@@ -33,13 +33,13 @@ namespace Si
 		}
 	};
 
-	boost::system::error_category const &zlib_category()
+	inline boost::system::error_category const &zlib_category()
 	{
 		static zlib_error_category const instance;
 		return instance;
 	}
 
-	void handle_zlib_status(int status)
+	inline void handle_zlib_status(int status)
 	{
 		if (status == Z_OK)
 		{

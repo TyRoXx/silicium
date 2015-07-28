@@ -6,7 +6,7 @@
 
 namespace Si
 {
-	bool decrement_once(unsigned long long &remaining_count)
+	inline bool decrement_once(unsigned long long &remaining_count)
 	{
 		if (remaining_count == 0)
 		{

@@ -36,7 +36,9 @@
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/function.hpp>
-#include <silicium/html.hpp>
+#include <silicium/get_last_error.hpp>
+#include <silicium/html/generator.hpp>
+#include <silicium/html/tree.hpp>
 #include <silicium/http/generate_header.hpp>
 #include <silicium/http/generate_request.hpp>
 #include <silicium/http/generate_response.hpp>
@@ -139,6 +141,7 @@
 #include <silicium/source/throwing_source.hpp>
 #include <silicium/source/transforming_source.hpp>
 #include <silicium/source/virtualized_source.hpp>
+#include <silicium/sqlite3.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/success.hpp>
 #include <silicium/terminate_on_exception.hpp>
@@ -148,6 +151,7 @@
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>
 #include <silicium/utility.hpp>
+#include <silicium/variant.hpp>
 #include <silicium/vector.hpp>
 #include <silicium/version.hpp>
 #include <silicium/win32/directory_changes.hpp>

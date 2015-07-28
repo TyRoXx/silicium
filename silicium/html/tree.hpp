@@ -139,9 +139,9 @@ namespace Si
 		template <std::size_t KeyLength, std::size_t ValueLength>
 		auto attribute(char const (&key)[KeyLength], char const (&value)[ValueLength])
 		{
-			static BOOST_CONSTEXPR_OR_CONST std::size_t const space = 1;
-			static BOOST_CONSTEXPR_OR_CONST std::size_t const assign = 1;
-			static BOOST_CONSTEXPR_OR_CONST std::size_t const quote = 1;
+			static BOOST_CONSTEXPR_OR_CONST std::size_t space = 1;
+			static BOOST_CONSTEXPR_OR_CONST std::size_t assign = 1;
+			static BOOST_CONSTEXPR_OR_CONST std::size_t quote = 1;
 			static BOOST_CONSTEXPR_OR_CONST std::size_t length = space + (KeyLength - 1) + assign + quote + (ValueLength - 1) + quote;
 			return detail::make_element<min_length<length>>(
 				[&key, &value](sink<char, success> &destination)
@@ -154,7 +154,7 @@ namespace Si
 		auto text(char const (&content)[Length])
 		{
 			typedef min_length<Length - 1> length;
-			return detail::make_element<length>([content](sink<char, success> &destination)
+			return detail::make_element<length>([&content](sink<char, success> &destination)
 			{
 				html::write_string(destination, content);
 			});
