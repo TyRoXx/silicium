@@ -611,6 +611,12 @@ namespace
 			return respond(client, Si::make_c_str_range("404"), Si::make_c_str_range("Not Found"), Si::make_c_str_range("unknown path"), yield);
 		}
 
+		bool const build_triggered = (request.method == "POST");
+		if (build_triggered)
+		{
+			trigger_build(client.get_io_service(), state, repository, workspace);
+		}
+
 		std::vector<char> old_style_generated;
 		auto html = Si::html::make_generator(Si::make_container_sink(old_style_generated));
 		html("html", [&]
@@ -624,9 +630,8 @@ namespace
 			});
 			html("body", [&]
 			{
-				if (request.method == "POST")
+				if (build_triggered)
 				{
-					trigger_build(client.get_io_service(), state, repository, workspace);
 					html.write("build was triggered");
 				}
 				html("form",
@@ -657,13 +662,12 @@ namespace
 				)
 			)+
 			tag("body",
-				dynamic<min_length<0>>([&request, &client, &state, &repository, &workspace](Si::sink<char, Si::success> &destination)
+				dynamic<min_length<0>>([build_triggered](Si::sink<char, Si::success> &destination)
 				{
-					if (request.method != "POST")
+					if (!build_triggered)
 					{
 						return;
 					}
-					trigger_build(client.get_io_service(), state, repository, workspace);
 					text("build was triggered").generate(destination);
 				})+
 				tag("form",
