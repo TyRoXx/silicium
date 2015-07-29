@@ -158,7 +158,7 @@ namespace Si
 
 		namespace detail
 		{
-			void no_attributes(sink<char, success> &)
+			inline void no_attributes(sink<char, success> &)
 			{
 			}
 		}
@@ -218,7 +218,7 @@ namespace Si
 
 		namespace detail
 		{
-			void no_content(sink<char, success> &)
+			inline void no_content(sink<char, success> &)
 			{
 			}
 		}
