@@ -14,6 +14,12 @@
 #	define SILICIUM_GCC 0
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 6)
+#	define SILICIUM_GCC46 1
+#else
+#	define SILICIUM_GCC46 0
+#endif
+
 #ifdef _MSC_VER
 #	define SILICIUM_COMPILER_CXX11 1
 #	define SILICIUM_COMPILER_CXX14 1
@@ -278,7 +284,7 @@ namespace Si
 	{
 	};
 	template <class T>
-	struct is_move_assignable : is_nothrow_move_assignable<T>
+	struct is_move_assignable : std::integral_constant<bool, __has_nothrow_assign(T)>
 	{
 	};
 	template <class T>
@@ -286,7 +292,7 @@ namespace Si
 	{
 	};
 	template <class T>
-	struct is_move_constructible : is_nothrow_move_constructible<T>
+	struct is_move_constructible : std::integral_constant<bool, __has_nothrow_copy(T)>
 	{
 	};
 	template <class T>

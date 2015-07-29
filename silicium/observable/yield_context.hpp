@@ -12,7 +12,7 @@ namespace Si
 	{
 		struct basic_yield_context
 		{
-			typedef observable<nothing, ptr_observer<observer<nothing>>> observable_type;
+			typedef Observable<nothing, ptr_observer<observer<nothing>>>::interface observable_type;
 			virtual ~basic_yield_context()
 			{
 			}

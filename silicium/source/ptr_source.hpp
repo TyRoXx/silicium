@@ -56,10 +56,10 @@ namespace Si
 	template <class Source>
 	auto erase_source(Source &&input)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> ptr_source<std::unique_ptr<source<typename std::decay<Source>::type::element_type>>>
+		-> ptr_source<std::unique_ptr<typename Si::Source<typename std::decay<Source>::type::element_type>::interface>>
 #endif
 	{
-		return ptr_source<std::unique_ptr<source<typename std::decay<Source>::type::element_type>>>(
+		return ptr_source<std::unique_ptr<typename Si::Source<typename std::decay<Source>::type::element_type>::interface>>(
 			Si::to_unique(virtualize_source(std::forward<Source>(input)))
 		);
 	}

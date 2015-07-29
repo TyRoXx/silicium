@@ -6,14 +6,14 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/write.hpp>
 
-#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
+#if (BOOST_VERSION >= 105400) && SILICIUM_HAS_EXCEPTIONS
 #include <boost/asio/spawn.hpp>
 
 namespace Si
 {
 	namespace asio
 	{
-		struct socket_sink : Si::sink<char, boost::system::error_code>
+		struct socket_sink : Si::Sink<char, boost::system::error_code>::interface
 		{
 			explicit socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
 			virtual boost::system::error_code append(iterator_range<char const *> data) SILICIUM_OVERRIDE;

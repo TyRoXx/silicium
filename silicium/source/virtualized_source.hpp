@@ -7,7 +7,7 @@
 namespace Si
 {
 	template <class Original>
-	struct virtualized_source : source<typename Original::element_type>
+	struct virtualized_source : Source<typename Original::element_type>::interface
 	{
 		typedef typename Original::element_type element_type;
 

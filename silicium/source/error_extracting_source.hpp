@@ -21,7 +21,7 @@ namespace Si
 	}
 
 	template <class ErrorOrSource>
-	struct error_extracting_source : source<typename detail::get_error_parameters<typename ErrorOrSource::element_type>::value_type>
+	struct error_extracting_source : Source<typename detail::get_error_parameters<typename ErrorOrSource::element_type>::value_type>::interface
 	{
 		typedef typename detail::get_error_parameters<typename ErrorOrSource::element_type>::value_type element_type;
 		typedef typename detail::get_error_parameters<typename ErrorOrSource::element_type>::error_type error_type;

@@ -84,7 +84,7 @@ namespace Si
 
 	private:
 
-		typedef Si::observable<nothing, ptr_observer<observer<nothing>>> *command_type;
+		typedef Observable<nothing, ptr_observer<observer<nothing>>>::interface *command_type;
 		typedef
 #if BOOST_VERSION >= 105500
 			typename boost::coroutines::coroutine<command_type>::pull_type

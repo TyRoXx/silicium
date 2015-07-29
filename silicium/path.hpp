@@ -136,7 +136,9 @@ namespace Si
 		underlying_type m_value;
 	};
 
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<path>::value);
+#endif
 
 	inline std::ostream &operator << (std::ostream &out, path const &p)
 	{

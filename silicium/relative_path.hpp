@@ -124,7 +124,9 @@ namespace Si
 		path m_value;
 	};
 
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<relative_path>::value);
+#endif
 
 	inline std::ostream &operator << (std::ostream &out, relative_path const &p)
 	{

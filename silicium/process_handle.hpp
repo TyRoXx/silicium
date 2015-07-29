@@ -9,7 +9,9 @@
 
 namespace Si
 {
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<process_handle>::value);
+#endif
 }
 
 #endif

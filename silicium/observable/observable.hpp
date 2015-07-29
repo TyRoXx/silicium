@@ -13,8 +13,10 @@ namespace Si
 		((async_get_one, (1, (Observer)), void))
 	)
 
+#if SILICIUM_COMPILER_HAS_USING
 	template <class Element, class Observer>
 	using observable = typename Observable<Element, Observer>::interface;
+#endif
 }
 
 #endif

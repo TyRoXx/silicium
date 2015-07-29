@@ -27,8 +27,10 @@ namespace Si
 		((append, (1, (iterator_range<element_type const *>)), error_type))
 	)
 
+#if SILICIUM_COMPILER_HAS_USING
 	template <class Element, class Error = boost::system::error_code>
 	using sink = typename Sink<Element, Error>::interface;
+#endif
 
 	template <class Element, class Error = boost::system::error_code>
 	struct null_sink

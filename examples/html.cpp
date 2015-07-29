@@ -15,7 +15,7 @@ int main()
 			)
 			+
 			tag("body",
-				text("Hello, ") + raw("<b>world</b>") + dynamic<exact_length<5>>([](Si::sink<char, Si::success> &destination)
+				text("Hello, ") + raw("<b>world</b>") + dynamic<exact_length<5>>([](Si::Sink<char, Si::success>::interface &destination)
 				{
 					Si::html::unpaired_element(destination, "br");
 				})

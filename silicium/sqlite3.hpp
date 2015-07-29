@@ -41,7 +41,11 @@ namespace Si
 
 	        virtual std::string message(int ev) const SILICIUM_OVERRIDE
 			{
+#if SQLITE_VERSION_NUMBER > 3007009
 				return sqlite3_errstr(ev);
+#else
+				return "?";
+#endif
 			}
 		};
 

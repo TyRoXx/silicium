@@ -63,7 +63,9 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(file_handle &operator = (file_handle const &))
 	};
 
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<file_handle>::value);
+#endif
 }
 
 #endif

@@ -19,11 +19,13 @@ namespace Si
 		((copy_next, (1, (iterator_range<element_type *>)), element_type *))
 	)
 
+#if SILICIUM_COMPILER_HAS_USING
 	template <class Element>
-	using source = typename Source<Element>::interface;
+	using source = Source<Element>::interface;
+#endif
 
 	template <class Source>
-	Si::optional<typename Source::element_type> get(Source &from)
+	optional<typename Source::element_type> get(Source &from)
 	{
 		typename Source::element_type result;
 		if (&result == from.copy_next(Si::make_iterator_range(&result, &result + 1)))
@@ -39,8 +41,8 @@ namespace Si
 		return container.empty() ? nullptr : &container[0];
 	}
 
-	template <class Element, class Sequence = std::vector<Element>>
-	auto take(source<Element> &from, std::size_t count) -> Sequence
+	template <class Source, class Sequence = std::vector<typename Source::element_type>>
+	auto take(Source &from, std::size_t count) -> Sequence
 	{
 		Sequence taken;
 		taken.resize(count);

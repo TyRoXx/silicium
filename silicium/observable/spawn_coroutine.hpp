@@ -53,18 +53,20 @@ namespace Si
 			-> decltype(lambda_to_value_impl(
 				std::forward<Function>(function),
 				std::integral_constant<bool,
-				std::is_move_assignable<typename std::decay<Function>::type>::value &&
-				std::is_move_constructible<typename std::decay<Function>::type>::value
-			>()))
+					Si::is_move_assignable<typename std::decay<Function>::type>::value &&
+					Si::is_move_constructible<typename std::decay<Function>::type>::value
+				>()
+			))
 #endif
 		{
 			typedef typename std::decay<Function>::type clean;
 			return lambda_to_value_impl(
 				std::forward<Function>(function),
 				std::integral_constant<bool,
-				std::is_move_assignable<clean>::value &&
-				std::is_move_constructible<clean>::value
-			>());
+					Si::is_move_assignable<clean>::value &&
+					Si::is_move_constructible<clean>::value
+				>()
+			);
 		}
 }
 
@@ -144,7 +146,7 @@ namespace Si
 
 	struct spawn_context
 	{
-		typedef std::function<void(observable<nothing, ptr_observer<observer<nothing>>> &)> wait_function;
+		typedef std::function<void(Observable<nothing, ptr_observer<observer<nothing>>>::interface &)> wait_function;
 
 		spawn_context()
 		{
@@ -214,7 +216,7 @@ namespace Si
 				m_coro = coroutine([this, function](coroutine_push_type &push)
 				{
 					spawn_context context(
-						[this, &push](observable<nothing, ptr_observer<observer<nothing>>> &waiting_for)
+						[this, &push](Observable<nothing, ptr_observer<observer<nothing>>>::interface &waiting_for)
 						{
 							wait_for(waiting_for);
 							if (m_waiting)
@@ -243,7 +245,7 @@ namespace Si
 			bool m_waiting;
 			bool m_suspended;
 
-			void wait_for(observable<nothing, ptr_observer<observer<nothing>>> &waiting_for)
+			void wait_for(Observable<nothing, ptr_observer<observer<nothing>>>::interface &waiting_for)
 			{
 				m_waiting = true;
 				waiting_for.async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));

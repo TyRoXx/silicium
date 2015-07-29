@@ -7,6 +7,7 @@
 namespace Si
 {
 #if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
+#	define SILICIUM_HAS_IS_HANDLE 1
 	template <class T>
 	struct is_handle : std::integral_constant<bool,
 		Si::is_nothrow_default_constructible<T>::value &&
@@ -17,6 +18,7 @@ namespace Si
 	{
 	};
 #else
+#	define SILICIUM_HAS_IS_HANDLE 0
 	template <class T>
 	struct is_handle : std::integral_constant<bool,
 		!std::is_const<T>::value &&

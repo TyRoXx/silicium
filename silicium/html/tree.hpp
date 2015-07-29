@@ -65,7 +65,7 @@ namespace Si
 			}
 		}
 
-		typedef sink<char, success> destination_sink;
+		typedef Sink<char, success>::interface destination_sink;
 
 		template <class Length = min_length<0>>
 		SILICIUM_TRAIT_WITH_TYPEDEFS(
@@ -87,14 +87,14 @@ namespace Si
 		template <std::size_t Length>
 		auto raw(char const (&content)[Length])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> detail::element<exact_length<Length - 1>, std::function<void(sink<char, success> &)>>
+			-> detail::element<std::function<void(Sink<char, success>::interface &)>, exact_length<Length - 1>>
 #endif
 		{
 			return dynamic<exact_length<Length - 1>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-				std::function<void(sink<char, success> &)>
+				std::function<void(Sink<char, success>::interface &)>
 #endif
-				([&content](sink<char, success> &destination)
+				([&content](Sink<char, success>::interface &destination)
 			{
 				Si::append(destination, content);
 			}));
@@ -109,18 +109,19 @@ namespace Si
 		>::type>
 		auto tag(char const (&name)[NameLength], Attributes &&attributes, Element &&content)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> detail::element<ResultLength, std::function<void(sink<char, success> &)>>
+			-> detail::element<std::function<void(Sink<char, success>::interface &)>, ResultLength>
 #endif
 		{
+			auto &generate_content = content.generate;
 			return detail::make_element<ResultLength>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-				std::function<void(sink<char, success> &)>
+				std::function<void(Sink<char, success>::interface &)>
 #endif
 				([
 					&name,
-					SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(content.generate)),
+					SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(generate_content)),
 					SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
-				] (sink<char, success> &destination)
+				] (Sink<char, success>::interface &destination)
 				{
 					html::open_attributed_element(destination, name);
 					attributes.generate(destination);
@@ -137,17 +138,17 @@ namespace Si
 		>::type>
 		auto tag(char const (&name)[NameLength], Attributes &&attributes, empty_t)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> detail::element<ResultLength, std::function<void(sink<char, success> &)>>
+			-> detail::element<std::function<void(Sink<char, success>::interface &)>, ResultLength>
 #endif
 		{
 			return detail::make_element<ResultLength>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-				std::function<void(sink<char, success> &)>
+				std::function<void(Sink<char, success>::interface &)>
 #endif
 				([
 					&name,
 					SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
-				] (sink<char, success> &destination)
+				] (Sink<char, success>::interface &destination)
 				{
 					html::open_attributed_element(destination, name);
 					attributes.generate(destination);
@@ -158,7 +159,7 @@ namespace Si
 
 		namespace detail
 		{
-			inline void no_attributes(sink<char, success> &)
+			inline void no_attributes(Sink<char, success>::interface &)
 			{
 			}
 		}
@@ -186,14 +187,14 @@ namespace Si
 		>
 		auto attribute(char const (&key)[KeyLength], char const (&value)[ValueLength])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> detail::element<min_length<ResultLength>, std::function<void(sink<char, success> &)>>
+			-> detail::element<std::function<void(Sink<char, success>::interface &)>, min_length<ResultLength>>
 #endif
 		{
 			return detail::make_element<min_length<ResultLength>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-				std::function<void(sink<char, success> &)>
+				std::function<void(Sink<char, success>::interface &)>
 #endif
-				([&key, &value](sink<char, success> &destination)
+				([&key, &value](Sink<char, success>::interface &destination)
 			{
 				add_attribute(destination, key, value);
 			}));
@@ -202,14 +203,14 @@ namespace Si
 		template <std::size_t Length>
 		auto text(char const (&content)[Length])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> detail::element<min_length<Length - 1>, std::function<void(sink<char, success> &)>>
+			-> detail::element<std::function<void(Sink<char, success>::interface &)>, min_length<Length - 1>>
 #endif
 		{
 			return detail::make_element<min_length<Length - 1>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-				std::function<void(sink<char, success> &)>
+				std::function<void(Sink<char, success>::interface &)>
 #endif
-				([&content](sink<char, success> &destination)
+				([&content](Sink<char, success>::interface &destination)
 				{
 					html::write_string(destination, content);
 				})
@@ -218,7 +219,7 @@ namespace Si
 
 		namespace detail
 		{
-			inline void no_content(sink<char, success> &)
+			inline void no_content(Sink<char, success>::interface &)
 			{
 			}
 		}
@@ -234,10 +235,12 @@ namespace Si
 		template <class Head, class ...Tail>
 		auto sequence(Head &&head, Tail &&...tail)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> detail::element<min_length<0>, std::function<void(sink<char, success> &)>>
+			-> detail::element<std::function<void(Sink<char, success>::interface &)>, min_length<0>>
 #endif
 		{
 			auto tail_elements = sequence(std::forward<Tail>(tail)...);
+			auto &generate_head = head.generate;
+			auto &generate_tail_elements = tail_elements.generate;
 			return detail::make_element<
 #if SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 				typename detail::concatenate<
@@ -249,12 +252,12 @@ namespace Si
 #endif
 			>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-				std::function<void(sink<char, success> &)>
+				std::function<void(Sink<char, success>::interface &)>
 #endif
 				([
-					SILICIUM_CAPTURE_EXPRESSION(generate_head, std::move(head.generate)),
-					SILICIUM_CAPTURE_EXPRESSION(generate_tail_elements, std::move(tail_elements.generate))
-				](sink<char, success> &destination)
+					SILICIUM_CAPTURE_EXPRESSION(generate_head, std::move(generate_head)),
+					SILICIUM_CAPTURE_EXPRESSION(generate_tail_elements, std::move(generate_tail_elements))
+				](Sink<char, success>::interface &destination)
 				{
 					generate_head(destination);
 					generate_tail_elements(destination);

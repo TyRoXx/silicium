@@ -354,6 +354,7 @@ namespace Si
 		T *m_data;
 	};
 
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<optional<int>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int *>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int const *>>::value);
@@ -361,6 +362,7 @@ namespace Si
 	BOOST_STATIC_ASSERT(is_handle<optional<nothing>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int &>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int const &>>::value);
+#endif
 
 	template <class T>
 	SILICIUM_USE_RESULT

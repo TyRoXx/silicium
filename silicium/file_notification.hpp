@@ -46,7 +46,9 @@ namespace Si
 		}
 	};
 
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<file_notification>::value);
+#endif
 }
 
 #endif

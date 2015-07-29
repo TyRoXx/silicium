@@ -22,7 +22,7 @@ namespace Si
 	}
 
 	template <class RangeSource>
-	struct enumerating_source : source<typename detail::value_type<typename RangeSource::element_type>::type>
+	struct enumerating_source : Source<typename detail::value_type<typename RangeSource::element_type>::type>::interface
 	{
 		typedef typename detail::value_type<typename RangeSource::element_type>::type element_type;
 		typedef typename RangeSource::element_type range_type;

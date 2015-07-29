@@ -284,7 +284,7 @@ namespace Si
 		});
 		argument_pointers.emplace_back(nullptr);
 
-		pipe child_error = make_pipe().get();
+		pipe child_error = make_pipe().move_value();
 
 		pid_t const forked = fork();
 		if (forked < 0)

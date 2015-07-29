@@ -8,7 +8,7 @@
 namespace Si
 {
 	template <class Observable, class Observer>
-	struct virtualized_observable : observable<typename Observable::element_type, Observer>
+	struct virtualized_observable : Si::Observable<typename Observable::element_type, Observer>::interface
 	{
 		typedef typename Observable::element_type element_type;
 

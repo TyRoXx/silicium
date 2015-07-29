@@ -8,7 +8,7 @@
 namespace Si
 {
 	template <class Element>
-	struct mutable_source : source<Element>
+	struct mutable_source : Source<Element>::interface
 	{
 		virtual iterator_range<Element *> map_next_mutable(std::size_t size) = 0;
 		virtual std::size_t skip(std::size_t count) = 0;
@@ -19,7 +19,7 @@ namespace Si
 	{
 		typedef Element element_type;
 
-		explicit buffering_source(source<Element> &next, std::size_t capacity)
+		explicit buffering_source(typename Source<Element>::interface &next, std::size_t capacity)
 			: m_next(&next)
 			, m_buffer(capacity)
 		{
@@ -76,7 +76,7 @@ namespace Si
 
 	private:
 
-		source<Element> *m_next;
+		typename Source<Element>::interface *m_next;
 		boost::circular_buffer<Element> m_buffer;
 
 		void pull()
@@ -97,10 +97,10 @@ namespace Si
 		}
 	};
 
-	template <class Element>
-	buffering_source<Element> make_buffer(source<Element> &buffered, std::size_t capacity)
+	template <class Source>
+	buffering_source<typename Source::element_type> make_buffer(Source &buffered, std::size_t capacity)
 	{
-		return buffering_source<Element>(buffered, capacity);
+		return buffering_source<typename Source::element_type>(buffered, capacity);
 	}
 
 	template <class Element>

@@ -617,7 +617,7 @@ namespace Si
 		{
 		}
 
-		template <class First, class ...Initializer, class = typename boost::disable_if<boost::is_same<boost::decay<First>::type, variant>, void>::type>
+		template <class First, class ...Initializer, class = typename boost::disable_if<boost::is_same<typename boost::decay<First>::type, variant>, void>::type>
 		variant(First &&first, Initializer &&...init)
 			: base(std::forward<First>(first), std::forward<Initializer>(init)...)
 		{
@@ -633,7 +633,7 @@ namespace Si
 		{
 		}
 
-		template <class Content, class = typename boost::disable_if<boost::is_same<boost::decay<Content>::type, variant>, void>::type>
+		template <class Content, class = typename boost::disable_if<boost::is_same<typename boost::decay<Content>::type, variant>, void>::type>
 		variant &operator = (Content &&other)
 		{
 			static_cast<base &>(*this) = std::forward<Content>(other);
@@ -660,8 +660,10 @@ namespace Si
 	};
 #endif
 
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<variant<int>>::value);
 	BOOST_STATIC_ASSERT((is_handle<variant<int, nothing>>::value));
+#endif
 
 	template <class ...T>
 	bool operator != (variant<T...> const &left, variant<T...> const &right)
@@ -735,14 +737,18 @@ namespace Si
 	template <class Element, class ...T>
 	Element *try_get_ptr(variant<T...> &from) BOOST_NOEXCEPT
 	{
+#if !SILICIUM_GCC46
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
+#endif
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
 
 	template <class Element, class ...T>
 	typename std::add_const<Element>::type *try_get_ptr(variant<T...> const &from) BOOST_NOEXCEPT
 	{
+#if !SILICIUM_GCC46
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
+#endif
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
 

@@ -10,9 +10,9 @@ namespace Si
 	using unique_observable = ptr_observable<Element, std::unique_ptr<observable<Element, ptr_observer<observer<Element>>>>>;
 #else
 	template <class Element>
-	struct unique_observable : ptr_observable<Element, std::unique_ptr<observable<Element, ptr_observer<observer<Element>>>>>
+	struct unique_observable : ptr_observable<Element, std::unique_ptr<typename Observable<Element, ptr_observer<observer<Element>>>::interface>>
 	{
-		typedef ptr_observable<Element, std::unique_ptr<observable<Element, ptr_observer<observer<Element>>>>> base;
+		typedef ptr_observable<Element, std::unique_ptr<typename Observable<Element, ptr_observer<observer<Element>>>::interface>> base;
 
 		template <class Initializer>
 		unique_observable(Initializer &&init)

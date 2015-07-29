@@ -9,14 +9,14 @@ namespace Si
 {
 	namespace detail
 	{
-		struct line_source SILICIUM_FINAL : source<std::vector<char>>
+		struct line_source SILICIUM_FINAL : Source<std::vector<char>>::interface
 		{
 			line_source()
 				: m_next(nullptr)
 			{
 			}
 
-			explicit line_source(Si::source<char> &next)
+			explicit line_source(Source<char>::interface &next)
 				: m_next(&next)
 			{
 			}
@@ -64,7 +64,7 @@ namespace Si
 
 		private:
 
-			Si::source<char> *m_next;
+			Source<char>::interface *m_next;
 		};
 
 		template <class CharRange>

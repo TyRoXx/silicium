@@ -139,7 +139,9 @@ namespace Si
 		}
 	};
 
+#if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(Si::is_handle<absolute_path>::value);
+#endif
 
 	inline std::ostream &operator << (std::ostream &out, absolute_path const &p)
 	{

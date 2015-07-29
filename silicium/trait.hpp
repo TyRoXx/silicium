@@ -14,7 +14,7 @@
 	SILICIUM_DEFAULT_MOVE(struct_name)
 #else
 #	define SILICIUM_MOVABLE_MEMBER(struct_name, member_name) \
-	struct_name() : member_name() BOOST_NOEXCEPT {} \
+	struct_name() BOOST_NOEXCEPT : member_name() {} \
 	struct_name(struct_name &&other) BOOST_NOEXCEPT : member_name(std::move(other.member_name)) {} \
 	struct_name &operator = (struct_name &&other) BOOST_NOEXCEPT { member_name = std::move(other.member_name); return *this; }
 #endif
