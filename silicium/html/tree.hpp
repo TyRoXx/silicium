@@ -86,60 +86,90 @@ namespace Si
 
 		template <std::size_t Length>
 		auto raw(char const (&content)[Length])
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> detail::element<exact_length<Length - 1>, std::function<void(sink<char, success> &)>>
+#endif
 		{
-			return dynamic<exact_length<Length - 1>>([&content](sink<char, success> &destination)
+			return dynamic<exact_length<Length - 1>>(
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+				std::function<void(sink<char, success> &)>
+#endif
+				([&content](sink<char, success> &destination)
 			{
 				Si::append(destination, content);
-			});
+			}));
 		}
 
-		template <std::size_t NameLength, class Attributes, class Element>
+		template <std::size_t NameLength, class Attributes, class Element, class ResultLength = typename detail::concatenate<
+			typename std::decay<Element>::type::length_type,
+			typename detail::concatenate<
+			typename std::decay<Attributes>::type::length_type,
+			exact_length<1 + (NameLength - 1) + 1 + 2 + (NameLength - 1) + 1>
+			>::type
+		>::type>
 		auto tag(char const (&name)[NameLength], Attributes &&attributes, Element &&content)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> detail::element<ResultLength, std::function<void(sink<char, success> &)>>
+#endif
 		{
-			typedef typename detail::concatenate<
-				typename std::decay<Element>::type::length_type,
-				typename detail::concatenate<
-					typename std::decay<Attributes>::type::length_type,
-					exact_length<1 + (NameLength - 1) + 1 + 2 + (NameLength - 1) + 1>
-				>::type
-			>::type length;
-			return detail::make_element<length>([
-				&name,
-				SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(content.generate)),
-				SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
-			] (sink<char, success> &destination)
-			{
-				html::open_attributed_element(destination, name);
-				attributes.generate(destination);
-				html::finish_attributes(destination);
-				generate_content(destination);
-				html::close_element(destination, name);
-			});
+			return detail::make_element<ResultLength>(
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+				std::function<void(sink<char, success> &)>
+#endif
+				([
+					&name,
+					SILICIUM_CAPTURE_EXPRESSION(generate_content, std::move(content.generate)),
+					SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
+				] (sink<char, success> &destination)
+				{
+					html::open_attributed_element(destination, name);
+					attributes.generate(destination);
+					html::finish_attributes(destination);
+					generate_content(destination);
+					html::close_element(destination, name);
+				})
+			);
 		}
 
-		template <std::size_t NameLength, class Attributes>
+		template <std::size_t NameLength, class Attributes, class ResultLength = typename detail::concatenate<
+			min_length<1 + (NameLength - 1) + 2>,
+			typename std::decay<Attributes>::type::length_type
+		>::type>
 		auto tag(char const (&name)[NameLength], Attributes &&attributes, empty_t)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> detail::element<ResultLength, std::function<void(sink<char, success> &)>>
+#endif
 		{
-			typedef typename detail::concatenate<
-				min_length<1 + (NameLength - 1) + 2>,
-				typename std::decay<Attributes>::type::length_type
-			>::type length;
-			return detail::make_element<length>([
-				&name,
-				SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
-			] (sink<char, success> &destination)
+			return detail::make_element<ResultLength>(
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+				std::function<void(sink<char, success> &)>
+#endif
+				([
+					&name,
+					SILICIUM_CAPTURE_EXPRESSION(attributes, std::forward<Attributes>(attributes))
+				] (sink<char, success> &destination)
+				{
+					html::open_attributed_element(destination, name);
+					attributes.generate(destination);
+					finish_attributes_of_unpaired_tag(destination);
+				})
+			);
+		}
+
+		namespace detail
+		{
+			void no_attributes(sink<char, success> &)
 			{
-				html::open_attributed_element(destination, name);
-				attributes.generate(destination);
-				finish_attributes_of_unpaired_tag(destination);
-			});
+			}
 		}
 
 		template <std::size_t NameLength, class Element>
 		auto tag(char const (&name)[NameLength], Element &&content)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> decltype(tag(name, detail::make_element<exact_length<0>>(&detail::no_attributes), std::forward<Element>(content)))
+#endif
 		{
-			auto no_attributes = [](sink<char, success> &) {};
-			return tag(name, detail::make_element<exact_length<0>>(no_attributes), std::forward<Element>(content));
+			return tag(name, detail::make_element<exact_length<0>>(&detail::no_attributes), std::forward<Element>(content));
 		}
 
 		template <std::size_t KeyLength, std::size_t ValueLength>
