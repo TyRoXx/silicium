@@ -44,11 +44,6 @@ namespace Si
 			});
 			watcher.async_get_one(Si::observe_by_ref(consumer));
 
-#ifdef _WIN32
-			//currently the implementation for Windows needs some time for the background thread to set everything up
-			boost::this_thread::sleep(boost::posix_time::seconds(1));
-#endif
-
 			provoke_event();
 
 			boost::asio::basic_waitable_timer<std::chrono::steady_clock> timeout(io);
