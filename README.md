@@ -5,7 +5,8 @@ compilers
 =========
 
 * GCC 4.8 (older versions may work)
-* Visual C++ 2013 Update 3 (older versions will not work)
+* Visual C++ 2015
+    * broken at the moment due to template/decltype bugs: Visual C++ 2013 Update 3
 * recent versions of Clang will probably work, too
 
 dependencies
@@ -20,8 +21,10 @@ sudo apt-get install libboost-all-dev liburiparser-dev zlib1g-dev
 On ancient operating systems, you may have to install some of the
 libraries from a recent source release.
 
-Boost 1.54 or later (required)
+Boost 1.49 or later (required)
 ------------------------------
+
+Many components of the library are only available with more recent versions of Boost though.
 
 http://www.boost.org/users/download/
 
@@ -54,7 +57,6 @@ to do
 * static analysis
 * move the web server stuff to a separate library (including the uriparser dependency)
 * move the zlib wrapper to a separate library
-* rename fast_variant to either flat_variant or variant
 * allow for recursive variants
 * reduce sizeof(fast_variant&lt;T&gt;) to sizeof(T)
 * reduce sizeof(fast_variant&lt;char&gt;) to (sizeof(char) * 2)
