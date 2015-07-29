@@ -2,6 +2,7 @@
 #define SILICIUM_OBSERVABLE_HPP
 
 #include <silicium/trait.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
