@@ -153,7 +153,7 @@ namespace Si
 		boost::asio::io_service *dispatcher;
 		boost::optional<boost::asio::io_service::work> blocker;
 		Action action;
-		Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface *from;
+		typename Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface *from;
 
 		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
 			: dispatcher(&dispatcher)
