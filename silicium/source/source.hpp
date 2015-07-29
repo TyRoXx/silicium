@@ -21,7 +21,7 @@ namespace Si
 
 #if SILICIUM_COMPILER_HAS_USING
 	template <class Element>
-	using source = Source<Element>::interface;
+	using source = typename Source<Element>::interface;
 #endif
 
 	template <class Source>

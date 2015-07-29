@@ -37,7 +37,7 @@ target_link_libraries(silicium_build_tester ${Boost_LIBRARIES} ${URIPARSER_LIBRA
 
 if(SILICIUM_HAS_WEBSOCKETPP)
 	add_executable(websocketpp "websocketpp.cpp" "websocketpp.hpp.js")
-	if(${CMAKE_VERSION} VERSION_GREATER "3.0")
+	if(${CMAKE_VERSION} VERSION_GREATER "2.8.8")
 		if(MSVC)
 			target_compile_options(websocketpp PRIVATE "/wd4127")
 		else()
