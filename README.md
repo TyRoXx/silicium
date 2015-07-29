@@ -55,17 +55,30 @@ sudo apt-get install zlib1g-dev
 to do
 =====
 
+important
+---------
+
+* continuous integration
 * measure test coverage
-* static analysis
-* move the web server stuff to a separate library (including the uriparser dependency)
-* move the zlib wrapper to a separate library
 * allow for recursive variants
-* reduce sizeof(fast_variant&lt;T&gt;) to sizeof(T)
-* reduce sizeof(fast_variant&lt;char&gt;) to (sizeof(char) * 2)
 * check whether fast_variant&lt;T &amp;&gt; makes sense
 * Asio-style async_wait for the end of a child process
 * async read and write for anonymous pipes on Win32
-* further investigation of container wrappers like Si::vector
+* clean up noexcept annotations
+
+nice to have
+------------
+
+* static analysis
+* move the web server stuff to a separate library (including the uriparser dependency)
+* move the zlib wrapper to a separate library
+* reduce sizeof(fast_variant&lt;T&gt;) to sizeof(T)
+* reduce sizeof(fast_variant&lt;char&gt;) to (sizeof(char) * 2)
 * move everything HTTP into a separate library
+
+probably outside of scope
+-------------------------
+
 * Asio-style websockets
 * investigate async read and write for files
+* further investigation of container wrappers like Si::vector
