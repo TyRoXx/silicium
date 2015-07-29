@@ -1,6 +1,8 @@
 silicium
 ========
 
+[very work-in-progress, incomplete and usually outdated Doxygen](http://tyroxx.github.io/silicium/annotated.html)
+
 compilers
 =========
 
