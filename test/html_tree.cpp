@@ -95,3 +95,77 @@ BOOST_AUTO_TEST_CASE(html_tree_trait)
 	erased.generate(sink);
 	BOOST_CHECK_EQUAL("<test>Hello</test>", generated);
 }
+
+
+BOOST_AUTO_TEST_CASE(html_tree_produces_same_output_as_generator)
+{
+	bool const build_triggered = true;
+
+	std::vector<char> old_style_generated;
+	auto html = Si::html::make_generator(Si::make_container_sink(old_style_generated));
+	html("html", [&]
+	{
+		html("head", [&]
+		{
+			html("title", [&]
+			{
+				html.write("Silicium build tester");
+			});
+		});
+		html("body", [&]
+		{
+			if (build_triggered)
+			{
+				html.write("build was triggered");
+			}
+			html("form",
+				[&]
+			{
+				html.attribute("action", "/");
+				html.attribute("method", "POST");
+			},
+				[&]
+			{
+				html("input",
+					[&]
+				{
+					html.attribute("type", "submit");
+					html.attribute("value", "Trigger build");
+				},
+					Si::html::empty);
+			});
+		});
+
+	});
+
+	using namespace Si::html;
+	auto document = tag("html",
+		tag("head",
+			tag("title",
+				text("Silicium build tester")
+			)
+		) +
+		tag("body",
+			dynamic<min_length<0>>([build_triggered](Si::sink<char, Si::success> &destination)
+			{
+				if (!build_triggered)
+				{
+					return;
+				}
+				text("build was triggered").generate(destination);
+			}) +
+			tag("form",
+				attribute("action", "/") +
+				attribute("method", "POST"),
+				tag("input",
+					attribute("type", "submit") +
+					attribute("value", "Trigger build"),
+					empty
+				)
+			)
+		)
+	);
+	std::vector<char> new_style_generated = Si::html::generate<std::vector<char>>(document);
+
+	BOOST_CHECK(old_style_generated == new_style_generated);
+}

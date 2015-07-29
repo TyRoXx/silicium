@@ -617,43 +617,6 @@ namespace
 			trigger_build(client.get_io_service(), state, repository, workspace);
 		}
 
-		std::vector<char> old_style_generated;
-		auto html = Si::html::make_generator(Si::make_container_sink(old_style_generated));
-		html("html", [&]
-		{
-			html("head", [&]
-			{
-				html("title", [&]
-				{
-					html.write("Silicium build tester");
-				});
-			});
-			html("body", [&]
-			{
-				if (build_triggered)
-				{
-					html.write("build was triggered");
-				}
-				html("form",
-					[&]
-				{
-					html.attribute("action", "/");
-					html.attribute("method", "POST");
-				},
-					[&]
-				{
-					html("input",
-						[&]
-					{
-						html.attribute("type", "submit");
-						html.attribute("value", "Trigger build");
-					},
-						Si::html::empty);
-				});
-			});
-
-		});
-
 		using namespace Si::html;
 		auto document = tag("html",
 			tag("head",
@@ -682,8 +645,6 @@ namespace
 			)
 		);
 		std::vector<char> new_style_generated = Si::html::generate<std::vector<char>>(document);
-
-		assert(old_style_generated == new_style_generated);
 		return respond(client, Si::make_c_str_range("200"), Si::make_c_str_range("OK"), Si::make_memory_range(new_style_generated), yield);
 	}
 
