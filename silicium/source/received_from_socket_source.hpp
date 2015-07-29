@@ -18,9 +18,9 @@ namespace Si
 		}
 	}
 
-	struct received_from_socket_source : source<char>
+	struct received_from_socket_source : Source<char>::interface
 	{
-		explicit received_from_socket_source(source<error_or<memory_range>> &original)
+		explicit received_from_socket_source(Source<error_or<memory_range>>::interface &original)
 			: original(&original)
 		{
 		}
@@ -69,7 +69,7 @@ namespace Si
 
 	private:
 
-		Si::source<error_or<memory_range>> *original;
+		Source<error_or<memory_range>>::interface *original;
 		memory_range rest;
 
 		std::size_t skip(std::size_t count)

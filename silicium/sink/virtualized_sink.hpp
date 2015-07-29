@@ -7,7 +7,7 @@
 namespace Si
 {
 	template <class Next>
-	struct virtualized_sink : sink<typename Next::element_type, typename Next::error_type>
+	struct virtualized_sink : Sink<typename Next::element_type, typename Next::error_type>::interface
 	{
 		typedef typename Next::element_type element_type;
 		typedef typename Next::error_type error_type;

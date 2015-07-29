@@ -189,7 +189,7 @@ namespace Si
 				}
 			}
 
-			virtual void get_one(observable<nothing, ptr_observer<observer<nothing>>> &target) SILICIUM_OVERRIDE
+			virtual void get_one(Observable<nothing, ptr_observer<observer<nothing>>>::interface &target) SILICIUM_OVERRIDE
 			{
 				got_something.block(target);
 			}
@@ -199,7 +199,7 @@ namespace Si
 	};
 
 	template <class Element, class ThreadingAPI, class Action>
-	auto make_thread_generator(Action &&action) -> thread_generator_observable<Element, ThreadingAPI>
+	thread_generator_observable<Element, ThreadingAPI> make_thread_generator(Action &&action)
 	{
 		return thread_generator_observable<Element, ThreadingAPI>(std::forward<Action>(action));
 	}

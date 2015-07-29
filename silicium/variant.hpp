@@ -267,7 +267,9 @@ namespace Si
 			};
 
 			typedef unsigned which_type;
+#if !SILICIUM_GCC46
 			typedef boost::mpl::vector<T...> element_types;
+#endif
 
 			variant_base() BOOST_NOEXCEPT
 			{

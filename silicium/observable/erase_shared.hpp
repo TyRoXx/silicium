@@ -10,9 +10,9 @@ namespace Si
 	using shared_observable = ptr_observable<Element, std::shared_ptr<observable<Element, ptr_observer<observer<Element>>>>>;
 #else
 	template <class Element>
-	struct shared_observable : ptr_observable<Element, std::shared_ptr<observable<Element, ptr_observer<observer<Element>>>>>
+	struct shared_observable : ptr_observable<Element, std::shared_ptr<typename Observable<Element, ptr_observer<observer<Element>>>::interface>>
 	{
-		typedef ptr_observable<Element, std::shared_ptr<observable<Element, ptr_observer<observer<Element>>>>> base;
+		typedef ptr_observable<Element, std::shared_ptr<typename Observable<Element, ptr_observer<observer<Element>>>::interface>> base;
 
 		template <class Initializer>
 		shared_observable(Initializer &&init)

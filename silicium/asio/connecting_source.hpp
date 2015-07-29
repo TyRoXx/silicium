@@ -22,7 +22,7 @@ namespace Si
 		typedef std::shared_ptr<boost::asio::ip::tcp::socket> connecting_source_socket_ptr;
 		typedef boost::variant<connecting_source_socket_ptr, boost::system::error_code> connecting_source_element_type;
 
-		struct connecting_source : Si::source<connecting_source_element_type>
+		struct connecting_source : Source<connecting_source_element_type>::interface
 		{
 			typedef connecting_source_element_type element_type;
 

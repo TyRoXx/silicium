@@ -9,7 +9,7 @@
 namespace Si
 {
 	template <class Element>
-	struct empty_source SILICIUM_FINAL : source<Element>
+	struct empty_source SILICIUM_FINAL : Source<Element>::interface
 	{
 		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{

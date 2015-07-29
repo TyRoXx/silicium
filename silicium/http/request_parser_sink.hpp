@@ -11,7 +11,7 @@ namespace Si
 	namespace http
 	{
 		template <class Output>
-		struct request_parser_sink : sink<char, typename Output::error_type>
+		struct request_parser_sink : Sink<char, typename Output::error_type>::interface
 		{
 			typedef char element_type;
 			typedef typename Output::error_type error_type;

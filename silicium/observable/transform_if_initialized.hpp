@@ -3,7 +3,7 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
-#include <silicium/config.hpp>
+#include <silicium/optional.hpp>
 #include <cassert>
 #include <stdexcept>
 #include <boost/config.hpp>
@@ -17,14 +17,14 @@ namespace Si
 		typedef Element element_type;
 
 		conditional_transformer()
-			: receiver_(nullptr)
+			: receiver_()
 		{
 		}
 
 		explicit conditional_transformer(Input original, Transformation transform)
 			: original(std::move(original))
 			, transform(std::move(transform))
-			, receiver_(nullptr)
+			, receiver_()
 		{
 		}
 
@@ -50,7 +50,7 @@ namespace Si
 
 		void async_get_one(Observer receiver)
 		{
-			receiver_ = receiver;
+			receiver_ = std::move(receiver);
 			fetch();
 		}
 
@@ -58,7 +58,7 @@ namespace Si
 
 		Input original;
 		Transformation transform; //TODO: optimize for emptiness
-		Observer receiver_;
+		optional<Observer> receiver_;
 
 		SILICIUM_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &))
 		SILICIUM_DELETED_FUNCTION(conditional_transformer &operator = (conditional_transformer const &))
@@ -73,7 +73,7 @@ namespace Si
 			auto converted = transform(std::move(value));
 			if (converted)
 			{
-				std::move(receiver_).got_element(std::move(*converted));
+				std::move(*receiver_).got_element(std::move(*converted));
 			}
 			else
 			{
@@ -83,7 +83,7 @@ namespace Si
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
-			std::move(receiver_).ended();
+			std::move(*receiver_).ended();
 		}
 	};
 

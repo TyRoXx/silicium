@@ -62,13 +62,13 @@ namespace Si
 
 		struct yield
 		{
-			observable<nothing, ptr_observer<observer<nothing>>> *target;
+			Observable<nothing, ptr_observer<observer<nothing>>>::interface *target;
 		};
 
 		template <class Element>
 		struct make_command
 		{
-			typedef Si::variant<result<Element *>, yield> type;
+			typedef variant<result<Element *>, yield> type;
 		};
 
 		template <class Element>
@@ -90,7 +90,7 @@ namespace Si
 				(*consumer)(detail::result<Element *>(&result));
 			}
 
-			virtual void get_one(observable<nothing, ptr_observer<observer<nothing>>> &target) SILICIUM_OVERRIDE
+			virtual void get_one(Observable<nothing, ptr_observer<observer<nothing>>>::interface &target) SILICIUM_OVERRIDE
 			{
 				(*consumer)(detail::yield{&target});
 			}

@@ -12,7 +12,7 @@ namespace Si
 	template <class SourceOfErrorOrs>
 	auto make_throwing_source(SourceOfErrorOrs &&input)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> ptr_source<std::unique_ptr<source<typename std::decay<SourceOfErrorOrs>::type::element_type::value_type>>>
+		-> ptr_source<std::unique_ptr<typename Source<typename std::decay<SourceOfErrorOrs>::type::element_type::value_type>::interface>>
 #endif
 	{
 		return

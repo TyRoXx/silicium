@@ -625,7 +625,7 @@ namespace
 				)
 			)+
 			tag("body",
-				dynamic<min_length<0>>([build_triggered](Si::sink<char, Si::success> &destination)
+				dynamic<min_length<0>>([build_triggered](Si::Sink<char, Si::success>::interface &destination)
 				{
 					if (!build_triggered)
 					{

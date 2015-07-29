@@ -10,7 +10,7 @@
 namespace Si
 {
 	template <class Element>
-	struct memory_source SILICIUM_FINAL : source<Element>
+	struct memory_source SILICIUM_FINAL : Source<Element>::interface
 	{
 		memory_source()
 		{
@@ -44,7 +44,7 @@ namespace Si
 	};
 
 	template <class Element>
-	struct mutable_memory_source SILICIUM_FINAL : source<Element>
+	struct mutable_memory_source SILICIUM_FINAL : Source<Element>::interface
 	{
 		mutable_memory_source()
 		{

@@ -272,7 +272,7 @@ namespace Si
 	{
 	};
 	template <class T>
-	struct is_nothrow_move_constructible : std::has_nothrow_copy_constructor<T>
+	struct is_nothrow_move_constructible : std::is_nothrow_constructible<T, T>
 	{
 	};
 	template <class T>

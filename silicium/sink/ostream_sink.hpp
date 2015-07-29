@@ -74,7 +74,7 @@ namespace Si
 #endif
 	};
 
-	inline std::unique_ptr<sink<char, boost::system::error_code>> make_file_sink(boost::filesystem::path const &name)
+	inline std::unique_ptr<Sink<char, boost::system::error_code>::interface> make_file_sink(boost::filesystem::path const &name)
 	{
 		std::unique_ptr<std::ostream> file(new std::ofstream(name.string(), std::ios::binary));
 		if (!*file)

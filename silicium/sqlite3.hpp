@@ -44,6 +44,7 @@ namespace Si
 #if SQLITE_VERSION_NUMBER > 3007009
 				return sqlite3_errstr(ev);
 #else
+				(void)ev;
 				return "?";
 #endif
 			}

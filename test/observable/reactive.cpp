@@ -77,7 +77,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::observable<int, Si::ptr_observer<Si::observer<int>>>>> first{bridge};
+		Si::ptr_observable<int, std::shared_ptr<Si::Observable<int, Si::ptr_observer<Si::observer<int>>>::interface>> first{bridge};
 		auto buf = Si::make_buffer_observable(first, 2);
 		buf.prefetch();
 
@@ -153,7 +153,7 @@ namespace Si
 		boost::asio::io_service *dispatcher;
 		boost::optional<boost::asio::io_service::work> blocker;
 		Action action;
-		Si::observable<Element, Si::ptr_observer<Si::observer<Element>>> *from;
+		Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface *from;
 
 		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
 			: dispatcher(&dispatcher)
@@ -213,7 +213,7 @@ namespace Si
 	};
 
 	template <class Element>
-	struct connection : observable<Element, ptr_observer<observer<Element>>>
+	struct connection : Observable<Element, ptr_observer<observer<Element>>>::interface
 	{
 		typedef Element element_type;
 

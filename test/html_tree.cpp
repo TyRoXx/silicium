@@ -14,11 +14,11 @@ BOOST_AUTO_TEST_CASE(html_tree)
 			)
 			+
 			tag("body",
-				text("Hello, ") + raw("<b>world</b>") + dynamic<min_length<0>>([](Si::sink<char, Si::success> &destination)
+				text("Hello, ") + raw("<b>world</b>") + dynamic<min_length<0>>([](Si::Sink<char, Si::success>::interface &destination)
 				{
 					Si::html::unpaired_element(destination, "br");
 				})+
-				tag("input", detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
+				tag("input", detail::make_element<min_length<0>>([](Si::Sink<char, Si::success>::interface &destination)
 					{
 						Si::html::add_attribute(destination, "key", "value");
 					}),
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(html_tree_attributes_of_unpaired_tag)
 {
 	using namespace Si::html;
 	auto document =
-		tag("input", detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
+		tag("input", detail::make_element<min_length<0>>([](Si::Sink<char, Si::success>::interface &destination)
 			{
 				Si::html::add_attribute(destination, "key", "value");
 			}),
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(html_tree_attributes)
 {
 	using namespace Si::html;
 	auto document =
-		tag("input", detail::make_element<min_length<0>>([](Si::sink<char, Si::success> &destination)
+		tag("input", detail::make_element<min_length<0>>([](Si::Sink<char, Si::success>::interface &destination)
 			{
 				Si::html::add_attribute(destination, "key", "value");
 			}),
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(html_tree_produces_same_output_as_generator)
 			)
 		) +
 		tag("body",
-			dynamic<min_length<0>>([build_triggered](Si::sink<char, Si::success> &destination)
+			dynamic<min_length<0>>([build_triggered](Si::Sink<char, Si::success>::interface &destination)
 			{
 				if (!build_triggered)
 				{

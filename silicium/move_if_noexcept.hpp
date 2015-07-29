@@ -10,7 +10,7 @@ namespace Si
 	using std::move_if_noexcept;
 #else
 	template <class T, class Result = typename std::conditional<
-		!Si::is_nothrow_move_constructible<T>::value && Si::is_copy_constructible<T>::value,
+		std::is_nothrow_constructible<T, T>::value,
 		const T &,
 		T &&
 	>::type>

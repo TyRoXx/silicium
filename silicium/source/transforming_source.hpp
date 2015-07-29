@@ -9,7 +9,7 @@
 namespace Si
 {
 	template <class From, class Transformation, class To>
-	struct transforming_source SILICIUM_FINAL : source<To>
+	struct transforming_source SILICIUM_FINAL : Source<To>::interface
 	{
 		transforming_source()
 		{

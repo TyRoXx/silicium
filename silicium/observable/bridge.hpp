@@ -10,7 +10,7 @@
 namespace Si
 {
 	template <class Element>
-	struct bridge : observable<Element, ptr_observer<observer<Element>>>, observer<Element>
+	struct bridge : Observable<Element, ptr_observer<observer<Element>>>::interface, observer<Element>
 	{
 		typedef Element element_type;
 

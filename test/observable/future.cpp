@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(virtualize)
 	auto f = Si::virtualize_observable<Si::ptr_observer<Si::observer<int>>>(Si::make_ready_future(42));
 
 	//a virtualized observable implements the observable interface
-	Si::observable<int, Si::ptr_observer<Si::observer<int>>> &v = f;
+	Si::Observable<int, Si::ptr_observer<Si::observer<int>>>::interface &v = f;
 
 	bool got_value = false;
 	auto observer = Si::consume<int>([&got_value](int value)

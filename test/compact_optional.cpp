@@ -204,9 +204,11 @@ namespace Si
 	typedef compact_optional<non_empty_string<noexcept_string>> optional_non_empty_string;
 	BOOST_STATIC_ASSERT(sizeof(optional_non_empty_string) == sizeof(noexcept_string));
 
+#if SILICIUM_COMPILER_HAS_USING
 	template <class Pointee>
 	using optional_ptr = compact_optional<pointer<Pointee>>;
 	BOOST_STATIC_ASSERT(sizeof(optional_ptr<int>) == sizeof(int *));
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(compact_optional_none_equal)
@@ -239,6 +241,7 @@ BOOST_AUTO_TEST_CASE(compact_optional_construct)
 	BOOST_CHECK_EQUAL(a, f);
 }
 
+#if SILICIUM_COMPILER_HAS_USING
 BOOST_AUTO_TEST_CASE(optional_ptr)
 {
 	Si::optional_ptr<long> a, b;
@@ -251,3 +254,4 @@ BOOST_AUTO_TEST_CASE(optional_ptr)
 	**b = 3;
 	BOOST_CHECK_EQUAL(3, pointee);
 }
+#endif

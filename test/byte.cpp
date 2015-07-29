@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE(byte_ostream)
 BOOST_AUTO_TEST_CASE(byte_relational)
 {
 	std::set<Si::byte> s;
-	s.emplace(Si::byte::zero);
-	s.emplace(Si::byte::one);
+	s.insert(Si::byte::zero);
+	s.insert(Si::byte::one);
 	BOOST_CHECK_EQUAL(1u, s.count(Si::byte::zero));
 	BOOST_CHECK_EQUAL(1u, s.count(Si::byte::one));
 	BOOST_CHECK_EQUAL(0u, s.count(Si::byte::maximum));

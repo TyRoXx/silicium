@@ -120,7 +120,7 @@ namespace Si
 		private:
 
 			ErrorOrMemoryRangeObservable m_input;
-			boost::optional<request_parser_sink<ptr_sink<sink<request, success>, sink<request, success> *>>> m_state;
+			boost::optional<request_parser_sink<ptr_sink<Sink<request, success>::interface, Sink<request, success>::interface *>>> m_state;
 			observer<element_type> *m_observer;
 			bool m_got_result;
 
@@ -138,7 +138,7 @@ namespace Si
 				}
 				if (!m_state)
 				{
-					m_state = boost::in_place(ref_sink(static_cast<sink<request, success> &>(*this)));
+					m_state = boost::in_place(ref_sink(static_cast<Sink<request, success>::interface &>(*this)));
 				}
 				m_state->append(piece.get());
 				if (m_got_result)

@@ -36,7 +36,12 @@ namespace
 	{
 		typedef Si::asio::timer_elapsed element_type;
 
-		bool is_element = false;
+		bool is_element;
+
+		test_observer()
+			: is_element(false)
+		{
+		}
 
 		void got_element(Si::asio::timer_elapsed)
 		{

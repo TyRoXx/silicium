@@ -69,7 +69,7 @@ namespace
 		{
 		}
 
-		Si::source<Si::error_or<Si::memory_range>> &receiving()
+		Si::Source<Si::error_or<Si::memory_range>>::interface &receiving()
 		{
 			return receiving_;
 		}
@@ -101,7 +101,7 @@ namespace
 		Si::virtualized_source<Si::observable_source<socket_observable, Si::push_context<Si::nothing>>> receiving_;
 	};
 
-	struct thread_socket_source : Si::source<Si::error_or<Si::memory_range>>
+	struct thread_socket_source : Si::Source<Si::error_or<Si::memory_range>>::interface
 	{
 		typedef Si::error_or<Si::memory_range> element_type;
 
@@ -156,7 +156,7 @@ namespace
 		{
 		}
 
-		Si::source<Si::error_or<Si::memory_range>> &receiving()
+		Si::Source<Si::error_or<Si::memory_range>>::interface &receiving()
 		{
 			return receiving_;
 		}
