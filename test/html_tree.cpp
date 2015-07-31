@@ -31,6 +31,107 @@ BOOST_AUTO_TEST_CASE(html_tree)
 	BOOST_CHECK_EQUAL("<html><head><title>Title</title></head><body>Hello, <b>world</b><br/><input key=\"value\"/></body></html>", generated);
 }
 
+#if !SILICIUM_VC2013
+BOOST_AUTO_TEST_CASE(html_tree_tag_without_attributes_argument)
+{
+	using namespace Si::html;
+	auto document = tag("a", empty);
+	BOOST_CHECK_EQUAL(4u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a/>", generated);
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(html_tree_unpaired_tag)
+{
+	using namespace Si::html;
+	auto no_attributes = detail::make_element<exact_length<0>>([](Si::Sink<char, Si::success>::interface &)
+	{
+	});
+	auto document = tag("a", no_attributes, empty);
+	BOOST_CHECK_EQUAL(4u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a/>", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_paired_empty_tag)
+{
+	using namespace Si::html;
+	auto document = tag("a", dynamic<exact_length<0>>([](Si::Sink<char, Si::success>::interface &) {}));
+	BOOST_CHECK_EQUAL(7u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a></a>", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_tag_sequence_of_tags_0)
+{
+	using namespace Si::html;
+	auto document = sequence();
+	BOOST_CHECK_EQUAL(0u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_tag_sequence_of_tags_1)
+{
+	using namespace Si::html;
+	auto no_attributes = detail::make_element<exact_length<0>>([](Si::Sink<char, Si::success>::interface &)
+	{
+	});
+	auto document = sequence(tag("a", no_attributes, empty));
+	BOOST_CHECK_EQUAL(4u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a/>", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_tag_sequence_of_tags_2)
+{
+	using namespace Si::html;
+	auto no_attributes = detail::make_element<exact_length<0>>([](Si::Sink<char, Si::success>::interface &)
+	{
+	});
+	auto document = sequence(tag("a", no_attributes, empty), tag("b", no_attributes, empty));
+	BOOST_CHECK_EQUAL(8u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a/><b/>", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_tag_sequence_of_tags_3)
+{
+	using namespace Si::html;
+	auto no_attributes = detail::make_element<exact_length<0>>([](Si::Sink<char, Si::success>::interface &)
+	{
+	});
+	auto document = sequence(tag("a", no_attributes, empty), tag("b", no_attributes, empty), tag("c", no_attributes, empty));
+	BOOST_CHECK_EQUAL(12u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a/><b/><c/>", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_tag_sum_of_tags_2)
+{
+	using namespace Si::html;
+	auto no_attributes = detail::make_element<exact_length<0>>([](Si::Sink<char, Si::success>::interface &)
+	{
+	});
+	auto document = tag("a", no_attributes, empty) + tag("b", no_attributes, empty);
+	BOOST_CHECK_EQUAL(8u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a/><b/>", generated);
+}
+
+BOOST_AUTO_TEST_CASE(html_tree_tag_sum_of_tags_3)
+{
+	using namespace Si::html;
+	auto no_attributes = detail::make_element<exact_length<0>>([](Si::Sink<char, Si::success>::interface &)
+	{
+	});
+	auto document = tag("a", no_attributes, empty) + tag("b", no_attributes, empty) + tag("c", no_attributes, empty);
+	BOOST_CHECK_EQUAL(12u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<a/><b/><c/>", generated);
+}
+
 BOOST_AUTO_TEST_CASE(html_tree_attributes_of_unpaired_tag)
 {
 	using namespace Si::html;
