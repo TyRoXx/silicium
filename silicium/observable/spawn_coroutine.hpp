@@ -41,13 +41,13 @@ namespace Si
 		//TODO?
 #endif
 
-		template <class Function, class Clean>
+		template <class Function>
 		auto lambda_to_value_impl(Function &&function, std::false_type)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> decltype(lambda_to_value_impl_lambda_case(std::forward<Function>(function), &typename std::decay<Function>::type::operator()))
+			-> decltype(lambda_to_value_impl_lambda_case(std::forward<Function>(function), &std::decay<Function>::type::operator()))
 #endif
 		{
-			return lambda_to_value_impl_lambda_case(std::forward<Function>(function), &typename std::decay<Function>::type::operator());
+			return lambda_to_value_impl_lambda_case(std::forward<Function>(function), &std::decay<Function>::type::operator());
 		}
 
 		template <class Function>
