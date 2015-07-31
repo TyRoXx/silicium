@@ -2,6 +2,7 @@
 #define SILICIUM_COROUTINE_HPP
 
 #include <silicium/config.hpp>
+#include <silicium/observable/yield_context.hpp>
 
 #define SILICIUM_HAS_COROUTINE_OBSERVABLE ((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT)
 
@@ -10,7 +11,6 @@
 #include <silicium/exchange.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
-#include <silicium/observable/yield_context.hpp>
 #include <algorithm>
 #include <boost/asio/io_service.hpp>
 #include <boost/coroutine/all.hpp>

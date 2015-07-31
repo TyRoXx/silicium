@@ -199,7 +199,6 @@ namespace Si
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 			template <class ...Args>
-			SILICIUM_DEPRECATED
 			void operator()(Args &&...args)
 			{
 				element(std::forward<Args>(args)...);
