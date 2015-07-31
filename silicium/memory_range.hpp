@@ -23,17 +23,18 @@ namespace Si
 		typedef typename boost::mpl::if_<boost::is_const<From>, boost::add_const<To>, boost::remove_const<To>>::type::type type;
 	};
 
-	template <class Byte, class DestType = typename copy_const<char, Byte>::type>
+	template <class Byte>
 	auto make_memory_range(Byte *begin, Byte *end)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> iterator_range<DestType *>
+		-> iterator_range<typename copy_const<char, Byte>::type *>
 #endif
 	{
 		BOOST_STATIC_ASSERT(sizeof(Byte) == 1);
 		BOOST_STATIC_ASSERT(std::is_pod<Byte>::value);
+		typedef typename copy_const<char, Byte>::type destination;
 		return make_iterator_range(
-			reinterpret_cast<DestType *>(begin),
-			reinterpret_cast<DestType *>(end)
+			reinterpret_cast<destination *>(begin),
+			reinterpret_cast<destination *>(end)
 		);
 	}
 

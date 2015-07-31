@@ -21,9 +21,11 @@
 #endif
 
 #ifdef _MSC_VER
+#	define SILICIUM_VC2012 (_MSC_VER == 1700)
 #	define SILICIUM_VC2013 (_MSC_VER == 1800)
 #	define SILICIUM_VC2015 (_MSC_VER == 1900)
 #else
+#	define SILICIUM_VC2012 0
 #	define SILICIUM_VC2013 0
 #	define SILICIUM_VC2015 0
 #endif
@@ -47,6 +49,8 @@
 #else
 #	define SILICIUM_HAS_EXCEPTIONS 1
 #endif
+
+#define SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES !SILICIUM_VC2012
 
 #if defined(NDEBUG) || !SILICIUM_HAS_EXCEPTIONS
 #	ifdef _MSC_VER
@@ -101,13 +105,13 @@
 #	define SILICIUM_CAPTURE_EXPRESSION(name, value) name
 #endif
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && (__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
 #	define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 1
 #else
 #	define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 0
 #endif
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1800))
 #	define SILICIUM_COMPILER_HAS_USING 1
 #else
 #	define SILICIUM_COMPILER_HAS_USING 0
@@ -183,11 +187,13 @@ namespace Si
 		return true;
 	}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 	template <class T, class ...Args>
 	auto make_unique(Args &&...args) -> std::unique_ptr<T>
 	{
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
+#endif
 
 	template <class To, class From>
 	To function_ptr_cast(From from)

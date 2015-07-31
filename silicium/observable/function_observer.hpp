@@ -66,7 +66,14 @@ namespace Si
 
 	private:
 
-		typedef typename detail::proper_value_function<Function, void, typename detail::argument_of<Function>::type>::type function_holder;
+#if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
+		typedef typename detail::proper_value_function<
+			Function,
+			void,
+			typename detail::argument_of<Function>::type>::type function_holder;
+#else
+		typedef Function function_holder;
+#endif
 
 		function_holder m_function;
 	};

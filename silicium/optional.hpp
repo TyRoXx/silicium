@@ -86,12 +86,14 @@ namespace Si
 			new (data()) T(value);
 		}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class ...Args>
 		explicit optional(some_t, Args &&...args)
 			: m_is_set(true)
 		{
 			new (data()) T(std::forward<Args>(args)...);
 		}
+#endif
 
 		~optional() BOOST_NOEXCEPT
 		{
@@ -198,10 +200,7 @@ namespace Si
 			return *this;
 		}
 
-		explicit operator bool() const BOOST_NOEXCEPT
-		{
-			return m_is_set;
-		}
+		SILICIUM_EXPLICIT_OPERATOR_BOOL()
 
 		SILICIUM_USE_RESULT
 		bool operator !() const BOOST_NOEXCEPT
@@ -258,6 +257,7 @@ namespace Si
 			return data();
 		}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class ...Args>
 		void emplace(Args &&...args)
 		{
@@ -265,6 +265,7 @@ namespace Si
 			new (data()) T{std::forward<Args>(args)...};
 			m_is_set = true;
 		}
+#endif
 
 	private:
 
@@ -498,6 +499,7 @@ namespace Si
 		return none;
 	}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 	namespace detail
 	{
 		inline bool all_of()
@@ -526,6 +528,7 @@ namespace Si
 		}
 		return none;
 	}
+#endif
 }
 
 namespace std

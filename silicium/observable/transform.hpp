@@ -10,8 +10,11 @@
 #include <functional>
 #include <boost/config.hpp>
 
+#define SILICIUM_HAS_TRANSFORM_OBSERVABLE SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+
 namespace Si
 {
+#if SILICIUM_HAS_TRANSFORM_OBSERVABLE
 	template <class Transform, class Original>
 	struct transformation
 		: private observer<typename Original::element_type>
@@ -71,13 +74,17 @@ namespace Si
 
 	private:
 
+#if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
 		typedef typename detail::proper_value_function<
 			Transform,
 			element_type,
 			from_type
 		>::type proper_transform;
-
 		proper_transform transform; //TODO empty base optimization
+#else
+		Transform transform;
+#endif
+
 		Original original;
 		observer<element_type> *receiver;
 
@@ -171,6 +178,7 @@ namespace Si
 				std::forward<Original>(original)
 			);
 	}
+#endif
 }
 
 #endif

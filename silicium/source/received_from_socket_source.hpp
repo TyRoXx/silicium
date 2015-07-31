@@ -38,12 +38,12 @@ namespace Si
 				auto next = Si::get(*original);
 				if (!next)
 				{
-					return {};
+					return iterator_range<char const *>{};
 				}
 				auto bytes = detail::strip_error(*next);
 				if (!bytes)
 				{
-					return {};
+					return iterator_range<char const *>{};
 				}
 				rest = *bytes;
 			}

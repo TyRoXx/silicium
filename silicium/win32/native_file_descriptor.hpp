@@ -7,7 +7,7 @@
 
 namespace Si
 {
-	using native_file_descriptor = HANDLE;
+	typedef HANDLE native_file_descriptor;
 
 	native_file_descriptor const no_file_handle = INVALID_HANDLE_VALUE;
 

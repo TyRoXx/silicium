@@ -7,8 +7,10 @@
 #include <memory>
 #include <cassert>
 
+#define SILICIUM_HAS_FUNCTION SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 namespace Si
 {
+#if SILICIUM_HAS_FUNCTION
 	template <class Signature>
 	struct function;
 
@@ -95,6 +97,7 @@ namespace Si
 	};
 
 	BOOST_STATIC_ASSERT(is_handle<function<void ()>>::value);
+#endif
 }
 
 #endif

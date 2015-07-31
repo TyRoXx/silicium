@@ -33,11 +33,11 @@ namespace Si
 		{
 		}
 
-		template <class Observable, class Gotten = typename std::decay<Observable>::type::element_type>
-		boost::optional<Gotten> get_one(Observable &&from) const
+		template <class Observable>
+		boost::optional<typename std::decay<Observable>::type::element_type> get_one(Observable &&from) const
 		{
-			boost::optional<Gotten> result;
-			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result](Gotten element)
+			boost::optional<typename std::decay<Observable>::type::element_type> result;
+			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result](typename std::decay<Observable>::type::element_type element)
 			{
 				assert(!result);
 				result = std::move(element);
@@ -47,11 +47,11 @@ namespace Si
 			return result;
 		}
 
-		template <class Observable, class Gotten = typename std::decay<Observable>::type::element_type>
-		bool get_one(Observable &&from, Gotten &result) const
+		template <class Observable>
+		bool get_one(Observable &&from, typename std::decay<Observable>::type::element_type &result) const
 		{
 			bool got_result = false;
-			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result, &got_result](Gotten element)
+			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result, &got_result](typename std::decay<Observable>::type::element_type element)
 			{
 				result = std::move(element);
 				got_result = true;
