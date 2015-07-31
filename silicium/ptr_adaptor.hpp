@@ -12,11 +12,19 @@ namespace Si
 	template <class Pointee>
 	struct ptr_adaptor
 	{
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class ...Args>
 		explicit ptr_adaptor(Args &&...args)
 			: m_value(std::forward<Args>(args)...)
 		{
 		}
+#else
+		template <class Arg>
+		explicit ptr_adaptor(Arg &&arg)
+			: m_value(std::forward<Arg>(arg))
+		{
+		}
+#endif
 
 		Pointee &operator *() BOOST_NOEXCEPT
 		{

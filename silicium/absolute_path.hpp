@@ -317,7 +317,7 @@ namespace Si
 		{
 			return error;
 		}
-		for (; i != boost::filesystem::directory_iterator{}; )
+		for (; i != boost::filesystem::directory_iterator(); )
 		{
 			boost::filesystem::remove_all(i->path(), error);
 			if (!!error)

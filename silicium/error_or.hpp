@@ -60,8 +60,8 @@ namespace Si
 #endif
 		}
 
-		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
-		error_or(ConvertibleToValue &&value) BOOST_NOEXCEPT
+		template <class ConvertibleToValue>
+		error_or(ConvertibleToValue &&value, typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type * = nullptr) BOOST_NOEXCEPT
 			: code(0)
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
 			, value_(std::forward<ConvertibleToValue>(value))
@@ -298,8 +298,8 @@ namespace Si
 			return get() == other.get();
 		}
 
-		template <class ConvertibleToValue, class = typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type>
-		bool equals(ConvertibleToValue const &right) const
+		template <class ConvertibleToValue>
+		typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, bool>::type equals(ConvertibleToValue const &right) const
 		{
 			if (is_error())
 			{
@@ -373,8 +373,8 @@ namespace Si
 		return left.equals(right);
 	}
 
-	template <class Anything, class Value, class Error, class = typename std::enable_if<!is_error_or<Anything>::value, void>::type>
-	bool operator == (Anything const &left, error_or<Value, Error> const &right)
+	template <class Anything, class Value, class Error>
+	typename std::enable_if<!is_error_or<Anything>::value, bool>::type operator == (Anything const &left, error_or<Value, Error> const &right)
 	{
 		return right.equals(left);
 	}
@@ -458,9 +458,11 @@ namespace Si
 		}
 	}
 
-	template <class ErrorOr, class OnValue, class CleanErrorOr = typename std::decay<ErrorOr>::type, class = typename std::enable_if<is_error_or<CleanErrorOr>::value, void>::type>
+	template <class ErrorOr, class OnValue>
 	auto map(ErrorOr &&maybe, OnValue &&on_value)
-		-> error_or<decltype(std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get()))>
+		-> typename std::enable_if<is_error_or<typename std::decay<ErrorOr>::type>::value,
+			error_or<decltype(std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get()))>
+		>::type
 	{
 		if (maybe.is_error())
 		{

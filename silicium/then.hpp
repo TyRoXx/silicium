@@ -4,8 +4,11 @@
 #include <utility>
 #include <type_traits>
 
+#define SILICIUM_HAS_THEN SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+
 namespace Si
 {
+#if SILICIUM_HAS_THEN
 	namespace detail
 	{
 		template <class T>
@@ -71,6 +74,7 @@ namespace Si
 		typedef decltype(std::forward<First>(first)()) result_type;
 		return detail::then_impl<result_type>()(std::forward<First>(first), std::forward<Sequence>(actions)...);
 	}
+#endif
 }
 
 #endif

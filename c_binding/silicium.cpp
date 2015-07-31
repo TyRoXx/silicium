@@ -42,11 +42,19 @@ struct silicium_observable : Si::Observable<void *, Si::ptr_observer<Si::observe
 #if SILICIUM_HAS_COROUTINE_OBSERVABLE
 struct silicium_coroutine : silicium_observable
 {
+#if SILICIUM_VC2012
+	template <class Arg>
+	explicit silicium_coroutine(Arg &&arg)
+		: m_coroutine(std::forward<Arg>(arg))
+	{
+	}
+#else
 	template <class ...Args>
 	explicit silicium_coroutine(Args &&...args)
 		: m_coroutine(std::forward<Args>(args)...)
 	{
 	}
+#endif
 
 	virtual void async_get_one(Si::ptr_observer<Si::observer<void *>> observer) SILICIUM_OVERRIDE
 	{
@@ -103,7 +111,7 @@ void silicium_async_get_one(silicium_observable *observable, silicium_observer_f
 extern "C"
 void silicium_free_observable(silicium_observable *observable)
 {
-	std::unique_ptr<silicium_observable>{observable};
+	std::unique_ptr<silicium_observable> destroyed(observable);
 }
 
 void *silicium_yield_get_one(silicium_yield_context *yield, silicium_observable *from)

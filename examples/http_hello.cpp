@@ -87,7 +87,7 @@ namespace
 			)
 		);
 
-		return {};
+		return boost::system::error_code();
 	}
 }
 #endif

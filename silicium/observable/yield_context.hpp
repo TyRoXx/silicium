@@ -6,8 +6,11 @@
 #include <silicium/observable/ref.hpp>
 #include <boost/optional.hpp>
 
+#define SILICIUM_HAS_YIELD_CONTEXT SILICIUM_HAS_TRANSFORM_OBSERVABLE
+
 namespace Si
 {
+#if SILICIUM_HAS_YIELD_CONTEXT
 	namespace detail
 	{
 		struct basic_yield_context
@@ -79,6 +82,7 @@ namespace Si
 			return static_cast<detail::push_context_impl<Element> *>(impl)->push_result(std::move(result));
 		}
 	};
+#endif
 }
 
 #endif

@@ -1,6 +1,8 @@
 #include <silicium/function.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_FUNCTION
+
 BOOST_AUTO_TEST_CASE(function_default_constructor)
 {
 	Si::function<void ()> f;
@@ -20,3 +22,5 @@ BOOST_AUTO_TEST_CASE(function_call)
 	BOOST_CHECK_EQUAL(3, inc(2));
 	BOOST_CHECK(inc);
 }
+
+#endif

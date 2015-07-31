@@ -2,11 +2,13 @@
 #define SILICIUM_ASIO_USE_OBSERVABLE_HPP
 
 #include <boost/version.hpp>
+#include <silicium/variant.hpp>
 
-#if BOOST_VERSION >= 105400
+#define SILICIUM_HAS_USE_OBSERVABLE (SILICIUM_HAS_VARIANT && (BOOST_VERSION >= 105400))
+
+#if SILICIUM_HAS_USE_OBSERVABLE
 #include <silicium/observable/ptr.hpp>
 #include <silicium/observable/erased_observer.hpp>
-#include <silicium/fast_variant.hpp>
 #include <silicium/error_or.hpp>
 #include <algorithm>
 #include <boost/asio/async_result.hpp>

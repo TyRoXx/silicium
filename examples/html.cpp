@@ -5,6 +5,7 @@
 
 int main()
 {
+#if SILICIUM_HAS_HTML_TREE
 	using namespace Si::html;
 	auto document =
 		tag("html",
@@ -26,4 +27,7 @@ int main()
 	document.generate(sink);
 	std::cout.write(generated.data(), generated.size());
 	std::cout << '\n';
+#else
+	std::cerr << "This example requires a more recent compiler\n";
+#endif
 }

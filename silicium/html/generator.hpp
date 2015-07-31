@@ -197,11 +197,14 @@ namespace Si
 				unpaired_element(m_out, name);
 			}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 			template <class ...Args>
+			SILICIUM_DEPRECATED
 			void operator()(Args &&...args)
 			{
 				element(std::forward<Args>(args)...);
 			}
+#endif
 
 			template <class StringLike>
 			void element_with_text(name_type const &name, StringLike const &text)

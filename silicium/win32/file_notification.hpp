@@ -10,10 +10,11 @@ namespace Si
 	{
 		struct file_notification
 		{
-			DWORD action = 0;
+			DWORD action;
 			relative_path name;
 
 			file_notification()
+				: action(0)
 			{
 			}
 

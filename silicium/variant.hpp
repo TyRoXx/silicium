@@ -15,8 +15,11 @@
 #include <boost/optional.hpp>
 #include <boost/type_traits.hpp>
 
+#define SILICIUM_HAS_VARIANT SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+
 namespace Si
 {
+#if SILICIUM_HAS_VARIANT
 	template <class Visitor, class Variant>
 	auto apply_visitor(Visitor &&visitor, Variant &&variant) -> typename std::decay<Visitor>::type::result_type
 	{
@@ -818,8 +821,10 @@ namespace Si
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
+#endif
 }
 
+#if SILICIUM_HAS_VARIANT
 namespace std
 {
 	template <class ...T>
@@ -839,5 +844,6 @@ BOOST_STATIC_ASSERT(sizeof(Si::variant<boost::uint32_t>) == (2 * sizeof(boost::u
 BOOST_STATIC_ASSERT(sizeof(Si::variant<int *>) == (sizeof(boost::uint32_t) + sizeof(int *)));
 
 BOOST_STATIC_ASSERT(sizeof(Si::variant<std::hash<Si::variant<int>>>) == sizeof(boost::uint32_t));
+#endif
 
 #endif

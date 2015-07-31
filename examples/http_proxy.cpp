@@ -10,7 +10,9 @@
 #include <iostream>
 #include <boost/algorithm/string/predicate.hpp>
 
-#if SILICIUM_HAS_SPAWN_COROUTINE
+#define SILICIUM_EXAMPLE_IS_AVAILABLE (SILICIUM_HAS_SPAWN_COROUTINE && SILICIUM_HAS_TRANSFORM_OBSERVABLE)
+
+#if SILICIUM_EXAMPLE_IS_AVAILABLE
 namespace
 {
 	template <class YieldContext>
@@ -106,7 +108,7 @@ namespace
 int main()
 {
 	boost::asio::io_service io;
-#if SILICIUM_HAS_SPAWN_COROUTINE
+#if SILICIUM_EXAMPLE_IS_AVAILABLE
 	boost::system::error_code ec = spawn_server(io);
 	if (ec)
 	{

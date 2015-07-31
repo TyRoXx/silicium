@@ -67,7 +67,7 @@ namespace Si
 	inline error_or<pipe> make_pipe() BOOST_NOEXCEPT
 	{
 #ifdef _WIN32
-		SECURITY_ATTRIBUTES security{};
+		SECURITY_ATTRIBUTES security = {};
 		security.nLength = sizeof(security);
 		security.bInheritHandle = TRUE;
 		HANDLE read, write;

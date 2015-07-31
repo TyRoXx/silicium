@@ -7,7 +7,7 @@
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/test/unit_test.hpp>
 
-#if BOOST_VERSION >= 105400 && SILICIUM_HAS_SPAWN_COROUTINE
+#if SILICIUM_HAS_USE_OBSERVABLE && SILICIUM_HAS_SPAWN_COROUTINE
 
 #include <boost/filesystem/operations.hpp>
 

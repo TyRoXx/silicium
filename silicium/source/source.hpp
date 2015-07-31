@@ -41,7 +41,7 @@ namespace Si
 		return container.empty() ? nullptr : &container[0];
 	}
 
-	template <class Source, class Sequence = std::vector<typename Source::element_type>>
+	template <class Sequence, class Source>
 	auto take(Source &from, std::size_t count) -> Sequence
 	{
 		Sequence taken;

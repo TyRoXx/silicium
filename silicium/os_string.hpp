@@ -96,7 +96,7 @@ namespace Si
 		if (str.empty())
 		{
 			//because WideCharToMultiByte fails for empty input
-			return {};
+			return std::string();
 		}
 		if (str.length() > static_cast<size_t>((std::numeric_limits<int>::max)()))
 		{

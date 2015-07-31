@@ -15,12 +15,14 @@ namespace Si
 			assert(!*this);
 		}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class ...Args>
 		compact_optional(some_t, Args &&...args)
 			: m_storage(std::forward<Args>(args)...)
 		{
 			assert(*this);
 		}
+#endif
 
 		compact_optional(none_t)
 			: m_storage(Policy::get_none())

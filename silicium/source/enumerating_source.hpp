@@ -4,27 +4,16 @@
 #include <silicium/source/source.hpp>
 #include <silicium/exchange.hpp>
 #include <algorithm>
+#include <iterator>
 #include <boost/concept_check.hpp>
+#include <boost/range/value_type.hpp>
 
 namespace Si
 {
-	namespace detail
-	{
-		template <class Range>
-		struct value_type
-		{
-			typedef typename std::iterator_traits<
-				typename std::decay<
-					decltype(std::declval<Range>().begin())
-				>::type
-			>::value_type type;
-		};
-	}
-
 	template <class RangeSource>
-	struct enumerating_source : Source<typename detail::value_type<typename RangeSource::element_type>::type>::interface
+	struct enumerating_source : Source<typename boost::range_value<typename RangeSource::element_type>::type>::interface
 	{
-		typedef typename detail::value_type<typename RangeSource::element_type>::type element_type;
+		typedef typename boost::range_value<typename RangeSource::element_type>::type element_type;
 		typedef typename RangeSource::element_type range_type;
 
 		enumerating_source()

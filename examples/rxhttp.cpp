@@ -119,7 +119,7 @@ namespace
 		virtual Si::iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			(void)size;
-			return {};
+			return Si::iterator_range<element_type const *>();
 		}
 
 		virtual element_type *copy_next(Si::iterator_range<element_type *> destination) SILICIUM_OVERRIDE

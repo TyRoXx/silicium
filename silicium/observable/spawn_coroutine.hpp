@@ -28,6 +28,7 @@ namespace Si
 			return std::forward<Function>(function);
 		}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class Function, class Result, class Class, class ...Arguments>
 		auto lambda_to_value_impl_lambda_case(Function &&function, Result(Class::*)(Arguments...) const)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
@@ -36,14 +37,17 @@ namespace Si
 		{
 			return std::function<Result(Arguments...)>(std::forward<Function>(function));
 		}
+#else
+		//TODO?
+#endif
 
-		template <class Function, class Clean = typename std::decay<Function>::type>
+		template <class Function, class Clean>
 		auto lambda_to_value_impl(Function &&function, std::false_type)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> decltype(lambda_to_value_impl_lambda_case(std::forward<Function>(function), &Clean::operator()))
+			-> decltype(lambda_to_value_impl_lambda_case(std::forward<Function>(function), &typename std::decay<Function>::type::operator()))
 #endif
 		{
-			return lambda_to_value_impl_lambda_case(std::forward<Function>(function), &Clean::operator());
+			return lambda_to_value_impl_lambda_case(std::forward<Function>(function), &typename std::decay<Function>::type::operator());
 		}
 
 		template <class Function>

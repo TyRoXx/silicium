@@ -32,7 +32,7 @@ namespace Si
 		typedef std::mutex mutex;
 		typedef std::condition_variable condition_variable;
 		typedef std::unique_lock<std::mutex> unique_lock;
-#if SILICIUM_HAS_EXCEPTIONS
+#if SILICIUM_HAS_EXCEPTIONS && SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class Action, class ...Args>
 		static auto launch_async(Action &&action, Args &&...args) -> std::future<decltype(action(std::forward<Args>(args)...))>
 		{

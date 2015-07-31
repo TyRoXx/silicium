@@ -15,12 +15,13 @@ namespace Si
 	{
 		struct overlapped_directory_changes
 		{
-			using element_type = std::vector<file_notification>;
+			typedef std::vector<file_notification> element_type;
 
 			overlapped_directory_changes()
 				: is_recursive(false)
 				, io(nullptr)
 				, receiver_(nullptr)
+				, received(0)
 			{
 			}
 
@@ -28,6 +29,7 @@ namespace Si
 				: is_recursive(std::move(other.is_recursive))
 				, io(other.io)
 				, receiver_(other.receiver_)
+				, received(0)
 				, watch_file(std::move(other.watch_file))
 			{
 			}
@@ -36,6 +38,7 @@ namespace Si
 				: is_recursive(is_recursive)
 				, io(&io)
 				, receiver_(nullptr)
+				, received(0)
 				, watch_file(CreateFileW(
 					watched.c_str(),
 					FILE_LIST_DIRECTORY,
@@ -127,8 +130,8 @@ namespace Si
 
 			bool is_recursive;
 			boost::asio::io_service *io;
-			observer<element_type> *receiver_ = nullptr;
-			DWORD received = 0;
+			observer<element_type> *receiver_;
+			DWORD received;
 			std::array<char, 0x10000> buffer;
 			Si::win32::unique_handle watch_file;
 

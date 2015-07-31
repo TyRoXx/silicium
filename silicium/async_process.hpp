@@ -152,11 +152,11 @@ namespace Si
 		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
 		win32::winapi_string command_line = detail::build_command_line(all_arguments);
 
-		SECURITY_ATTRIBUTES security{};
+		SECURITY_ATTRIBUTES security = {};
 		security.nLength = sizeof(security);
 		security.bInheritHandle = TRUE;
 
-		STARTUPINFOW startup{};
+		STARTUPINFOW startup = {};
 		startup.cb = sizeof(startup);
 		startup.dwFlags |= STARTF_USESTDHANDLES;
 		startup.hStdError = standard_error;
@@ -172,7 +172,11 @@ namespace Si
 			//@environment will contain pointers into this block of memory:
 			std::vector<os_char> mutable_parent_variables;
 
-			switch (inheritance)
+			switch (
+#if SILICIUM_VC2012
+				static_cast<int>
+#endif
+				(inheritance))
 			{
 			case environment_inheritance::inherit:
 				{

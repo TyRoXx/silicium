@@ -177,13 +177,13 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(coroutine_observable &operator = (coroutine_observable const &))
 	};
 
-	template <class Action, class Element = decltype(std::declval<Action>()(std::declval<yield_context>()))>
+	template <class Action>
 	auto make_coroutine(Action &&action)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> coroutine_observable<Element>
+		-> coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>
 #endif
 	{
-		return coroutine_observable<Element>(std::forward<Action>(action));
+		return coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>(std::forward<Action>(action));
 	}
 }
 

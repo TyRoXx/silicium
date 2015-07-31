@@ -5,10 +5,13 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/trait.hpp>
 
+#define SILICIUM_HAS_HTML_TREE SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+
 namespace Si
 {
 	namespace html
 	{
+#if SILICIUM_HAS_HTML_TREE
 		template <std::size_t Length>
 		struct exact_length : std::integral_constant<std::size_t, Length>
 		{
@@ -299,6 +302,7 @@ namespace Si
 			tree.generate(sink);
 			return generated;
 		}
+#endif
 	}
 }
 

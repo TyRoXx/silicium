@@ -75,13 +75,21 @@ namespace Si
 			SILICIUM_DELETED_FUNCTION(timer &operator = (timer const &))
 		};
 
-		template <class AsioTimer = boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>
+		template <class AsioTimer>
 		auto make_timer(boost::asio::io_service &io)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			-> timer<AsioTimer>
 #endif
 		{
 			return timer<AsioTimer>(io);
+		}
+
+		inline auto make_timer(boost::asio::io_service &io)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> timer<boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>
+#endif
+		{
+			return timer<boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>(io);
 		}
 	}
 }
