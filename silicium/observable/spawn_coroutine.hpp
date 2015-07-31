@@ -38,6 +38,24 @@ namespace Si
 			return std::function<Result(Arguments...)>(std::forward<Function>(function));
 		}
 #else
+		template <class Function, class Result, class Class>
+		auto lambda_to_value_impl_lambda_case(Function &&function, Result(Class::*)() const)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> std::function<Result()>
+#endif
+		{
+			return std::function<Result()>(std::forward<Function>(function));
+		}
+
+		template <class Function, class Result, class Class, class A0>
+		auto lambda_to_value_impl_lambda_case(Function &&function, Result(Class::*)(A0) const)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			-> std::function<Result(A0)>
+#endif
+		{
+			return std::function<Result(A0)>(std::forward<Function>(function));
+		}
+
 		//TODO?
 #endif
 

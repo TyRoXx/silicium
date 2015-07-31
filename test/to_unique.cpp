@@ -19,9 +19,9 @@ struct derived : base
 
 BOOST_AUTO_TEST_CASE(to_unique_explicit_pointee)
 {
-	std::unique_ptr<derived> p = Si::to_unique(derived{});
+	std::unique_ptr<derived> p = Si::to_unique(derived());
 	BOOST_REQUIRE(p);
 
-	std::unique_ptr<base> q = Si::to_unique<base>(derived{});
+	std::unique_ptr<base> q = Si::to_unique<base>(derived());
 	BOOST_REQUIRE(q);
 }

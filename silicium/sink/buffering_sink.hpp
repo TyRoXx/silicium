@@ -5,8 +5,11 @@
 #include <silicium/then.hpp>
 #include <array>
 
+#define SILICIUM_HAS_BUFFERING_SINK SILICIUM_HAS_THEN
+
 namespace Si
 {
+#if SILICIUM_HAS_BUFFERING_SINK
 	template <
 		class Next,
 		class Error = typename Next::error_type,
@@ -85,6 +88,7 @@ namespace Si
 	{
 		return buffering_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
 	}
+#endif
 }
 
 #endif

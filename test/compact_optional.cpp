@@ -22,6 +22,19 @@ namespace Si
 		{
 			assert(*this);
 		}
+#else
+		compact_optional(some_t)
+			: m_storage()
+		{
+			assert(*this);
+		}
+
+		template <class A0>
+		compact_optional(some_t, A0 &&a0)
+			: m_storage(std::forward<A0>(a0))
+		{
+			assert(*this);
+		}
 #endif
 
 		compact_optional(none_t)
@@ -177,7 +190,7 @@ namespace Si
 		}
 		static value_type get_none()
 		{
-			return {};
+			return value_type();
 		}
 	};
 

@@ -70,7 +70,7 @@ struct throws_on_copy_construction
 		}
 	}
 
-	throws_on_copy_construction &operator = (throws_on_copy_construction const &) = delete;
+	SILICIUM_DELETED_FUNCTION(throws_on_copy_construction &operator = (throws_on_copy_construction const &))
 };
 
 BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_value_throws)

@@ -2,6 +2,8 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_HTML_TREE
+
 BOOST_AUTO_TEST_CASE(html_tree)
 {
 	using namespace Si::html;
@@ -270,3 +272,5 @@ BOOST_AUTO_TEST_CASE(html_tree_produces_same_output_as_generator)
 
 	BOOST_CHECK(old_style_generated == new_style_generated);
 }
+
+#endif

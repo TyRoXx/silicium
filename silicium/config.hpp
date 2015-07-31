@@ -7,6 +7,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
+#include <boost/static_assert.hpp>
 
 #if defined(__GNUC__)
 #	define SILICIUM_GCC ((__GNUC__ * 100) + __GNUC_MINOR__)
@@ -198,6 +199,12 @@ namespace Si
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 #else
+	template <class T>
+	std::unique_ptr<T> make_unique()
+	{
+		return std::unique_ptr<T>(new T());
+	}
+
 	template <class T, class A0>
 	std::unique_ptr<T> make_unique(A0 &&a0)
 	{
@@ -332,6 +339,13 @@ namespace Si
 	{
 	};
 #endif
+	BOOST_STATIC_ASSERT(is_default_constructible<int>::value);
+	BOOST_STATIC_ASSERT(is_nothrow_default_constructible<int>::value);
+	BOOST_STATIC_ASSERT(is_nothrow_move_constructible<int>::value);
+	BOOST_STATIC_ASSERT(is_nothrow_move_assignable<int>::value);
+	BOOST_STATIC_ASSERT(is_nothrow_destructible<int>::value);
+	BOOST_STATIC_ASSERT(is_move_assignable<int>::value);
+	BOOST_STATIC_ASSERT(is_move_constructible<int>::value);
 
 #if BOOST_VERSION <= 105400
 #	if defined(_MSC_VER) && (_MSC_VER < 1900)

@@ -7,8 +7,11 @@
 #include <silicium/observable/ptr.hpp>
 #include <silicium/observable/erase_unique.hpp>
 
+#define SILICIUM_HAS_FOR_EACH_OBSERVABLE SILICIUM_HAS_TRANSFORM_OBSERVABLE
+
 namespace Si
 {
+#if SILICIUM_HAS_FOR_EACH_OBSERVABLE
 	template <class Input, class Handler>
 	auto for_each(Input &&input, Handler &&handle_element)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
@@ -30,9 +33,10 @@ namespace Si
 			(transform(std::forward<Input>(input), [handle_element_capture](element value) -> nothing
 		{
 			handle_element_capture(std::move(value));
-			return {};
+			return nothing();
 		})));
 	}
+#endif
 }
 
 #endif

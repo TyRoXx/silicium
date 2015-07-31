@@ -51,7 +51,13 @@ namespace Si
 
 	private:
 
-		typedef typename detail::proper_value_function<Generator, typename std::result_of<Generator ()>::type>::type proper_generator;
+		typedef
+#if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
+			typename detail::proper_value_function<Generator, typename std::result_of<Generator ()>::type>::type
+#else
+			Generator
+#endif
+			proper_generator;
 
 		proper_generator generate;
 	};

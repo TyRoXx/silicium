@@ -1,13 +1,13 @@
 #ifndef SILICIUM_REACTIVE_COROUTINE_GENERATOR_HPP
 #define SILICIUM_REACTIVE_COROUTINE_GENERATOR_HPP
 
-#include <boost/version.hpp>
+#include <silicium/config.hpp>
+#include <silicium/variant.hpp>
 
-#define SILICIUM_HAS_COROUTINE_GENERATOR ((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS)
+#define SILICIUM_HAS_COROUTINE_GENERATOR ((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_VARIANT)
 
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>
-#include <silicium/fast_variant.hpp>
 #ifdef _WIN32
 //win32.hpp will include Asio before coroutine will include Windows stuff
 //because Asio wants to be first.

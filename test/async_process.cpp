@@ -8,6 +8,7 @@
 #include <silicium/std_threading.hpp>
 #include <silicium/environment_variables.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/assign/list_of.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #	include <boost/filesystem/operations.hpp>
@@ -67,7 +68,7 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 	parameters.arguments.emplace_back("which");
 	parameters.current_path = Si::get_current_working_directory();
 
-	process_output result = run_process(parameters, {}, Si::environment_inheritance::inherit);
+	process_output result = run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::inherit);
 
 	BOOST_CHECK_EQUAL("/usr/bin/which\n", result.output);
 	BOOST_CHECK_EQUAL("", result.error);
@@ -82,7 +83,7 @@ BOOST_AUTO_TEST_CASE(async_process_win32_where)
 	parameters.executable = *Si::absolute_path::create(L"C:\\Windows\\System32\\where.exe");
 	parameters.current_path = Si::get_current_working_directory();
 
-	process_output result = run_process(parameters, {}, Si::environment_inheritance::no_inherit);
+	process_output result = run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::no_inherit);
 
 	std::size_t const windows7whereHelpSize = 1830;
 	BOOST_CHECK_EQUAL(windows7whereHelpSize, result.output.size());
@@ -109,7 +110,7 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 	parameters.executable = arbitrary_root_dir / "does-not-exist";
 	parameters.current_path = Si::get_current_working_directory();
 
-	BOOST_CHECK_EXCEPTION(run_process(parameters, {}, Si::environment_inheritance::no_inherit), boost::system::system_error, [](boost::system::system_error const &ex)
+	BOOST_CHECK_EXCEPTION(run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::no_inherit), boost::system::system_error, [](boost::system::system_error const &ex)
 	{
 		return ex.code() == boost::system::errc::no_such_file_or_directory;
 	});
@@ -163,10 +164,9 @@ namespace
 
 namespace
 {
-	std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const additional_variables
-	{
-		{SILICIUM_SYSTEM_LITERAL("key"), SILICIUM_SYSTEM_LITERAL("value")}
-	};
+	std::vector<std::pair<Si::os_char const *, Si::os_char const *>> const additional_variables = boost::assign::list_of(
+		std::make_pair(SILICIUM_SYSTEM_LITERAL("key"), SILICIUM_SYSTEM_LITERAL("value"))
+	);
 }
 
 BOOST_AUTO_TEST_CASE(async_process_environment_variables_inherit_additional_vars)

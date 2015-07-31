@@ -29,11 +29,13 @@ namespace Si
 			return *this;
 		}
 
+#if !SILICIUM_VC2012
 		vector(std::initializer_list<Element> elements)
 			//Boost 1.56 is missing the initializer_list ctor
 			: m_impl(elements.begin(), elements.end())
 		{
 		}
+#endif
 
 		SILICIUM_DISABLE_COPY(vector)
 	public:
@@ -83,11 +85,13 @@ namespace Si
 			return m_impl.end();
 		}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class ...Args>
 		void emplace_back(Args &&...args)
 		{
 			m_impl.emplace_back(std::forward<Args>(args)...);
 		}
+#endif
 
 	private:
 

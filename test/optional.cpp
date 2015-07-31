@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(optional_less)
 
 BOOST_AUTO_TEST_CASE(optional_movable_only)
 {
-	Si::optional<std::unique_ptr<int>> f{Si::make_unique<int>(5)};
+	Si::optional<std::unique_ptr<int>> f = Si::make_unique<int>(5);
 	BOOST_CHECK(f);
 	f = std::move(f);
 	BOOST_CHECK(f);
@@ -190,6 +190,7 @@ BOOST_AUTO_TEST_CASE(optional_reference)
 	BOOST_CHECK_EQUAL(ref, container.front());
 }
 
+#if SILICIUM_HAS_VARIADIC_FMAP
 BOOST_AUTO_TEST_CASE(optional_variadic_fmap_zero)
 {
 	BOOST_CHECK_EQUAL(Si::optional<int>(23), Si::variadic_fmap([]() { return 23; }));
@@ -219,3 +220,4 @@ BOOST_AUTO_TEST_CASE(optional_variadic_fmap_two_neither)
 {
 	BOOST_CHECK_EQUAL(Si::optional<long>(), Si::variadic_fmap([](int, long) { BOOST_FAIL("unreachable"); return 0L; }, Si::optional<int>(), Si::optional<long>()));
 }
+#endif

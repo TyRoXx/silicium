@@ -11,6 +11,7 @@
 #include <silicium/error_or.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/utility/in_place_factory.hpp>
+#include <boost/assign/list_of.hpp>
 
 namespace Si
 {
@@ -27,10 +28,7 @@ namespace Si
 		BOOST_CHECK_EQUAL("GET", parsed->method);
 		BOOST_CHECK_EQUAL("/", parsed->path);
 		BOOST_CHECK_EQUAL("HTTP/1.0", parsed->http_version);
-		std::map<noexcept_string, noexcept_string> const expected_arguments
-		{
-			{"Key", "Value"}
-		};
+		std::map<noexcept_string, noexcept_string> const expected_arguments = boost::assign::list_of(std::make_pair("Key", "Value"));
 		BOOST_CHECK(expected_arguments == parsed->arguments);
 	}
 
@@ -65,6 +63,7 @@ namespace Si
 		a = b;
 	}
 
+#if SILICIUM_HAS_VARIANT
 	BOOST_AUTO_TEST_CASE(response_header_compatible_with_variant)
 	{
 		variant<http::response> v;
@@ -73,6 +72,7 @@ namespace Si
 		auto u = std::move(w);
 		u = v;
 	}
+#endif
 
 	BOOST_AUTO_TEST_CASE(http_request_parser_sink)
 	{

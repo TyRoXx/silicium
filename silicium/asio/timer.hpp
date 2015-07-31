@@ -63,7 +63,7 @@ namespace Si
 						assert(error == boost::asio::error::operation_aborted); //TODO: remove this assumption
 						return;
 					}
-					std::forward<Observer>(receiver).got_element(timer_elapsed{});
+					std::forward<Observer>(receiver).got_element(timer_elapsed());
 				});
 			}
 

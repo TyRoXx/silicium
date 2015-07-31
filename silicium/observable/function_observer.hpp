@@ -17,6 +17,11 @@ namespace Si
 		{
 			typename std::decay<Element>::type *value;
 
+			explicit optional_maker(typename std::decay<Element>::type *value)
+				: value(value)
+			{
+			}
+
 			template <class T>
 			operator boost::optional<T>() const
 			{
@@ -56,7 +61,7 @@ namespace Si
 		template <class Element>
 		void got_element(Element &&element)
 		{
-			m_function(detail::optional_maker<Element>{&element});
+			m_function(detail::optional_maker<Element>(&element));
 		}
 
 		void ended()

@@ -9,7 +9,9 @@
 #include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 
-#if SILICIUM_HAS_SPAWN_COROUTINE
+#define SILICIUM_THIS_EXAMPLE_AVAILABLE (SILICIUM_HAS_SPAWN_COROUTINE && SILICIUM_HAS_TRANSFORM_OBSERVABLE)
+
+#if SILICIUM_THIS_EXAMPLE_AVAILABLE
 namespace
 {
 	template <class YieldContext>
@@ -95,7 +97,7 @@ namespace
 int main()
 {
 	boost::asio::io_service io;
-#if SILICIUM_HAS_SPAWN_COROUTINE
+#if SILICIUM_THIS_EXAMPLE_AVAILABLE
 	boost::system::error_code ec = spawn_server(io);
 	if (ec)
 	{

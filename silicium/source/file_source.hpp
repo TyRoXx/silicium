@@ -32,13 +32,13 @@ namespace Si
 			error_or<std::size_t> read_result = read(file, read_buffer);
 			if (read_result.is_error())
 			{
-				return file_read_result{read_result.error()};
+				return file_read_result(read_result.error());
 			}
 			else if (read_result.get() == 0)
 			{
 				return none;
 			}
-			return file_read_result{make_memory_range(read_buffer.begin(), read_buffer.begin() + read_result.get())};
+			return file_read_result(make_memory_range(read_buffer.begin(), read_buffer.begin() + read_result.get()));
 		}));
 	}
 }

@@ -101,7 +101,7 @@ namespace Si
 		{
 			assert(m_destination);
 			m_destination->insert(m_destination->end(), data.begin(), data.end());
-			return {};
+			return success();
 		}
 
 	private:

@@ -18,7 +18,7 @@ struct test_producer
 
 BOOST_AUTO_TEST_CASE(trivial_trait)
 {
-	std::unique_ptr<Producer::interface> p = Si::to_unique(Producer::erase(test_producer{}));
+	std::unique_ptr<Producer::interface> p = Si::to_unique(Producer::erase(test_producer()));
 	BOOST_REQUIRE(p);
 	BOOST_CHECK_EQUAL(42, p->get());
 }
@@ -35,7 +35,7 @@ SILICIUM_TRAIT(
 
 BOOST_AUTO_TEST_CASE(templatized_trait)
 {
-	auto container = Container<int>::erase(std::vector<int>{});
+	auto container = Container<int>::erase(std::vector<int>());
 	container.emplace_back(123);
 	{
 		std::vector<int> const expected{123};

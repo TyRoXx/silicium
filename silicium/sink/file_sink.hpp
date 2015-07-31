@@ -14,8 +14,11 @@
 #	include <sys/uio.h>
 #endif
 
+#define SILICIUM_HAS_FILE_SINK SILICIUM_HAS_VARIANT
+
 namespace Si
 {
+#if SILICIUM_HAS_FILE_SINK
 	struct seek_set
 	{
 		boost::uint64_t from_beginning;
@@ -233,6 +236,8 @@ namespace Si
 		}
 #endif
 	};
+
+#endif
 }
 
 #endif

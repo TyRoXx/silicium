@@ -46,7 +46,7 @@ namespace Si
 		auto std_output = make_pipe().move_value();
 		auto std_error = make_pipe().move_value();
 		async_process process =
-			launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle, {}, environment_inheritance::inherit).move_value();
+			launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle, std::vector<std::pair<os_char const *, os_char const *>>(), environment_inheritance::inherit).move_value();
 
 		boost::asio::io_service io;
 

@@ -69,7 +69,13 @@ namespace Si
 
 	private:
 
-		typedef typename detail::proper_value_function<Generator, Si::optional<Element>>::type proper_generator;
+		typedef
+#if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
+			typename detail::proper_value_function<Generator, Si::optional<Element>>::type
+#else
+			Generator
+#endif
+			proper_generator;
 
 		proper_generator m_generate_next;
 	};
@@ -80,7 +86,7 @@ namespace Si
 		-> generator_source<typename std::decay<Generator>::type>
 #endif
 	{
-		return generator_source<typename std::decay<Generator>::type>{std::forward<Generator>(generate_next)};
+		return generator_source<typename std::decay<Generator>::type>(std::forward<Generator>(generate_next));
 	}
 
 	template <class OneShotGenerator>

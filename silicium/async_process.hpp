@@ -256,7 +256,7 @@ namespace Si
 			environment_block.emplace_back(L'\0');
 		}
 
-		PROCESS_INFORMATION process{};
+		PROCESS_INFORMATION process = {};
 		if (!CreateProcessW(
 			parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE,
 			flags, environment_block.empty() ? NULL : environment_block.data(),

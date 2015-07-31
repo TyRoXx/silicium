@@ -95,7 +95,7 @@ namespace Si
 				converted_pair.first = p->key;
 				if (p->value)
 				{
-					converted_pair.second.emplace(p->value);
+					converted_pair.second = p->value;
 				}
 				converted_pairs.emplace_back(std::move(converted_pair));
 			}

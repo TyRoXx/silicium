@@ -29,7 +29,13 @@ namespace Si
 
 	private:
 
-		typedef typename detail::proper_value_function<AsyncGetOne, void, ptr_observer<observer<element_type>>>::type proper_get;
+		typedef
+#if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
+			typename detail::proper_value_function<AsyncGetOne, void, ptr_observer<observer<element_type>>>::type
+#else
+			AsyncGetOne
+#endif
+			proper_get;
 
 		proper_get get;
 	};

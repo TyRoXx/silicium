@@ -5,8 +5,11 @@
 #include <silicium/c_string.hpp>
 #include <silicium/sink/file_sink.hpp>
 
+#define SILICIUM_HAS_WRITE_FILE SILICIUM_HAS_FILE_SINK
+
 namespace Si
 {
+#if SILICIUM_HAS_WRITE_FILE
 	SILICIUM_USE_RESULT
 	inline boost::system::error_code write_file(native_path_string name, memory_range data)
 	{
@@ -18,6 +21,7 @@ namespace Si
 		Si::file_sink sink(file.get().handle);
 		return Si::append(sink, Si::file_sink_element{data});
 	}
+#endif
 }
 
 #endif

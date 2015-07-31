@@ -210,7 +210,7 @@ namespace Si
 			{
 				return Error(code, *category);
 			}
-			return {};
+			return Error();
 		}
 
 		void throw_if_error() const

@@ -7,6 +7,7 @@
 #include <boost/test/unit_test.hpp>
 #include <unordered_set>
 
+#if SILICIUM_HAS_VARIANT
 namespace Si
 {
 #ifdef _MSC_VER
@@ -538,3 +539,4 @@ namespace Si
 		}
 	}
 }
+#endif

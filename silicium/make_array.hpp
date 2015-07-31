@@ -5,8 +5,11 @@
 #include <silicium/identity.hpp>
 #include <array>
 
+#define SILICIUM_HAS_MAKE_ARRAY SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+
 namespace Si
 {
+#if SILICIUM_HAS_MAKE_ARRAY
 	template <class Element = void, class ...T>
 	auto make_array(T &&...elements)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
@@ -31,6 +34,7 @@ namespace Si
 		}};
 		return result;
 	}
+#endif
 }
 
 #endif

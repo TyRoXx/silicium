@@ -1,6 +1,8 @@
 #include <silicium/make_array.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_MAKE_ARRAY
+
 BOOST_AUTO_TEST_CASE(make_array_inferred_type)
 {
 	{
@@ -56,3 +58,5 @@ BOOST_AUTO_TEST_CASE(make_array_explicit_type)
 		BOOST_CHECK_EQUAL(0u, f.size());
 	}
 }
+
+#endif

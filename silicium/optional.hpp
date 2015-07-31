@@ -93,6 +93,19 @@ namespace Si
 		{
 			new (data()) T(std::forward<Args>(args)...);
 		}
+#else
+		explicit optional(some_t)
+			: m_is_set(true)
+		{
+			new (data()) T();
+		}
+
+		template <class A0>
+		explicit optional(some_t, A0 &&a0)
+			: m_is_set(true)
+		{
+			new (data()) T(std::forward<A0>(a0));
+		}
 #endif
 
 		~optional() BOOST_NOEXCEPT
@@ -263,6 +276,21 @@ namespace Si
 		{
 			*this = none;
 			new (data()) T{std::forward<Args>(args)...};
+			m_is_set = true;
+		}
+#else
+		void emplace()
+		{
+			*this = none;
+			new (data()) T{};
+			m_is_set = true;
+		}
+
+		template <class A0>
+		void emplace(A0 &&a0)
+		{
+			*this = none;
+			new (data()) T{std::forward<A0>(a0)};
 			m_is_set = true;
 		}
 #endif
@@ -499,7 +527,9 @@ namespace Si
 		return none;
 	}
 
-#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+#define SILICIUM_HAS_VARIADIC_FMAP SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+
+#if SILICIUM_HAS_VARIADIC_FMAP
 	namespace detail
 	{
 		inline bool all_of()

@@ -21,6 +21,7 @@ BOOST_AUTO_TEST_CASE(file_size_empty)
 	BOOST_CHECK_EQUAL(Si::make_optional<boost::uintmax_t>(0), Si::file_size(handle.handle).get());
 }
 
+#if SILICIUM_HAS_FILE_SINK
 BOOST_AUTO_TEST_CASE(file_size_non_empty)
 {
 	auto const file = test_root() / "file_size_non_empty.txt";
@@ -31,6 +32,7 @@ BOOST_AUTO_TEST_CASE(file_size_non_empty)
 	}
 	BOOST_CHECK_EQUAL(Si::make_optional<boost::uintmax_t>(4), Si::file_size(handle.handle).get());
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(file_size_error)
 {

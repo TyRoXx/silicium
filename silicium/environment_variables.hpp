@@ -23,7 +23,7 @@ namespace Si
 			return get_last_error();
 		}
 #endif
-		return{};
+		return boost::system::error_code();
 	}
 }
 
