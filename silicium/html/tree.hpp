@@ -53,6 +53,14 @@ namespace Si
 			{
 				typedef Length length_type;
 				ContentGenerator generate;
+
+#if SILICIUM_VC2013
+				//workaround against superfluous warnings C4510 and C4610 ("constructor cannot be generated")
+				explicit element(ContentGenerator generate)
+					: generate(std::move(generate))
+				{
+				}
+#endif
 			};
 
 			template <class Length, class ContentGenerator>
@@ -172,7 +180,7 @@ namespace Si
 		{
 			return tag(name, detail::make_element<exact_length<0>>(&detail::no_attributes), std::forward<Element>(content));
 		}
-
+		
 		namespace detail
 		{
 			static BOOST_CONSTEXPR_OR_CONST std::size_t space = 1;

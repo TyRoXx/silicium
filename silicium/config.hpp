@@ -21,6 +21,14 @@
 #endif
 
 #ifdef _MSC_VER
+#	define SILICIUM_VC2013 (_MSC_VER == 1800)
+#	define SILICIUM_VC2015 (_MSC_VER == 1900)
+#else
+#	define SILICIUM_VC2013 0
+#	define SILICIUM_VC2015 0
+#endif
+
+#ifdef _MSC_VER
 #	define SILICIUM_COMPILER_CXX11 1
 #	define SILICIUM_COMPILER_CXX14 1
 #elif __cplusplus > 201103L
