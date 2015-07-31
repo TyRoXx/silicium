@@ -230,6 +230,12 @@ namespace Si
 			inline void no_content(Sink<char, success>::interface &)
 			{
 			}
+
+			template <class T>
+			struct identity
+			{
+				typedef T type;
+			};
 		}
 
 		auto sequence()
@@ -243,21 +249,21 @@ namespace Si
 		template <class Head, class ...Tail>
 		auto sequence(Head &&head, Tail &&...tail)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> detail::element<std::function<void(Sink<char, success>::interface &)>, min_length<0>>
+			-> detail::element<std::function<void(Sink<char, success>::interface &)>,
+				typename detail::concatenate<
+					typename std::decay<Head>::type::length_type,
+					typename detail::identity<decltype(sequence(std::forward<Tail>(tail)...))>::type::length_type
+				>::type>
 #endif
 		{
 			auto tail_elements = sequence(std::forward<Tail>(tail)...);
 			auto &generate_head = head.generate;
 			auto &generate_tail_elements = tail_elements.generate;
 			return detail::make_element<
-#if SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 				typename detail::concatenate<
 					typename std::decay<Head>::type::length_type,
 					typename decltype(tail_elements)::length_type
 				>::type
-#else
-				min_length<0>
-#endif
 			>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 				std::function<void(Sink<char, success>::interface &)>
