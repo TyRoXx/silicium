@@ -2,6 +2,7 @@
 #include <silicium/sink/buffering_sink.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_BUFFERING_SINK
 BOOST_AUTO_TEST_CASE(buffering_sink_append)
 {
 	std::vector<int> v;
@@ -29,3 +30,4 @@ BOOST_AUTO_TEST_CASE(buffering_sink_make_append_space)
 	std::vector<int> const expected{3};
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), v.begin(), v.end());
 }
+#endif

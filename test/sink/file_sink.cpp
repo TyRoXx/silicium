@@ -19,7 +19,7 @@ namespace
 	}
 }
 
-#if SILICIUM_HAS_EXCEPTIONS //for Boost filesystem
+#if SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_FILE_SINK //for Boost filesystem
 BOOST_AUTO_TEST_CASE(file_sink_success)
 {
 	boost::filesystem::path const file_name = boost::filesystem::temp_directory_path() / "silicium_file_sink_success.txt";
@@ -69,6 +69,7 @@ namespace
 	}
 }
 
+#if SILICIUM_HAS_FILE_SINK
 BOOST_AUTO_TEST_CASE(file_sink_error)
 {
 	auto file = get(Si::open_reading(Si::native_path_string(get_readonly_file().c_str())));
@@ -123,4 +124,5 @@ BOOST_AUTO_TEST_CASE(file_sink_writev)
 
 	writer.get();
 }
+#endif
 #endif

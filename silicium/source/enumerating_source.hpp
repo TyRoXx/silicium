@@ -50,7 +50,7 @@ namespace Si
 			auto element = Si::get(m_input);
 			if (!element)
 			{
-				return {};
+				return iterator_range<element_type const *>();
 			}
 			return iterator_range<element_type const *>(element->begin(), element->end());
 		}

@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 }
 #endif
 
-#if defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#if defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_RUN_PROCESS
 BOOST_AUTO_TEST_CASE(async_process_win32_where)
 {
 	Si::async_process_parameters parameters;
@@ -103,7 +103,7 @@ namespace
 	);
 }
 
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_RUN_PROCESS
 BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 {
 	Si::async_process_parameters parameters;
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 }
 #endif
 
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_RUN_PROCESS
 namespace
 {
 	void test_environment_variables(
@@ -181,11 +181,11 @@ BOOST_AUTO_TEST_CASE(async_process_environment_variables_no_inherit_additional_v
 
 BOOST_AUTO_TEST_CASE(async_process_environment_variables_inherit)
 {
-	test_environment_variables(Si::environment_inheritance::inherit, {});
+	test_environment_variables(Si::environment_inheritance::inherit, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>());
 }
 
 BOOST_AUTO_TEST_CASE(async_process_environment_variables_no_inherit)
 {
-	test_environment_variables(Si::environment_inheritance::no_inherit, {});
+	test_environment_variables(Si::environment_inheritance::no_inherit, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>());
 }
 #endif

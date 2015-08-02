@@ -30,7 +30,7 @@ namespace Si
 					return error;
 				}
 			}
-			return {};
+			return error_type();
 		}
 
 	private:

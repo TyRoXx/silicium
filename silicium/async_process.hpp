@@ -408,7 +408,9 @@ namespace Si
 
 #endif
 
-#ifdef _WIN32
+#define SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE (SILICIUM_HAS_THREAD_OBSERVABLE && SILICIUM_HAS_BUFFERING_SINK)
+
+#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE && defined(_WIN32)
 	namespace win32
 	{
 		template <class ByteSink>
@@ -472,8 +474,6 @@ namespace Si
 #endif
 	namespace experimental
 	{
-#define SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE SILICIUM_HAS_THREAD_OBSERVABLE
-
 #if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
 		//TODO: find a more generic API for reading from a pipe portably
 		template <class CharSink>

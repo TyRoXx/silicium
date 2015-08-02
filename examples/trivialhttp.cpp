@@ -26,7 +26,7 @@ int main()
 				std::array<char, 1024> receive_buffer;
 				boost::system::error_code ec;
 				client->read_some(boost::asio::buffer(receive_buffer), ec);
-				if (ec)
+				if (!!ec)
 				{
 					return;
 				}
@@ -55,7 +55,7 @@ int main()
 				std::array<char, 1024> receive_buffer;
 				boost::system::error_code ec;
 				client->receive(boost::asio::buffer(receive_buffer), 0, ec);
-				if (ec)
+				if (!!ec)
 				{
 					break;
 				}

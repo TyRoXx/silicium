@@ -25,6 +25,7 @@ BOOST_AUTO_TEST_CASE(transform)
 }
 #endif
 
+#if SILICIUM_HAS_TRANSFORM_OBSERVABLE
 namespace
 {
 	template <class Void>
@@ -72,3 +73,4 @@ BOOST_AUTO_TEST_CASE(transform_void_const_volatile)
 {
 	test_transform_void<void const volatile>();
 }
+#endif

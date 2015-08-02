@@ -27,6 +27,7 @@ BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 	BOOST_CHECK_EQUAL(original, std::string(decompressed.begin(), decompressed.begin() + decompressed_length));
 }
 
+#if SILICIUM_HAS_DEFLATING_SINK
 BOOST_AUTO_TEST_CASE(zlib_deflating_sink_test)
 {
 	std::vector<char> compressed;
@@ -35,3 +36,4 @@ BOOST_AUTO_TEST_CASE(zlib_deflating_sink_test)
 	Si::append(compressor, Si::zlib_sink_element{Si::flush{}});
 	BOOST_CHECK_GE(compressed.size(), 1u);
 }
+#endif

@@ -1,5 +1,6 @@
 #include <silicium/vector.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/assign/list_of.hpp>
 
 #if BOOST_VERSION >= 105000
 BOOST_AUTO_TEST_CASE(vector_default_constructor)
@@ -10,7 +11,7 @@ BOOST_AUTO_TEST_CASE(vector_default_constructor)
 BOOST_AUTO_TEST_CASE(vector_move_constructor)
 {
 	Si::vector<int> v;
-	Si::vector<int> w{std::move(v)};
+	Si::vector<int> w(std::move(v));
 }
 
 BOOST_AUTO_TEST_CASE(vector_move_assignment)
@@ -29,7 +30,7 @@ BOOST_AUTO_TEST_CASE(vector_emplace_back)
 
 BOOST_AUTO_TEST_CASE(vector_copy)
 {
-	Si::vector<int> v{1, 2, 3};
+	Si::vector<int> v = boost::assign::list_of(1)(2)(3);
 	Si::vector<int> w = v.copy();
 	BOOST_CHECK_EQUAL(3u, w.size());
 	BOOST_CHECK(v == w);
@@ -37,7 +38,7 @@ BOOST_AUTO_TEST_CASE(vector_copy)
 
 BOOST_AUTO_TEST_CASE(vector_for)
 {
-	Si::vector<int> v{1, 2, 3};
+	Si::vector<int> v = boost::assign::list_of(1)(2)(3);
 	int expected = 1;
 	for (int &e : v)
 	{

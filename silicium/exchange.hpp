@@ -4,6 +4,7 @@
 #include <silicium/move_if_noexcept.hpp>
 #include <utility>
 #include <boost/config.hpp>
+#include <boost/concept_check.hpp>
 
 namespace Si
 {
@@ -12,7 +13,20 @@ namespace Si
 		template <class T, class U>
 		T exchange_impl(T &dest, U &&source, std::true_type)
 		{
-			auto old = Si::move_if_noexcept(dest);
+			auto old =
+#if SILICIUM_HAS_MOVE_IF_NOEXCEPT
+				Si::move_if_noexcept
+#else
+				//This is not exception safe, but at least we do not break
+				//exchange for unique_ptr on ancient compilers.
+				std::move
+#endif
+				(dest)
+				;
+#if SILICIUM_VC2012
+			//silence a wrong "unreferenced parameter" warning
+			boost::ignore_unused_variable_warning(source);
+#endif
 			dest = std::forward<U>(source);
 			return old;
 		}
@@ -33,7 +47,7 @@ namespace Si
 			dest,
 			std::forward<U>(source),
 			std::integral_constant<bool,
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 				true
 #else
 				BOOST_NOEXCEPT_EXPR(dest = std::forward<U>(source))

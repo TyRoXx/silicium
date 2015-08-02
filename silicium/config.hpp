@@ -8,6 +8,8 @@
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/type_traits/is_copy_assignable.hpp>
+#include <boost/type_traits/is_copy_constructible.hpp>
 
 #if defined(__GNUC__)
 #	define SILICIUM_GCC ((__GNUC__ * 100) + __GNUC_MINOR__)
@@ -198,7 +200,7 @@ namespace Si
 	{
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
-#else
+#else // SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 	template <class T>
 	std::unique_ptr<T> make_unique()
 	{
@@ -216,9 +218,9 @@ namespace Si
 	{
 		return std::unique_ptr<T>(new T(std::forward<A0>(a0), std::forward<A1>(a1)));
 	}
-#endif
+#endif // SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 
-#endif
+#endif // defined(_MSC_VER) && (_MSC_VER >= 1800)
 
 	template <class To, class From>
 	To function_ptr_cast(From from)
@@ -232,62 +234,35 @@ namespace Si
 		return result;
 	}
 
+#define SILICIUM_HAS_COPY_TRAITS !SILICIUM_VC2012
+
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 }
 #include <type_traits>
 namespace Si
 {
+	BOOST_STATIC_ASSERT(SILICIUM_HAS_COPY_TRAITS);
 	using std::is_copy_constructible;
 	using std::is_copy_assignable;
 #elif BOOST_VERSION >= 105500 //1.55
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 }
+#endif
+
 #include <boost/type_traits/is_copy_constructible.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #	include <future>
-#endif
+#endif // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
 
 namespace Si
 {
-	using boost::is_copy_constructible;
-#if SILICIUM_HAS_EXCEPTIONS
-	template <class T>
-	struct is_copy_constructible<std::future<T>> : std::false_type
-	{
-	};
-#endif
-	template <class T>
-	struct is_copy_assignable : std::true_type
-	{
-	};
-#if SILICIUM_HAS_EXCEPTIONS
-	template <class T>
-	struct is_copy_assignable<std::future<T>> : std::false_type
-	{
-	};
-#endif
-	template <class T, class D>
-	struct is_copy_assignable<std::unique_ptr<T, D>> : std::false_type
-	{
-	};
-#else
-#define SILICIUM_HAS_PROPER_COPY_TRAITS 0
-	template <class T>
-	struct is_copy_constructible : std::true_type
-	{
-	};
-	template <class T>
-	struct is_copy_assignable : std::true_type
-	{
-	};
-#endif
-
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
 }
 #include <type_traits>
+#include <boost/type_traits/is_nothrow_move_assignable.hpp>
 namespace Si
 {
 	using std::is_default_constructible;
@@ -295,9 +270,22 @@ namespace Si
 	using std::is_move_constructible;
 	using std::is_nothrow_default_constructible;
 	using std::is_nothrow_move_constructible;
+#if SILICIUM_VC2012
+	template <class T>
+	struct is_nothrow_move_assignable : std::integral_constant<bool, std::is_pod<T>::value || std::has_nothrow_copy_assign<T>::value>
+	{
+	};
+#else // SILICIUM_VC2012
 	using std::is_nothrow_move_assignable;
+#endif // SILICIUM_VC2012
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1800)
+	BOOST_STATIC_ASSERT(SILICIUM_HAS_COPY_TRAITS);
+	using std::is_copy_assignable;
+	using std::is_copy_constructible;
+#endif // defined(_MSC_VER) && (_MSC_VER >= 1800)
 	using std::is_nothrow_destructible;
-#else
+#else // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
 	template <class T>
 	struct is_default_constructible : std::conditional<
 		std::is_reference<T>::value,
@@ -318,10 +306,12 @@ namespace Si
 	struct is_nothrow_move_assignable : std::has_nothrow_copy_assign<T>
 	{
 	};
+#if 0
 	template <class T>
 	struct is_nothrow_destructible : std::true_type
 	{
 	};
+#endif
 	template <class T>
 	struct is_move_assignable : std::integral_constant<bool, __has_nothrow_assign(T)>
 	{
@@ -338,7 +328,8 @@ namespace Si
 	struct is_move_constructible<std::unique_ptr<T>> : std::true_type
 	{
 	};
-#endif
+#endif // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+
 	BOOST_STATIC_ASSERT(is_default_constructible<int>::value);
 	BOOST_STATIC_ASSERT(is_nothrow_default_constructible<int>::value);
 	BOOST_STATIC_ASSERT(is_nothrow_move_constructible<int>::value);
@@ -346,6 +337,24 @@ namespace Si
 	BOOST_STATIC_ASSERT(is_nothrow_destructible<int>::value);
 	BOOST_STATIC_ASSERT(is_move_assignable<int>::value);
 	BOOST_STATIC_ASSERT(is_move_constructible<int>::value);
+#if SILICIUM_HAS_COPY_TRAITS
+	BOOST_STATIC_ASSERT(is_copy_constructible<int>::value);
+	BOOST_STATIC_ASSERT(is_copy_assignable<int>::value);
+#endif
+
+	BOOST_STATIC_ASSERT(is_default_constructible<std::unique_ptr<int>>::value);
+#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
+	BOOST_STATIC_ASSERT(is_nothrow_default_constructible<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(is_nothrow_move_constructible<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(is_nothrow_move_assignable<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(is_nothrow_destructible<std::unique_ptr<int>>::value);
+#endif
+	BOOST_STATIC_ASSERT(is_move_assignable<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(is_move_constructible<std::unique_ptr<int>>::value);
+#if SILICIUM_HAS_COPY_TRAITS
+	BOOST_STATIC_ASSERT(!is_copy_constructible<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(!is_copy_assignable<std::unique_ptr<int>>::value);
+#endif
 
 #if BOOST_VERSION <= 105400
 #	if defined(_MSC_VER) && (_MSC_VER < 1900)

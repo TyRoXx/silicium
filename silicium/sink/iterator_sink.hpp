@@ -54,7 +54,7 @@ namespace Si
 		success append(iterator_range<Element const *> data)
 		{
 			m_out = boost::range::copy(data, m_out);
-			return {};
+			return success();
 		}
 
 		OutputIterator &position()

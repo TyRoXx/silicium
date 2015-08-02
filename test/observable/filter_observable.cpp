@@ -5,6 +5,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/concept_check.hpp>
 
+#if SILICIUM_HAS_FOR_EACH_OBSERVABLE
 BOOST_AUTO_TEST_CASE(filter_true)
 {
 	Si::bridge<int> input;
@@ -42,3 +43,4 @@ BOOST_AUTO_TEST_CASE(filter_false)
 	all.start();
 	input.got_element(3);
 }
+#endif

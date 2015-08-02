@@ -7,9 +7,15 @@ compilers
 =========
 
 * GCC 4.8 (older versions may work)
-* Visual C++ 2015
-    * broken at the moment due to template/decltype bugs: Visual C++ 2013 Update 3
+* Visual C++ 2012
+    * but many features require 2013 or even 2015
 * recent versions of Clang will probably work, too
+
+Regularly tested configurations at the moment:
+* GCC 4.8 on Ubuntu 14.04 with Boost 1.54
+* Visual C++ 2015 with Boost 1.59
+
+There will be CI eventually to ensure compatibility with all supported compilers.
 
 dependencies
 ============
@@ -75,6 +81,7 @@ nice to have
 * reduce sizeof(fast_variant&lt;T&gt;) to sizeof(T)
 * reduce sizeof(fast_variant&lt;char&gt;) to (sizeof(char) * 2)
 * move everything HTTP into a separate library
+* do not #include <boost/concept_check.hpp> just to get boost::ignore_unused_variable_warning
 
 probably outside of scope
 -------------------------

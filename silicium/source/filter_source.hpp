@@ -49,7 +49,13 @@ namespace Si
 
 	private:
 
-		typedef typename detail::proper_value_function<Predicate, bool, element_type const &>::type proper_predicate;
+		typedef
+#if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
+			typename detail::proper_value_function<Predicate, bool, element_type const &>::type
+#else
+			Predicate
+#endif
+			proper_predicate;
 
 		Input input;
 		proper_predicate is_propagated;

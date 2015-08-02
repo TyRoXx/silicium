@@ -4,7 +4,7 @@
 #include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
 #include <silicium/iterator_range.hpp>
-#include <boost/optional.hpp>
+#include <silicium/optional.hpp>
 
 namespace Si
 {
@@ -25,11 +25,13 @@ namespace Si
 
 		zlib_inflate_stream(zlib_inflate_stream &&other) BOOST_NOEXCEPT
 		{
+			using std::swap;
 			swap(m_stream, other.m_stream);
 		}
 
 		zlib_inflate_stream &operator = (zlib_inflate_stream &&other) BOOST_NOEXCEPT
 		{
+			using std::swap;
 			swap(m_stream, other.m_stream);
 			return *this;
 		}
@@ -66,7 +68,7 @@ namespace Si
 
 	private:
 
-		boost::optional<z_stream> m_stream;
+		optional<z_stream> m_stream;
 
 		explicit zlib_inflate_stream(z_stream stream) BOOST_NOEXCEPT
 			: m_stream(stream)

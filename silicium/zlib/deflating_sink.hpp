@@ -1,13 +1,15 @@
 #ifndef SILICIUM_ZLIB_DEFLATING_SINK_HPP
 #define SILICIUM_ZLIB_DEFLATING_SINK_HPP
 
-#include <silicium/fast_variant.hpp>
+#include <silicium/variant.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/zlib/zlib.hpp>
+#include <silicium/optional.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
-#include <boost/optional.hpp>
+
+#define SILICIUM_HAS_DEFLATING_SINK SILICIUM_HAS_VARIANT
 
 namespace Si
 {
@@ -27,11 +29,13 @@ namespace Si
 
 		zlib_deflate_stream(zlib_deflate_stream &&other) BOOST_NOEXCEPT
 		{
+			using std::swap;
 			swap(m_stream, other.m_stream);
 		}
 
 		zlib_deflate_stream &operator = (zlib_deflate_stream &&other) BOOST_NOEXCEPT
 		{
+			using std::swap;
 			swap(m_stream, other.m_stream);
 			return *this;
 		}
@@ -68,12 +72,13 @@ namespace Si
 
 	private:
 
-		boost::optional<z_stream> m_stream;
+		optional<z_stream> m_stream;
 
 		SILICIUM_DELETED_FUNCTION(zlib_deflate_stream(zlib_deflate_stream const &))
 		SILICIUM_DELETED_FUNCTION(zlib_deflate_stream &operator = (zlib_deflate_stream const &))
 	};
 
+#if SILICIUM_HAS_DEFLATING_SINK
 	typedef variant<flush, memory_range> zlib_sink_element;
 
 	template <class Next>
@@ -148,6 +153,7 @@ namespace Si
 	{
 		return zlib_deflating_sink<typename std::decay<Next>::type>(std::forward<Next>(next), std::move(stream));
 	}
+#endif
 }
 
 #endif

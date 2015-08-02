@@ -2,6 +2,7 @@
 #include <silicium/http/uri.hpp>
 #include <silicium/memory_range.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/assign/list_of.hpp>
 #include <boost/optional/optional_io.hpp>
 
 namespace
@@ -31,10 +32,7 @@ BOOST_AUTO_TEST_CASE(uri_parse_http)
 	BOOST_CHECK_EQUAL("http", to_string(parsed->scheme));
 	BOOST_CHECK_EQUAL("k=0", to_string(parsed->query));
 	BOOST_CHECK_EQUAL("h", to_string(parsed->fragment));
-	std::vector<std::string> const expected_path
-	{
-		"a", "b"
-	};
+	std::vector<std::string> const expected_path = boost::assign::list_of("a")("b");
 	std::vector<std::string> const parsed_path = map(parsed->path, to_string);
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected_path.begin(), expected_path.end(), parsed_path.begin(), parsed_path.end());
 }
@@ -52,12 +50,11 @@ BOOST_AUTO_TEST_CASE(uri_parse_html_query)
 {
 	Si::optional<std::vector<Si::http::html_query_pair>> const parsed = Si::http::parse_html_query(Si::make_c_str_range("a=2&b=3&c=&d"));
 	BOOST_REQUIRE(parsed);
-	std::vector<Si::http::html_query_pair> const expected
-	{
-		std::make_pair("a", Si::optional<std::string>("2")),
-		std::make_pair("b", Si::optional<std::string>("3")),
-		std::make_pair("c", Si::optional<std::string>("")),
-		std::make_pair("d", Si::optional<std::string>()),
-	};
+	std::vector<Si::http::html_query_pair> const expected = boost::assign::list_of
+		(std::make_pair("a", Si::optional<std::string>("2")))
+		(std::make_pair("b", Si::optional<std::string>("3")))
+		(std::make_pair("c", Si::optional<std::string>("")))
+		(std::make_pair("d", Si::optional<std::string>()))
+	;
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), parsed->begin(), parsed->end());
 }

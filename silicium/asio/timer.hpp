@@ -58,7 +58,7 @@ namespace Si
 				assert(impl);
 				impl->async_wait([this, receiver](boost::system::error_code error) mutable
 				{
-					if (error)
+					if (!!error)
 					{
 						assert(error == boost::asio::error::operation_aborted); //TODO: remove this assumption
 						return;

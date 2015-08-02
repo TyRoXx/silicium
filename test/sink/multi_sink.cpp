@@ -13,6 +13,7 @@ BOOST_AUTO_TEST_CASE(multi_sink_empty)
 	BOOST_CHECK(!Si::append(sink, 23));
 }
 
+#if SILICIUM_HAS_MAKE_ARRAY
 BOOST_AUTO_TEST_CASE(multi_sink_multiple)
 {
 	std::vector<int> a, b;
@@ -29,7 +30,9 @@ BOOST_AUTO_TEST_CASE(multi_sink_multiple)
 	BOOST_CHECK_EQUAL(a[0], 23);
 	BOOST_CHECK_EQUAL(b[0], 23);
 }
+#endif
 
+#if SILICIUM_HAS_MAKE_ARRAY
 BOOST_AUTO_TEST_CASE(multi_sink_error)
 {
 	auto a = Si::Sink<int, boost::system::error_code>::make_box(Si::make_function_sink<int>([](Si::iterator_range<int const *> data)
@@ -51,3 +54,4 @@ BOOST_AUTO_TEST_CASE(multi_sink_error)
 	boost::system::error_code error = Si::append(sink, 42);
 	BOOST_CHECK_EQUAL(boost::system::error_code(111, boost::system::generic_category()), error);
 }
+#endif

@@ -1,23 +1,15 @@
-#include <silicium/move.hpp>
-#include <silicium/move_if_noexcept.hpp>
+#include <silicium/exchange.hpp>
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(move)
+BOOST_AUTO_TEST_CASE(exchange_noexcept_true)
 {
 	auto p = Si::make_unique<int>(123);
-	auto q = Si::move(p);
-	BOOST_CHECK(!p);
+	auto r = Si::make_unique<int>(456);
+	auto q = Si::exchange(p, std::move(r));
+	BOOST_CHECK(!r);
+	BOOST_REQUIRE(p);
 	BOOST_REQUIRE(q);
-	BOOST_CHECK_EQUAL(123, *q);
-}
-
-#if SILICIUM_HAS_MOVE_IF_NOEXCEPT
-BOOST_AUTO_TEST_CASE(move_if_noexcept_true)
-{
-	auto p = Si::make_unique<int>(123);
-	auto q = Si::move_if_noexcept(p);
-	BOOST_CHECK(!p);
-	BOOST_REQUIRE(q);
+	BOOST_CHECK_EQUAL(456, *p);
 	BOOST_CHECK_EQUAL(123, *q);
 }
 
@@ -55,12 +47,14 @@ struct non_noexcept_movable
 	}
 };
 
-BOOST_AUTO_TEST_CASE(move_if_noexcept_false)
+BOOST_AUTO_TEST_CASE(exchange_noexcept_false)
 {
 	non_noexcept_movable a;
 	a.state = 123;
-	non_noexcept_movable b = Si::move_if_noexcept(a);
-	BOOST_CHECK_EQUAL(123, a.state);
-	BOOST_CHECK_EQUAL(123, b.state);
+	non_noexcept_movable b;
+	b.state = 456;
+	non_noexcept_movable c = Si::exchange(a, std::move(b));
+	BOOST_CHECK_EQUAL(456, a.state);
+	BOOST_CHECK_EQUAL(123, c.state);
+	BOOST_CHECK_EQUAL(0, b.state);
 }
-#endif

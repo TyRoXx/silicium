@@ -10,7 +10,9 @@
 #include <boost/format.hpp>
 #include <iostream>
 
-#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
+#define SILICIUM_EXAMPLE_AVAILABLE ((BOOST_VERSION >= 105400) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_BUFFERING_SINK)
+
+#if SILICIUM_EXAMPLE_AVAILABLE
 namespace
 {
 	void serve_client(
@@ -63,7 +65,7 @@ int main()
 {
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
-#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
+#if SILICIUM_EXAMPLE_AVAILABLE
 	boost::asio::spawn(io, [&acceptor](boost::asio::yield_context yield)
 	{
 		Si::asio::accepting_source clients(acceptor, yield);

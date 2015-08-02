@@ -2,6 +2,7 @@
 #include <silicium/source/generator_source.hpp>
 #include <silicium/source/memory_source.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/assign/list_of.hpp>
 
 BOOST_AUTO_TEST_CASE(filter_source_true)
 {
@@ -16,7 +17,7 @@ BOOST_AUTO_TEST_CASE(filter_source_true)
 
 BOOST_AUTO_TEST_CASE(filter_source_false)
 {
-	std::vector<int> const elements{1, 2, 3};
+	std::vector<int> const elements = boost::assign::list_of(1)(2)(3);
 	auto f = Si::make_filter_source(Si::make_container_source(elements), [](int element)
 	{
 		return element >= 3;

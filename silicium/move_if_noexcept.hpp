@@ -6,7 +6,11 @@
 
 namespace Si
 {
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#define SILICIUM_HAS_MOVE_IF_NOEXCEPT SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
+
+#if SILICIUM_HAS_MOVE_IF_NOEXCEPT
+
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1800))
 	using std::move_if_noexcept;
 #else
 	template <class T, class Result = typename std::conditional<
@@ -18,6 +22,8 @@ namespace Si
 	{
 		return static_cast<Result>(x);
 	}
+#endif
+
 #endif
 }
 

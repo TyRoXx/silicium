@@ -10,7 +10,7 @@
 #include <boost/optional.hpp>
 #include <boost/concept_check.hpp>
 
-#define SILICIUM_HAS_THREAD_GENERATOR SILICIUM_HAS_EXCEPTIONS
+#define SILICIUM_HAS_THREAD_GENERATOR (SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT)
 
 #if SILICIUM_HAS_THREAD_GENERATOR
 #include <future>

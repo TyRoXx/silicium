@@ -86,19 +86,19 @@ namespace Si
 	template <class Element, std::size_t N>
 	memory_source<Element> make_container_source(std::array<Element, N> const &container)
 	{
-		return memory_source<Element>({container.data(), container.data() + container.size()});
+		return memory_source<Element>(make_iterator_range(container.data(), container.data() + container.size()));
 	}
 
 	template <class Element, std::size_t N>
 	mutable_memory_source<Element> make_container_source(std::array<Element, N> &&container)
 	{
-		return mutable_memory_source<Element>({container.data(), container.data() + container.size()});
+		return mutable_memory_source<Element>(make_iterator_range(container.data(), container.data() + container.size()));
 	}
 
 	template <class Element>
 	memory_source<Element> make_container_source(std::basic_string<Element> const &container)
 	{
-		return memory_source<Element>({container.data(), container.data() + container.size()});
+		return memory_source<Element>(make_iterator_range(container.data(), container.data() + container.size()));
 	}
 
 	template <class Element>

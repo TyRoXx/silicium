@@ -9,6 +9,11 @@
 #include <boost/static_assert.hpp>
 #include <boost/functional/hash.hpp>
 
+#if !SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
+#include <boost/preprocessor/iteration/local.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#endif
+
 namespace Si
 {
 	template <class T>
@@ -279,21 +284,73 @@ namespace Si
 			m_is_set = true;
 		}
 #else
+
 		void emplace()
 		{
 			*this = none;
-			new (data()) T{};
+			new (data()) T();
 			m_is_set = true;
 		}
 
+#define BOOST_PP_LOCAL_MACRO(N) \
+		template <BOOST_PP_ENUM_PARAMS(N, class A)> \
+		void emplace(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
+		{ \
+			*this = none; \
+			new (data()) T(BOOST_PP_ENUM_PARAMS(N, a)); \
+			m_is_set = true; \
+		}
+#define BOOST_PP_LOCAL_LIMITS (1, 10)
+#include BOOST_PP_LOCAL_ITERATE()
+#undef BOOST_PP_LOCAL_MACRO
+
+#if 0
 		template <class A0>
 		void emplace(A0 &&a0)
 		{
 			*this = none;
-			new (data()) T{std::forward<A0>(a0)};
+			new (data()) T(std::forward<A0>(a0));
+			m_is_set = true;
+		}
+
+		template <class A0, class A1>
+		void emplace(A0 &&a0, A1 &&a1)
+		{
+			*this = none;
+			new (data()) T(std::forward<A0>(a0), std::forward<A1>(a1));
 			m_is_set = true;
 		}
 #endif
+#endif
+
+		void swap(optional &other) BOOST_NOEXCEPT
+		{
+			if (*this)
+			{
+				if (other)
+				{
+					using std::swap;
+					swap(**this, *other);
+				}
+				else
+				{
+					other.emplace(std::move(*this));
+					*this = none;
+				}
+			}
+			else
+			{
+				if (other)
+				{
+					this->emplace(std::move(*other));
+					other = none;
+				}
+				else
+				{
+					//both empty -> nothing to be done here
+				}
+			}
+		}
 
 	private:
 

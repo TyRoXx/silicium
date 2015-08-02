@@ -83,11 +83,11 @@
 	SILICIUM_DETAIL_MAKE_BOX(box, typedefs, methods) \
 	template <class Original> \
 	static eraser<typename std::decay<Original>::type> erase(Original &&original) { \
-		return eraser<typename std::decay<Original>::type>{std::forward<Original>(original)}; \
+		return eraser<typename std::decay<Original>::type>(std::forward<Original>(original)); \
 		} \
 	template <class Original> \
 	static box make_box(Original &&original) { \
-		return box{Si::to_unique(erase(std::forward<Original>(original)))}; \
+		return box(Si::to_unique(erase(std::forward<Original>(original)))); \
 		} \
 };
 

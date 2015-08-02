@@ -1,5 +1,6 @@
 #include <silicium/trait.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/assign/list_of.hpp>
 
 typedef long element;
 
@@ -38,24 +39,24 @@ BOOST_AUTO_TEST_CASE(templatized_trait)
 	auto container = Container<int>::erase(std::vector<int>());
 	container.emplace_back(123);
 	{
-		std::vector<int> const expected{123};
+		std::vector<int> const expected = boost::assign::list_of(123);
 		BOOST_CHECK(expected == container.original);
 	}
 	container.resize(2);
 	{
-		std::vector<int> const expected{123, 0};
+		std::vector<int> const expected = boost::assign::list_of(123)(0);
 		BOOST_CHECK(expected == container.original);
 	}
 	container.resize(3, 7);
 	{
-		std::vector<int> const expected{123, 0, 7};
+		std::vector<int> const expected = boost::assign::list_of(123)(0)(7);
 		BOOST_CHECK(expected == container.original);
 	}
 }
 
 BOOST_AUTO_TEST_CASE(trait_const_method)
 {
-	auto container = Container<int>::erase(std::vector<int>{});
+	auto container = Container<int>::erase(std::vector<int>());
 	auto const &const_ref = container;
 	BOOST_CHECK(const_ref.empty());
 	container.original.resize(1);
@@ -65,7 +66,7 @@ BOOST_AUTO_TEST_CASE(trait_const_method)
 #if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
 BOOST_AUTO_TEST_CASE(trait_noexcept_method)
 {
-	auto container = Container<int>::erase(std::vector<int>{});
+	auto container = Container<int>::erase(std::vector<int>());
 	auto const &const_ref = container;
 	BOOST_CHECK_EQUAL(0u, const_ref.size());
 	container.original.resize(3);
@@ -81,7 +82,7 @@ BOOST_AUTO_TEST_CASE(trait_box)
 
 	{
 		//move construction is available:
-		Container<int>::box container2 = Container<int>::make_box(std::vector<int>{});
+		Container<int>::box container2 = Container<int>::make_box(std::vector<int>());
 
 		//move assignment is available:
 		container = std::move(container2);
@@ -102,7 +103,9 @@ BOOST_AUTO_TEST_CASE(trait_eraser)
 
 	{
 		//move construction is available:
-		Container<int>::eraser<std::vector<int>> container2 = Container<int>::erase(std::vector<int>{1, 2, 3});
+		std::vector<int> content = boost::assign::list_of(1)(2)(3);
+		Container<int>::eraser<std::vector<int>> container2 = Container<int>::erase(std::move(content));
+		BOOST_CHECK(content.empty());
 
 		BOOST_CHECK_EQUAL(0u, container.original.size());
 		BOOST_CHECK_EQUAL(3u, container2.original.size());
@@ -153,7 +156,7 @@ struct impl_with_typedefs
 
 BOOST_AUTO_TEST_CASE(trait_with_typedefs)
 {
-	WithTypedefs::box b = WithTypedefs::make_box(impl_with_typedefs{});
+	WithTypedefs::box b = WithTypedefs::make_box(impl_with_typedefs());
 	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::eraser<impl_with_typedefs>::element_type>::value));
 	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::interface::element_type>::value));
 	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::box::element_type>::value));

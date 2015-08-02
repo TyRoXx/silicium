@@ -121,7 +121,7 @@ namespace Si
 			yield.get_one(message_bound);
 		}
 
-		observable<Message, ptr_observer<observer<Message>>> &receiver()
+		typename Observable<Message, ptr_observer<observer<Message>>>::interface &receiver()
 		{
 			return receiving;
 		}

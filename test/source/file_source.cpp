@@ -31,6 +31,7 @@ BOOST_AUTO_TEST_CASE(file_source)
 	BOOST_CHECK(pointing_to_same_subrange(Si::make_contiguous_range(buffer), r->get()));
 }
 
+#if SILICIUM_HAS_WRITE_FILE
 BOOST_AUTO_TEST_CASE(file_source_enumerate)
 {
 	BOOST_REQUIRE(!Si::write_file(Si::native_path_string(SILICIUM_SYSTEM_LITERAL("test.txt")), Si::make_memory_range("Test", 4)));
@@ -43,3 +44,4 @@ BOOST_AUTO_TEST_CASE(file_source_enumerate)
 	BOOST_CHECK_EQUAL('t', Si::get(s));
 	BOOST_CHECK_EQUAL(Si::none, Si::get(s));
 }
+#endif

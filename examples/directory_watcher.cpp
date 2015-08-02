@@ -8,7 +8,7 @@ int main()
 {
 	boost::asio::io_service io;
 
-#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
+#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER && SILICIUM_HAS_FOR_EACH_OBSERVABLE
 	auto const watched_dir = Si::get_current_working_directory();
 	std::cerr << "Watching " << watched_dir << '\n';
 
@@ -25,7 +25,7 @@ int main()
 	});
 	all.start();
 #else
-	std::cerr << "This example requires Boost filesystem support\n";
+	std::cerr << "This example requires Boost filesystem and/or a more recent compiler\n";
 #endif
 
 	io.run();

@@ -24,6 +24,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/thread.hpp>
 #include <boost/mpl/list.hpp>
+#include <boost/assign/list_of.hpp>
 #include <unordered_map>
 #if SILICIUM_HAS_EXCEPTIONS
 #	include <future>
@@ -77,7 +78,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::Observable<int, Si::ptr_observer<Si::observer<int>>>::interface>> first{bridge};
+		Si::ptr_observable<int, std::shared_ptr<Si::Observable<int, Si::ptr_observer<Si::observer<int>>>::interface>> first(bridge);
 		auto buf = Si::make_buffer_observable(first, 2);
 		buf.prefetch();
 
@@ -188,7 +189,7 @@ namespace Si
 	};
 
 	template <class Element, class Action>
-	auto blocking_then(boost::asio::io_service &io, Si::observable<Element, Si::ptr_observer<Si::observer<Element>>> &from, Action &&action)
+	auto blocking_then(boost::asio::io_service &io, typename Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface &from, Action &&action)
 		-> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
 	{
 		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(io, std::forward<Action>(action));
@@ -322,7 +323,7 @@ namespace
 		con2.async_get_one(Si::observe_by_ref(consumer));
 		s.emit_one(3);
 		s.emit_one(4);
-		std::vector<int> const expected{2, 3};
+		std::vector<int> const expected = boost::assign::list_of(2)(3);
 		BOOST_CHECK(expected == generated);
 	}
 }

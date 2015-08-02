@@ -89,7 +89,11 @@ namespace Si
 		BOOST_CHECK_EQUAL("/", result.path);
 		BOOST_CHECK_EQUAL("HTTP/1.1", result.http_version);
 		BOOST_CHECK_EQUAL(1u, result.arguments.size());
-		BOOST_CHECK((std::map<Si::noexcept_string, Si::noexcept_string>{{"Host", "host"}}) == result.arguments);
+		{
+			std::map<Si::noexcept_string, Si::noexcept_string> expected_arguments;
+			expected_arguments.insert(std::make_pair("Host", "host"));
+			BOOST_CHECK(expected_arguments == result.arguments);
+		}
 	}
 }
 
@@ -160,7 +164,7 @@ namespace Si
 				assert(!m_got_result);
 				Si::exchange(m_observer, nullptr)->got_element(data.front());
 				m_got_result = true;
-				return {};
+				return success();
 			}
 		};
 

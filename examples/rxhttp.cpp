@@ -19,7 +19,9 @@
 #include <boost/thread/future.hpp>
 #include <cassert>
 
-#if SILICIUM_HAS_EXCEPTIONS
+#define SILICIUM_EXAMPLE_AVAILABLE (SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT)
+
+#if SILICIUM_EXAMPLE_AVAILABLE
 #include <thread>
 
 namespace
@@ -181,7 +183,7 @@ namespace
 
 	typedef Si::shared_observable<Si::nothing> events;
 
-#if SILICIUM_HAS_COROUTINE_GENERATOR
+#if SILICIUM_EXAMPLE_AVAILABLE
 	struct coroutine_web_server
 	{
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
@@ -277,7 +279,7 @@ int main()
 {
 	boost::asio::io_service io;
 
-#if SILICIUM_HAS_COROUTINE_GENERATOR
+#if SILICIUM_EXAMPLE_AVAILABLE
 	coroutine_web_server coroutined(io, 8080);
 	coroutined.start();
 

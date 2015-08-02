@@ -135,6 +135,7 @@ namespace Si
 	}
 
 
+#if SILICIUM_HAS_FILE_SINK
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_write)
 	{
 		Si::absolute_path const watched_dir = Si::get_current_working_directory();
@@ -158,6 +159,7 @@ namespace Si
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
 		});
 	}
+#endif
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_close)
 	{

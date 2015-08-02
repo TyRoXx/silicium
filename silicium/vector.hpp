@@ -18,6 +18,12 @@ namespace Si
 		{
 		}
 
+		template <class Iterator>
+		vector(Iterator begin, Iterator end)
+			: m_impl(begin, end)
+		{
+		}
+
 		vector(vector &&other) BOOST_NOEXCEPT
 			: m_impl(std::move(other.m_impl))
 		{
@@ -42,7 +48,7 @@ namespace Si
 
 		vector copy() const
 		{
-			return vector{m_impl};
+			return vector(m_impl);
 		}
 
 		bool empty() const BOOST_NOEXCEPT
@@ -90,6 +96,12 @@ namespace Si
 		void emplace_back(Args &&...args)
 		{
 			m_impl.emplace_back(std::forward<Args>(args)...);
+		}
+#else
+		template <class A0>
+		void emplace_back(A0 &&a0)
+		{
+			m_impl.emplace_back(std::forward<A0>(a0));
 		}
 #endif
 
