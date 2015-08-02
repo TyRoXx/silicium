@@ -233,21 +233,20 @@ namespace Si
 		To result = reinterpret_cast<To>(from);
 		return result;
 	}
-
+}
 #define SILICIUM_HAS_COPY_TRAITS !SILICIUM_VC2012
 
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
-}
 #include <type_traits>
 namespace Si
 {
 	BOOST_STATIC_ASSERT(SILICIUM_HAS_COPY_TRAITS);
 	using std::is_copy_constructible;
 	using std::is_copy_assignable;
+}
 #elif BOOST_VERSION >= 105500 //1.55
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
-}
 #endif
 
 #include <boost/type_traits/is_copy_constructible.hpp>
