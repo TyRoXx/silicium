@@ -281,8 +281,28 @@ namespace Si
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1800)
 	BOOST_STATIC_ASSERT(SILICIUM_HAS_COPY_TRAITS);
+#if _MSC_VER >= 1900
 	using std::is_copy_assignable;
 	using std::is_copy_constructible;
+#else
+	template <class T>
+	struct is_copy_assignable : boost::is_copy_assignable<T>
+	{
+	};
+	template <class T, class D>
+	struct is_copy_assignable<std::unique_ptr<T, D>> : std::false_type
+	{
+	};
+	template <class T>
+	struct is_copy_constructible : boost::is_copy_constructible<T>
+	{
+	};
+	template <class T, class D>
+	struct is_copy_constructible<std::unique_ptr<T, D>> : std::false_type
+	{
+	};
+#endif
+
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1800)
 	using std::is_nothrow_destructible;
 #else // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
