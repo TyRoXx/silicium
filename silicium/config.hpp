@@ -9,7 +9,11 @@
 #include <boost/preprocessor/if.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_copy_assignable.hpp>
+#include <boost/type_traits/has_trivial_constructor.hpp>
 #include <boost/type_traits/is_copy_constructible.hpp>
+#include <boost/type_traits/is_nothrow_move_constructible.hpp>
+#include <boost/type_traits/is_nothrow_move_assignable.hpp>
+#include <boost/type_traits/has_nothrow_destructor.hpp>
 
 #if defined(__GNUC__)
 #	define SILICIUM_GCC ((__GNUC__ * 100) + __GNUC_MINOR__)
@@ -24,6 +28,7 @@
 #endif
 
 #ifdef _MSC_VER
+#	define SILICIUM_VC 1
 #	define SILICIUM_VC2010 (_MSC_VER == 1600)
 #	define SILICIUM_VC2010_OR_LATER (_MSC_VER >= 1600)
 #	define SILICIUM_VC2012 (_MSC_VER == 1700)
@@ -33,6 +38,7 @@
 #	define SILICIUM_VC2015 (_MSC_VER == 1900)
 #	define SILICIUM_VC2015_OR_LATER (_MSC_VER >= 1900)
 #else
+#	define SILICIUM_VC 0
 #	define SILICIUM_VC2010 0
 #	define SILICIUM_VC2010_OR_LATER 0
 #	define SILICIUM_VC2012 0
@@ -244,7 +250,8 @@ namespace Si
 		return result;
 	}
 }
-#define SILICIUM_HAS_COPY_TRAITS !SILICIUM_VC2012
+
+#define SILICIUM_HAS_COPY_TRAITS (!SILICIUM_VC || SILICIUM_VC2013_OR_LATER)
 
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
@@ -321,7 +328,11 @@ namespace Si
 	struct is_default_constructible : std::conditional<
 		std::is_reference<T>::value,
 		std::false_type,
+#if !defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER
 		std::is_constructible<T>
+#else
+		boost::has_trivial_constructor<T>
+#endif
 	>::type
 	{
 	};
@@ -329,20 +340,34 @@ namespace Si
 	struct is_nothrow_default_constructible : std::has_nothrow_default_constructor<T>
 	{
 	};
+
+#if !defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER
 	template <class T>
 	struct is_nothrow_move_constructible : std::is_nothrow_constructible<T, T>
 	{
 	};
+#else
+	using boost::is_nothrow_move_constructible;
+#endif
+
+#if !defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER
 	template <class T>
 	struct is_nothrow_move_assignable : std::has_nothrow_copy_assign<T>
 	{
 	};
-#if 0
+#else
+	using boost::is_nothrow_move_assignable;
+#endif
+
+#if !defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER
+	using std::is_nothrow_destructible;
+#else
 	template <class T>
-	struct is_nothrow_destructible : std::true_type
+	struct is_nothrow_destructible : boost::has_nothrow_destructor<T>
 	{
 	};
 #endif
+
 	template <class T>
 	struct is_move_assignable : std::integral_constant<bool, __has_nothrow_assign(T)>
 	{
