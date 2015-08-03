@@ -24,13 +24,23 @@
 #endif
 
 #ifdef _MSC_VER
+#	define SILICIUM_VC2010 (_MSC_VER == 1600)
+#	define SILICIUM_VC2010_OR_LATER (_MSC_VER >= 1600)
 #	define SILICIUM_VC2012 (_MSC_VER == 1700)
+#	define SILICIUM_VC2012_OR_LATER (_MSC_VER >= 1700)
 #	define SILICIUM_VC2013 (_MSC_VER == 1800)
+#	define SILICIUM_VC2013_OR_LATER (_MSC_VER >= 1800)
 #	define SILICIUM_VC2015 (_MSC_VER == 1900)
+#	define SILICIUM_VC2015_OR_LATER (_MSC_VER >= 1900)
 #else
+#	define SILICIUM_VC2010 0
+#	define SILICIUM_VC2010_OR_LATER 0
 #	define SILICIUM_VC2012 0
+#	define SILICIUM_VC2012_OR_LATER 0
 #	define SILICIUM_VC2013 0
+#	define SILICIUM_VC2013_OR_LATER 0
 #	define SILICIUM_VC2015 0
+#	define SILICIUM_VC2015_OR_LATER 0
 #endif
 
 #ifdef _MSC_VER
@@ -53,7 +63,7 @@
 #	define SILICIUM_HAS_EXCEPTIONS 1
 #endif
 
-#define SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES !SILICIUM_VC2012
+#define SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES (SILICIUM_GCC || SILICIUM_VC2013_OR_LATER)
 
 #if defined(NDEBUG) || !SILICIUM_HAS_EXCEPTIONS
 #	ifdef _MSC_VER
@@ -252,13 +262,15 @@ namespace Si
 #include <boost/type_traits/is_copy_constructible.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
-#if SILICIUM_HAS_EXCEPTIONS
+#define SILICIUM_COMPILER_HAS_FUTURE (SILICIUM_GCC || SILICIUM_VC2012_OR_LATER)
+
+#if SILICIUM_HAS_EXCEPTIONS && SILICIUM_COMPILER_HAS_FUTURE
 #	include <future>
-#endif // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
+#endif
 
 namespace Si
 {
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || SILICIUM_VC2012_OR_LATER
 }
 #include <type_traits>
 #include <boost/type_traits/is_nothrow_move_assignable.hpp>
