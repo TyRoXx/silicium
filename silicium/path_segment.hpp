@@ -1,8 +1,7 @@
 #ifndef SILICIUM_PATH_SEGMENT_HPP
 #define SILICIUM_PATH_SEGMENT_HPP
 
-#include <silicium/relative_path.hpp>
-#include <silicium/absolute_path.hpp>
+#include <silicium/path.hpp>
 #include <silicium/optional.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -65,6 +64,11 @@ namespace Si
 		char_type const *c_str() const BOOST_NOEXCEPT
 		{
 			return m_value.c_str();
+		}
+
+		void append(path_segment const &right)
+		{
+			m_value.append(right.m_value);
 		}
 
 		static optional<path_segment> create(boost::filesystem::path const &maybe_segment)
@@ -139,29 +143,16 @@ namespace Si
 		return left.underlying() < right.underlying();
 	}
 
+	inline path_segment operator + (path_segment left, path_segment const &right)
+	{
+		left.append(right);
+		return left;
+	}
+
 	inline std::size_t hash_value(path_segment const &value)
 	{
 		using boost::hash_value;
 		return hash_value(value.underlying());
-	}
-
-	inline relative_path operator / (path_segment const &front, path_segment const &back)
-	{
-		//TODO: do this efficiently
-		relative_path result(front.to_boost_path() / back.to_boost_path());
-		return result;
-	}
-
-	inline relative_path operator / (relative_path const &front, path_segment const &back)
-	{
-		return front / relative_path(back.to_boost_path());
-	}
-
-	inline absolute_path operator / (absolute_path const &front, path_segment const &back)
-	{
-		absolute_path result = front;
-		result.combine(relative_path(back.to_boost_path()));
-		return result;
 	}
 }
 

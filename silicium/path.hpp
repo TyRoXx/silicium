@@ -131,6 +131,11 @@ namespace Si
 			return m_value.c_str();
 		}
 
+		void append(path const &right)
+		{
+			m_value += right.m_value;
+		}
+
 	private:
 
 		underlying_type m_value;

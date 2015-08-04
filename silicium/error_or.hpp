@@ -23,6 +23,24 @@ namespace Si
 		SILICIUM_UNREACHABLE();
 	}
 
+	inline void throw_if_error(boost::system::error_code error)
+	{
+		if (!error)
+		{
+			return;
+		}
+		throw_error(error);
+	}
+
+	inline void throw_if_error(std::error_code error)
+	{
+		if (!error)
+		{
+			return;
+		}
+		throw_error(error);
+	}
+
 	namespace detail
 	{
 		template <class To, class From>

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_RELATIVE_PATH_HPP
 #define SILICIUM_RELATIVE_PATH_HPP
 
-#include <silicium/path.hpp>
+#include <silicium/path_segment.hpp>
 #include <silicium/noexcept_string.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -211,6 +211,18 @@ namespace Si
 	{
 		//TODO: do this efficiently
 		return relative_path(front.to_boost_path() / back.to_boost_path());
+	}
+
+	inline relative_path operator / (path_segment const &front, path_segment const &back)
+	{
+		//TODO: do this efficiently
+		relative_path result(front.to_boost_path() / back.to_boost_path());
+		return result;
+	}
+
+	inline relative_path operator / (relative_path const &front, path_segment const &back)
+	{
+		return front / relative_path(back.to_boost_path());
 	}
 }
 

@@ -55,16 +55,38 @@ int main(int argc, char **argv)
 
 		for (Si::os_string const &boost_archive_argument : boost_archives)
 		{
-			std::vector<std::string> arguments;
-			arguments.push_back("x");
-			arguments.push_back("-o" + Si::to_utf8_string(install_root_argument));
-			arguments.push_back(Si::to_utf8_string(boost_archive_argument));
-
-			auto command_line_output = Si::virtualize_sink(Si::ostream_ref_sink(std::cout));
-			if (Si::run_process(seven_zip_exe.to_boost_path(), arguments, maybe_install_root->to_boost_path(), command_line_output) != 0)
+			Si::optional<Si::absolute_path> const boost_archive = Si::absolute_path::create(boost_archive_argument);
+			if (!boost_archive)
 			{
-				LOG("Could not run 7zip");
+				LOG("The boost archive argument is not an absolute path: " << Si::to_utf8_string(boost_archive_argument));
 				return 1;
+			}
+
+			Si::optional<Si::path_segment> const boost_archive_name = boost_archive->name();
+			if (!boost_archive_name)
+			{
+				LOG("The boost archive argument is mising a file name: " << Si::to_utf8_string(boost_archive_argument));
+				return 1;
+			}
+
+			Si::absolute_path const complete_output_directory = *maybe_install_root / *boost_archive_name;
+			if (!Si::file_exists(complete_output_directory).get())
+			{
+				Si::absolute_path const incomplete_output_directory = *maybe_install_root / (*boost_archive_name + *Si::path_segment::create(".incomplete"));
+
+				std::vector<std::string> arguments;
+				arguments.push_back("x");
+				arguments.push_back("-o" + Si::to_utf8_string(incomplete_output_directory));
+				arguments.push_back(Si::to_utf8_string(boost_archive_argument));
+
+				auto command_line_output = Si::virtualize_sink(Si::ostream_ref_sink(std::cout));
+				if (Si::run_process(seven_zip_exe.to_boost_path(), arguments, maybe_install_root->to_boost_path(), command_line_output) != 0)
+				{
+					LOG("Could not run 7zip");
+					return 1;
+				}
+
+				Si::throw_if_error(Si::rename(incomplete_output_directory, complete_output_directory));
 			}
 		}
 	}

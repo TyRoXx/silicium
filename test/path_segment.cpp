@@ -1,4 +1,4 @@
-#include <silicium/path_segment.hpp>
+#include <silicium/relative_path.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/unordered_map.hpp>
 #include <unordered_map>

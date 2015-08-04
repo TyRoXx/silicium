@@ -2,6 +2,7 @@
 #define SILICIUM_ABSOLUTE_PATH_HPP
 
 #include <silicium/relative_path.hpp>
+#include <silicium/path_segment.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/is_handle.hpp>
@@ -135,6 +136,15 @@ namespace Si
 			return create(boost::filesystem::path(maybe_absolute));
 		}
 #endif
+
+		optional<path_segment> name() const
+		{
+			if (!m_value.underlying().has_filename())
+			{
+				return none;
+			}
+			return path_segment::create(m_value.underlying().filename());
+		}
 
 	private:
 
@@ -276,6 +286,18 @@ namespace Si
 	}
 #endif
 
+	inline absolute_path operator / (absolute_path const &front, path_segment const &back)
+	{
+		absolute_path result = front;
+		result.combine(relative_path(back.to_boost_path()));
+		return result;
+	}
+
+	inline noexcept_string to_utf8_string(absolute_path const &path)
+	{
+		return path.to_boost_path().string();
+	}
+
 #if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 	SILICIUM_USE_RESULT
 	inline absolute_path get_current_working_directory()
@@ -354,6 +376,14 @@ namespace Si
 			return ec;
 		}
 		return true;
+	}
+
+	SILICIUM_USE_RESULT
+	inline boost::system::error_code rename(absolute_path const &from, absolute_path const &to)
+	{
+		boost::system::error_code ec;
+		boost::filesystem::rename(from.to_boost_path(), to.to_boost_path(), ec);
+		return ec;
 	}
 #endif
 }
