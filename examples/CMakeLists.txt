@@ -1,36 +1,46 @@
 if(NOT (Boost_VERSION LESS 105400))
 	add_executable(hellohttp "hellohttp.cpp")
 	target_link_libraries(hellohttp ${Boost_LIBRARIES})
+	set_target_properties(hellohttp PROPERTIES FOLDER examples)
 endif()
 
 add_executable(rxhttp "rxhttp.cpp")
 target_link_libraries(rxhttp ${Boost_LIBRARIES})
+set_target_properties(rxhttp PROPERTIES FOLDER examples)
 
 add_executable(trivialhttp "trivialhttp.cpp")
 target_link_libraries(trivialhttp ${Boost_LIBRARIES})
+set_target_properties(trivialhttp PROPERTIES FOLDER examples)
 
 add_executable(directory_watcher "directory_watcher.cpp")
 target_link_libraries(directory_watcher ${Boost_LIBRARIES})
+set_target_properties(directory_watcher PROPERTIES FOLDER examples)
 
 if(NOT (Boost_VERSION LESS 105300)) #Boost.Coroutine required
 	add_executable(sleep "sleep.cpp")
 	target_link_libraries(sleep ${Boost_LIBRARIES})
+	set_target_properties(sleep PROPERTIES FOLDER examples)
 endif()
 
 add_executable(http_hello "http_hello.cpp")
 target_link_libraries(http_hello ${Boost_LIBRARIES})
+set_target_properties(http_hello PROPERTIES FOLDER examples)
 
 add_executable(http_proxy "http_proxy.cpp")
 target_link_libraries(http_proxy ${Boost_LIBRARIES})
+set_target_properties(http_proxy PROPERTIES FOLDER examples)
 
 add_executable(html "html.cpp")
 target_link_libraries(html ${Boost_LIBRARIES})
+set_target_properties(html PROPERTIES FOLDER examples)
 
 add_executable(dynamic_web_site "dynamic_web_site.cpp")
 target_link_libraries(dynamic_web_site ${Boost_LIBRARIES})
+set_target_properties(dynamic_web_site PROPERTIES FOLDER examples)
 
 add_executable(variant "variant.cpp")
 target_link_libraries(variant ${Boost_LIBRARIES})
+set_target_properties(variant PROPERTIES FOLDER examples)
 
 if(SILICIUM_HAS_WEBSOCKETPP)
 	add_executable(websocketpp "websocketpp.cpp" "websocketpp.hpp.js")
@@ -43,9 +53,11 @@ if(SILICIUM_HAS_WEBSOCKETPP)
 		endif()
 	endif()
 	target_link_libraries(websocketpp ${Boost_LIBRARIES})
+	set_target_properties(websocketpp PROPERTIES FOLDER examples)
 endif()
 
 if(UNIX) #TODO: Windows
 	add_executable(run_process "run_process.cpp")
 	target_link_libraries(run_process ${Boost_LIBRARIES})
+set_target_properties(run_process PROPERTIES FOLDER examples)
 endif()
