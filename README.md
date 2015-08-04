@@ -71,6 +71,7 @@ important
 * Asio-style async_wait for the end of a child process
 * async read and write for anonymous pipes on Win32
 * clean up noexcept annotations
+* prevent all integer overflows in the library
 
 nice to have
 ------------
@@ -82,6 +83,7 @@ nice to have
 * reduce sizeof(fast_variant&lt;char&gt;) to (sizeof(char) * 2)
 * move everything HTTP into a separate library
 * do not #include <boost/concept_check.hpp> just to get boost::ignore_unused_variable_warning
+* play with Visual C++ 2015 await: http://blogs.msdn.com/b/vcblog/archive/2014/11/12/resumable-functions-in-c.aspx
 
 probably outside of scope
 -------------------------
