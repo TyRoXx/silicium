@@ -155,4 +155,5 @@ endif()
 
 add_subdirectory("test")
 add_subdirectory("test_includes")
+add_subdirectory("build_tester")
 add_subdirectory("examples")

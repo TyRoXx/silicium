@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(serialization_le_uint32_parser_all_at_once)
 	BOOST_REQUIRE(nullptr == p.check_result());
 	std::array<Si::serialization::byte, sizeof(boost::uint32_t)> const input =
 	{{
-			0x01, 0xEF, 0xCD, 0xAB
+		0x01, 0xEF, 0xCD, 0xAB
 	}};
 	BOOST_REQUIRE(input.end() == p.consume_input(input.begin(), input.end()));
 	BOOST_REQUIRE(nullptr != p.check_result());
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(serialization_le_uint32_parser_all_at_once_with_rest)
 	BOOST_REQUIRE(nullptr == p.check_result());
 	std::array<Si::serialization::byte, sizeof(boost::uint32_t) + 1> const input =
 	{{
-			0x01, 0xEF, 0xCD, 0xAB, 0x44
+		0x01, 0xEF, 0xCD, 0xAB, 0x44
 	}};
 	BOOST_REQUIRE((input.begin() + sizeof(boost::uint32_t)) == p.consume_input(input.begin(), input.begin() + sizeof(boost::uint32_t)));
 	BOOST_REQUIRE(nullptr != p.check_result());
