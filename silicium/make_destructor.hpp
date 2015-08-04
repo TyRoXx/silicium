@@ -26,7 +26,7 @@ namespace Si
 			(*m_action)();
 		}
 
-		SILICIUM_DEFAULT_NOEXCEPT_MOVE(destructor)
+		SILICIUM_DEFAULT_MOVE(destructor)
 		SILICIUM_DISABLE_COPY(destructor)
 
 	private:
