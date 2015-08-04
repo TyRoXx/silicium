@@ -250,7 +250,7 @@ namespace Si
 			-> detail::element<std::function<void(Sink<char, success>::interface &)>,
 				typename detail::concatenate<
 					typename std::decay<Head>::type::length_type,
-					typename detail::identity<decltype(sequence(std::forward<Tail>(tail)...))>::type::length_type
+					typename identity<decltype(sequence(std::forward<Tail>(tail)...))>::type::length_type
 				>::type>
 #endif
 		{

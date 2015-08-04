@@ -35,6 +35,7 @@ BOOST_AUTO_TEST_CASE(make_destructor_copyable_state)
 	BOOST_CHECK(called_once);
 }
 
+#if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
 BOOST_AUTO_TEST_CASE(make_destructor_movable_only_state)
 {
 	bool called_once = false;
@@ -50,3 +51,4 @@ BOOST_AUTO_TEST_CASE(make_destructor_movable_only_state)
 	}
 	BOOST_CHECK(called_once);
 }
+#endif
