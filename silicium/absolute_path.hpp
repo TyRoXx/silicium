@@ -93,6 +93,13 @@ namespace Si
 			*this = absolute_path(to_boost_path() / back.to_boost_path());
 		}
 
+		template <class RelativePath>
+		absolute_path &operator /= (RelativePath &&other)
+		{
+			combine(std::forward<RelativePath>(other));
+			return *this;
+		}
+
 		SILICIUM_USE_RESULT
 		bool empty() const BOOST_NOEXCEPT
 		{

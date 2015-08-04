@@ -360,6 +360,21 @@ namespace
 		arguments.emplace_back(source.c_str());
 		arguments.emplace_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DCMAKE_BUILD_TYPE=")) + get_build_type_name_in_cmake(build_type));
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DSILICIUM_TEST_INCLUDES=OFF"));
+#ifdef _WIN32
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DBOOST_ROOT=C:\\dev\\libs\\boost_1_59_0_b1"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DZLIB_INCLUDE_DIR=C:\\dev\\libs\\zlib-1.2.8"));
+		switch (build_type)
+		{
+		case cmake_build_type::debug:
+			arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DZLIB_LIBRARY=C:\\dev\\libs\\boost_1_59_0_b1\\stage\\lib\\libboost_zlib-vc140-mt-gd-1_59.lib"));
+			break;
+		case cmake_build_type::release:
+			arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DZLIB_LIBRARY=C:\\dev\\libs\\boost_1_59_0_b1\\stage\\lib\\libboost_zlib-vc140-mt-1_59.lib"));
+			break;
+		}
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DURIPARSER_INCLUDE_DIR=C:\\dev\\libs\\uriparser-0.8.1\\include"));
+		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DURIPARSER_LIBRARY=C:\\dev\\libs\\uriparser-0.8.1\\win32\\uriparser.lib"));
+#endif
 		Si::optional<int> const result = log_error(execute_process(cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake generator");
 		if (!result)
 		{
@@ -397,10 +412,28 @@ namespace
 	}
 
 	SILICIUM_USE_RESULT
-	success_or_failure run_silicium_tests(Si::absolute_path const &build)
+	success_or_failure run_silicium_tests(
+		Si::absolute_path const &build,
+		cmake_build_type build_type)
 	{
-		Si::absolute_path const test_dir = build / Si::relative_path("test");
-		Si::absolute_path const test_exe = test_dir / Si::relative_path("unit_test");
+		Si::absolute_path test_dir = build / Si::relative_path(SILICIUM_SYSTEM_LITERAL("test"));
+#ifdef _WIN32
+		switch (build_type)
+		{
+		case cmake_build_type::debug:
+			test_dir /= Si::relative_path(L"Debug");
+			break;
+		case cmake_build_type::release:
+			test_dir /= Si::relative_path(L"Release");
+			break;
+		}
+#endif
+		Si::absolute_path const test_exe = test_dir / Si::relative_path(
+			SILICIUM_SYSTEM_LITERAL("unit_test")
+#ifdef _WIN32
+			SILICIUM_SYSTEM_LITERAL(".exe")
+#endif
+		);
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("--progress=yes"));
 		Si::optional<int> const result = log_error(execute_process(test_exe, std::move(arguments), test_dir, std::cerr), "Could not run the tests");
@@ -447,7 +480,7 @@ namespace
 			return success_or_failure::failure;
 		}
 
-		switch (run_silicium_tests(build_directory))
+		switch (run_silicium_tests(build_directory, build_type))
 		{
 		case success_or_failure::success:
 			break;
