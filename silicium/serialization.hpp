@@ -80,7 +80,15 @@ namespace Si
 			std::size_t m_bytes_in_buffer;
 		};
 
+		typedef endian_parser<boost::uint8_t, big_endian> be_uint8_parser;
+		typedef endian_parser<boost::uint16_t, big_endian> be_uint16_parser;
 		typedef endian_parser<boost::uint32_t, big_endian> be_uint32_parser;
+		typedef endian_parser<boost::uint64_t, big_endian> be_uint64_parser;
+
+		typedef endian_parser<boost::uint8_t, little_endian> le_uint8_parser;
+		typedef endian_parser<boost::uint16_t, little_endian> le_uint16_parser;
+		typedef endian_parser<boost::uint32_t, little_endian> le_uint32_parser;
+		typedef endian_parser<boost::uint64_t, little_endian> le_uint64_parser;
 	}
 }
 
