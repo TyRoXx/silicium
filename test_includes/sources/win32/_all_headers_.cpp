@@ -52,6 +52,7 @@
 #include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/make_array.hpp>
+#include <silicium/make_destructor.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/move.hpp>
 #include <silicium/move_if_noexcept.hpp>
