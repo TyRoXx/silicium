@@ -16,6 +16,7 @@
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
 #include <silicium/byte.hpp>
+#include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>

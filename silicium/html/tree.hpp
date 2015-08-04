@@ -4,6 +4,7 @@
 #include <silicium/html/generator.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/trait.hpp>
+#include <silicium/identity.hpp>
 
 #define SILICIUM_HAS_HTML_TREE SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 
@@ -233,15 +234,9 @@ namespace Si
 			inline void no_content(Sink<char, success>::interface &)
 			{
 			}
-
-			template <class T>
-			struct identity
-			{
-				typedef T type;
-			};
 		}
 
-		auto sequence()
+		inline auto sequence()
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			-> decltype(detail::make_element<exact_length<0>>(&detail::no_content))
 #endif

@@ -2,9 +2,10 @@
 #define SILICIUM_SERIALIZATION_HPP
 
 #include <silicium/config.hpp>
-#include <silicium/sink/sink.hpp>
-#include <silicium/source/source.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/byte_order_intrinsics.hpp>
+#include <silicium/identity.hpp>
+#include <boost/concept_check.hpp>
 
 namespace Si
 {
@@ -28,6 +29,24 @@ namespace Si
 				return index;
 			}
 		};
+
+		template <class Unsigned, class Endianness, class InputIterator>
+		optional<std::pair<Unsigned, InputIterator>> bytes_to_integer_shortcut(InputIterator, InputIterator, Endianness, identity<Unsigned>) BOOST_NOEXCEPT
+		{
+			return none;
+		}
+
+		inline optional<std::pair<boost::uint32_t, byte const *>> bytes_to_integer_shortcut(byte const *begin, byte const *end, big_endian, identity<boost::uint32_t>) BOOST_NOEXCEPT
+		{
+			if ((end - begin) < sizeof(boost::uint32_t))
+			{
+				return none;
+			}
+			boost::uint32_t result;
+			std::memcpy(&result, begin, sizeof(result));
+			result = ntoh32(result);
+			return std::make_pair(result, begin + sizeof(result));
+		}
 
 		template <class Unsigned>
 		struct unsigned_int_builder
@@ -56,9 +75,19 @@ namespace Si
 			template <class InputIterator>
 			InputIterator consume_input(InputIterator begin, InputIterator end)
 			{
-				while ((begin != end) && (m_bytes_in_buffer < sizeof(m_buffer)))
+				if (m_bytes_in_buffer == 0)
 				{
-					m_buffer.set_byte(Endianness::byte_index_to_significance(m_bytes_in_buffer, sizeof(m_buffer)), *begin);
+					optional<std::pair<Unsigned, InputIterator>> const succeeded = bytes_to_integer_shortcut(begin, end, Endianness(), identity<Unsigned>());
+					if (succeeded)
+					{
+						m_buffer.built = succeeded->first;
+						m_bytes_in_buffer = sizeof(Unsigned);
+						return succeeded->second;
+					}
+				}
+				while ((begin != end) && (m_bytes_in_buffer < sizeof(Unsigned)))
+				{
+					m_buffer.set_byte(Endianness::byte_index_to_significance(m_bytes_in_buffer, sizeof(Unsigned)), *begin);
 					++begin;
 					++m_bytes_in_buffer;
 				}
@@ -67,7 +96,7 @@ namespace Si
 
 			BOOST_CONSTEXPR Unsigned const *check_result() const BOOST_NOEXCEPT
 			{
-				if (m_bytes_in_buffer == sizeof(m_buffer))
+				if (m_bytes_in_buffer == sizeof(Unsigned))
 				{
 					return &m_buffer.built;
 				}
