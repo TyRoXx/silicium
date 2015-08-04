@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 			Si::optional<Si::path_segment> const boost_archive_name = boost_archive->name();
 			if (!boost_archive_name)
 			{
-				LOG("The boost archive argument is mising a file name: " << Si::to_utf8_string(boost_archive_argument));
+				LOG("The boost archive argument is missing a file name: " << Si::to_utf8_string(boost_archive_argument));
 				return 1;
 			}
 
