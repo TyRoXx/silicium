@@ -427,6 +427,8 @@ namespace
 			test_dir /= Si::relative_path(L"Release");
 			break;
 		}
+#else
+		boost::ignore_unused_variable_warning(build_type);
 #endif
 		Si::absolute_path const test_exe = test_dir / Si::relative_path(
 			SILICIUM_SYSTEM_LITERAL("unit_test")
