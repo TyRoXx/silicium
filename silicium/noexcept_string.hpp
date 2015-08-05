@@ -45,6 +45,15 @@ namespace Si
 	{
 		return utf8;
 	}
+
+	inline noexcept_string to_utf8_string(std::string const &utf8)
+	{
+#ifdef _WIN32
+		return utf8;
+#else
+		return noexcept_string(utf8.begin(), utf8.end());
+#endif
+	}
 }
 
 #endif
