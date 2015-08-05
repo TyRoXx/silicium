@@ -23,9 +23,8 @@ namespace Si
 
 		struct little_endian
 		{
-			static BOOST_CONSTEXPR std::size_t byte_index_to_significance(std::size_t index, std::size_t total_size)
+			static BOOST_CONSTEXPR std::size_t byte_index_to_significance(std::size_t index, std::size_t)
 			{
-				boost::ignore_unused_variable_warning(total_size);
 				return index;
 			}
 		};
@@ -38,7 +37,7 @@ namespace Si
 
 		inline optional<std::pair<boost::uint32_t, byte const *>> bytes_to_integer_shortcut(byte const *begin, byte const *end, big_endian, identity<boost::uint32_t>) BOOST_NOEXCEPT
 		{
-			if ((end - begin) < sizeof(boost::uint32_t))
+			if (static_cast<size_t>(end - begin) < sizeof(boost::uint32_t))
 			{
 				return none;
 			}

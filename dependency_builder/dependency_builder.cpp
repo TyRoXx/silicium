@@ -11,6 +11,12 @@ namespace
 	Si::absolute_path const seven_zip_exe = *Si::absolute_path::create(L"C:\\Program Files\\7-Zip\\7z.exe");
 }
 
+#ifdef _WIN32
+#define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::wvalue
+#else
+#define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::value
+#endif
+
 int main(int argc, char **argv)
 {
 	std::vector<Si::os_string> boost_archives;
@@ -19,8 +25,8 @@ int main(int argc, char **argv)
 	boost::program_options::options_description options("options");
 	options.add_options()
 		("help,h", "produce help message")
-		("install-root,i", boost::program_options::wvalue(&install_root_argument), "")
-		("boost-archive,b", boost::program_options::wvalue(&boost_archives), "")
+		("install-root,i", SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE(&install_root_argument), "")
+		("boost-archive,b", SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE(&boost_archives), "")
 		;
 	boost::program_options::positional_options_description positional;
 	positional.add("install-root", 1);
@@ -74,7 +80,7 @@ int main(int argc, char **argv)
 			{
 				Si::absolute_path const incomplete_output_directory = *maybe_install_root / (*boost_archive_name + *Si::path_segment::create(".incomplete"));
 
-				std::vector<std::string> arguments;
+				std::vector<Si::noexcept_string> arguments;
 				arguments.push_back("x");
 				arguments.push_back("-o" + Si::to_utf8_string(incomplete_output_directory));
 				arguments.push_back(Si::to_utf8_string(boost_archive_argument));

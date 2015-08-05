@@ -20,7 +20,7 @@ namespace
 	struct process_output
 	{
 		int exit_code;
-		std::string output, error;
+		Si::noexcept_string output, error;
 	};
 
 #if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE

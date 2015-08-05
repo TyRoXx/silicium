@@ -38,7 +38,7 @@ namespace Si
 		{
 			throw std::invalid_argument("a process can only be started with an absolute path as the working directory");
 		}
-		boost::range::transform(parameters.arguments, std::back_inserter(async_parameters.arguments), [](std::string const &argument)
+		boost::range::transform(parameters.arguments, std::back_inserter(async_parameters.arguments), [](noexcept_string const &argument)
 		{
 			return to_os_string(argument);
 		});
@@ -98,7 +98,7 @@ namespace Si
 
 	inline int run_process(
 		boost::filesystem::path executable,
-		std::vector<std::string> arguments,
+		std::vector<noexcept_string> arguments,
 		boost::filesystem::path current_path,
 		Sink<char, success>::interface &output)
 	{

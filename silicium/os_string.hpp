@@ -116,9 +116,9 @@ namespace Si
 		return result;
 	}
 #else
-	inline std::string to_utf8_string(os_string const &str)
+	inline noexcept_string to_utf8_string(os_string str)
 	{
-		return std::string(str.begin(), str.end());
+		return str;
 	}
 #endif
 }

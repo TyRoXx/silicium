@@ -40,6 +40,11 @@ namespace Si
 		return str;
 	}
 #endif
+
+	inline noexcept_string to_utf8_string(char const *utf8)
+	{
+		return utf8;
+	}
 }
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef SILICIUM_THEN_HPP
 #define SILICIUM_THEN_HPP
 
+#include <silicium/config.hpp>
 #include <utility>
 #include <type_traits>
 

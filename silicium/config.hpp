@@ -8,9 +8,11 @@
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
 #include <boost/static_assert.hpp>
-#include <boost/type_traits/is_copy_assignable.hpp>
+#if BOOST_VERSION >= 105500
+#	include <boost/type_traits/is_copy_assignable.hpp>
+#	include <boost/type_traits/is_copy_constructible.hpp>
+#endif
 #include <boost/type_traits/has_trivial_constructor.hpp>
-#include <boost/type_traits/is_copy_constructible.hpp>
 #include <boost/type_traits/is_nothrow_move_constructible.hpp>
 #include <boost/type_traits/is_nothrow_move_assignable.hpp>
 #include <boost/type_traits/has_nothrow_destructor.hpp>
@@ -266,7 +268,6 @@ namespace Si
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 #endif
 
-#include <boost/type_traits/is_copy_constructible.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
 #define SILICIUM_COMPILER_HAS_FUTURE (SILICIUM_GCC || SILICIUM_VC2012_OR_LATER)

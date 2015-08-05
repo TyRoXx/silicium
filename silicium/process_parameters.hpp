@@ -4,6 +4,7 @@
 #include <silicium/source/source.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/success.hpp>
+#include <silicium/noexcept_string.hpp>
 #include <vector>
 #include <string>
 #include <boost/filesystem/path.hpp>
@@ -15,7 +16,7 @@ namespace Si
 		boost::filesystem::path executable;
 
 		/// the values for the child's argv[1...]
-		std::vector<std::string> arguments;
+		std::vector<noexcept_string> arguments;
 
 		/// must be an existing path, otherwise the child cannot launch properly
 		boost::filesystem::path current_path;

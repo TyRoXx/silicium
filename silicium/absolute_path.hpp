@@ -139,11 +139,12 @@ namespace Si
 
 		optional<path_segment> name() const
 		{
-			if (!m_value.underlying().has_filename())
+			auto &&path = to_boost_path();
+			if (!path.has_filename())
 			{
 				return none;
 			}
-			return path_segment::create(m_value.underlying().filename());
+			return path_segment::create(path.filename());
 		}
 
 	private:
@@ -293,9 +294,14 @@ namespace Si
 		return result;
 	}
 
+	inline noexcept_string to_utf8_string(boost::filesystem::path const &path)
+	{
+		return to_utf8_string(path.string());
+	}
+
 	inline noexcept_string to_utf8_string(absolute_path const &path)
 	{
-		return path.to_boost_path().string();
+		return to_utf8_string(path.to_boost_path());
 	}
 
 #if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
