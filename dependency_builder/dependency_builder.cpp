@@ -8,13 +8,19 @@
 
 namespace
 {
-	Si::absolute_path const seven_zip_exe = *Si::absolute_path::create(L"C:\\Program Files\\7-Zip\\7z.exe");
+	Si::absolute_path const seven_zip_exe = *Si::absolute_path::create(
+#ifdef _WIN32
+		L"C:\\Program Files\\7-Zip\\7z.exe"
+#else
+		"/usr/bin/7z"
+#endif
+	);
 }
 
 #ifdef _WIN32
-#define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::wvalue
+#	define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::wvalue
 #else
-#define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::value
+#	define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::value
 #endif
 
 int main(int argc, char **argv)
