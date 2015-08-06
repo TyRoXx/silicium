@@ -33,25 +33,26 @@ namespace
 		}
 
 		Si::absolute_path const complete_output_directory = install_root / *boost_archive_name;
-		if (!Si::file_exists(complete_output_directory).get())
+		if (Si::file_exists(complete_output_directory).get())
 		{
-			Si::absolute_path const incomplete_output_directory = install_root / (*boost_archive_name + *Si::path_segment::create(".incomplete"));
-
-			std::vector<Si::noexcept_string> arguments;
-			arguments.push_back("x");
-			arguments.push_back("-o" + Si::to_utf8_string(incomplete_output_directory));
-			arguments.push_back(Si::to_utf8_string(boost_archive));
-
-			auto command_line_output = Si::virtualize_sink(Si::ostream_ref_sink(std::cout));
-			if (Si::run_process(seven_zip_exe.to_boost_path(), arguments, install_root.to_boost_path(), command_line_output) != 0)
-			{
-				LOG("Could not run 7zip");
-				return extraction_result::failure;
-			}
-
-			Si::throw_if_error(Si::rename(incomplete_output_directory, complete_output_directory));
+			return extraction_result::success;
 		}
 
+		Si::absolute_path const incomplete_output_directory = install_root / (*boost_archive_name + *Si::path_segment::create(".incomplete"));
+
+		std::vector<Si::noexcept_string> arguments;
+		arguments.push_back("x");
+		arguments.push_back("-o" + Si::to_utf8_string(incomplete_output_directory));
+		arguments.push_back(Si::to_utf8_string(boost_archive));
+
+		auto command_line_output = Si::virtualize_sink(Si::ostream_ref_sink(std::cout));
+		if (Si::run_process(seven_zip_exe.to_boost_path(), arguments, install_root.to_boost_path(), command_line_output) != 0)
+		{
+			LOG("Could not run 7zip");
+			return extraction_result::failure;
+		}
+
+		Si::throw_if_error(Si::rename(incomplete_output_directory, complete_output_directory));
 		return extraction_result::success;
 	}
 }
