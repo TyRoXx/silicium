@@ -605,6 +605,15 @@ namespace Si
 				*out << value;
 			}
 		};
+
+#if SILICIUM_COMPILER_HAS_USING
+		template <bool IsCopyable, class ...T>
+		std::ostream &operator << (std::ostream &out, variant_base<IsCopyable, T...> const &v)
+		{
+			Si::apply_visitor(detail::ostream_visitor(out), v);
+			return out;
+		}
+#endif
 	}
 
 #if SILICIUM_COMPILER_HAS_USING
@@ -663,12 +672,14 @@ namespace Si
 	};
 #endif
 
+#if !SILICIUM_COMPILER_HAS_USING
 	template <class ...T>
 	std::ostream &operator << (std::ostream &out, variant<T...> const &v)
 	{
 		Si::apply_visitor(detail::ostream_visitor(out), v);
 		return out;
 	}
+#endif
 
 #if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<variant<int>>::value);
