@@ -285,15 +285,13 @@ namespace Si
 				destroy_storage(storage.which(), storage.storage());
 			}
 
-			template <class U = void, class V = typename boost::enable_if_c<is_noexcept_movable, U>::type>
-			variant_base(variant_base &&other) BOOST_NOEXCEPT
+			variant_base(variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
 				storage.which(other.storage.which());
 				move_construct_storage(storage.which(), storage.storage(), other.storage.storage());
 			}
 
-			template <class U = void, class V = typename boost::enable_if_c<is_noexcept_movable, U>::type>
-			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT
+			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
 				if (storage.which() == other.which())
 				{
@@ -479,7 +477,7 @@ namespace Si
 			{
 			}
 
-			variant_base(variant_base &&other) BOOST_NOEXCEPT
+			variant_base(variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
 				: base(std::move(other))
 			{
 			}
@@ -491,7 +489,7 @@ namespace Si
 				copy_construct_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
 			}
 
-			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT
+			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
 				base::operator = (std::move(other));
 				return *this;
