@@ -2,6 +2,7 @@
 #include <silicium/observable/consume.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/open.hpp>
+#include <silicium/steady_clock.hpp>
 #include <silicium/sink/file_sink.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -46,8 +47,8 @@ namespace Si
 
 			provoke_event();
 
-			boost::asio::basic_waitable_timer<std::chrono::steady_clock> timeout(io);
-			timeout.expires_from_now(std::chrono::seconds(1));
+			boost::asio::basic_waitable_timer<Si::steady_clock_if_available> timeout(io);
+			timeout.expires_from_now(Si::chrono::seconds(1));
 			timeout.async_wait([&io](boost::system::error_code)
 			{
 				io.stop();
@@ -361,8 +362,8 @@ namespace Si
 
 		boost::filesystem::rename(test_file_a.to_boost_path(), test_file_b.to_boost_path());
 
-		boost::asio::basic_waitable_timer<std::chrono::steady_clock> timeout(io);
-		timeout.expires_from_now(std::chrono::seconds(1));
+		boost::asio::basic_waitable_timer<Si::steady_clock_if_available> timeout(io);
+		timeout.expires_from_now(Si::chrono::seconds(1));
 		timeout.async_wait([&io](boost::system::error_code)
 		{
 			io.stop();

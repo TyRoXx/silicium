@@ -16,7 +16,9 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/find.hpp>
 
-#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_MAKE_ARRAY
+#define SILICIUM_HAS_BUILD_TESTER (BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_MAKE_ARRAY && SILICIUM_HAS_HTML_TREE)
+
+#if SILICIUM_HAS_BUILD_TESTER
 #include <boost/asio/spawn.hpp>
 
 namespace

@@ -3,11 +3,11 @@
 
 #include <silicium/config.hpp>
 #include <silicium/variant.hpp>
+#include <silicium/observable/yield_context.hpp>
 
-#define SILICIUM_HAS_COROUTINE_GENERATOR ((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_VARIANT)
+#define SILICIUM_HAS_COROUTINE_GENERATOR ((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_VARIANT && SILICIUM_HAS_YIELD_CONTEXT)
 
 #include <silicium/exchange.hpp>
-#include <silicium/observable/yield_context.hpp>
 #ifdef _WIN32
 //win32.hpp will include Asio before coroutine will include Windows stuff
 //because Asio wants to be first.

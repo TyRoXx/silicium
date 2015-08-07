@@ -477,7 +477,7 @@ namespace Si
 			{
 			}
 
-			variant_base(variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
+			variant_base(variant_base &&other) BOOST_NOEXCEPT_IF(base::is_noexcept_movable)
 				: base(std::move(other))
 			{
 			}
@@ -489,7 +489,7 @@ namespace Si
 				copy_construct_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
 			}
 
-			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
+			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(base::is_noexcept_movable)
 			{
 				base::operator = (std::move(other));
 				return *this;
@@ -541,6 +541,7 @@ namespace Si
 			}
 		};
 
+#if SILICIUM_HAS_COPY_TRAITS
 		template <class ...T>
 		struct are_copyable;
 
@@ -560,6 +561,12 @@ namespace Si
 		struct are_copyable<> : std::true_type
 		{
 		};
+#else
+		template <class ...T>
+		struct are_copyable : std::true_type
+		{
+		};
+#endif
 
 		BOOST_STATIC_ASSERT(are_copyable<>::value);
 		BOOST_STATIC_ASSERT(are_copyable<int>::value);
@@ -567,7 +574,7 @@ namespace Si
 
 		//In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
 		//so this assert would fail.
-#if SILICIUM_HAS_PROPER_COPY_TRAITS
+#if SILICIUM_HAS_COPY_TRAITS
 		//GCC 4.6 with Boost < 1.55 is also a problem
 		BOOST_STATIC_ASSERT((!are_copyable<int, std::unique_ptr<int>>::value));
 #endif
@@ -598,13 +605,6 @@ namespace Si
 				*out << value;
 			}
 		};
-
-		template <bool IsCopyable, class ...T>
-		std::ostream &operator << (std::ostream &out, variant_base<IsCopyable, T...> const &v)
-		{
-			Si::apply_visitor(ostream_visitor{ out }, v);
-			return out;
-		}
 	}
 
 #if SILICIUM_COMPILER_HAS_USING
@@ -662,6 +662,13 @@ namespace Si
 		}
 	};
 #endif
+
+	template <class ...T>
+	std::ostream &operator << (std::ostream &out, variant<T...> const &v)
+	{
+		Si::apply_visitor(detail::ostream_visitor(out), v);
+		return out;
+	}
 
 #if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<variant<int>>::value);

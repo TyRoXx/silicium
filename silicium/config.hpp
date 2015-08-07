@@ -253,7 +253,7 @@ namespace Si
 	}
 }
 
-#define SILICIUM_HAS_COPY_TRAITS (!SILICIUM_VC || SILICIUM_VC2013_OR_LATER)
+#define SILICIUM_HAS_COPY_TRAITS ((!SILICIUM_VC || SILICIUM_VC2013_OR_LATER) && !SILICIUM_GCC46)
 
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
@@ -360,7 +360,7 @@ namespace Si
 	using boost::is_nothrow_move_assignable;
 #endif
 
-#if !defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER
+#if (!defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER) && !SILICIUM_GCC46
 	using std::is_nothrow_destructible;
 #else
 	template <class T>

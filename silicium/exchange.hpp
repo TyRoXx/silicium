@@ -47,7 +47,7 @@ namespace Si
 			dest,
 			std::forward<U>(source),
 			std::integral_constant<bool,
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
+#if !SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
 				true
 #else
 				BOOST_NOEXCEPT_EXPR(dest = std::forward<U>(source))

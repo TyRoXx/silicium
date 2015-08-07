@@ -5,6 +5,7 @@
 #include <boost/container/string.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/lexical_cast.hpp>
 #include <unordered_set>
 
 #if SILICIUM_HAS_VARIANT
@@ -165,8 +166,10 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(variant_copyable_operator_move)
 	{
 		typedef variant<noexcept_string> variant;
+#if SILICIUM_HAS_COPY_TRAITS
 		BOOST_STATIC_ASSERT(Si::is_copy_assignable<variant>::value);
 		BOOST_STATIC_ASSERT(Si::is_copy_constructible<variant>::value);
+#endif
 		variant v;
 		variant w(noexcept_string(1000, 'a'));
 		BOOST_CHECK(v != w);
@@ -537,6 +540,11 @@ namespace Si
 				[](needs_inplace_construction const &value) { return value.v; }
 			));
 		}
+	}
+
+	BOOST_AUTO_TEST_CASE(variant_std_ostream)
+	{
+		BOOST_CHECK_EQUAL("123", boost::lexical_cast<std::string>(Si::variant<int>(123)));
 	}
 }
 #endif
