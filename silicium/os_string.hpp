@@ -74,6 +74,31 @@ namespace Si
 			}
 			return result;
 		}
+
+		inline noexcept_string to_utf8_string(wchar_t const *utf16, size_t length)
+		{
+			if (length == 0)
+			{
+				//because WideCharToMultiByte fails for empty input
+				return std::string();
+			}
+			if (length > static_cast<size_t>((std::numeric_limits<int>::max)()))
+			{
+				throw std::invalid_argument("Input string is too long for WinAPI");
+			}
+			int destination_length = WideCharToMultiByte(CP_UTF8, 0, utf16, length, nullptr, 0, 0, FALSE);
+			if (!destination_length)
+			{
+				throw_last_error();
+			}
+			std::string result;
+			result.resize(destination_length);
+			if (!WideCharToMultiByte(CP_UTF8, 0, utf16, length, &result.front(), destination_length, 0, FALSE))
+			{
+				throw_last_error();
+			}
+			return result;
+		}
 	}
 
 	inline os_string to_os_string(char const *c_str)
@@ -91,29 +116,14 @@ namespace Si
 		return win32::utf8_to_winapi_string(begin, end - begin);
 	}
 
-	inline std::string to_utf8_string(os_string const &str)
+	inline noexcept_string to_utf8_string(os_string const &str)
 	{
-		if (str.empty())
-		{
-			//because WideCharToMultiByte fails for empty input
-			return std::string();
-		}
-		if (str.length() > static_cast<size_t>((std::numeric_limits<int>::max)()))
-		{
-			throw std::invalid_argument("Input string is too long for WinAPI");
-		}
-		int destination_length = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str.length(), nullptr, 0, 0, FALSE);
-		if (!destination_length)
-		{
-			throw_last_error();
-		}
-		std::string result;
-		result.resize(destination_length);
-		if (!WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str.length(), &result.front(), destination_length, 0, FALSE))
-		{
-			throw_last_error();
-		}
-		return result;
+		return win32::to_utf8_string(str.data(), str.length());
+	}
+
+	inline noexcept_string to_utf8_string(wchar_t const *utf16)
+	{
+		return win32::to_utf8_string(utf16, std::wcslen(utf16));
 	}
 #else
 	inline noexcept_string to_utf8_string(os_string str)
