@@ -8,7 +8,13 @@
 
 #if SILICIUM_HAS_DEPENDENCY_BUILDER
 
-#define LOG(...) do { std::cerr << __VA_ARGS__ << '\n'; } while (0,0)
+#ifdef _MSC_VER
+#	define SILICIUM_WHILE_FALSE while (0,0)
+#else
+#	define SILICIUM_WHILE_FALSE while (false)
+#endif
+
+#define LOG(...) do { std::cerr << __VA_ARGS__ << '\n'; } SILICIUM_WHILE_FALSE
 
 namespace
 {
