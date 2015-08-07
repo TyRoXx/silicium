@@ -56,10 +56,9 @@ namespace
 						throw std::runtime_error("Cannot open file " + source.string());
 					}
 					source_file << "#include " << header_name << "\n";
-#ifdef _MSC_VER
-					source_file << "namespace {\n\t//\"This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library\"\n"
-						"\tint dummy_to_avoid_msvc_linker_warning_LNK4221;\n}\n";
-#endif
+					source_file << "#ifdef _MSC_VER\nnamespace {\n\t//\"This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library\"\n"
+						"\tint dummy_to_avoid_msvc_linker_warning_LNK4221;\n}\n#endif\n";
+					source_file.flush();
 					if (!source_file)
 					{
 						throw std::runtime_error("Could not write to " + source.string());

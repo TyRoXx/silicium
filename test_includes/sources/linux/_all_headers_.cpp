@@ -16,6 +16,7 @@
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
 #include <silicium/byte.hpp>
+#include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>
@@ -57,6 +58,7 @@
 #include <silicium/linux/process_handle.hpp>
 #include <silicium/linux/single_directory_watcher.hpp>
 #include <silicium/make_array.hpp>
+#include <silicium/make_destructor.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/move.hpp>
 #include <silicium/move_if_noexcept.hpp>
@@ -75,6 +77,7 @@
 #include <silicium/observable/erase_shared.hpp>
 #include <silicium/observable/erase_unique.hpp>
 #include <silicium/observable/erased_observer.hpp>
+#include <silicium/observable/error_or_enumerate.hpp>
 #include <silicium/observable/extensible_observer.hpp>
 #include <silicium/observable/filter.hpp>
 #include <silicium/observable/finite_state_machine.hpp>
@@ -120,6 +123,7 @@
 #include <silicium/read_file.hpp>
 #include <silicium/relative_path.hpp>
 #include <silicium/run_process.hpp>
+#include <silicium/serialization.hpp>
 #include <silicium/single_directory_watcher.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
