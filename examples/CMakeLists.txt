@@ -59,5 +59,12 @@ endif()
 if(UNIX) #TODO: Windows
 	add_executable(run_process "run_process.cpp")
 	target_link_libraries(run_process ${Boost_LIBRARIES})
-set_target_properties(run_process PROPERTIES FOLDER examples)
+	set_target_properties(run_process PROPERTIES FOLDER examples)
+endif()
+
+if(MSVC14 AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
+	add_executable(vs2015_await "vs2015_await.cpp")
+	target_link_libraries(vs2015_await ${Boost_LIBRARIES})
+	target_compile_options(vs2015_await PRIVATE "/await")
+	set_target_properties(vs2015_await PROPERTIES FOLDER examples)
 endif()
