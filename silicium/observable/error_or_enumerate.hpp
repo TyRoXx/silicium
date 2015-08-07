@@ -3,6 +3,7 @@
 
 #include <silicium/observable/enumerate.hpp>
 #include <silicium/variant.hpp>
+#include <silicium/error_or.hpp>
 #include <queue>
 
 #define SILICIUM_HAS_ERROR_OR_ENUMERATE SILICIUM_HAS_VARIANT

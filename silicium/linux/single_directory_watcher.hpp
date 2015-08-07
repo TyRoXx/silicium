@@ -25,7 +25,7 @@ namespace Si
 			}
 		}
 
-		Si::optional<file_notification_type> to_portable_file_notification_type(boost::uint32_t mask)
+		optional<file_notification_type> to_portable_file_notification_type(boost::uint32_t mask)
 		{
 			using detail::are_set;
 			if (are_set(mask, IN_MOVED_TO) || are_set(mask, IN_CREATE))
@@ -55,20 +55,20 @@ namespace Si
 			return Si::none;
 		}
 
-		Si::optional<Si::file_notification> to_portable_file_notification(linux::file_notification &&original, Si::relative_path const &root)
+		optional<error_or<Si::file_notification>> to_portable_file_notification(linux::file_notification &&original, relative_path const &root)
 		{
 			auto const type = to_portable_file_notification_type(original.mask);
 			if (!type)
 			{
-				return Si::none;
+				return none;
 			}
-			return Si::file_notification(*type, root / std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR);
+			return error_or<Si::file_notification>(Si::file_notification(*type, root / std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR));
 		}
 	}
 
 	struct single_directory_watcher
 	{
-		typedef file_notification element_type;
+		typedef error_or<file_notification> element_type;
 
 		single_directory_watcher()
 		{
@@ -85,8 +85,8 @@ namespace Si
 		void async_get_one(Observer &&receiver)
 		{
 			impl.async_get_one(
-				function_observer<std::function<void (optional<file_notification>)>>(
-					[SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](optional<file_notification> element) mutable
+				function_observer<std::function<void (optional<error_or<file_notification>>)>>(
+					[SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](optional<error_or<file_notification>> element) mutable
 					{
 						if (element)
 						{
@@ -105,10 +105,10 @@ namespace Si
 
 		linux::inotify_observable inotify;
 		conditional_transformer<
-			file_notification,
+			error_or<file_notification>,
 			enumerator<ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
-			std::function<Si::optional<file_notification>(linux::file_notification &&)>,
-			function_observer<std::function<void (optional<file_notification>)>>
+			std::function<optional<error_or<file_notification>>(linux::file_notification &&)>,
+			function_observer<std::function<void (optional<error_or<file_notification>>)>>
 		> impl;
 		linux::watch_descriptor root;
 	};
