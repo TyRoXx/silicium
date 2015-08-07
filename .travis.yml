@@ -8,12 +8,10 @@ notifications:
     on_success: change # [always|never|change] # default: change
     on_failure: change # [always|never|change] # default: always
 
-matrix:
-  exclude:
-    - os: linux
-  include:
-    - os: linux
-
+compiler:
+  - clang
+  - gcc
+  
 before_install:
  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository -y ppa:boost-latest/ppa; fi
