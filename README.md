@@ -67,8 +67,9 @@ important
 ---------
 
 * continuous integration
+  * [x] create .travis.yml and let travis-ci run it
   * [ ] travis support finished
-    * [ ] upgrade: http://docs.travis-ci.com/user/migrating-from-legacy/?utm_source=legacy-notice&utm_medium=banner&utm_campaign=legacy-upgrade
+  * [ ] travis upgrade: http://docs.travis-ci.com/user/migrating-from-legacy/?utm_source=legacy-notice&utm_medium=banner&utm_campaign=legacy-upgrade
 * measure test coverage
 * allow for recursive variants
 * check whether fast_variant&lt;T &amp;&gt; makes sense
