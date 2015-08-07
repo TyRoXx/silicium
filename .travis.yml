@@ -2,15 +2,15 @@ language: cpp
 os:
  - linux
 notifications:
-  email:
-    recipients:
-        - tyroxxxx@gmail.com
-    on_success: change # [always|never|change] # default: change
-    on_failure: change # [always|never|change] # default: always
+ email:
+  recipients:
+   - tyroxxxx@gmail.com
+  on_success: change # [always|never|change] # default: change
+  on_failure: change # [always|never|change] # default: always
 
 compiler:
-  - clang
-  - gcc
+ - clang
+ - gcc
   
 before_install:
  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
