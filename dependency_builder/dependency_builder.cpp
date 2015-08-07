@@ -4,6 +4,10 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 
+#define SILICIUM_HAS_DEPENDENCY_BUILDER SILICIUM_HAS_RUN_PROCESS
+
+#if SILICIUM_HAS_DEPENDENCY_BUILDER
+
 #define LOG(...) do { std::cerr << __VA_ARGS__ << '\n'; } while (0,0)
 
 namespace
@@ -178,3 +182,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 }
+#else
+int main()
+{
+	std::cerr << "The compiler or a library is too old.\n";
+	return 1;
+}
+#endif

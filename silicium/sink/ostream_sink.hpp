@@ -25,7 +25,7 @@ namespace Si
 		{
 			assert(m_file);
 			m_file->write(data.begin(), data.size());
-			return{};
+			return error_type();
 		}
 
 	private:
@@ -48,7 +48,7 @@ namespace Si
 		boost::system::error_code append(iterator_range<char const *> data)
 		{
 			m_file->write(data.begin(), data.size());
-			return {};
+			return boost::system::error_code();
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES

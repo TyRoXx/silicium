@@ -36,10 +36,10 @@ namespace Si
 			single_directory_watcher watcher(io, watched_dir);
 
 			bool got_event = false;
-			auto consumer = consume<file_notification>([&io, &got_event, &on_event](file_notification const &event)
+			auto consumer = consume<error_or<file_notification>>([&io, &got_event, &on_event](error_or<file_notification> const &event)
 			{
 				io.stop();
-				on_event(event);
+				on_event(event.get());
 				got_event = true;
 			});
 			watcher.async_get_one(Si::observe_by_ref(consumer));
@@ -337,15 +337,15 @@ namespace Si
 
 		spawn_coroutine([&watcher, &test_file_a, &test_file_b, &got_something](spawn_context &yield)
 		{
-			optional<file_notification> first_event = yield.get_one(Si::ref(watcher));
+			optional<error_or<file_notification>> first_event = yield.get_one(Si::ref(watcher));
 			BOOST_REQUIRE(first_event);
-			optional<file_notification> second_event = yield.get_one(Si::ref(watcher));
+			optional<error_or<file_notification>> second_event = yield.get_one(Si::ref(watcher));
 			BOOST_REQUIRE(second_event);
 
 			got_something = true;
 
-			file_notification *remove = &*first_event;
-			file_notification *add = &*second_event;
+			file_notification *remove = &first_event->get();
+			file_notification *add = &second_event->get();
 			if (add->type != file_notification_type::add)
 			{
 				using std::swap;

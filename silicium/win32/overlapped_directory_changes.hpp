@@ -6,6 +6,7 @@
 #include <silicium/absolute_path.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/throw_last_error.hpp>
+#include <silicium/error_or.hpp>
 #include <silicium/observable/observer.hpp>
 #include <silicium/win32/file_notification.hpp>
 
@@ -15,7 +16,7 @@ namespace Si
 	{
 		struct overlapped_directory_changes
 		{
-			typedef std::vector<file_notification> element_type;
+			typedef error_or<std::vector<file_notification>> element_type;
 
 			overlapped_directory_changes()
 				: is_recursive(false)
@@ -98,6 +99,11 @@ namespace Si
 				receiver_ = receiver.get();
 				boost::asio::windows::overlapped_ptr overlapped(*io, [this](boost::system::error_code ec, std::size_t)
 				{
+					if (!!ec)
+					{
+						Si::exchange(this->receiver_, nullptr)->got_element(ec);
+						return;
+					}
 					std::vector<file_notification> notifications;
 					for (char *next_event = buffer.data();;)
 					{

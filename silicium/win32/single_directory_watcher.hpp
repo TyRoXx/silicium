@@ -4,7 +4,7 @@
 #include <silicium/win32/overlapped_directory_changes.hpp>
 #include <silicium/file_notification.hpp>
 #include <silicium/absolute_path.hpp>
-#include <silicium/observable/enumerate.hpp>
+#include <silicium/observable/error_or_enumerate.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/transform_if_initialized.hpp>
 #include <silicium/observable/function_observer.hpp>
@@ -13,7 +13,7 @@
 #include <boost/ref.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
-#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER 1
+#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER SILICIUM_HAS_ERROR_OR_ENUMERATE
 
 namespace Si
 {
@@ -40,27 +40,31 @@ namespace Si
 			}
 		}
 
-		inline optional<Si::file_notification> to_portable_file_notification(win32::file_notification &&original)
+		inline optional<error_or<Si::file_notification>> to_portable_file_notification(error_or<win32::file_notification> &&original)
 		{
-			auto const type = to_portable_file_notification_type(original.action);
+			if (original.is_error())
+			{
+				return error_or<Si::file_notification>(original.error());
+			}
+			auto const type = to_portable_file_notification_type(original.get().action);
 			if (!type)
 			{
 				return none;
 			}
-			return Si::file_notification(*type, std::move(original.name), true);
+			return error_or<Si::file_notification>(Si::file_notification(*type, std::move(original.get().name), true));
 		}
 	}
 	
 	struct single_directory_watcher
 	{
-		typedef file_notification element_type;
+		typedef error_or<file_notification> element_type;
 
 		single_directory_watcher()
 		{
 		}
 
 		explicit single_directory_watcher(boost::asio::io_service &io, Si::absolute_path const &watched)
-			: impl(enumerate(win32::overlapped_directory_changes(io, watched, false)), win32::to_portable_file_notification)
+			: impl(error_or_enumerate(win32::overlapped_directory_changes(io, watched, false)), win32::to_portable_file_notification)
 			, work(boost::in_place(boost::ref(io)))
 		{
 		}
@@ -69,12 +73,12 @@ namespace Si
 		void async_get_one(Observer &&observer)
 		{
 			impl.async_get_one(
-				function_observer<std::function<void(optional<file_notification>)>>(
+				function_observer<std::function<void(optional<error_or<file_notification>>)>>(
 				[observer
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
 					= std::forward<Observer>(observer)
 #endif
-				](optional<file_notification> element) mutable
+				](optional<error_or<file_notification>> element) mutable
 				{
 					if (element)
 					{
@@ -92,10 +96,10 @@ namespace Si
 
 		//TODO: save the memory for the function pointer
 		conditional_transformer<
-			file_notification,
-			enumerator<win32::overlapped_directory_changes>,
-			optional<file_notification>(*)(win32::file_notification &&),
-			function_observer<std::function<void(optional<file_notification>)>>
+			error_or<file_notification>,
+			error_or_enumerator<win32::overlapped_directory_changes>,
+			optional<error_or<file_notification>>(*)(error_or<win32::file_notification> &&),
+			function_observer<std::function<void(optional<error_or<file_notification>>)>>
 		> impl;
 		boost::optional<boost::asio::io_service::work> work;
 	};

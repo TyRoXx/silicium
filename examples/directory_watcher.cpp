@@ -13,15 +13,20 @@ int main()
 	std::cerr << "Watching " << watched_dir << '\n';
 
 	Si::single_directory_watcher notifier(io, watched_dir);
-	auto all = Si::for_each(Si::ref(notifier), [](Si::file_notification const &event)
+	auto all = Si::for_each(Si::ref(notifier), [](Si::error_or<Si::file_notification> const &event)
 	{
+		if (event.is_error())
+		{
+			std::cerr << "Something went wrong while watching: " << event.error() << '\n';
+			return;
+		}
 		std::cerr <<
 #if BOOST_VERSION >= 105000
 			boost::underlying_cast
 #else
 			static_cast
 #endif
-			<int>(event.type) << " " << event.name << '\n';
+			<int>(event.get().type) << " " << event.get().name << '\n';
 	});
 	all.start();
 #else
