@@ -4,7 +4,7 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 
-#define LOG(...) do { std::cerr << __VA_ARGS__ << '\n'; } while (false)
+#define LOG(...) do { std::cerr << __VA_ARGS__ << '\n'; } while (0,0)
 
 namespace
 {
