@@ -8,7 +8,7 @@
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
 #include <boost/static_assert.hpp>
-#if BOOST_VERSION >= 105500
+#if BOOST_VERSION >= 105700
 #	include <boost/type_traits/is_copy_assignable.hpp>
 #	include <boost/type_traits/is_copy_constructible.hpp>
 #endif
@@ -264,7 +264,7 @@ namespace Si
 	using std::is_copy_constructible;
 	using std::is_copy_assignable;
 }
-#elif BOOST_VERSION >= 105500 //1.55
+#elif BOOST_VERSION >= 105700
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 #endif
 
