@@ -86,14 +86,14 @@ namespace Si
 			{
 				throw std::invalid_argument("Input string is too long for WinAPI");
 			}
-			int destination_length = WideCharToMultiByte(CP_UTF8, 0, utf16, length, nullptr, 0, 0, FALSE);
+			int const destination_length = WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), nullptr, 0, 0, FALSE);
 			if (!destination_length)
 			{
 				throw_last_error();
 			}
 			std::string result;
 			result.resize(destination_length);
-			if (!WideCharToMultiByte(CP_UTF8, 0, utf16, length, &result.front(), destination_length, 0, FALSE))
+			if (!WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), &result.front(), destination_length, 0, FALSE))
 			{
 				throw_last_error();
 			}
