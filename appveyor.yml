@@ -11,8 +11,6 @@ skip_tags: true
 # Operating system (build VM template)
 os: Visual Studio 2015
 
-clone_folder: c:\silicium
-
 before_build:
   - git submodule update --init
   - mkdir test
