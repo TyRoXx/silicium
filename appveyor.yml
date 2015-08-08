@@ -1,0 +1,34 @@
+# version format
+version: 0.1.{build}-{branch}
+ 
+# branches to build
+branches:
+  # blacklist
+  except:
+    - gh-pages
+skip_tags: true
+ 
+# Operating system (build VM template)
+os: Visual Studio 2015
+
+clone_folder: c:\silicium
+platform: x64
+configuration: Release
+
+before_build:
+  - git submodule update --init
+  - mkdir test
+  - cd test
+  - cmake ..
+build_script:
+  - cmake --build .
+after_build:
+
+before_test:
+test_script:
+  - ./test/unit_test/Release/unit_test.exe
+after_test:
+
+on_success:
+on_failure:
+on_finish:
