@@ -7,7 +7,7 @@ notifications:
   on_failure: always # [always|never|change] # default: always
 
 compiler:
- - clang
+# - clang
  - gcc
 
 env:
