@@ -10,6 +10,8 @@
 #include <boost/static_assert.hpp>
 #if BOOST_VERSION >= 105700
 #	include <boost/type_traits/is_copy_assignable.hpp>
+#endif
+#if BOOST_VERSION >= 105500
 #	include <boost/type_traits/is_copy_constructible.hpp>
 #endif
 #include <boost/type_traits/has_trivial_constructor.hpp>
@@ -304,6 +306,8 @@ namespace Si
 	using std::is_copy_assignable;
 	using std::is_copy_constructible;
 #else
+
+#if BOOST_VERSION >= 105700
 	template <class T>
 	struct is_copy_assignable : boost::is_copy_assignable<T>
 	{
@@ -312,6 +316,11 @@ namespace Si
 	struct is_copy_assignable<std::unique_ptr<T, D>> : std::false_type
 	{
 	};
+#else
+	template <class T>
+	struct is_copy_assignable : std::true_type {};
+#endif
+
 	template <class T>
 	struct is_copy_constructible : boost::is_copy_constructible<T>
 	{
