@@ -255,8 +255,8 @@ namespace Si
 		private:
 
 #if BOOST_VERSION >= 105500
-			typedef boost::coroutines::asymmetric_coroutine<nothing>::pull_type coroutine;
-			typedef boost::coroutines::asymmetric_coroutine<nothing>::push_type coroutine_push_type;
+			typedef boost::coroutines::coroutine<nothing>::pull_type coroutine;
+			typedef boost::coroutines::coroutine<nothing>::push_type coroutine_push_type;
 #else
 			typedef boost::coroutines::coroutine<nothing ()> coroutine;
 			typedef boost::coroutines::coroutine<nothing ()>::caller_type coroutine_push_type;
