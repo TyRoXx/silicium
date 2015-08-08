@@ -3,10 +3,8 @@ os:
  - linux
 notifications:
  email:
-  recipients:
-   - tyroxxxx@gmail.com
   on_success: change # [always|never|change] # default: change
-  on_failure: change # [always|never|change] # default: always
+  on_failure: always # [always|never|change] # default: always
 
 compiler:
  - clang
