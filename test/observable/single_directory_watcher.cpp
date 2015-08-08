@@ -31,8 +31,7 @@ namespace Si
 		void test_single_event(
 			Si::absolute_path const &watched_dir,
 			std::function<void ()> const &provoke_event,
-			std::function<void (file_notification const &)> const &on_event,
-			Si::steady_clock_if_available::duration extra_timeout = Si::chrono::seconds(0))
+			std::function<void (file_notification const &)> const &on_event)
 		{
 			boost::asio::io_service io;
 			single_directory_watcher watcher(io, watched_dir);
@@ -49,7 +48,7 @@ namespace Si
 			provoke_event();
 
 			boost::asio::basic_waitable_timer<Si::steady_clock_if_available> timeout(io);
-			timeout.expires_from_now(Si::chrono::seconds(1) + extra_timeout);
+			timeout.expires_from_now(Si::chrono::seconds(1));
 			timeout.async_wait([&io](boost::system::error_code ec)
 			{
 				BOOST_REQUIRE(!ec);
@@ -294,10 +293,7 @@ namespace Si
 		{
 			BOOST_CHECK(file_notification_type::move_self == event.type);
 			BOOST_CHECK_EQUAL("", event.name.underlying());
-		},
-			//travis needs more time here
-			Si::chrono::seconds(10)
-		);
+		});
 	}
 #endif
 
