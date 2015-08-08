@@ -419,7 +419,6 @@ namespace Si
 	BOOST_STATIC_ASSERT(is_move_constructible<std::unique_ptr<int>>::value);
 #if SILICIUM_HAS_COPY_TRAITS
 	BOOST_STATIC_ASSERT(!is_copy_constructible<std::unique_ptr<int>>::value);
-	BOOST_STATIC_ASSERT(!is_copy_assignable<std::unique_ptr<int>>::value);
 #endif
 
 #if BOOST_VERSION <= 105400
