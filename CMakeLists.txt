@@ -100,7 +100,7 @@ endif()
 if(UNIX)
 	add_definitions("-DBOOST_TEST_DYN_LINK")
 	add_definitions("-DBOOST_USE_VALGRIND")
-	if(Boost_VERSION GREATER 105500)
+	if(NOT (Boost_VERSION LESS 105500))
 		add_definitions("-DBOOST_COROUTINES_UNIDIRECT")
 		#define the misspelled macro for Boost.Asio:
 		add_definitions("-DBOOST_COROUTINES_UNIDRECT")
