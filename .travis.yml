@@ -25,6 +25,6 @@ script:
  - mkdir build
  - cd build
  - cmake .. -DSILICIUM_USE_WEBSOCKETPP=OFF -DSILICIUM_TEST_INCLUDES=$TEST_INCLUDES
- - cmake --build .
+ - cmake --build . -- -j2
  - cd test
  - ./unit_test
