@@ -296,7 +296,7 @@ namespace Si
 			BOOST_CHECK_EQUAL("", event.name.underlying());
 		},
 			//travis needs more time here
-			Si::chrono::seconds(1)
+			Si::chrono::seconds(10)
 		);
 	}
 #endif
