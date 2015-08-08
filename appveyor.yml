@@ -15,7 +15,7 @@ before_build:
   - git submodule update --init
   - mkdir build
   - cd build
-  - cmake -DBOOST_ROOT=c:\Libraries\boost ..
+  - cmake -G "Visual Studio 12" -DBOOST_ROOT=c:\Libraries\boost ..
 
 build_script:
   - cmake --build .
