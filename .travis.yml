@@ -12,6 +12,8 @@ compiler:
 env:
  - BOOST=libboost1.55-all-dev TEST_INCLUDES=ON
  - BOOST=libboost1.54-all-dev TEST_INCLUDES=ON
+ - BOOST=libboost1.48-all-dev TEST_INCLUDES=ON
+ - BOOST=libboost1.46-all-dev TEST_INCLUDES=ON
 
 before_install:
  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
