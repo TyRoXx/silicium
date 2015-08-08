@@ -94,6 +94,7 @@ silicium_observable *silicium_make_coroutine(silicium_coroutine_function action,
 		return nullptr;
 	}
 #else
+	boost::ignore_unused_variable_warning(action);
 	boost::ignore_unused_variable_warning(user_data);
 	return nullptr;
 #endif
