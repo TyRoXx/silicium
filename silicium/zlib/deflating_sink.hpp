@@ -153,8 +153,7 @@ namespace Si
 	{
 		return zlib_deflating_sink<typename std::decay<Next>::type>(std::forward<Next>(next), std::move(stream));
 	}
-
-#endif
 }
+#endif
 
 #endif
