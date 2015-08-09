@@ -76,7 +76,7 @@ important
   * [ ] appveyor integration finished
 * measure test coverage
 * allow for recursive variants
-* check whether fast_variant&lt;T &amp;&gt; makes sense
+* check whether variant&lt;T &amp;&gt; makes sense
 * Asio-style async_wait for the end of a child process
 * async read and write for anonymous pipes on Win32
 * clean up noexcept annotations
