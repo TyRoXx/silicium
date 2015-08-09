@@ -127,6 +127,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package(ZLIB)
 if(ZLIB_FOUND)
 	include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
+else()
+	add_definitions("-DSILICIUM_AVOID_ZLIB=1")
 endif()
 
 find_package(UriParser)

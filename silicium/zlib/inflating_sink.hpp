@@ -6,6 +6,7 @@
 #include <silicium/iterator_range.hpp>
 #include <silicium/optional.hpp>
 
+#if !SILICIUM_AVOID_ZLIB
 namespace Si
 {
 	struct zlib_inflate_stream
@@ -79,5 +80,6 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(zlib_inflate_stream &operator = (zlib_inflate_stream const &))
 	};
 }
+#endif
 
 #endif

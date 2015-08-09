@@ -9,8 +9,9 @@
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
 
-#define SILICIUM_HAS_DEFLATING_SINK SILICIUM_HAS_VARIANT
+#define SILICIUM_HAS_DEFLATING_SINK (SILICIUM_HAS_VARIANT && !SILICIUM_AVOID_ZLIB)
 
+#if SILICIUM_HAS_DEFLATING_SINK
 namespace Si
 {
 	struct zlib_deflate_stream
@@ -78,7 +79,6 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(zlib_deflate_stream &operator = (zlib_deflate_stream const &))
 	};
 
-#if SILICIUM_HAS_DEFLATING_SINK
 	typedef variant<flush, memory_range> zlib_sink_element;
 
 	template <class Next>
@@ -153,6 +153,7 @@ namespace Si
 	{
 		return zlib_deflating_sink<typename std::decay<Next>::type>(std::forward<Next>(next), std::move(stream));
 	}
+
 #endif
 }
 

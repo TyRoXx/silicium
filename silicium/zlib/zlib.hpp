@@ -4,6 +4,8 @@
 #include <silicium/config.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
+
+#if !SILICIUM_AVOID_ZLIB
 #include <zlib.h>
 
 namespace Si
@@ -48,5 +50,6 @@ namespace Si
 		boost::throw_exception(boost::system::system_error(status, zlib_category()));
 	}
 }
+#endif
 
 #endif

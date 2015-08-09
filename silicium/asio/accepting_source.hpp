@@ -6,7 +6,9 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>
 
-#if BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS
+#define SILICIUM_HAS_ASIO_ACCEPTING_SOURCE (BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS && !SILICIUM_AVOID_BOOST_COROUTINE)
+
+#if SILICIUM_HAS_ASIO_ACCEPTING_SOURCE
 #include <boost/asio/spawn.hpp>
 
 namespace Si
