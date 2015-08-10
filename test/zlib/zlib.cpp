@@ -3,6 +3,7 @@
 #include <silicium/zlib/inflating_sink.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_DEFLATING_SINK
 BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 {
 	Si::zlib_deflate_stream deflator(Z_DEFAULT_COMPRESSION);
@@ -27,7 +28,6 @@ BOOST_AUTO_TEST_CASE(zlib_stream_wrappers)
 	BOOST_CHECK_EQUAL(original, std::string(decompressed.begin(), decompressed.begin() + decompressed_length));
 }
 
-#if SILICIUM_HAS_DEFLATING_SINK
 BOOST_AUTO_TEST_CASE(zlib_deflating_sink_test)
 {
 	std::vector<char> compressed;
