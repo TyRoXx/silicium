@@ -22,7 +22,7 @@ namespace Si
 		void touch(Si::absolute_path const &name)
 		{
 			//remove existing file to reset the attributes
-			Si::remove_file(name);
+			Si::throw_if_error(Si::remove_file(name));
 
 			std::ofstream file(name.c_str());
 			BOOST_REQUIRE(file);
@@ -151,8 +151,8 @@ namespace Si
 			[&file]
 		{
 			Si::file_sink sink(file.handle);
-			Si::append(sink, Si::file_sink_element(Si::make_c_str_range("hello\n")));
-			Si::append(sink, Si::file_sink_element(Si::flush()));
+			Si::throw_if_error(Si::append(sink, Si::file_sink_element(Si::make_c_str_range("hello\n"))));
+			Si::throw_if_error(Si::append(sink, Si::file_sink_element(Si::flush())));
 			//we write to the file without closing it
 		},
 			[&test_file, &watched_dir](file_notification const &event)
