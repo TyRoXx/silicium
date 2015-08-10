@@ -134,6 +134,8 @@ endif()
 find_package(UriParser)
 if(URIPARSER_FOUND)
 	include_directories(SYSTEM ${URIPARSER_INCLUDE_DIR})
+else()
+	add_definitions("-DSILICIUM_AVOID_URIPARSER=1")
 endif()
 
 find_package(SQLite3)

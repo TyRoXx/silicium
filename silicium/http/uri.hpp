@@ -3,8 +3,12 @@
 
 #include <silicium/iterator_range.hpp>
 #include <silicium/optional.hpp>
-#include <uriparser/Uri.h>
 #include <vector>
+
+#define SILICIUM_HAS_HTTP_URI !SILICIUM_AVOID_URIPARSER
+
+#if SILICIUM_HAS_HTTP_URI
+#include <uriparser/Uri.h>
 
 namespace Si
 {
@@ -103,5 +107,6 @@ namespace Si
 		}
 	}
 }
+#endif
 
 #endif

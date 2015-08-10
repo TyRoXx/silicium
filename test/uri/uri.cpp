@@ -5,6 +5,7 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/optional/optional_io.hpp>
 
+#if SILICIUM_HAS_HTTP_URI
 namespace
 {
 	std::string to_string(Si::http::uri::string str)
@@ -58,3 +59,4 @@ BOOST_AUTO_TEST_CASE(uri_parse_html_query)
 	;
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), parsed->begin(), parsed->end());
 }
+#endif
