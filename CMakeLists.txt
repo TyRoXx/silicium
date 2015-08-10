@@ -171,6 +171,11 @@ if(SILICIUM_NO_DEPRECATED)
 	add_definitions("-DSILICIUM_NO_DEPRECATED")
 endif()
 
+option(SILICIUM_TESTS_RUNNING_ON_TRAVIS_CI "Enable this when running the unit tests on travis-ci.org. It will exclude file system tests that are known to be flaky due to travis issues." OFF)
+if(SILICIUM_TESTS_RUNNING_ON_TRAVIS_CI)
+	add_definitions("-DSILICIUM_TESTS_RUNNING_ON_TRAVIS_CI")
+endif()
+
 include_directories(".")
 
 if(NOT (Boost_VERSION LESS 105300))

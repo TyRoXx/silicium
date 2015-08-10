@@ -297,8 +297,10 @@ namespace Si
 	}
 #endif
 
-#ifndef _WIN32
-	//we cannot yet detect the removal of the watched directory
+#if !defined(_WIN32) && !defined(SILICIUM_TESTS_RUNNING_ON_TRAVIS_CI)
+	//It is a known problem that travis-ci.org does not properly implement IN_DELETE_SELF,
+	//so this test is pointless there.
+	//https://github.com/travis-ci/travis-ci/issues/2342
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_watched_dir)
 	{
 		Si::absolute_path const root_dir = Si::get_current_working_directory();
