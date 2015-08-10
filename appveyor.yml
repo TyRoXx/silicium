@@ -25,7 +25,7 @@ after_build:
 before_test:
 
 test_script:
-  - ./test/unit_test/Release/unit_test.exe
+  - test\unit_test\Release\unit_test.exe
 
 after_test:
 
