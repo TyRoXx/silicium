@@ -40,7 +40,9 @@ namespace Si
 		int result = run_process(parameters);
 		BOOST_CHECK_EQUAL(2, result);
 		std::size_t const windows7whereHelpSize = 1830;
-		BOOST_CHECK_EQUAL(windows7whereHelpSize, out.size());
+		std::size_t const windowsServer2012whereHelpSize = 1705;
+		BOOST_CHECK_GE(windows7whereHelpSize, out.size());
+		BOOST_CHECK_LE(windowsServer2012whereHelpSize, out.size());
 	}
 #endif
 

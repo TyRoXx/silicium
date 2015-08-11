@@ -87,7 +87,9 @@ BOOST_AUTO_TEST_CASE(async_process_win32_where)
 	process_output result = run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::no_inherit);
 
 	std::size_t const windows7whereHelpSize = 1830;
-	BOOST_CHECK_EQUAL(windows7whereHelpSize, result.output.size());
+	std::size_t const windowsServer2012whereHelpSize = 1705;
+	BOOST_CHECK_GE(windows7whereHelpSize, result.output.size());
+	BOOST_CHECK_LE(windowsServer2012whereHelpSize, result.output.size());
 	BOOST_CHECK_EQUAL("", result.error);
 	BOOST_CHECK_EQUAL(2, result.exit_code);
 }
