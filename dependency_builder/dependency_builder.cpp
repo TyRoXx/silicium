@@ -1,10 +1,10 @@
 #include <silicium/os_string.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
-#include <boost/program_options.hpp>
+#include <silicium/program_options.hpp>
 #include <iostream>
 
-#define SILICIUM_HAS_DEPENDENCY_BUILDER SILICIUM_HAS_RUN_PROCESS
+#define SILICIUM_HAS_DEPENDENCY_BUILDER (SILICIUM_HAS_RUN_PROCESS && SILICIUM_HAS_PROGRAM_OPTIONS)
 
 #if SILICIUM_HAS_DEPENDENCY_BUILDER
 

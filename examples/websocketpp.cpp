@@ -170,7 +170,11 @@ int main()
 	}
 	catch (std::exception const &ex)
 	{
-		std::cerr << typeid(ex).name() << ": " << ex.what() << '\n';
+		std::cerr <<
+#if SILICIUM_HAS_RTTI
+			typeid(ex).name() << ": " <<
+#endif
+			ex.what() << '\n';
 		return 1;
 	}
 }

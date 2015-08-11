@@ -73,6 +73,12 @@
 #	define SILICIUM_HAS_EXCEPTIONS 1
 #endif
 
+#ifdef BOOST_NO_RTTI
+#	define SILICIUM_HAS_RTTI 0
+#else
+#	define SILICIUM_HAS_RTTI 1
+#endif
+
 #ifndef SILICIUM_AVOID_BOOST_COROUTINE
 #	define SILICIUM_AVOID_BOOST_COROUTINE 0
 #endif

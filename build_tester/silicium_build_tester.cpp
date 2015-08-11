@@ -11,12 +11,12 @@
 #include <silicium/make_array.hpp>
 #include <silicium/source/file_source.hpp>
 #include <silicium/terminate_on_exception.hpp>
+#include <silicium/program_options.hpp>
 #include <iostream>
 #include <boost/unordered_map.hpp>
-#include <boost/program_options.hpp>
 #include <boost/algorithm/string/find.hpp>
 
-#define SILICIUM_HAS_BUILD_TESTER (BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_MAKE_ARRAY && SILICIUM_HAS_HTML_TREE)
+#define SILICIUM_HAS_BUILD_TESTER ((BOOST_VERSION >= 105400) && SILICIUM_HAS_PROGRAM_OPTIONS && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_MAKE_ARRAY && SILICIUM_HAS_HTML_TREE)
 
 #if SILICIUM_HAS_BUILD_TESTER
 #include <boost/asio/spawn.hpp>
