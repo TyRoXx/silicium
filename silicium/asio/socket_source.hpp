@@ -15,11 +15,13 @@ namespace Si
 	namespace asio
 	{
 		template <class YieldContext>
-		struct basic_socket_source : Si::Source<char>::interface
+		struct basic_socket_source
 		{
+			typedef char element_type;
+
 			explicit basic_socket_source(boost::asio::ip::tcp::socket &socket, YieldContext &yield);
-			virtual iterator_range<char const *> map_next(std::size_t size) SILICIUM_OVERRIDE;
-			virtual char *copy_next(iterator_range<char *> destination) SILICIUM_OVERRIDE;
+			iterator_range<char const *> map_next(std::size_t size);
+			char *copy_next(iterator_range<char *> destination);
 
 		private:
 

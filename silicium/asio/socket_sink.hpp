@@ -15,10 +15,13 @@ namespace Si
 {
 	namespace asio
 	{
-		struct socket_sink : Si::Sink<char, boost::system::error_code>::interface
+		struct socket_sink
 		{
+			typedef char element_type;
+			typedef boost::system::error_code error_type;
+
 			explicit socket_sink(boost::asio::ip::tcp::socket &socket, boost::asio::yield_context &yield);
-			virtual boost::system::error_code append(iterator_range<char const *> data) SILICIUM_OVERRIDE;
+			boost::system::error_code append(iterator_range<char const *> data);
 
 		private:
 

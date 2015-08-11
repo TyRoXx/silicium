@@ -22,7 +22,7 @@ namespace
 	{
 		try
 		{
-			Si::asio::socket_source receiver(*client, yield);
+			auto receiver = Si::virtualize_source(Si::asio::socket_source(*client, yield));
 			Si::asio::socket_sink sender(*client, yield);
 			auto buffered_sender = Si::make_buffering_sink(Si::ref_sink(sender));
 			auto buffered_receiver = Si::make_buffer(receiver, 4096);
