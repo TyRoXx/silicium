@@ -15,13 +15,13 @@ namespace Si
 {
 	namespace asio
 	{
-		struct accepting_source : Source<std::shared_ptr<boost::asio::ip::tcp::socket>>::interface
+		struct accepting_source
 		{
 			typedef std::shared_ptr<boost::asio::ip::tcp::socket> element_type;
 
 			explicit accepting_source(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context &yield);
-			virtual iterator_range<element_type const *> map_next(std::size_t) SILICIUM_OVERRIDE;
-			virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE;
+			iterator_range<element_type const *> map_next(std::size_t);
+			element_type *copy_next(iterator_range<element_type *> destination);
 
 		private:
 

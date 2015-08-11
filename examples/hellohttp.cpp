@@ -2,6 +2,7 @@
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/socket_sink.hpp>
 #include <silicium/asio/socket_source.hpp>
+#include <silicium/source/virtualized_source.hpp>
 #include <silicium/source/buffering_source.hpp>
 #include <silicium/config.hpp>
 #include <silicium/sink/ptr_sink.hpp>
@@ -68,7 +69,7 @@ int main()
 #if SILICIUM_EXAMPLE_AVAILABLE
 	boost::asio::spawn(io, [&acceptor](boost::asio::yield_context yield)
 	{
-		Si::asio::accepting_source clients(acceptor, yield);
+		auto clients = Si::virtualize_source(Si::asio::accepting_source(acceptor, yield));
 		for (auto client : Si::make_buffer(clients, 1))
 		{
 			boost::asio::spawn(acceptor.get_io_service(), std::bind(serve_client, client, std::placeholders::_1));
