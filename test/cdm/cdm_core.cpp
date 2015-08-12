@@ -5,6 +5,7 @@ namespace
 {
 	Si::error_or<Si::absolute_path> get_current_executable_path()
 	{
+#ifdef _WIN32
 		//will be enough for most cases
 		std::vector<wchar_t> buffer(MAX_PATH);
 		for (;;)
@@ -27,6 +28,15 @@ namespace
 				return error;
 			}
 		}
+#else
+		boost::system::error_code ec;
+		auto result = boost::filesystem::read_symlink("/proc/self/exe", ec);
+		if (!!ec)
+		{
+			return ec;
+		}
+		return *Si::absolute_path::create(std::move(result));
+#endif
 	}
 }
 
@@ -36,7 +46,11 @@ BOOST_AUTO_TEST_CASE(cdm_core_trivial)
 #ifdef _MSC_VER
 	auto const build_type = directory_containing_test_exe.leaf();
 #endif
-	auto const description_library = directory_containing_test_exe.parent_path().parent_path() / "cdm" / "websocketpp" /
+	auto const description_library = directory_containing_test_exe.parent_path()
+#ifdef _MSC_VER
+		.parent_path()
+#endif
+		/ "cdm" / "websocketpp" /
 #ifdef _MSC_VER
 		build_type / "cdm_websocketpp.dll"
 #else

@@ -40,22 +40,12 @@ namespace Si
 			{
 			}
 
-			void open(native_path_string file, boost::system::error_code &ec)
-			{
-				std::unique_ptr<void, deleter> new_handle(DynamicLibraryImpl::open(file, ec));
-				if (!ec)
-				{
-					handle = std::move(new_handle);
-				}
-			}
-
 			void open(native_path_string file)
 			{
-				boost::system::error_code ec;
-				open(file, ec);
-				if (ec)
+				std::unique_ptr<void, deleter> new_handle(DynamicLibraryImpl::open(file));
+				if (new_handle)
 				{
-					boost::throw_exception(boost::system::system_error(ec));
+					handle = std::move(new_handle);
 				}
 			}
 

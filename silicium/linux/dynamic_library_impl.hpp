@@ -12,16 +12,12 @@ namespace Si
 		struct dynamic_library_impl
 		{
 			SILICIUM_USE_RESULT
-			static void *open(c_string file, boost::system::error_code &ec)
+			static void *open(c_string file)
 			{
 				void * const handle = dlopen(file.c_str(), RTLD_LAZY);
-				if (handle)
+				if (!handle)
 				{
-					ec = boost::system::error_code();
-				}
-				else
-				{
-					ec = get_last_error();
+					throw std::runtime_error(dlerror());
 				}
 				return handle;
 			}
