@@ -4,6 +4,7 @@
 #include <silicium/c_string.hpp>
 #include <silicium/get_last_error.hpp>
 #include <dlfcn.h>
+#include <boost/throw_exception.hpp>
 
 namespace Si
 {
@@ -17,7 +18,7 @@ namespace Si
 				void * const handle = dlopen(file.c_str(), RTLD_LAZY);
 				if (!handle)
 				{
-					throw std::runtime_error(dlerror());
+					boost::throw_exception(std::runtime_error(dlerror()));
 				}
 				return handle;
 			}
