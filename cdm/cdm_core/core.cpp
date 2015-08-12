@@ -21,6 +21,6 @@ namespace cdm
 		{
 			return boost::system::error_code(error::cdm_describe_failed);
 		}
-		return std::move(result);
+		return Si::error_or<dynamic_library_description>(std::move(result));
 	}
 }

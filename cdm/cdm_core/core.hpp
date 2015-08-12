@@ -11,6 +11,25 @@ namespace cdm
 	{
 		Si::dynamic_library library;
 		description cached_description;
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		dynamic_library_description()
+		{
+		}
+
+		dynamic_library_description(dynamic_library_description &&other) BOOST_NOEXCEPT
+			: library(std::move(other.library))
+			, cached_description(std::move(other.cached_description))
+		{
+		}
+
+		dynamic_library_description &operator = (dynamic_library_description &&other) BOOST_NOEXCEPT
+		{
+			library = std::move(other.library);
+			cached_description = std::move(other.cached_description);
+			return *this;
+		}
+#endif
 	};
 
 	enum class error
