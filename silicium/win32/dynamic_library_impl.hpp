@@ -2,7 +2,7 @@
 #define SILICIUM_WIN32_DYNAMIC_LIBRARY_IMPL_HPP
 
 #include <silicium/c_string.hpp>
-#include <silicium/get_last_error.hpp>
+#include <silicium/throw_last_error.hpp>
 #include <boost/filesystem/path.hpp>
 
 namespace Si
@@ -13,16 +13,12 @@ namespace Si
 		struct dynamic_library_impl
 		{
 			SILICIUM_USE_RESULT
-			static void *open(native_path_string file, boost::system::error_code &ec)
+			static void *open(native_path_string file)
 			{
 				HMODULE const handle = LoadLibraryW(file.c_str());
-				if (handle)
+				if (!handle)
 				{
-					ec = boost::system::error_code();
-				}
-				else
-				{
-					ec = get_last_error();
+					throw_last_error();
 				}
 				return handle;
 			}

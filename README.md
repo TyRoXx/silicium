@@ -81,6 +81,7 @@ important
 * async read and write for anonymous pipes on Win32
 * clean up noexcept annotations
 * prevent all integer overflows in the library
+* noexcept function to load a dynamic library
 
 nice to have
 ------------
