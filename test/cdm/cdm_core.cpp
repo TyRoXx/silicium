@@ -1,4 +1,5 @@
 #include <cdm_core/core.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace
