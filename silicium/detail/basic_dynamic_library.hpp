@@ -52,6 +52,7 @@ namespace Si
 			SILICIUM_USE_RESULT
 			void *find_symbol(c_string name) const
 			{
+				assert(handle);
 				return DynamicLibraryImpl::find_symbol(handle.get(), name);
 			}
 
