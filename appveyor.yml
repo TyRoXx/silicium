@@ -2,8 +2,8 @@
 version: 0.1.{build}-{branch}
 
 branches:
-  only:
-    - master
+  except:
+    - gh_pages
 
 skip_tags: true
 
