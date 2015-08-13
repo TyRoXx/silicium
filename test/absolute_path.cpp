@@ -203,6 +203,7 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_wchar_not_ok)
 }
 #endif
 
+#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 BOOST_AUTO_TEST_CASE(absolute_path_get_current_executable_path)
 {
 	Si::absolute_path p = Si::get_current_executable_path().move_value();
@@ -212,3 +213,4 @@ BOOST_AUTO_TEST_CASE(absolute_path_get_current_executable_path)
 #endif
 		, p.to_boost_path().leaf());
 }
+#endif
