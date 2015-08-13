@@ -207,10 +207,12 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_wchar_not_ok)
 BOOST_AUTO_TEST_CASE(absolute_path_get_current_executable_path)
 {
 	Si::absolute_path p = Si::get_current_executable_path().move_value();
-	BOOST_CHECK_EQUAL("unit_test"
+	auto const expected =
+		"unit_test"
 #ifdef _WIN32
-					  ".exe"
+		".exe"
 #endif
-		, p.to_boost_path().leaf());
+		;
+	BOOST_CHECK_EQUAL(expected, p.to_boost_path().leaf());
 }
 #endif

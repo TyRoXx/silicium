@@ -7,6 +7,10 @@
 #include <silicium/error_or.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/c_string.hpp>
+#include <silicium/get_last_error.hpp>
+#ifdef _WIN32
+#	include <silicium/win32/win32.hpp>
+#endif
 
 //Boost filesystem requires exceptions
 #define SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS SILICIUM_HAS_EXCEPTIONS
