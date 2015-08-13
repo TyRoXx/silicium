@@ -202,3 +202,13 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_wchar_not_ok)
 	BOOST_CHECK(!p);
 }
 #endif
+
+BOOST_AUTO_TEST_CASE(absolute_path_get_current_executable_path)
+{
+	Si::absolute_path p = Si::get_current_executable_path().move_value();
+	BOOST_CHECK_EQUAL("unit_test"
+#ifdef _WIN32
+					  ".exe"
+#endif
+		, p.to_boost_path().leaf());
+}
