@@ -91,7 +91,10 @@ namespace Si
 			return *this;
 		}
 
-		T &value() &
+		T &value()
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+			&
+#endif
 		{
 			return visit<T &>(
 				content,
@@ -106,7 +109,10 @@ namespace Si
 			);
 		}
 
-		T const &value() const &
+		T const &value() const
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+			&
+#endif
 		{
 			return visit<T const &>(
 				content,
@@ -121,6 +127,7 @@ namespace Si
 			);
 		}
 
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 		T &&value() &&
 		{
 			return visit<T &&>(
@@ -135,6 +142,7 @@ namespace Si
 				}
 			);
 		}
+#endif
 
 		template <class ...Args>
 		void emplace(Args &&...args)
