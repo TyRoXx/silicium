@@ -45,3 +45,18 @@ BOOST_AUTO_TEST_CASE(safe_arithmetic_mul_size_t_overflow)
 	Si::optional<Si::safe_number<std::size_t>> result = a * b;
 	BOOST_CHECK(!result);
 }
+
+BOOST_AUTO_TEST_CASE(safe_arithmetic_div_size_t)
+{
+	Si::safe_number<std::size_t> a(50), b(3);
+	Si::optional<Si::safe_number<std::size_t>> result = a / b;
+	BOOST_REQUIRE(result);
+	BOOST_CHECK_EQUAL(16, result->value);
+}
+
+BOOST_AUTO_TEST_CASE(safe_arithmetic_div_size_t_zero)
+{
+	Si::safe_number<std::size_t> a(23), b(0);
+	Si::optional<Si::safe_number<std::size_t>> result = a / b;
+	BOOST_CHECK(!result);
+}

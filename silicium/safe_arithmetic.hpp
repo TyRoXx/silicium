@@ -68,6 +68,18 @@ namespace Si
 		return result;
 	}
 
+	template <class Unsigned>
+	optional<safe_number<Unsigned>> operator / (safe_number<Unsigned> left, safe_number<Unsigned> right)
+	{
+		safe_number<Unsigned> result;
+		if (right.value == 0)
+		{
+			return none;
+		}
+		result.value = left.value / right.value;
+		return result;
+	}
+
 #define SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(op) \
 	template <class Unsigned> \
 	optional<safe_number<Unsigned>> operator op (optional<safe_number<Unsigned>> left, safe_number<Unsigned> right) \
@@ -100,6 +112,7 @@ namespace Si
 	SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(+)
 	SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(-)
 	SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(*)
+	SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(/)
 #undef SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR
 
 	template <class T>
