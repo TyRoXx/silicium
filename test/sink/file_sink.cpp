@@ -10,6 +10,7 @@
 #include <array>
 #include <fstream>
 
+#if SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_FILE_SINK //for Boost filesystem
 namespace
 {
 	std::vector<char> read_file(boost::filesystem::path const &name)
@@ -19,7 +20,6 @@ namespace
 	}
 }
 
-#if SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_FILE_SINK //for Boost filesystem
 BOOST_AUTO_TEST_CASE(file_sink_success)
 {
 	boost::filesystem::path const file_name = boost::filesystem::temp_directory_path() / "silicium_file_sink_success.txt";
