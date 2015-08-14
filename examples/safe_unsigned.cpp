@@ -8,13 +8,13 @@ bool checked_fma(boost::uint64_t *a, boost::uint64_t b, boost::uint64_t c)
 	//inlining works perfectly.
 	//The generated code may not be optimal yet because the operators have not been optimized in
 	//this regard.
-	Si::optional<Si::safe_number<boost::uint64_t>> product = Si::safe(b) * Si::safe(c);
-	Si::optional<Si::safe_number<boost::uint64_t>> sum = Si::safe(*a) + product;
-	if (!sum)
+	Si::overflow_or<Si::safe_number<boost::uint64_t>> product = Si::safe(b) * Si::safe(c);
+	Si::overflow_or<Si::safe_number<boost::uint64_t>> sum = Si::safe(*a) + product;
+	if (sum.is_overflow())
 	{
 		return false;
 	}
-	*a = sum->value;
+	*a = sum.value()->value;
 	return true;
 }
 

@@ -32,24 +32,67 @@ namespace Si
 		return std::move(value);
 	}
 
+	struct overflow_type {};
+
+	static BOOST_CONSTEXPR_OR_CONST overflow_type overflow;
+
 	template <class Unsigned>
-	optional<safe_number<Unsigned>> operator + (safe_number<Unsigned> left, safe_number<Unsigned> right)
+	struct overflow_or
+	{
+		typedef Unsigned value_type;
+
+		overflow_or() BOOST_NOEXCEPT
+		{
+		}
+
+		overflow_or(Unsigned value)
+			: m_state(value)
+		{
+		}
+
+		overflow_or(overflow_type)
+		{
+		}
+
+		bool is_overflow() const BOOST_NOEXCEPT
+		{
+			return !m_state;
+		}
+
+		optional<Unsigned> const &value() const BOOST_NOEXCEPT
+		{
+			return m_state;
+		}
+
+	private:
+
+		optional<Unsigned> m_state;
+	};
+
+	template <class Char, class Traits, class T>
+	std::basic_ostream<Char, Traits> &operator << (std::basic_ostream<Char, Traits> &out, overflow_or<T> const &value)
+	{
+		return out << value.value();
+	}
+
+	template <class Unsigned>
+	overflow_or<safe_number<Unsigned>> operator + (safe_number<Unsigned> left, safe_number<Unsigned> right)
 	{
 		safe_number<Unsigned> result;
 		result.value = left.value + right.value;
 		if (result.value < left.value)
 		{
-			return none;
+			return overflow;
 		}
 		return result;
 	}
 
 	template <class Unsigned>
-	optional<safe_number<Unsigned>> operator - (safe_number<Unsigned> left, safe_number<Unsigned> right)
+	overflow_or<safe_number<Unsigned>> operator - (safe_number<Unsigned> left, safe_number<Unsigned> right)
 	{
 		if (left.value < right.value)
 		{
-			return none;
+			return overflow;
 		}
 		safe_number<Unsigned> result;
 		result.value = left.value - right.value;
@@ -57,24 +100,24 @@ namespace Si
 	}
 
 	template <class Unsigned>
-	optional<safe_number<Unsigned>> operator * (safe_number<Unsigned> left, safe_number<Unsigned> right)
+	overflow_or<safe_number<Unsigned>> operator * (safe_number<Unsigned> left, safe_number<Unsigned> right)
 	{
 		safe_number<Unsigned> result;
 		result.value = left.value * right.value;
 		if (left.value != 0 && (((std::numeric_limits<Unsigned>::max)() / left.value) < right.value))
 		{
-			return none;
+			return overflow;
 		}
 		return result;
 	}
 
 	template <class Unsigned>
-	optional<safe_number<Unsigned>> operator / (safe_number<Unsigned> left, safe_number<Unsigned> right)
+	overflow_or<safe_number<Unsigned>> operator / (safe_number<Unsigned> left, safe_number<Unsigned> right)
 	{
 		safe_number<Unsigned> result;
 		if (right.value == 0)
 		{
-			return none;
+			return overflow;
 		}
 		result.value = left.value / right.value;
 		return result;
@@ -82,31 +125,31 @@ namespace Si
 
 #define SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(op) \
 	template <class Unsigned> \
-	optional<safe_number<Unsigned>> operator op (optional<safe_number<Unsigned>> left, safe_number<Unsigned> right) \
+	overflow_or<safe_number<Unsigned>> operator op (overflow_or<safe_number<Unsigned>> left, safe_number<Unsigned> right) \
 	{ \
-		if (!left) \
+		if (left.is_overflow()) \
 		{ \
-			return none; \
+			return overflow; \
 		} \
-		return *left op right; \
+		return *left.value() op right; \
 	} \
 	template <class Unsigned> \
-	optional<safe_number<Unsigned>> operator op (safe_number<Unsigned> left, optional<safe_number<Unsigned>> right) \
+	overflow_or<safe_number<Unsigned>> operator op (safe_number<Unsigned> left, overflow_or<safe_number<Unsigned>> right) \
 	{ \
-		if (!right) \
+		if (right.is_overflow()) \
 		{ \
-			return none; \
+			return overflow; \
 		} \
-		return left op *right; \
+		return left op *right.value(); \
 	} \
 	template <class Unsigned> \
-	optional<safe_number<Unsigned>> operator op (optional<safe_number<Unsigned>> left, optional<safe_number<Unsigned>> right) \
+	overflow_or<safe_number<Unsigned>> operator op (overflow_or<safe_number<Unsigned>> left, overflow_or<safe_number<Unsigned>> right) \
 	{ \
-		if (!left || !right) \
+		if (left.is_overflow() || right.is_overflow()) \
 		{ \
-			return none; \
+			return overflow; \
 		} \
-		return *left op *right; \
+		return *left.value() op *right.value(); \
 	}
 
 	SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(+)
