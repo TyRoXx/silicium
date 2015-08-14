@@ -51,7 +51,7 @@ namespace Si
 
 				//VC++ 2013 bug: this cannot be captured by the following lambda for some reason (fails with
 				//nonsense compiler error about a generated posting_observable copy operator)
-				auto *io = m_io;
+				auto *io = this->m_io;
 				m_next.async_get_one(
 					make_function_observer([io,
 					SILICIUM_CAPTURE_EXPRESSION(keep_io_running, std::move(keep_io_running)),
