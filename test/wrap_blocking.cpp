@@ -71,6 +71,7 @@ namespace Si
 }
 #endif
 
+#if SILICIUM_HAS_COROUTINE_GENERATOR
 namespace
 {
 	int blocking_stuff()
@@ -79,7 +80,6 @@ namespace
 	}
 }
 
-#if SILICIUM_HAS_COROUTINE_GENERATOR
 BOOST_AUTO_TEST_CASE(wrap_blocking_coroutine)
 {
 	auto coro = Si::make_coroutine_generator<int>([](Si::push_context<int> &yield)
