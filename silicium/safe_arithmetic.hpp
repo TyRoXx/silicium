@@ -3,6 +3,7 @@
 
 #include <silicium/optional.hpp>
 #include <limits>
+#include <ostream>
 
 namespace Si
 {
@@ -24,6 +25,12 @@ namespace Si
 		{
 		}
 	};
+
+	template <class T>
+	safe_number<T> safe(T value)
+	{
+		return std::move(value);
+	}
 
 	template <class Unsigned>
 	optional<safe_number<Unsigned>> operator + (safe_number<Unsigned> left, safe_number<Unsigned> right)
@@ -118,6 +125,12 @@ namespace Si
 	{
 		using boost::hash_value;
 		return hash_value(value.value);
+	}
+
+	template <class ...S, class T>
+	std::basic_ostream<S...> &operator << (std::basic_ostream<S...> &out, safe_number<T> const &value)
+	{
+		return out << value.value;
 	}
 }
 

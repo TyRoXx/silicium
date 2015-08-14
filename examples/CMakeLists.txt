@@ -12,6 +12,10 @@ add_executable(trivialhttp "trivialhttp.cpp")
 target_link_libraries(trivialhttp ${Boost_LIBRARIES})
 set_target_properties(trivialhttp PROPERTIES FOLDER examples)
 
+add_executable(safe_unsigned "safe_unsigned.cpp")
+target_link_libraries(safe_unsigned ${Boost_LIBRARIES})
+set_target_properties(safe_unsigned PROPERTIES FOLDER examples)
+
 add_executable(directory_watcher "directory_watcher.cpp")
 target_link_libraries(directory_watcher ${Boost_LIBRARIES})
 set_target_properties(directory_watcher PROPERTIES FOLDER examples)

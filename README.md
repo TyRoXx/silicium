@@ -94,6 +94,10 @@ nice to have
 * move everything HTTP into a separate library
 * do not #include <boost/concept_check.hpp> just to get boost::ignore_unused_variable_warning
 * play with Visual C++ 2015 await: http://blogs.msdn.com/b/vcblog/archive/2014/11/12/resumable-functions-in-c.aspx
+* define operator<< for basic_ostream, not ostream
+* optimize safe integer arithmetic
+  * GCC/Clang intrinsics?
+  * avoid the div in operator*
 
 probably outside of scope
 -------------------------
