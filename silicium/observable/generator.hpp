@@ -28,9 +28,20 @@ namespace Si
 		{
 		}
 
+		generator_observable(generator_observable const &other)
+			: generate(other.generate)
+		{
+		}
+
 		generator_observable &operator = (generator_observable &&other)
 		{
 			generate = std::move(other.generate);
+			return *this;
+		}
+
+		generator_observable &operator = (generator_observable const &other)
+		{
+			generate = other.generate;
 			return *this;
 		}
 #endif

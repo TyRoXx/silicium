@@ -31,6 +31,12 @@
 #	define SILICIUM_GCC46 0
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 7)
+#	define SILICIUM_GCC47 1
+#else
+#	define SILICIUM_GCC47 0
+#endif
+
 #ifdef _MSC_VER
 #	define SILICIUM_VC 1
 #	define SILICIUM_VC2010 (_MSC_VER == 1600)

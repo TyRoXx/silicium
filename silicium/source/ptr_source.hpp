@@ -23,15 +23,27 @@ namespace Si
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		SILICIUM_DEFAULT_MOVE(ptr_source)
+		SILICIUM_DEFAULT_COPY(ptr_source)
 #else
 		ptr_source(ptr_source &&other)
 			: m_ptr(std::move(other.m_ptr))
 		{
 		}
 
+		ptr_source(ptr_source const &other)
+			: m_ptr(other.m_ptr)
+		{
+		}
+
 		ptr_source &operator = (ptr_source &&other)
 		{
 			m_ptr = std::move(other.m_ptr);
+			return *this;
+		}
+
+		ptr_source &operator = (ptr_source const &other)
+		{
+			m_ptr = other.m_ptr;
 			return *this;
 		}
 #endif
@@ -49,8 +61,6 @@ namespace Si
 	private:
 
 		SourcePtr m_ptr;
-
-		SILICIUM_DISABLE_COPY(ptr_source)
 	};
 
 	template <class Source>

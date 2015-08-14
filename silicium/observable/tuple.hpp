@@ -5,7 +5,7 @@
 #include <silicium/config.hpp>
 #include <bitset>
 
-#if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING
+#if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING || SILICIUM_GCC47 /*GCC 4.7 crashes when using tuple*/
 #	define SILICIUM_RX_TUPLE_AVAILABLE 0
 #else
 #	define SILICIUM_RX_TUPLE_AVAILABLE 1
@@ -41,6 +41,15 @@ namespace Si
 		{
 		}
 
+		tuple_observable(tuple_observable const &other)
+			: parts(other.parts)
+			, receiver(other.receiver)
+			, buffer(other.buffer)
+			, elements_received(other.elements_received)
+			, observers(other.observers)
+		{
+		}
+
 		tuple_observable &operator = (tuple_observable &&other)
 		{
 			parts = std::move(other.parts);
@@ -48,6 +57,16 @@ namespace Si
 			buffer = std::move(other.buffer);
 			elements_received = std::move(other.elements_received);
 			observers = std::move(other.observers);
+			return *this;
+		}
+
+		tuple_observable &operator = (tuple_observable const &other)
+		{
+			parts = other.parts;
+			receiver = other.receiver;
+			buffer = other.buffer;
+			elements_received = other.elements_received;
+			observers = other.observers;
 			return *this;
 		}
 #endif
