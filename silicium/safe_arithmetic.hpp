@@ -140,8 +140,8 @@ namespace Si
 		return hash_value(value.value);
 	}
 
-	template <class ...S, class T>
-	std::basic_ostream<S...> &operator << (std::basic_ostream<S...> &out, safe_number<T> const &value)
+	template <class Char, class Traits, class T>
+	std::basic_ostream<Char, Traits> &operator << (std::basic_ostream<Char, Traits> &out, safe_number<T> const &value)
 	{
 		return out << value.value;
 	}
