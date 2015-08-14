@@ -5,6 +5,9 @@ if(${CMAKE_SYSTEM} MATCHES "Linux")
 	set(SILICIUM_LINUX ON)
 endif()
 
+message("C compiler:   " ${CMAKE_C_COMPILER})
+message("C++ compiler: " ${CMAKE_CXX_COMPILER})
+
 if(UNIX)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		add_definitions("-std=c++1y")
