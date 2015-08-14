@@ -350,7 +350,14 @@ namespace Si
 #endif
 
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1800)
+
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) == 407)
+	template <class T>
+	struct is_nothrow_destructible : std::true_type {};
+#else
 	using std::is_nothrow_destructible;
+#endif
+
 #else // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
 	template <class T>
 	struct is_default_constructible : std::conditional<
