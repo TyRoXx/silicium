@@ -20,15 +20,75 @@ namespace Si
 		{
 		}
 
+		expected(T &&value)
+			: content(std::move(value))
+		{
+		}
+
+		expected(T const &value)
+			: content(std::move(value))
+		{
+		}
+
 		template <class ...Args>
 		explicit expected(Args &&...args)
 			: content(inplace<T>(), std::forward<Args>(args)...)
 		{
 		}
 
-		explicit expected(exception_ptr exception)
+		expected(exception_ptr exception)
 			: content(std::move(exception))
 		{
+		}
+
+		expected(expected &&other)
+			: content(std::move(other.content))
+		{
+		}
+
+		expected(expected const &other)
+			: content(other.content)
+		{
+		}
+
+		expected &operator = (T &&value)
+		{
+			T * const existing = try_get_ptr<T>(content);
+			if (existing)
+			{
+				*existing = std::move(value);
+			}
+			else
+			{
+				content = std::move(value);
+			}
+			return *this;
+		}
+
+		expected &operator = (T const &value)
+		{
+			T * const existing = try_get_ptr<T>(content);
+			if (existing)
+			{
+				*existing = value;
+			}
+			else
+			{
+				content = value;
+			}
+			return *this;
+		}
+
+		expected &operator = (expected &&other)
+		{
+			content = std::move(other.content);
+			return *this;
+		}
+
+		expected &operator = (expected const &other)
+		{
+			content = other.content;
+			return *this;
 		}
 
 		T &value() &

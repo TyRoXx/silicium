@@ -1,15 +1,15 @@
 #include <cdm_description/all.hpp>
+#include <silicium/expected.hpp>
 
 extern "C"
-
 #ifdef _WIN32
 __declspec(dllexport)
 #else
 __attribute__((visibility("default")))
 #endif
-
-bool cdm_describe(cdm::description *result)
+void cdm_describe(Si::expected<cdm::description> *result)
 {
-	result->name = "websocketpp";
-	return true;
+	cdm::description description;
+	description.name = "websocketpp";
+	*result = std::move(description);
 }

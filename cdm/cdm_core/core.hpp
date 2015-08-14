@@ -34,8 +34,7 @@ namespace cdm
 
 	enum class error
 	{
-		cdm_describe_not_found = 1,
-		cdm_describe_failed
+		cdm_describe_not_found = 1
 	};
 
 	struct error_category : boost::system::error_category
@@ -50,7 +49,6 @@ namespace cdm
 			switch (static_cast<error>(ev))
 			{
 			case error::cdm_describe_not_found: return "cdm_describe_not_found";
-			case error::cdm_describe_failed: return "cdm_describe_failed";
 			}
 			return "";
 		}
