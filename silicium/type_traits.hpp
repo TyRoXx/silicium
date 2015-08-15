@@ -10,8 +10,10 @@
 #	include <boost/type_traits/is_copy_constructible.hpp>
 #endif
 #include <boost/type_traits/has_trivial_constructor.hpp>
-#include <boost/type_traits/is_nothrow_move_constructible.hpp>
-#include <boost/type_traits/is_nothrow_move_assignable.hpp>
+#if BOOST_VERSION >= 104900
+#	include <boost/type_traits/is_nothrow_move_constructible.hpp>
+#	include <boost/type_traits/is_nothrow_move_assignable.hpp>
+#endif
 #include <boost/type_traits/has_nothrow_destructor.hpp>
 
 #define SILICIUM_HAS_COPY_TRAITS ((!SILICIUM_VC || SILICIUM_VC2013_OR_LATER) && !SILICIUM_GCC46)
