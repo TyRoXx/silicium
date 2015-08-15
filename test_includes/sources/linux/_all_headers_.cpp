@@ -167,6 +167,7 @@
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>
+#include <silicium/type_traits.hpp>
 #include <silicium/utility.hpp>
 #include <silicium/variant.hpp>
 #include <silicium/vector.hpp>

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_IS_HANDLE_HPP
 #define SILICIUM_IS_HANDLE_HPP
 
-#include <silicium/config.hpp>
+#include <silicium/type_traits.hpp>
 #include <boost/static_assert.hpp>
 
 namespace Si
