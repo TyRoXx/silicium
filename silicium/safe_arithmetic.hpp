@@ -34,6 +34,12 @@ namespace Si
 
 	struct overflow_type {};
 
+	template <class Char, class Traits>
+	std::basic_ostream<Char, Traits> &operator << (std::basic_ostream<Char, Traits> &out, overflow_type)
+	{
+		return out << "overflow";
+	}
+
 	static BOOST_CONSTEXPR_OR_CONST overflow_type overflow;
 
 	template <class Unsigned>
@@ -79,7 +85,7 @@ namespace Si
 	overflow_or<safe_number<Unsigned>> operator + (safe_number<Unsigned> left, safe_number<Unsigned> right)
 	{
 		safe_number<Unsigned> result;
-		result.value = left.value + right.value;
+		result.value = static_cast<Unsigned>(left.value + right.value);
 		if (result.value < left.value)
 		{
 			return overflow;
@@ -150,6 +156,26 @@ namespace Si
 			return overflow; \
 		} \
 		return *left.value() op *right.value(); \
+	} \
+	template <class Unsigned> \
+	overflow_or<safe_number<Unsigned>> operator op (overflow_or<safe_number<Unsigned>> const &, overflow_type) \
+	{ \
+		return overflow; \
+	} \
+	template <class Unsigned> \
+	overflow_or<safe_number<Unsigned>> operator op (safe_number<Unsigned> const &, overflow_type) \
+	{ \
+		return overflow; \
+	} \
+	template <class Unsigned> \
+	overflow_or<safe_number<Unsigned>> operator op (overflow_type, overflow_or<safe_number<Unsigned>> const &) \
+	{ \
+		return overflow; \
+	} \
+	template <class Unsigned> \
+	overflow_or<safe_number<Unsigned>> operator op (overflow_type, safe_number<Unsigned> const &) \
+	{ \
+		return overflow; \
 	}
 
 	SILICIUM_SAFE_NUMBER_DEFINE_OPTIONAL_OPERATOR(+)
@@ -162,6 +188,52 @@ namespace Si
 	bool operator == (safe_number<T> const &left, safe_number<T> const &right)
 	{
 		return left.value == right.value;
+	}
+
+	template <class T>
+	bool operator == (overflow_or<safe_number<T>> const &left, overflow_type)
+	{
+		return left.is_overflow();
+	}
+
+	template <class T>
+	bool operator == (overflow_type, overflow_or<safe_number<T>> const &right)
+	{
+		return right.is_overflow();
+	}
+
+	template <class T>
+	bool operator == (overflow_or<safe_number<T>> const &left, safe_number<T> const &right)
+	{
+		if (left.is_overflow())
+		{
+			return false;
+		}
+		return *left.value() == right;
+	}
+
+	template <class T>
+	bool operator == (safe_number<T> const &left, overflow_or<safe_number<T>> const &right)
+	{
+		if (right.is_overflow())
+		{
+			return false;
+		}
+		return left == *right.value();
+	}
+
+	template <class T>
+	bool operator == (overflow_or<safe_number<T>> const &left, overflow_or<safe_number<T>> const &right)
+	{
+		if (left.is_overflow() && right.is_overflow())
+		{
+			return true;
+		}
+		if (left.is_overflow() != right.is_overflow())
+		{
+			return false;
+		}
+		return *left.value() == *right.value();
 	}
 
 	template <class T>
