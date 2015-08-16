@@ -101,7 +101,7 @@ namespace Si
 			return overflow;
 		}
 		safe_number<Unsigned> result;
-		result.value = left.value - right.value;
+		result.value = static_cast<Unsigned>(left.value - right.value);
 		return result;
 	}
 
