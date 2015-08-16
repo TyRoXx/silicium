@@ -53,36 +53,79 @@ namespace
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) + overflow_uint(Si::overflow));
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::overflow) + overflow_uint(Si::safe<Unsigned>(3)));
 	}
+
+	template <class Unsigned>
+	void test_mul_overloads()
+	{
+		typedef Si::overflow_or<Si::safe_number<Unsigned>> overflow_uint;
+
+		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(6), Si::safe<Unsigned>(2) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(Si::overflow, Si::safe((std::numeric_limits<Unsigned>::max)()) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) * Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) * Si::overflow);
+		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow * Si::safe<Unsigned>(3));
+
+		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(6), Si::safe<Unsigned>(2) * overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(Si::overflow, Si::safe((std::numeric_limits<Unsigned>::max)()) * overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) * overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) * overflow_uint(Si::overflow));
+		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow * overflow_uint(Si::safe<Unsigned>(3)));
+
+		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(6), overflow_uint(Si::safe<Unsigned>(2)) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) * Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) * Si::overflow);
+		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::overflow) * Si::safe<Unsigned>(3));
+
+		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(6)), Si::safe<Unsigned>(2) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe((std::numeric_limits<Unsigned>::max)()) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) * Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) * Si::overflow);
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::overflow * Si::safe<Unsigned>(3));
+
+		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(6)), overflow_uint(Si::safe<Unsigned>(2)) * overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) * overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) * overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) * overflow_uint(Si::overflow));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::overflow) * overflow_uint(Si::safe<Unsigned>(3)));
+	}
+
+	template <class Unsigned>
+	void test_arithmetic_overloads()
+	{
+		test_add_overloads<Unsigned>();
+		test_mul_overloads<Unsigned>();
+	}
 }
 
-BOOST_AUTO_TEST_CASE(safe_arithmetic_add_unsigned_char_all_overloads)
+BOOST_AUTO_TEST_CASE(safe_arithmetic_unsigned_char_all_overloads)
 {
-	test_add_overloads<unsigned char>();
+	test_arithmetic_overloads<unsigned char>();
 }
 
-BOOST_AUTO_TEST_CASE(safe_arithmetic_add_unsigned_short_all_overloads)
+BOOST_AUTO_TEST_CASE(safe_arithmetic_unsigned_short_all_overloads)
 {
-	test_add_overloads<unsigned short>();
+	test_arithmetic_overloads<unsigned short>();
 }
 
-BOOST_AUTO_TEST_CASE(safe_arithmetic_add_unsigned_all_overloads)
+BOOST_AUTO_TEST_CASE(safe_arithmetic_unsigned_all_overloads)
 {
-	test_add_overloads<unsigned>();
+	test_arithmetic_overloads<unsigned>();
 }
 
-BOOST_AUTO_TEST_CASE(safe_arithmetic_add_unsigned_long_all_overloads)
+BOOST_AUTO_TEST_CASE(safe_arithmetic_unsigned_long_all_overloads)
 {
-	test_add_overloads<unsigned long>();
+	test_arithmetic_overloads<unsigned long>();
 }
 
-BOOST_AUTO_TEST_CASE(safe_arithmetic_add_unsigned_long_long_all_overloads)
+BOOST_AUTO_TEST_CASE(safe_arithmetic_unsigned_long_long_all_overloads)
 {
-	test_add_overloads<unsigned long long>();
+	test_arithmetic_overloads<unsigned long long>();
 }
 
-BOOST_AUTO_TEST_CASE(safe_arithmetic_add_size_t_all_overloads)
+BOOST_AUTO_TEST_CASE(safe_arithmetic_size_t_all_overloads)
 {
-	test_add_overloads<std::size_t>();
+	test_arithmetic_overloads<std::size_t>();
 }
 
 BOOST_AUTO_TEST_CASE(safe_arithmetic_sub_size_t)

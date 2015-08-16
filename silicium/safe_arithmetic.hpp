@@ -109,11 +109,11 @@ namespace Si
 	overflow_or<safe_number<Unsigned>> operator * (safe_number<Unsigned> left, safe_number<Unsigned> right)
 	{
 		safe_number<Unsigned> result;
-		result.value = left.value * right.value;
 		if (left.value != 0 && (((std::numeric_limits<Unsigned>::max)() / left.value) < right.value))
 		{
 			return overflow;
 		}
+		result.value = static_cast<Unsigned>(left.value * right.value);
 		return result;
 	}
 
