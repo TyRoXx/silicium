@@ -1,5 +1,6 @@
 #include <silicium/safe_arithmetic.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/lexical_cast.hpp>
 
 BOOST_AUTO_TEST_CASE(safe_arithmetic_add_size_t)
 {
@@ -240,4 +241,15 @@ BOOST_AUTO_TEST_CASE(safe_arithmetic_div_size_t_zero)
 	Si::safe_number<std::size_t> a(23), b(0);
 	Si::overflow_or<Si::safe_number<std::size_t>> result = a / b;
 	BOOST_CHECK(result.is_overflow());
+}
+
+BOOST_AUTO_TEST_CASE(overflow_ostream)
+{
+	BOOST_CHECK_EQUAL("overflow", boost::lexical_cast<std::string>(Si::overflow));
+}
+
+BOOST_AUTO_TEST_CASE(overflow_or_ostream)
+{
+	BOOST_CHECK_EQUAL("overflow", boost::lexical_cast<std::string>(Si::overflow_or<Si::safe_number<unsigned>>()));
+	BOOST_CHECK_EQUAL("23", boost::lexical_cast<std::string>(Si::overflow_or<Si::safe_number<unsigned>>(23)));
 }

@@ -78,7 +78,11 @@ namespace Si
 	template <class Char, class Traits, class T>
 	std::basic_ostream<Char, Traits> &operator << (std::basic_ostream<Char, Traits> &out, overflow_or<T> const &value)
 	{
-		return out << value.value();
+		if (value.is_overflow())
+		{
+			return out << overflow;
+		}
+		return out << *value.value();
 	}
 
 	template <class Unsigned>
