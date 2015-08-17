@@ -196,6 +196,20 @@ namespace Si
 			return *this;
 		}
 
+		~expected()
+		{
+			switch (m_state)
+			{
+			case has_value:
+				value_address().~value_type();
+				break;
+
+			case has_exception:
+				exception_address().~exception_ptr();
+				break;
+			}
+		}
+
 		T &value()
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 			&
