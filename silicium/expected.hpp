@@ -1,10 +1,11 @@
 #ifndef SILICIUM_EXPECTED_HPP
 #define SILICIUM_EXPECTED_HPP
 
-#include <silicium/explicit_operator_bool.hpp>
-#include <silicium/variant.hpp>
+#include <silicium/variant.hpp> //for inplace
+#include <boost/type_traits/alignment_of.hpp>
+#include <type_traits>
 
-#define SILICIUM_HAS_EXPECTED (SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_VARIANT)
+#define SILICIUM_HAS_EXPECTED SILICIUM_HAS_EXCEPTIONS
 
 #if SILICIUM_HAS_EXPECTED
 #include <boost/exception_ptr.hpp>
@@ -17,77 +18,181 @@ namespace Si
 		typedef ExceptionPtr exception_ptr;
 
 		expected()
+			: m_state(has_value)
 		{
+			new (&value_address()) value_type();
 		}
 
 		expected(T &&value)
-			: content(std::move(value))
+			: m_state(has_value)
 		{
+			new (&value_address()) value_type(std::move(value));
 		}
 
 		expected(T const &value)
-			: content(std::move(value))
+			: m_state(has_value)
 		{
+			new (&value_address()) value_type(value);
 		}
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class ...Args>
 		explicit expected(Args &&...args)
-			: content(inplace<T>(), std::forward<Args>(args)...)
+			: m_state(has_value)
 		{
+			new (&value_address()) value_type(std::forward<Args>(args)...);
 		}
+#else
+		template <class A0, class A1>
+		expected(A0 &&a0, A1 &&a1)
+			: m_state(has_value)
+		{
+			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<A1>(a1));
+		}
+#endif
 
 		expected(exception_ptr exception)
-			: content(std::move(exception))
+			: m_state(has_exception)
 		{
+			new (&exception_address()) exception_ptr(std::move(exception));
 		}
 
 		expected(expected &&other)
-			: content(std::move(other.content))
+			: m_state(other.m_state)
 		{
+			switch (m_state)
+			{
+			case has_value:
+				new (&value_address()) value_type(std::move(other.value_address()));
+				break;
+
+			case has_exception:
+				new (&exception_address()) exception_ptr(std::move(other.exception_address()));
+				break;
+			}
 		}
 
 		expected(expected const &other)
-			: content(other.content)
+			: m_state(other.m_state)
 		{
+			switch (m_state)
+			{
+			case has_value:
+				new (&value_address()) value_type(other.value_address());
+				break;
+
+			case has_exception:
+				new (&exception_address()) exception_ptr(other.exception_address());
+				break;
+			}
 		}
 
 		expected &operator = (T &&value)
 		{
-			T * const existing = try_get_ptr<T>(content);
-			if (existing)
+			switch (m_state)
 			{
-				*existing = std::move(value);
-			}
-			else
-			{
-				content = std::move(value);
+			case has_value:
+				value_address() = std::move(value);
+				break;
+
+			case has_exception:
+				exception_address().~exception_ptr();
+				new (&value_address()) value_type(std::move(value));
+				m_state = has_value;
+				break;
 			}
 			return *this;
 		}
 
 		expected &operator = (T const &value)
 		{
-			T * const existing = try_get_ptr<T>(content);
-			if (existing)
+			switch (m_state)
 			{
-				*existing = value;
-			}
-			else
-			{
-				content = value;
+			case has_value:
+				value_address() = value;
+				break;
+
+			case has_exception:
+				{
+					value_type copy(value);
+					exception_address().~exception_ptr();
+					new (&value_address()) value_type(std::move(copy));
+					m_value = has_value;
+					break;
+				}
 			}
 			return *this;
 		}
 
 		expected &operator = (expected &&other)
 		{
-			content = std::move(other.content);
+			switch (m_state)
+			{
+			case has_value:
+				switch (other.m_state)
+				{
+				case has_value:
+					value_address() = std::move(other.value_address());
+					break;
+
+				case has_exception:
+					value_address().~value_type();
+					new (&exception_address()) exception_ptr(std::move(other.exception_address()));
+					break;
+				}
+				break;
+
+			case has_exception:
+				switch (other.m_state)
+				{
+				case has_value:
+					exception_address().~exception_ptr();
+					new (&value_address()) value_type(std::move(other.value_address()));
+					break;
+
+				case has_exception:
+					exception_address() = std::move(other.exception_address());
+					break;
+				}
+				break;
+			}
+			m_state = other.m_state;
 			return *this;
 		}
 
 		expected &operator = (expected const &other)
 		{
-			content = other.content;
+			switch (m_state)
+			{
+			case has_value:
+				switch (other.m_state)
+				{
+				case has_value:
+					value_address() = other.value_address();
+					break;
+
+				case has_exception:
+					value_address().~value_type();
+					new (&exception_address()) exception_ptr(other.exception_address());
+					break;
+				}
+				break;
+
+			case has_exception:
+				switch (other.m_state)
+				{
+				case has_value:
+					exception_address().~exception_ptr();
+					new (&value_address()) value_type(other.value_address());
+					break;
+
+				case has_exception:
+					exception_address() = other.exception_address();
+					break;
+				}
+				break;
+			}
+			m_state = other.m_state;
 			return *this;
 		}
 
@@ -96,17 +201,15 @@ namespace Si
 			&
 #endif
 		{
-			return visit<T &>(
-				content,
-				[](T &value) -> T &
-				{
-					return value;
-				},
-				[](exception_ptr const &exception) -> T &
-				{
-					rethrow_exception(exception);
-				}
-			);
+			switch (m_state)
+			{
+			case has_value:
+				return value_address();
+
+			case has_exception:
+				rethrow_exception(exception_address());
+			}
+			SILICIUM_UNREACHABLE();
 		}
 
 		T const &value() const
@@ -114,60 +217,144 @@ namespace Si
 			&
 #endif
 		{
-			return visit<T const &>(
-				content,
-				[](T const &value) -> T const &
-				{
-					return value;
-				},
-				[](exception_ptr const &exception) -> T &
-				{
-					rethrow_exception(exception);
-				}
-			);
+			switch (m_state)
+			{
+			case has_value:
+				return value_address();
+
+			case has_exception:
+				rethrow_exception(exception_address());
+			}
+			SILICIUM_UNREACHABLE();
 		}
 
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 		T &&value() &&
 		{
-			return visit<T &&>(
-				content,
-				[](T &value) -> T &&
-				{
-					return std::move(value);
-				},
-				[](exception_ptr const &exception) -> T &&
-				{
-					rethrow_exception(exception);
-				}
-			);
+			switch (m_state)
+			{
+			case has_value:
+				return std::move(value_address());
+
+			case has_exception:
+				rethrow_exception(exception_address());
+			}
+			SILICIUM_UNREACHABLE();
 		}
 #endif
 
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 		template <class ...Args>
 		void emplace(Args &&...args)
 		{
-			T * const existing = try_get_ptr<T>(content);
-			if (existing)
+			switch (m_state)
 			{
-				*existing = T(std::forward<Args>(args)...);
+			case has_value:
+				value_address().~value_type();
+				break;
+
+			case has_exception:
+				exception_address().~exception_ptr();
+				break;
 			}
-			else
-			{
-				content = T(std::forward<Args>(args)...);
-			}
+			new (&value_address()) value_type(std::forward<Args>(args)...);
 		}
+#else
+		void emplace()
+		{
+			switch (m_state)
+			{
+			case has_value:
+				value_address().~value_type();
+				break;
+
+			case has_exception:
+				exception_address().~exception_ptr();
+				break;
+			}
+			new (&value_address()) value_type();
+		}
+
+		template <class A0>
+		void emplace(A0 &&a0)
+		{
+			switch (m_state)
+			{
+			case has_value:
+				value_address().~value_type();
+				break;
+
+			case has_exception:
+				exception_address().~exception_ptr();
+				break;
+			}
+			new (&value_address()) value_type(std::forward<A0>(a0));
+		}
+
+		template <class A0, class A1>
+		void emplace(A0 &&a0, A1 &&a1)
+		{
+			switch (m_state)
+			{
+			case has_value:
+				value_address().~value_type();
+				break;
+
+			case has_exception:
+				exception_address().~exception_ptr();
+				break;
+			}
+			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<A1>(a1));
+		}
+#endif
 
 		bool valid() const BOOST_NOEXCEPT
 		{
-			return try_get_ptr<T>(content) != nullptr;
+			switch (m_state)
+			{
+			case has_value: return true;
+			case has_exception: return false;
+			}
+			SILICIUM_UNREACHABLE();
 		}
 		
 	private:
 
-		//TODO: avoid the dependency on variant/variadic templates
-		variant<T, exception_ptr> content;
+		enum state
+		{
+			has_value,
+			has_exception
+		};
+
+		union
+		{
+			typename std::aligned_storage<sizeof(T), boost::alignment_of<T>::value>::type m_value;
+			typename std::aligned_storage<sizeof(exception_ptr), boost::alignment_of<exception_ptr>::value>::type m_exception;
+		};
+		state m_state;
+
+		T &value_address()
+		{
+			return *reinterpret_cast<T *>(&m_value);
+		}
+
+		T const &value_address() const
+		{
+			return *reinterpret_cast<T const *>(&m_value);
+		}
+
+		exception_ptr &exception_address()
+		{
+			return *reinterpret_cast<exception_ptr *>(&m_exception);
+		}
+
+		exception_ptr const &exception_address() const
+		{
+			return *reinterpret_cast<exception_ptr const *>(&m_exception);
+		}
 	};
+
+	BOOST_STATIC_ASSERT(sizeof(expected<void *>) <= (sizeof(boost::exception_ptr) + sizeof(void *)));
 }
 #endif
 
