@@ -162,14 +162,7 @@ namespace Si
 		{
 			return try_get_ptr<T>(content) != nullptr;
 		}
-
-		bool operator !() const BOOST_NOEXCEPT
-		{
-			return !valid();
-		}
-
-		SILICIUM_EXPLICIT_OPERATOR_BOOL()
-
+		
 	private:
 
 		//TODO: avoid the dependency on variant/variadic templates

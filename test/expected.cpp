@@ -5,21 +5,26 @@
 BOOST_AUTO_TEST_CASE(expected_default_construct)
 {
 	Si::expected<int> e;
+	BOOST_CHECK(e.valid());
 	BOOST_CHECK_EQUAL(0, e.value());
 }
 
 BOOST_AUTO_TEST_CASE(expected_construct_value)
 {
 	Si::expected<int> e(12);
+	BOOST_CHECK(e.valid());
 	BOOST_CHECK_EQUAL(12, e.value());
 }
 
 BOOST_AUTO_TEST_CASE(expected_emplace)
 {
 	Si::expected<int> e;
+	BOOST_CHECK(e.valid());
 	e.emplace(12);
+	BOOST_CHECK(e.valid());
 	BOOST_CHECK_EQUAL(12, e.value());
 	e.emplace(13);
+	BOOST_CHECK(e.valid());
 	BOOST_CHECK_EQUAL(13, e.value());
 }
 
@@ -46,6 +51,7 @@ BOOST_AUTO_TEST_CASE(expected_construct_exception)
 	catch (...)
 	{
 		Si::expected<int> e((boost::current_exception()));
+		BOOST_CHECK(!e.valid());
 		BOOST_CHECK_EXCEPTION(e.value(), test_exception, [&dummy](test_exception const &ex)
 		{
 			return (&dummy == ex.payload);
