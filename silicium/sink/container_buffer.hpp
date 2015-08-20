@@ -2,14 +2,15 @@
 #define SILICIUM_CONTAINER_BUFFER_HPP
 
 #include <silicium/sink/buffer.hpp>
+#include <silicium/success.hpp>
 
 namespace Si
 {
 	template <class ContiguousContainer>
-	struct container_buffer : buffer<typename ContiguousContainer::value_type, void>
+	struct container_buffer : Buffer<typename ContiguousContainer::value_type, success>::interface
 	{
 		typedef typename ContiguousContainer::value_type element_type;
-		typedef void error_type;
+		typedef success error_type;
 
 		container_buffer()
 			: m_destination(nullptr)
@@ -38,6 +39,7 @@ namespace Si
 		{
 			assert(m_destination);
 			m_committed = m_destination->size();
+			return success();
 		}
 
 	private:
