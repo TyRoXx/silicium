@@ -1,13 +1,13 @@
 #ifndef SILICIUM_CONTAINER_BUFFER_HPP
 #define SILICIUM_CONTAINER_BUFFER_HPP
 
-#include <silicium/sink/buffer.hpp>
 #include <silicium/success.hpp>
+#include <silicium/iterator_range.hpp>
 
 namespace Si
 {
 	template <class ContiguousContainer>
-	struct container_buffer : Buffer<typename ContiguousContainer::value_type, success>::interface
+	struct container_buffer
 	{
 		typedef typename ContiguousContainer::value_type element_type;
 		typedef success error_type;
@@ -24,7 +24,7 @@ namespace Si
 		{
 		}
 
-		virtual iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		iterator_range<element_type *> make_append_space(std::size_t size)
 		{
 			assert(m_destination);
 			auto remaining_capacity = m_destination->max_size() - m_committed;
@@ -35,7 +35,7 @@ namespace Si
 			return make_iterator_range(begin, begin + growth);
 		}
 
-		virtual error_type flush_append_space() SILICIUM_OVERRIDE
+		error_type flush_append_space()
 		{
 			assert(m_destination);
 			m_committed = m_destination->size();

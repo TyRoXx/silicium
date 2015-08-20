@@ -6,6 +6,8 @@ BOOST_AUTO_TEST_CASE(container_buffer_make)
 	std::vector<int> v;
 	Si::container_buffer<std::vector<int>> buffer = Si::make_container_buffer(v);
 	BOOST_CHECK(v.empty());
+	BOOST_CHECK(!buffer.flush_append_space());
+	BOOST_CHECK(v.empty());
 }
 
 BOOST_AUTO_TEST_CASE(container_buffer_shrink_append_space)
