@@ -82,6 +82,7 @@ important
 * clean up noexcept annotations
 * prevent all integer overflows in the library
 * noexcept function to load a dynamic library
+* rename the "trait" concept to something less ambiguous
 
 nice to have
 ------------
