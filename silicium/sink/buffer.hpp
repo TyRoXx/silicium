@@ -6,7 +6,6 @@
 
 namespace Si
 {
-
 	template <class Element, class Error>
 	SILICIUM_TRAIT_WITH_TYPEDEFS(
 		Buffer,

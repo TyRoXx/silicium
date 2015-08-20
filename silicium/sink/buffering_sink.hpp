@@ -2,7 +2,6 @@
 #define SILICIUM_BUFFERING_SINK_HPP
 
 #include <silicium/sink/sink.hpp>
-#include <silicium/sink/buffer.hpp>
 #include <silicium/then.hpp>
 #include <array>
 
@@ -17,7 +16,6 @@ namespace Si
 		class Buffer = std::array<typename Next::element_type, ((1U << 13U) / sizeof(typename Next::element_type))>
 	>
 	struct buffering_sink SILICIUM_FINAL
-		: Si::Buffer<typename Next::element_type, typename Next::error_type>::interface
 	{
 		typedef typename Next::element_type element_type;
 		typedef typename Next::error_type error_type;
@@ -33,13 +31,13 @@ namespace Si
 		{
 		}
 
-		iterator_range<element_type *> make_append_space(std::size_t size) SILICIUM_OVERRIDE
+		iterator_range<element_type *> make_append_space(std::size_t size)
 		{
 			m_buffer_used = (std::min)(size, m_fallback_buffer.size());
 			return make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used);
 		}
 
-		Error flush_append_space() SILICIUM_OVERRIDE
+		Error flush_append_space()
 		{
 			if (m_buffer_used)
 			{
