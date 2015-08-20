@@ -1,5 +1,6 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/initialize_array.hpp>
+#include <silicium/sink/append.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(iterator_sink_append)

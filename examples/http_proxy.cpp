@@ -6,9 +6,10 @@
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/append.hpp>
 #include <silicium/terminate_on_exception.hpp>
-#include <iostream>
 #include <boost/algorithm/string/predicate.hpp>
+#include <iostream>
 
 #define SILICIUM_EXAMPLE_IS_AVAILABLE (SILICIUM_HAS_SPAWN_COROUTINE && SILICIUM_HAS_TRANSFORM_OBSERVABLE)
 

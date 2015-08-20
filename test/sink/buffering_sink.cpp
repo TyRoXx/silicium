@@ -1,5 +1,6 @@
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/buffering_sink.hpp>
+#include <silicium/sink/append.hpp>
 #include <boost/test/unit_test.hpp>
 
 #if SILICIUM_HAS_BUFFERING_SINK

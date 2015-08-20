@@ -4,6 +4,7 @@
 #include <silicium/open.hpp>
 #include <silicium/steady_clock.hpp>
 #include <silicium/sink/file_sink.hpp>
+#include <silicium/sink/append.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/thread.hpp>

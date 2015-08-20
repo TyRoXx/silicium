@@ -1,6 +1,7 @@
 #include <silicium/file_size.hpp>
 #include <silicium/open.hpp>
 #include <silicium/sink/file_sink.hpp>
+#include <silicium/sink/append.hpp>
 #include <boost/test/unit_test.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS

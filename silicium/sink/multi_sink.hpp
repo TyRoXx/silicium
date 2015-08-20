@@ -1,7 +1,7 @@
 #ifndef SILICIUM_MULTI_SINK_HPP
 #define SILICIUM_MULTI_SINK_HPP
 
-#include <silicium/sink/sink.hpp>
+#include <silicium/sink/append.hpp>
 
 namespace Si
 {

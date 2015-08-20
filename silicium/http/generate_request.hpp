@@ -3,6 +3,7 @@
 
 #include <silicium/http/generate_header.hpp>
 #include <silicium/http/parse_request.hpp>
+#include <silicium/sink/append.hpp>
 
 namespace Si
 {

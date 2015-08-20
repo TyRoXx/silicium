@@ -1,5 +1,6 @@
 #include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/virtualized_sink.hpp>
+#include <silicium/sink/append.hpp>
 #include <silicium/open.hpp>
 #include <silicium/source/file_source.hpp>
 #include <silicium/posix/pipe.hpp>

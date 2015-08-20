@@ -2,6 +2,7 @@
 #define SILICIUM_HTML_GENERATOR_HPP
 
 #include <silicium/source/source.hpp>
+#include <silicium/sink/append.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/config.hpp>
 

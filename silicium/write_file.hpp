@@ -4,6 +4,7 @@
 #include <silicium/open.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/sink/file_sink.hpp>
+#include <silicium/sink/append.hpp>
 
 #define SILICIUM_HAS_WRITE_FILE SILICIUM_HAS_FILE_SINK
 

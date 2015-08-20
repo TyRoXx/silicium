@@ -17,6 +17,7 @@
 #include <silicium/asio/posting_observable.hpp>
 #include <silicium/asio/process_output.hpp>
 #include <silicium/std_threading.hpp>
+#include <silicium/sink/append.hpp>
 
 #ifndef _WIN32
 #	include <fcntl.h>
