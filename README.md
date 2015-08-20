@@ -1,25 +1,24 @@
 silicium
 ========
 
-Linux: [![Build Status](https://travis-ci.org/TyRoXx/silicium.svg?branch=master)](https://travis-ci.org/TyRoXx/silicium)
-
-Windows: [![Build status](https://ci.appveyor.com/api/projects/status/c3g0m66oe3t6e6ct/branch/master?svg=true)](https://ci.appveyor.com/project/TyRoXx/silicium/branch/master)
-
-[very work-in-progress, incomplete and usually outdated Doxygen](http://tyroxx.github.io/silicium/annotated.html)
-
 compilers
 =========
 
-* GCC 4.8 (older versions may work)
-* Visual C++ 2012
-    * but many features require 2013 or even 2015
-* recent versions of Clang will probably work, too
+* [![Build Status](https://travis-ci.org/TyRoXx/silicium.svg?branch=master)](https://travis-ci.org/TyRoXx/silicium)
+  the library is continuously tested with several versions of GCC on Ubuntu 12.04 (Boost 1.54 and 1.55)
+  * the oldest release of GCC compatible with this library is 4.6
+* [![Build status](https://ci.appveyor.com/api/projects/status/c3g0m66oe3t6e6ct/branch/master?svg=true)](https://ci.appveyor.com/project/TyRoXx/silicium/branch/master)
+  Visual Studio 2013 is tested with Boost 1.56
+  * the oldest release of Visual Studio compatible is 2012
+* Clang is not being tested regularly yet
+* OSX, BSDs and architectures other than x86 or AMD64 have not been tried yet
 
-Regularly tested configurations at the moment:
-* GCC 4.8 on Ubuntu 14.04 with Boost 1.54
-* Visual C++ 2015 with Boost 1.59
+documentation
+=============
 
-There will be CI eventually to ensure compatibility with all supported compilers.
+There will be documentation when the APIs have stabilized to some extent.
+
+[very work-in-progress, incomplete and usually outdated Doxygen](http://tyroxx.github.io/silicium/annotated.html)
 
 dependencies
 ============
