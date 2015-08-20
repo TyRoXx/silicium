@@ -73,7 +73,12 @@ important
   * [x] travis support finished
   * [ ] travis upgrade: http://docs.travis-ci.com/user/migrating-from-legacy/?utm_source=legacy-notice&utm_medium=banner&utm_campaign=legacy-upgrade
   * [ ] use travis for OSX
-  * [ ] appveyor integration finished
+  * [x] appveyor integration finished
+  * advanced appveyor stuff
+    * [ ] Visual Studio 2012
+    * [ ] Visual Studio 2013
+    * [ ] Visual Studio 2015
+    * [ ] Boost versions other than 1.56
 * measure test coverage
 * allow for recursive variants
 * check whether variant&lt;T &amp;&gt; makes sense
