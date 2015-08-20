@@ -1,7 +1,7 @@
 #ifndef SILICIUM_CONTAINER_BUFFER_HPP
 #define SILICIUM_CONTAINER_BUFFER_HPP
 
-#include <silicium/sink/sink.hpp>
+#include <silicium/sink/buffer.hpp>
 
 namespace Si
 {

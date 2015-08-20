@@ -129,6 +129,7 @@
 #include <silicium/safe_arithmetic.hpp>
 #include <silicium/serialization.hpp>
 #include <silicium/single_directory_watcher.hpp>
+#include <silicium/sink/buffer.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>

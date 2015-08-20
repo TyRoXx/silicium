@@ -45,21 +45,6 @@ namespace Si
 		}
 	};
 
-	template <class Element, class Error>
-	SILICIUM_TRAIT_WITH_TYPEDEFS(
-		Buffer,
-		typedef Element element_type;
-		typedef Error error_type;
-		,
-		((make_append_space, (1, (std::size_t)), iterator_range<element_type *>))
-		((flush_append_space, (0), error_type))
-	)
-
-#if SILICIUM_COMPILER_HAS_USING
-	template <class Element, class Error = boost::system::error_code>
-	using buffer = typename Buffer<Element, Error>::interface;
-#endif
-
 	template <class Stream>
 	struct error_type
 	{
