@@ -1,16 +1,18 @@
 #ifndef SILICIUM_TRANSFORMING_SOURCE_HPP
 #define SILICIUM_TRANSFORMING_SOURCE_HPP
 
+#include <silicium/iterator_range.hpp>
 #include <silicium/source/source.hpp>
-#include <silicium/config.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 
 namespace Si
 {
 	template <class From, class Transformation, class To>
-	struct transforming_source SILICIUM_FINAL : Source<To>::interface
+	struct transforming_source SILICIUM_FINAL
 	{
+		typedef To element_type;
+
 		transforming_source()
 		{
 		}
@@ -22,13 +24,13 @@ namespace Si
 		{
 		}
 
-		virtual iterator_range<To const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		iterator_range<To const *> map_next(std::size_t size)
 		{
 			(void)size;
 			return {};
 		}
 
-		virtual To *copy_next(iterator_range<To *> destination) SILICIUM_OVERRIDE
+		To *copy_next(iterator_range<To *> destination)
 		{
 			auto i = boost::begin(destination);
 			for (; i != boost::end(destination); ++i)
