@@ -87,6 +87,7 @@ important
 * prevent all integer overflows in the library
 * noexcept function to load a dynamic library
 * rename the "trait" concept to something less ambiguous
+* try precompiled headers
 
 nice to have
 ------------
