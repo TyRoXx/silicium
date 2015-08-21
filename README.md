@@ -88,6 +88,7 @@ important
 * noexcept function to load a dynamic library
 * rename the "trait" concept to something less ambiguous
 * try precompiled headers
+* rename error_or&lt;T, boost::system::error_code&gt; to system_result&lt;T&gt;
 
 nice to have
 ------------
