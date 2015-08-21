@@ -1,7 +1,7 @@
 #include <silicium/http/http.hpp>
 #include <silicium/http/request_parser_sink.hpp>
 #include <silicium/source/memory_source.hpp>
-#include <silicium/fast_variant.hpp>
+#include <silicium/variant.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/observable/function_observer.hpp>

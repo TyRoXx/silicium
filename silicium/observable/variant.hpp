@@ -1,10 +1,10 @@
-#ifndef SILICIUM_REACTIVE_VARIANT_OBSERVABLE_HPP
-#define SILICIUM_REACTIVE_VARIANT_OBSERVABLE_HPP
+#ifndef SILICIUM_VARIANT_OBSERVABLE_HPP
+#define SILICIUM_VARIANT_OBSERVABLE_HPP
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/config.hpp>
-#include <silicium/fast_variant.hpp>
+#include <silicium/variant.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #define SILICIUM_RX_VARIANT_AVAILABLE SILICIUM_COMPILER_HAS_USING

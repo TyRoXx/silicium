@@ -1,5 +1,5 @@
 #include <silicium/terminate_on_exception.hpp>
-#include <silicium/fast_variant.hpp>
+#include <silicium/variant.hpp>
 #include <ctime>
 #include <iostream>
 

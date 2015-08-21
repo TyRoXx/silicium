@@ -3,7 +3,7 @@
 
 #include <silicium/http/parse_request.hpp>
 #include <silicium/sink/sink.hpp>
-#include <silicium/fast_variant.hpp>
+#include <silicium/variant.hpp>
 #include <silicium/exchange.hpp>
 
 namespace Si
