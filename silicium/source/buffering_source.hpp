@@ -14,18 +14,18 @@ namespace Si
 		virtual std::size_t skip(std::size_t count) = 0;
 	};
 
-	template <class Element>
-	struct buffering_source SILICIUM_FINAL : mutable_source<Element>
+	template <class Next>
+	struct buffering_source SILICIUM_FINAL : mutable_source<typename Next::element_type>
 	{
-		typedef Element element_type;
+		typedef typename Next::element_type element_type;
 
-		explicit buffering_source(typename Source<Element>::interface &next, std::size_t capacity)
+		explicit buffering_source(Next &next, std::size_t capacity)
 			: m_next(&next)
 			, m_buffer(capacity)
 		{
 		}
 
-		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty())
 			{
@@ -35,14 +35,14 @@ namespace Si
 			return make_iterator_range(one.first, one.first + std::min(size, one.second));
 		}
 
-		virtual Element *copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
+		virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty() && (static_cast<size_t>(destination.size()) < m_buffer.capacity()))
 			{
 				pull();
 			}
 
-			Element *next = destination.begin();
+			element_type *next = destination.begin();
 
 			std::size_t taken_from_buffer = 0;
 			for (auto b = m_buffer.begin(); (b != m_buffer.end()) && (next != destination.end()); ++next, ++b, ++taken_from_buffer)
@@ -51,7 +51,7 @@ namespace Si
 			}
 
 			assert(m_next);
-			Element * const result = m_next->copy_next(make_iterator_range(next, destination.end()));
+			element_type * const result = m_next->copy_next(make_iterator_range(next, destination.end()));
 			m_buffer.erase_begin(taken_from_buffer);
 			return result;
 		}
@@ -64,7 +64,7 @@ namespace Si
 			return skipped_buffer;
 		}
 
-		virtual iterator_range<Element *> map_next_mutable(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type *> map_next_mutable(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty())
 			{
@@ -76,8 +76,8 @@ namespace Si
 
 	private:
 
-		typename Source<Element>::interface *m_next;
-		boost::circular_buffer<Element> m_buffer;
+		Next *m_next;
+		boost::circular_buffer<element_type> m_buffer;
 
 		void pull()
 		{
@@ -98,9 +98,9 @@ namespace Si
 	};
 
 	template <class Source>
-	buffering_source<typename Source::element_type> make_buffer(Source &buffered, std::size_t capacity)
+	buffering_source<Source> make_buffer(Source &buffered, std::size_t capacity)
 	{
-		return buffering_source<typename Source::element_type>(buffered, capacity);
+		return buffering_source<Source>(buffered, capacity);
 	}
 
 	template <class Element>

@@ -10,8 +10,10 @@
 namespace Si
 {
 	template <class Element>
-	struct memory_source SILICIUM_FINAL : Source<Element>::interface
+	struct memory_source SILICIUM_FINAL
 	{
+		typedef Element element_type;
+
 		memory_source()
 		{
 		}
@@ -21,13 +23,13 @@ namespace Si
 		{
 		}
 
-		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		iterator_range<Element const *> map_next(std::size_t size)
 		{
 			boost::ignore_unused_variable_warning(size);
 			return m_elements;
 		}
 
-		virtual Element *copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
+		Element *copy_next(iterator_range<Element *> destination)
 		{
 			while (!m_elements.empty() && !destination.empty())
 			{
@@ -44,8 +46,10 @@ namespace Si
 	};
 
 	template <class Element>
-	struct mutable_memory_source SILICIUM_FINAL : Source<Element>::interface
+	struct mutable_memory_source SILICIUM_FINAL
 	{
+		typedef Element element_type;
+
 		mutable_memory_source()
 		{
 		}
@@ -55,13 +59,13 @@ namespace Si
 		{
 		}
 
-		virtual iterator_range<Element const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		iterator_range<Element const *> map_next(std::size_t size)
 		{
 			boost::ignore_unused_variable_warning(size);
 			return {};
 		}
 
-		virtual Element *copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
+		Element *copy_next(iterator_range<Element *> destination)
 		{
 			while (!m_elements.empty() && !destination.empty())
 			{

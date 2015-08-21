@@ -65,7 +65,7 @@ namespace Si
 		SILICIUM_USE_RESULT
 		optional<response> parse_response(CharSource &&in)
 		{
-			Si::detail::line_source lines(in);
+			auto lines = Si::detail::make_line_source(in);
 			auto first_line = get(lines);
 			if (!first_line)
 			{

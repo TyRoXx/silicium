@@ -9,6 +9,7 @@ namespace Si
 {
 	namespace detail
 	{
+		template <class Next>
 		struct line_source SILICIUM_FINAL : Source<std::vector<char>>::interface
 		{
 			line_source()
@@ -16,7 +17,7 @@ namespace Si
 			{
 			}
 
-			explicit line_source(Source<char>::interface &next)
+			explicit line_source(Next &next)
 				: m_next(&next)
 			{
 			}
@@ -64,8 +65,14 @@ namespace Si
 
 		private:
 
-			Source<char>::interface *m_next;
+			Next *m_next;
 		};
+
+		template <class Next>
+		line_source<Next> make_line_source(Next &next)
+		{
+			return line_source<Next>(next);
+		}
 
 		template <class CharRange>
 		std::pair<noexcept_string, noexcept_string> split_value_line(CharRange const &line)

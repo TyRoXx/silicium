@@ -10,7 +10,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(line_source_empty)
 	{
 		memory_source<char> empty;
-		detail::line_source lines(empty);
+		auto lines = Si::detail::make_line_source(empty);
 		BOOST_CHECK(lines.map_next(1).empty());
 		std::vector<char> line;
 		auto * const result = lines.copy_next(make_iterator_range(&line, &line + 1));
@@ -21,7 +21,7 @@ namespace Si
 	{
 		std::string const original = "abc\r\n123";
 		memory_source<char> source(make_iterator_range(original.data(), original.data() + original.size()));
-		detail::line_source lines(source);
+		auto lines = Si::detail::make_line_source(source);
 		BOOST_CHECK(lines.map_next(1).empty());
 		std::vector<char> line;
 		auto * const result = lines.copy_next(make_iterator_range(&line, &line + 1));
@@ -32,7 +32,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(buffering_source_empty)
 	{
 		memory_source<char> source;
-		buffering_source<char> buffer(source, 1);
+		auto buffer = Si::make_buffer(source, 1);
 		BOOST_CHECK(buffer.map_next(1).empty());
 		char c = 0;
 		BOOST_CHECK_EQUAL(&c, buffer.copy_next(make_iterator_range(&c, &c + 1)));
@@ -42,7 +42,7 @@ namespace Si
 	{
 		std::string const original = "x";
 		memory_source<char> source(make_iterator_range(original.data(), original.data() + original.size()));
-		buffering_source<char> buffer(source, 1);
+		auto buffer = Si::make_buffer(source, 1);
 		auto mapped = buffer.map_next_mutable(1);
 		BOOST_REQUIRE_EQUAL(1, mapped.size());
 		BOOST_CHECK_EQUAL('x', mapped.front());
@@ -53,7 +53,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(mutable_source_iterator_empty)
 	{
 		memory_source<char> source;
-		buffering_source<char> buffer(source, 1);
+		auto buffer = Si::make_buffer(source, 1);
 		mutable_source_iterator<char> begin(buffer), end;
 		BOOST_CHECK(begin == end);
 	}
@@ -62,7 +62,7 @@ namespace Si
 	{
 		std::string const original = "x";
 		memory_source<char> source(make_iterator_range(original.data(), original.data() + original.size()));
-		buffering_source<char> buffer(source, 1);
+		auto buffer = Si::make_buffer(source, 1);
 		mutable_source_iterator<char> begin(buffer), end;
 		BOOST_REQUIRE(begin != end);
 		BOOST_CHECK_EQUAL('x', *begin);
