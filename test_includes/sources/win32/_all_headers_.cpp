@@ -31,7 +31,6 @@
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/explicit_operator_bool.hpp>
-#include <silicium/fast_variant.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/file_notification.hpp>
 #include <silicium/file_size.hpp>
