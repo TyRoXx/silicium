@@ -21,7 +21,7 @@ namespace Si
 	}
 
 	template <class ErrorOrSource>
-	struct error_extracting_source : Source<typename detail::get_error_parameters<typename ErrorOrSource::element_type>::value_type>::interface
+	struct error_extracting_source
 	{
 		typedef typename detail::get_error_parameters<typename ErrorOrSource::element_type>::value_type element_type;
 		typedef typename detail::get_error_parameters<typename ErrorOrSource::element_type>::error_type error_type;
@@ -35,7 +35,7 @@ namespace Si
 		{
 		}
 
-		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		iterator_range<element_type const *> map_next(std::size_t size)
 		{
 			boost::ignore_unused_variable_warning(size);
 			if (m_last_error)
@@ -58,7 +58,7 @@ namespace Si
 			return make_iterator_range(&value, &value + 1);
 		}
 
-		virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		element_type *copy_next(iterator_range<element_type *> destination)
 		{
 			element_type *copied = destination.begin();
 			if (m_last_error)
