@@ -18,8 +18,10 @@ namespace Si
 		}
 	}
 
-	struct received_from_socket_source : Source<char>::interface
+	struct received_from_socket_source
 	{
+		typedef char element_type;
+
 		explicit received_from_socket_source(Source<error_or<memory_range>>::interface &original)
 			: original(&original)
 		{
@@ -30,7 +32,7 @@ namespace Si
 			return rest;
 		}
 
-		virtual iterator_range<char const *> map_next(std::size_t) SILICIUM_OVERRIDE
+		iterator_range<char const *> map_next(std::size_t)
 		{
 			assert(original);
 			if (rest.begin() == rest.end())
@@ -50,7 +52,7 @@ namespace Si
 			return iterator_range<char const *>(rest.begin(), rest.end());
 		}
 
-		virtual char *copy_next(iterator_range<char *> destination) SILICIUM_OVERRIDE
+		char *copy_next(iterator_range<char *> destination)
 		{
 			auto mapped = map_next(destination.size());
 			auto const copy_size = std::min(destination.size(), mapped.size());
