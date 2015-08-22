@@ -28,7 +28,7 @@
 #endif
 
 //TODO: avoid the Boost filesystem operations that require exceptions
-#if BOOST_OS_MACOS
+#ifdef BOOST_OS_MACOS
 #	define SILICIUM_HAS_LAUNCH_PROCESS 0
 #else
 #	define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
