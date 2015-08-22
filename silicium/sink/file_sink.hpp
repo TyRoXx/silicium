@@ -7,6 +7,7 @@
 #include <silicium/file_handle.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/flush.hpp>
+#include <boost/predef.h>
 
 #ifdef _WIN32
 #	include <silicium/win32/win32.hpp>
@@ -14,7 +15,11 @@
 #	include <sys/uio.h>
 #endif
 
-#define SILICIUM_HAS_FILE_SINK SILICIUM_HAS_VARIANT
+#ifdef BOOST_OS_MACOS
+#	define SILICIUM_HAS_FILE_SINK 0
+#else
+#	define SILICIUM_HAS_FILE_SINK SILICIUM_HAS_VARIANT
+#endif
 
 namespace Si
 {

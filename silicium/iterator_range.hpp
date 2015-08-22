@@ -103,7 +103,7 @@ namespace Si
 		/// This method is only available with random access iterators so that it takes O(1) in time.
 		value_type &operator[](difference_type index) const BOOST_NOEXCEPT
 		{
-			static_cast<std::random_access_iterator_tag>(typename std::iterator_traits<Iterator>::iterator_category{});
+			(void)static_cast<std::random_access_iterator_tag>(typename std::iterator_traits<Iterator>::iterator_category{});
 			assert(index < size());
 			return begin()[index];
 		}

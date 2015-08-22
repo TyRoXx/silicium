@@ -60,7 +60,7 @@ namespace Si
 			element_type *copied = destination.begin();
 			for (;;)
 			{
-				std::size_t const requested = std::distance(copied, destination.end());
+				std::size_t const requested = static_cast<std::size_t>(std::distance(copied, destination.end()));
 				if (requested == 0)
 				{
 					break;
@@ -74,7 +74,7 @@ namespace Si
 					}
 					m_rest = std::move(*element);
 				}
-				std::size_t const provided = m_rest.size();
+				std::size_t const provided = static_cast<std::size_t>(m_rest.size());
 				if (provided == 0)
 				{
 					break;

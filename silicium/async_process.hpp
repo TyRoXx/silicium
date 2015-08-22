@@ -22,11 +22,17 @@
 #ifndef _WIN32
 #	include <fcntl.h>
 #	include <sys/wait.h>
-#	include <sys/prctl.h>
+#	ifdef __linux__
+#		include <sys/prctl.h>
+#	endif
 #endif
 
 //TODO: avoid the Boost filesystem operations that require exceptions
-#define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
+#if BOOST_OS_MACOS
+#	define SILICIUM_HAS_LAUNCH_PROCESS 0
+#else
+#	define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
+#endif
 
 namespace Si
 {

@@ -167,7 +167,7 @@ namespace
 		void send(Si::iterator_range<char const *> data)
 		{
 			assert(receiving_.get_socket());
-			boost::asio::write(*receiving_.get_socket(), boost::asio::buffer(data.begin(), data.size()));
+			boost::asio::write(*receiving_.get_socket(), boost::asio::buffer(data.begin(), static_cast<std::size_t>(data.size())));
 		}
 
 		void shutdown()

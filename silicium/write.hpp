@@ -27,7 +27,7 @@ namespace Si
 				return get_last_error();
 			}
 #else
-			ssize_t const written = ::write(file, data.begin() + total_written, data.size() - total_written);
+			ssize_t const written = ::write(file, data.begin() + total_written, static_cast<std::size_t>(data.size()) - total_written);
 			if (written < 0)
 			{
 				return get_last_error();
@@ -37,7 +37,7 @@ namespace Si
 			{
 				break;
 			}
-			total_written += written;
+			total_written += static_cast<std::size_t>(written);
 		}
 		while (total_written < static_cast<std::size_t>(data.size()));
 		return total_written;

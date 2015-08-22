@@ -47,7 +47,7 @@ namespace Si
 		{
 			assert(m_socket);
 			assert(m_yield);
-			size_t const read = m_socket->async_read_some(boost::asio::buffer(destination.begin(), destination.size()), *m_yield);
+			size_t const read = m_socket->async_read_some(boost::asio::buffer(destination.begin(), static_cast<std::size_t>(destination.size())), *m_yield);
 			return destination.begin() + read;
 		}
 

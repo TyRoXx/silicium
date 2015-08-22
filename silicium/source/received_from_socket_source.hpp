@@ -54,7 +54,7 @@ namespace Si
 
 		char *copy_next(iterator_range<char *> destination)
 		{
-			auto mapped = map_next(destination.size());
+			auto mapped = map_next(static_cast<std::size_t>(destination.size()));
 			auto const copy_size = std::min(destination.size(), mapped.size());
 #ifdef _MSC_VER
 			if (copy_size == 0)
@@ -65,7 +65,7 @@ namespace Si
 			}
 #endif
 			char * const copied = std::copy_n(mapped.begin(), copy_size, destination.begin());
-			skip(std::distance(destination.begin(), copied));
+			skip(static_cast<std::size_t>(std::distance(destination.begin(), copied)));
 			return copied;
 		}
 
@@ -77,9 +77,9 @@ namespace Si
 		std::size_t skip(std::size_t count)
 		{
 			std::size_t skipped = 0;
-			auto const rest_size = rest.size();
-			auto const rest_skipped = std::min<ptrdiff_t>(count, rest_size);
-			rest.pop_front(rest_skipped);
+			std::size_t const rest_size = static_cast<std::size_t>(rest.size());
+			std::size_t const rest_skipped = std::min(count, rest_size);
+			rest.pop_front(static_cast<std::ptrdiff_t>(rest_skipped));
 			count -= rest_skipped;
 			skipped += rest_skipped;
 			if (count > 0)

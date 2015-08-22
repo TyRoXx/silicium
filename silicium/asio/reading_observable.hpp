@@ -37,7 +37,7 @@ namespace Si
 			void async_get_one(Observer &&receiver)
 			{
 				stream->async_read_some(
-					boost::asio::buffer(buffer.begin(), buffer.size()),
+					boost::asio::buffer(buffer.begin(), static_cast<std::size_t>(buffer.size())),
 					[this, SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))]
 						(boost::system::error_code ec, std::size_t bytes_received) mutable
 				{

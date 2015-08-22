@@ -130,7 +130,7 @@
 #	define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 0
 #endif
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) || defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
 #	define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 1
 #else
 #	define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 0

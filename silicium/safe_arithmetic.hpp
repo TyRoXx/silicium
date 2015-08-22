@@ -32,7 +32,10 @@ namespace Si
 		return std::move(value);
 	}
 
-	struct overflow_type {};
+	struct overflow_type
+	{
+		BOOST_CONSTEXPR overflow_type() {}
+	};
 
 	template <class Char, class Traits>
 	std::basic_ostream<Char, Traits> &operator << (std::basic_ostream<Char, Traits> &out, overflow_type)

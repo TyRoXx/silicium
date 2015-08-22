@@ -172,7 +172,7 @@ namespace bf
 					break;
 
 				case command::write:
-					yield(static_cast<char>(memory[pointer]));
+					yield(memory[pointer]);
 					++pc;
 					break;
 
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(bf_hello_world)
 	std::string printed;
 	auto done = Si::for_each(std::move(interpreter), [&printed](boost::uint8_t output)
 	{
-		printed.push_back(output);
+		printed.push_back(static_cast<char>(output));
 	});
 	done.start();
 	BOOST_CHECK_EQUAL("Hello World!\n", printed);

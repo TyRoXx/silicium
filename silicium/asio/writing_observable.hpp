@@ -41,7 +41,7 @@ namespace Si
 				assert(stream);
 				boost::asio::async_write(
 					*stream,
-					boost::asio::buffer(m_buffer.begin(), m_buffer.size()),
+					boost::asio::buffer(m_buffer.begin(), static_cast<std::size_t>(m_buffer.size())),
 					[SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))]
 						(boost::system::error_code ec, std::size_t bytes_sent) mutable
 				{

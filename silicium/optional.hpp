@@ -29,6 +29,8 @@ namespace Si
 
 	struct none_t
 	{
+		BOOST_CONSTEXPR none_t() {}
+
 		BOOST_CONSTEXPR bool operator !() const BOOST_NOEXCEPT
 		{
 			return true;
@@ -44,7 +46,12 @@ namespace Si
 		return true;
 	}
 
-	struct some_t {};
+	struct some_t
+	{
+		BOOST_CONSTEXPR some_t()
+		{
+		}
+	};
 
 	static some_t BOOST_CONSTEXPR_OR_CONST some;
 

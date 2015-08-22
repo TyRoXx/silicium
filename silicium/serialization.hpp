@@ -59,7 +59,7 @@ namespace Si
 
 			void set_byte(std::size_t significance, byte digit)
 			{
-				built |= (digit << (significance * 8U));
+				built |= (static_cast<Unsigned>(digit) << static_cast<Unsigned>(significance * 8U));
 			}
 		};
 

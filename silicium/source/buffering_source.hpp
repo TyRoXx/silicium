@@ -85,13 +85,13 @@ namespace Si
 			auto one = m_buffer.array_one();
 			assert(m_next);
 			auto copied = m_next->copy_next(make_iterator_range(one.first, one.first + one.second));
-			std::size_t new_buffer_size = std::distance(one.first, copied);
+			std::size_t new_buffer_size = static_cast<std::size_t>(std::distance(one.first, copied));
 			if ((one.first + one.second) == copied)
 			{
 				auto two = m_buffer.array_two();
 				assert(m_next);
 				copied = m_next->copy_next(make_iterator_range(two.first, two.first + two.second));
-				new_buffer_size += std::distance(two.first, copied);
+				new_buffer_size += static_cast<std::size_t>(std::distance(two.first, copied));
 			}
 			m_buffer.resize(new_buffer_size);
 		}

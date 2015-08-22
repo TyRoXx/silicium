@@ -25,7 +25,7 @@ int main()
 	std::vector<char> generated;
 	auto sink = Si::Sink<char, Si::success>::erase(Si::make_container_sink(generated));
 	document.generate(sink);
-	std::cout.write(generated.data(), generated.size());
+	std::cout.write(generated.data(), static_cast<std::streamsize>(generated.size()));
 	std::cout << '\n';
 #else
 	std::cerr << "This example requires a more recent compiler\n";

@@ -45,6 +45,7 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 }
 #endif
 
+#if SILICIUM_HAS_FILE_SINK
 namespace
 {
 	Si::absolute_path get_readonly_file()
@@ -67,10 +68,12 @@ namespace
 		}
 		return file_name;
 #endif
+#ifdef BOOST_OS_MACOS
+		return *Si::absolute_path::create("/bin/ls");
+#endif
 	}
 }
 
-#if SILICIUM_HAS_FILE_SINK
 BOOST_AUTO_TEST_CASE(file_sink_error)
 {
 	auto file = get(Si::open_reading(Si::native_path_string(get_readonly_file().c_str())));

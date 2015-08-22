@@ -54,7 +54,7 @@ namespace Si
 			if (static_cast<size_t>(data.size()) <= (m_fallback_buffer.size() - m_buffer_used))
 			{
 				boost::range::copy(data, m_fallback_buffer.begin() + m_buffer_used);
-				m_buffer_used += data.size();
+				m_buffer_used += static_cast<size_t>(data.size());
 				return default_construct<Error>();
 			}
 

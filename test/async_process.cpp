@@ -23,7 +23,7 @@ namespace
 		Si::noexcept_string output, error;
 	};
 
-#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
+#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE && SILICIUM_HAS_LAUNCH_PROCESS
 	process_output run_process(
 		Si::async_process_parameters parameters,
 		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment_variables,
@@ -61,7 +61,7 @@ namespace
 #endif
 }
 
-#if !defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#if !defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_LAUNCH_PROCESS
 BOOST_AUTO_TEST_CASE(async_process_unix_which)
 {
 	Si::async_process_parameters parameters;

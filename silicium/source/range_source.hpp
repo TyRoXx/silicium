@@ -67,6 +67,7 @@ namespace Si
 
 		iterator_range<element_type const *> map_next_impl(std::size_t size, std::false_type)
 		{
+			boost::ignore_unused_variable_warning(size);
 			return {};
 		}
 	};

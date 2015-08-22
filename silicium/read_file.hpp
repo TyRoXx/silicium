@@ -23,7 +23,7 @@ namespace Si
 			return boost::system::error_code(error, boost::system::system_category());
 		}
 #else
-		ssize_t const read_bytes = ::read(file, destination.begin(), destination.size());
+		ssize_t const read_bytes = ::read(file, destination.begin(), static_cast<std::size_t>(destination.size()));
 		if (read_bytes < 0)
 		{
 			return get_last_error();

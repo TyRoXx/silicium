@@ -129,7 +129,10 @@ namespace Si
 			append(sink, '>');
 		}
 
-		struct empty_t {};
+		struct empty_t
+		{
+			BOOST_CONSTEXPR empty_t() {}
+		};
 
 		static BOOST_CONSTEXPR_OR_CONST empty_t empty;
 

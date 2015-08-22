@@ -12,6 +12,10 @@ namespace Si
 {
 	struct zlib_error_category : boost::system::error_category
 	{
+		zlib_error_category()
+		{
+		}
+
 		virtual const char *name() const BOOST_NOEXCEPT SILICIUM_OVERRIDE
 		{
 			return "zlib";

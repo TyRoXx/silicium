@@ -40,7 +40,7 @@ namespace Si
 			assert(m_socket);
 			assert(m_yield);
 			boost::system::error_code ec;
-			boost::asio::async_write(*m_socket, boost::asio::buffer(data.begin(), data.size()), (*m_yield)[ec]);
+			boost::asio::async_write(*m_socket, boost::asio::buffer(data.begin(), static_cast<std::size_t>(data.size())), (*m_yield)[ec]);
 			return ec;
 		}
 	}

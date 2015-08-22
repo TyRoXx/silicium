@@ -3,6 +3,7 @@
 
 #include <silicium/success.hpp>
 #include <silicium/iterator_range.hpp>
+#include <algorithm>
 
 namespace Si
 {
@@ -27,9 +28,9 @@ namespace Si
 		iterator_range<element_type *> make_append_space(std::size_t size)
 		{
 			assert(m_destination);
-			auto remaining_capacity = m_destination->max_size() - m_committed;
-			auto growth = std::min(size, remaining_capacity);
-			auto new_size = m_committed + growth;
+			std::size_t remaining_capacity = m_destination->max_size() - m_committed;
+			std::size_t growth = std::min(size, remaining_capacity);
+			std::size_t new_size = m_committed + growth;
 			m_destination->resize(new_size);
 			auto begin = m_destination->data() + m_committed;
 			return make_iterator_range(begin, begin + growth);

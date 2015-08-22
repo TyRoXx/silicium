@@ -27,7 +27,7 @@ namespace Si
 			{
 				return;
 			}
-			wait_for_exit();
+			wait_for_exit().get();
 		}
 
 		process_handle(process_handle &&other) BOOST_NOEXCEPT

@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(file_size_empty)
 {
 	auto const file = test_root() / "file_size_empty.txt";
 	Si::file_handle handle = Si::overwrite_file(Si::native_path_string(file.c_str())).move_value();
-	BOOST_CHECK_EQUAL(Si::make_optional<boost::uintmax_t>(0), Si::file_size(handle.handle).get());
+	BOOST_CHECK_EQUAL(Si::make_optional<boost::uint64_t>(0), Si::file_size(handle.handle).get());
 }
 
 #if SILICIUM_HAS_FILE_SINK
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(file_size_non_empty)
 
 BOOST_AUTO_TEST_CASE(file_size_error)
 {
-	Si::error_or<Si::optional<boost::uintmax_t>> size = Si::file_size(
+	Si::error_or<Si::optional<boost::uint64_t>> size = Si::file_size(
 #ifdef _WIN32
 		INVALID_HANDLE_VALUE
 #else

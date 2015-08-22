@@ -52,7 +52,9 @@ namespace Si
 	}
 }
 #else
+#ifndef __clang__
 #include <byteswap.h>
+#endif
 namespace Si
 {
 	inline boost::uint16_t bswap16(boost::uint16_t value)

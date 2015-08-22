@@ -3,6 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <boost/container/vector.hpp>
+#include <boost/range/algorithm/equal.hpp>
 
 namespace Si
 {
@@ -118,7 +119,7 @@ namespace Si
 	template <class Element, class Allocator>
 	bool operator == (vector<Element, Allocator> const &left, vector<Element, Allocator> const &right)
 	{
-		return (left.size() == right.size()) && std::equal(left.begin(), left.end(), right.begin());
+		return boost::range::equal(left, right);
 	}
 }
 

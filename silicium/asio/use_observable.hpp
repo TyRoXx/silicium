@@ -20,6 +20,8 @@ namespace Si
 	{
 		struct use_observable_t
 		{
+			BOOST_CONSTEXPR use_observable_t()
+			{}
 		};
 
 		static BOOST_CONSTEXPR_OR_CONST use_observable_t use_observable;

@@ -126,13 +126,13 @@ namespace Si
 				do
 				{
 					auto rest = make_iterator_range(next_in, piece_content_and_flag.first.end());
-					Si::iterator_range<char *> buffer = m_next.make_append_space(std::max<size_t>(rest.size(), 4096));
+					Si::iterator_range<char *> buffer = m_next.make_append_space(std::max<size_t>(static_cast<std::size_t>(rest.size()), 4096));
 					assert(!buffer.empty());
 					auto result = m_stream.deflate(rest, buffer, piece_content_and_flag.second);
-					std::size_t written = buffer.size() - result.second;
+					std::size_t written = static_cast<std::size_t>(buffer.size()) - result.second;
 					m_next.make_append_space(written);
 					m_next.flush_append_space();
-					next_in += (rest.size() - result.first);
+					next_in += (static_cast<std::size_t>(rest.size()) - result.first);
 				}
 				while (next_in != piece_content_and_flag.first.end());
 			}
