@@ -4,9 +4,8 @@
 #include <silicium/error_or.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/c_string.hpp>
-#include <boost/predef.h>
 
-#ifdef BOOST_OS_UNIX
+#ifdef __unix
 #	include <fcntl.h>
 #endif
 
