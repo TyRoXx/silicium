@@ -372,6 +372,13 @@ namespace Si
 		return error;
 	}
 
+	inline boost::system::error_code copy(absolute_path const &from, absolute_path const &to)
+	{
+		boost::system::error_code ec;
+		boost::filesystem::copy(from.to_boost_path(), to.to_boost_path(), ec);
+		return ec;
+	}
+
 	SILICIUM_USE_RESULT
 	inline error_or<bool> file_exists(absolute_path const &file)
 	{
@@ -430,6 +437,11 @@ namespace Si
 		}
 		return *Si::absolute_path::create(std::move(result));
 #endif
+	}
+
+	inline absolute_path temporary_directory()
+	{
+		return *absolute_path::create(boost::filesystem::temp_directory_path());
 	}
 #endif
 }
