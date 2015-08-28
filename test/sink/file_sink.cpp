@@ -7,6 +7,7 @@
 #include <silicium/absolute_path.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/thread/future.hpp>
 #include <array>
 #include <fstream>

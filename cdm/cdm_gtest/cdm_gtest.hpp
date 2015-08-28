@@ -1,7 +1,7 @@
 #ifndef CDM_GTEST_HPP
 #define CDM_GTEST_HPP
 
-#include <silicium/absolute_path.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
 
@@ -13,16 +13,6 @@ namespace cdm
 		Si::absolute_path library;
 		Si::absolute_path library_main;
 	};
-
-	inline void copy_recursively(Si::absolute_path const &from, Si::absolute_path const &to)
-	{
-		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
-		std::vector<Si::noexcept_string> arguments = {"-Rv", from.c_str(), to.c_str()};
-		if (Si::run_process("/bin/cp", arguments, from.to_boost_path(), output) != 0)
-		{
-			throw std::runtime_error("cp failed");
-		}
-	}
 
 	inline Si::error_or<gtest_paths> install_gtest(
 		Si::absolute_path const &gtest_source,
@@ -61,7 +51,7 @@ namespace cdm
 		Si::throw_if_error(Si::copy(temporarily_writable / *Si::path_segment::create("libgtest.a"), result.library));
 		Si::throw_if_error(Si::copy(temporarily_writable / *Si::path_segment::create("libgtest_main.a"), result.library_main));
 		Si::remove_all(result.include).move_value();
-		copy_recursively(gtest_source / *Si::path_segment::create("include") / *Si::path_segment::create("gtest"), result.include);
+		Si::copy_recursively(gtest_source / *Si::path_segment::create("include") / *Si::path_segment::create("gtest"), result.include, &output);
 
 		return std::move(result);
 	}

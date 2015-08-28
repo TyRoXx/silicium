@@ -1,4 +1,4 @@
-#include <silicium/absolute_path.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/os_string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/unordered_map.hpp>

@@ -2,10 +2,10 @@
 #define SILICIUM_ASYNC_PROCESS_HPP
 
 #include <silicium/os_string.hpp>
+#include <silicium/absolute_path.hpp>
 #include <silicium/process_parameters.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/process_handle.hpp>
-#include <silicium/error_or.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
@@ -18,6 +18,7 @@
 #include <silicium/asio/process_output.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/sink/append.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #ifndef _WIN32
 #	include <fcntl.h>
@@ -38,13 +39,13 @@ namespace Si
 {
 	struct async_process_parameters
 	{
-		Si::absolute_path executable;
+		absolute_path executable;
 
 		/// the values for the child's argv[1...]
 		std::vector<os_string> arguments;
 
 		/// must be an existing path, otherwise the child cannot launch properly
-		Si::absolute_path current_path;
+		absolute_path current_path;
 	};
 
 	struct async_process

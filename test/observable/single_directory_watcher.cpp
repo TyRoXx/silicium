@@ -3,6 +3,7 @@
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/open.hpp>
 #include <silicium/steady_clock.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/append.hpp>
 #include <boost/test/unit_test.hpp>

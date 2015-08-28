@@ -1,6 +1,6 @@
 #include <silicium/single_directory_watcher.hpp>
 #include <silicium/observable/for_each.hpp>
-#include <silicium/absolute_path.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/terminate_on_exception.hpp>
 #include <iostream>
 

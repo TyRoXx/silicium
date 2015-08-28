@@ -34,6 +34,7 @@
 #include <silicium/explicit_operator_bool.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/file_notification.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/function.hpp>

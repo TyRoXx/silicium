@@ -12,6 +12,7 @@
 #include <silicium/source/file_source.hpp>
 #include <silicium/terminate_on_exception.hpp>
 #include <silicium/program_options.hpp>
+#include <silicium/file_operations.hpp>
 #include <iostream>
 #include <boost/unordered_map.hpp>
 #include <boost/algorithm/string/find.hpp>
