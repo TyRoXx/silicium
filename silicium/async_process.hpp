@@ -18,7 +18,10 @@
 #include <silicium/asio/process_output.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/sink/append.hpp>
-#include <boost/filesystem/operations.hpp>
+
+#if SILICIUM_HAS_EXCEPTIONS
+#	include <boost/filesystem/operations.hpp>
+#endif
 
 #ifndef _WIN32
 #	include <fcntl.h>

@@ -7,10 +7,12 @@
 #include <silicium/absolute_path.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/thread/future.hpp>
 #include <array>
 #include <fstream>
+#if SILICIUM_HAS_EXCEPTIONS
+#	include <boost/filesystem/operations.hpp>
+#endif
 
 #if SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_FILE_SINK //for Boost filesystem
 namespace
