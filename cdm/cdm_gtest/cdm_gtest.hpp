@@ -25,9 +25,9 @@ namespace cdm
 	}
 
 	inline Si::error_or<gtest_paths> install_gtest(
-	    Si::absolute_path const &gtest_source,
+		Si::absolute_path const &gtest_source,
 		Si::absolute_path const &temporarily_writable,
-	    Si::absolute_path const &install_root)
+		Si::absolute_path const &install_root)
 	{
 		Si::absolute_path const cmake_exe = *Si::absolute_path::create("/usr/bin/cmake");
 		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
@@ -36,14 +36,20 @@ namespace cdm
 			arguments.push_back(gtest_source.c_str());
 			arguments.push_back(("-DCMAKE_INSTALL_PREFIX=" + install_root.to_boost_path().string()).c_str());
 			int rc = Si::run_process(cmake_exe.to_boost_path(), arguments, temporarily_writable.to_boost_path(), output);
-			assert(rc == 0);
+			if (rc != 0)
+			{
+				throw std::runtime_error("cmake configure failed");
+			}
 		}
 		{
 			std::vector<Si::noexcept_string> arguments;
 			arguments.push_back("--build");
 			arguments.push_back(".");
 			int rc = Si::run_process(cmake_exe.to_boost_path(), arguments, temporarily_writable.to_boost_path(), output);
-			assert(rc == 0);
+			if (rc != 0)
+			{
+				throw std::runtime_error("cmake build failed");
+			}
 		}
 		gtest_paths result;
 		result.include = install_root / *Si::path_segment::create("include");
