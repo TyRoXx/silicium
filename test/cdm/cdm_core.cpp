@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(test_cdm_gtest)
 	Si::absolute_path const install_dir = tmp / *Si::path_segment::create("install");
 	Si::throw_if_error(Si::recreate_directories(build_dir));
 	Si::throw_if_error(Si::recreate_directories(install_dir));
-	cdm::gtest_paths const built = cdm::install_gtest(gtest_source, build_dir, install_dir).move_value();
+	cdm::gtest_paths const built = cdm::install_gtest(gtest_source, build_dir, install_dir);
 	BOOST_CHECK_EQUAL(install_dir / *Si::path_segment::create("include"), built.include);
 	BOOST_CHECK(boost::filesystem::exists(built.include.to_boost_path()));
 	BOOST_CHECK(boost::filesystem::exists(built.library.to_boost_path()));

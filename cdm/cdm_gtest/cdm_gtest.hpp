@@ -14,7 +14,7 @@ namespace cdm
 		Si::absolute_path library_main;
 	};
 
-	inline Si::error_or<gtest_paths> install_gtest(
+	inline gtest_paths install_gtest(
 		Si::absolute_path const &gtest_source,
 		Si::absolute_path const &temporarily_writable,
 		Si::absolute_path const &install_root)
