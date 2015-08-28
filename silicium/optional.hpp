@@ -359,6 +359,17 @@ namespace Si
 			}
 		}
 
+		template <class EmptyHandler>
+		T &or_throw(EmptyHandler &&handle_empty)
+		{
+			if (*this)
+			{
+				return **this;
+			}
+			std::forward<EmptyHandler>(handle_empty);
+			SILICIUM_UNREACHABLE();
+		}
+
 	private:
 
 		enum

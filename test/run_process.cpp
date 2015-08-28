@@ -1,5 +1,6 @@
 #include <silicium/run_process.hpp>
 #include <silicium/to_unique.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/source/range_source.hpp>
@@ -15,9 +16,9 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(run_process_1_unix_which)
 	{
 		process_parameters parameters;
-		parameters.executable = "/usr/bin/which";
+		parameters.executable = *absolute_path::create("/usr/bin/which");
 		parameters.arguments.emplace_back("which");
-		parameters.current_path = boost::filesystem::current_path();
+		parameters.current_path = get_current_working_directory();
 		std::vector<char> out;
 		auto sink = Si::virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;
@@ -48,7 +49,7 @@ namespace Si
 
 	namespace
 	{
-		Si::native_path_string const absolute_root(
+		Si::absolute_path const absolute_root = *Si::absolute_path::create(
 	#ifdef _WIN32
 			L"C:/"
 	#else
@@ -60,8 +61,8 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(run_process_from_nonexecutable)
 	{
 		process_parameters parameters;
-		parameters.executable = boost::filesystem::path(absolute_root.c_str()) / SILICIUM_SYSTEM_LITERAL("does-not-exist");
-		parameters.current_path = boost::filesystem::current_path();
+		parameters.executable = absolute_root / SILICIUM_SYSTEM_LITERAL("does-not-exist");
+		parameters.current_path = Si::get_current_working_directory();
 		BOOST_CHECK_EXCEPTION(run_process(parameters), boost::system::system_error, [](boost::system::system_error const &e)
 		{
 			return e.code() == boost::system::error_code(ENOENT, boost::system::system_category());
@@ -72,8 +73,8 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(run_process_standard_input)
 	{
 		process_parameters parameters;
-		parameters.executable = "/bin/cat";
-		parameters.current_path = boost::filesystem::current_path();
+		parameters.executable = *Si::absolute_path::create("/bin/cat");
+		parameters.current_path = Si::get_current_working_directory();
 		auto message = Si::make_c_str_range("Hello, cat");
 		auto input = Si::Source<char>::erase(Si::make_range_source(message));
 		parameters.in = &input;

@@ -1,4 +1,5 @@
 #include <silicium/run_process.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/sink/function_sink.hpp>
 
 int main(int argc, char **argv)
@@ -6,8 +7,8 @@ int main(int argc, char **argv)
 	boost::ignore_unused_variable_warning(argc);
 #if SILICIUM_HAS_RUN_PROCESS
 	Si::process_parameters parameters;
-	parameters.executable = "/usr/bin/file";
-	parameters.current_path = boost::filesystem::current_path();
+	parameters.executable = *Si::absolute_path::create("/usr/bin/file");
+	parameters.current_path = Si::get_current_working_directory();
 	parameters.arguments.emplace_back(argv[0]);
 	auto output = Si::Sink<char, Si::success>::erase(
 		Si::make_function_sink<char>(

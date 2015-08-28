@@ -30,18 +30,9 @@ namespace Si
 	inline int run_process(process_parameters const &parameters)
 	{
 		async_process_parameters async_parameters;
-		if (!extract(async_parameters.executable, absolute_path::create(parameters.executable)))
-		{
-			throw std::invalid_argument("a process can only be started with an absolute path to the executable");
-		}
-		if (!extract(async_parameters.current_path, absolute_path::create(parameters.current_path)))
-		{
-			throw std::invalid_argument("a process can only be started with an absolute path as the working directory");
-		}
-		boost::range::transform(parameters.arguments, std::back_inserter(async_parameters.arguments), [](noexcept_string const &argument)
-		{
-			return to_os_string(argument);
-		});
+		async_parameters.executable = parameters.executable;
+		async_parameters.arguments = parameters.arguments;
+		async_parameters.current_path = parameters.current_path;
 		auto input = make_pipe().move_value();
 		auto std_output = make_pipe().move_value();
 		auto std_error = make_pipe().move_value();
@@ -96,18 +87,38 @@ namespace Si
 		return process.wait_for_exit().get();
 	}
 
+	SILICIUM_USE_RESULT
 	inline int run_process(
 		boost::filesystem::path executable,
 		std::vector<noexcept_string> arguments,
 		boost::filesystem::path current_path,
 		Sink<char, success>::interface &output)
 	{
-		Si::process_parameters parameters;
+		process_parameters parameters;
+		parameters.executable = absolute_path::create(std::move(executable)).or_throw([]{ throw std::invalid_argument("The executable must be an absolute path."); });
+		boost::range::transform(arguments, std::back_inserter(parameters.arguments), [&parameters](noexcept_string const &argument)
+		{
+			return to_os_string(argument);
+		});
+		parameters.current_path = absolute_path::create(std::move(current_path)).or_throw([]{ throw std::invalid_argument("The current directory must be an absolute path."); });
+		parameters.out = &output;
+		return run_process(parameters);
+	}
+
+	SILICIUM_USE_RESULT
+	inline error_or<int> run_process(
+		absolute_path executable,
+		std::vector<os_string> arguments,
+		absolute_path current_directory,
+		Sink<char, success>::interface &output
+		)
+	{
+		process_parameters parameters;
 		parameters.executable = std::move(executable);
 		parameters.arguments = std::move(arguments);
-		parameters.current_path = std::move(current_path);
+		parameters.current_path = std::move(current_directory);
 		parameters.out = &output;
-		return Si::run_process(parameters);
+		return run_process(parameters);
 	}
 }
 #endif
