@@ -47,4 +47,4 @@ script:
  - cd test
  - if [ $NO_RTTI != "ON" ]; then ./unit_test; fi
  - cd ../system_test
- - if [ $NO_RTTI != "ON" ]; then ./system_test; fi
+ - if [ $NO_RTTI != "ON" ] && [ $NO_EXCEPTIONS != "ON" ]; then ./system_test; fi
