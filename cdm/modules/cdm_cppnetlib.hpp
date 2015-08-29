@@ -10,9 +10,6 @@ namespace cdm
 	struct cppnetlib_paths
 	{
 		Si::absolute_path include;
-		Si::absolute_path uri_library;
-		Si::absolute_path server_parsers_library;
-		Si::absolute_path client_connections_library;
 	};
 
 	inline cppnetlib_paths install_cppnetlib(
@@ -47,10 +44,6 @@ namespace cdm
 		}
 		cppnetlib_paths result;
 		result.include = install_root / *Si::path_segment::create("include");
-		auto lib_dir = install_root / *Si::path_segment::create("lib");
-		result.uri_library = lib_dir / *Si::path_segment::create("libcppnetlib-uri.so");
-		result.server_parsers_library = lib_dir / *Si::path_segment::create("libcppnetlib-server-parsers.so");
-		result.client_connections_library = lib_dir / *Si::path_segment::create("libcppnetlib-client-connections.so");
 		return std::move(result);
 	}
 }

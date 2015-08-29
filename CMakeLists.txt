@@ -204,6 +204,7 @@ if(NOT SILICIUM_NO_EXCEPTIONS)
 endif()
 
 add_subdirectory("test")
+add_subdirectory("system_test")
 add_subdirectory("test_includes")
 add_subdirectory("build_tester")
 add_subdirectory("cdm")
