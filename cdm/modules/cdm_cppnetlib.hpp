@@ -32,8 +32,6 @@ namespace cdm
 			std::vector<Si::noexcept_string> arguments;
 			arguments.push_back("--build");
 			arguments.push_back(".");
-			arguments.push_back("--");
-			arguments.push_back("-j10");
 			int rc = Si::run_process(cmake_exe.to_boost_path(), arguments, install_root.to_boost_path(), output);
 			if (rc != 0)
 			{
