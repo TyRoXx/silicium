@@ -4,8 +4,6 @@
 #include <silicium/file_operations.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/thread/thread.hpp>
 
 namespace cdm
 {
@@ -40,7 +38,6 @@ namespace cdm
 			arguments.push_back("--build");
 			arguments.push_back(".");
 			arguments.push_back("--");
-			arguments.push_back("-j" + boost::lexical_cast<Si::noexcept_string>(boost::thread::hardware_concurrency()));
 			arguments.push_back("install");
 			int rc = Si::run_process(cmake_exe.to_boost_path(), arguments, temporarily_writable.to_boost_path(), output);
 			if (rc != 0)
