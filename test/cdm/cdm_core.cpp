@@ -26,6 +26,7 @@ BOOST_AUTO_TEST_CASE(cdm_core_trivial)
 	BOOST_CHECK(!loaded.library.empty());
 }
 
+#ifndef _WIN32
 namespace
 {
 	Si::absolute_path const this_file = *Si::absolute_path::create(__FILE__);
@@ -64,3 +65,4 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 	BOOST_CHECK(boost::filesystem::exists(built.client_connections_library.to_boost_path()));
 	BOOST_CHECK(boost::filesystem::exists(built.server_parsers_library.to_boost_path()));
 }
+#endif
