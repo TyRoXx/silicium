@@ -33,8 +33,8 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(run_process_1_win32_cmd)
 	{
 		process_parameters parameters;
-		parameters.executable = "C:\\Windows\\System32\\where.exe";
-		parameters.current_path = boost::filesystem::current_path();
+		parameters.executable = *Si::absolute_path::create(L"C:\\Windows\\System32\\where.exe");
+		parameters.current_path = Si::get_current_working_directory();
 		std::vector<char> out;
 		auto sink = virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;

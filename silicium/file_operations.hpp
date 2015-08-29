@@ -94,16 +94,26 @@ namespace Si
 		absolute_path const &to,
 		Sink<char, success>::interface *output)
 	{
-		std::vector<noexcept_string> arguments = {"-Rv", from.c_str(), to.c_str()};
+#ifdef _WIN32
+		boost::ignore_unused_variable_warning(from);
+		boost::ignore_unused_variable_warning(to);
+		boost::ignore_unused_variable_warning(output);
+		throw std::logic_error("copy_recursively: not implemented");
+#else
+		std::vector<os_string> arguments;
+		arguments.push_back(SILICIUM_SYSTEM_LITERAL("-Rv"));
+		arguments.push_back(from.c_str());
+		arguments.push_back(to.c_str());
 		auto null_output = Sink<char, success>::erase(null_sink<char, success>());
 		if (!output)
 		{
 			output = &null_output;
 		}
-		if (run_process("/bin/cp", arguments, from.to_boost_path(), *output) != 0)
+		if (run_process(*Si::absolute_path::create("/bin/cp"), arguments, from, *output) != 0)
 		{
 			throw std::runtime_error("cp failed");
 		}
+#endif
 	}
 
 	SILICIUM_USE_RESULT
