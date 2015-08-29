@@ -47,7 +47,7 @@ namespace cdm
 		}
 		cppnetlib_paths result;
 		result.include = install_root / *Si::path_segment::create("include");
-		auto lib_dir = install_root / *Si::path_segment::create("lib") / *Si::path_segment::create("x86_64-linux-gnu");
+		auto lib_dir = install_root / *Si::path_segment::create("lib");
 		result.uri_library = lib_dir / *Si::path_segment::create("libcppnetlib-uri.so");
 		result.server_parsers_library = lib_dir / *Si::path_segment::create("libcppnetlib-server-parsers.so");
 		result.client_connections_library = lib_dir / *Si::path_segment::create("libcppnetlib-client-connections.so");
