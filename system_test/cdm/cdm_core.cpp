@@ -40,4 +40,35 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "libs/network/src/libcppnetlib-server-parsers.so"));
 	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "libs/network/src/libcppnetlib-uri.so"));
 }
+
+BOOST_AUTO_TEST_CASE(test_using_gtest)
+{
+	Si::absolute_path const using_gtest_source = silicium / Si::relative_path("cdm/application/using_gtest");
+	Si::absolute_path const gtest_source = silicium / Si::relative_path("cdm/original_sources/gtest-1.7.0");
+	Si::absolute_path const tmp = Si::temporary_directory();
+	Si::absolute_path const build_dir = tmp / *Si::path_segment::create("build");
+	Si::absolute_path const install_dir = tmp / *Si::path_segment::create("install");
+	Si::throw_if_error(Si::recreate_directories(build_dir));
+	Si::throw_if_error(Si::recreate_directories(install_dir));
+	cdm::gtest_paths const gtest_installed = cdm::install_gtest(gtest_source, build_dir, install_dir);
+	auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
+	{
+		std::vector<Si::os_string> arguments;
+		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_INCLUDE_DIRS=")) + gtest_installed.include.c_str());
+		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_LIBRARIES=")) + gtest_installed.library.c_str() + ";" + gtest_installed.library_main.c_str());
+		arguments.push_back(Si::to_os_string(using_gtest_source.c_str()));
+		Si::throw_if_error(Si::recreate_directories(build_dir));
+		BOOST_REQUIRE_EQUAL(0, Si::run_process(*Si::absolute_path::create("/usr/bin/cmake"), arguments, build_dir, output));
+	}
+	{
+		std::vector<Si::os_string> arguments;
+		arguments.push_back(SILICIUM_SYSTEM_LITERAL("--build"));
+		arguments.push_back(SILICIUM_SYSTEM_LITERAL("."));
+		BOOST_REQUIRE_EQUAL(0, Si::run_process(*Si::absolute_path::create("/usr/bin/cmake"), arguments, build_dir, output));
+	}
+	{
+		std::vector<Si::os_string> arguments;
+		BOOST_REQUIRE_EQUAL(0, Si::run_process(build_dir / *Si::path_segment::create("using_gtest"), arguments, build_dir, output));
+	}
+}
 #endif

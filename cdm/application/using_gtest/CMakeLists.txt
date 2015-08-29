@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project(using_gtest)
+include_directories(${GTEST_INCLUDE_DIRS})
+add_executable(using_gtest using_gtest.cpp cdm.hpp)
+target_link_libraries(using_gtest ${GTEST_LIBRARIES} pthread)
