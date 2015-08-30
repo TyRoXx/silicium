@@ -112,6 +112,15 @@ namespace Si
 			{
 				throw_error(error);
 			}
+
+			void operator()(boost::system::error_code error, identity<void>) const
+			{
+				if (!error)
+				{
+					return;
+				}
+				throw_error(error);
+			}
 		};
 
 		struct variant_error_handler
