@@ -49,4 +49,17 @@ BOOST_AUTO_TEST_CASE(test_file_exists_false_variant)
 	Si::error_or<bool> const exists = Si::file_exists(absolute_root / *Si::path_segment::create("does-not-exist"), Si::variant_);
 	BOOST_CHECK(!exists.get());
 }
+
+BOOST_AUTO_TEST_CASE(test_temporary_directory_throw)
+{
+	Si::absolute_path const p = Si::temporary_directory(Si::throw_);
+	BOOST_CHECK(!p.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_temporary_directory_variant)
+{
+	Si::error_or<Si::absolute_path> const p = Si::temporary_directory(Si::variant_);
+	BOOST_REQUIRE(!p.is_error());
+	BOOST_CHECK(!p.get().empty());
+}
 #endif

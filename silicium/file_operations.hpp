@@ -175,9 +175,7 @@ namespace Si
 	template <class ErrorHandler>
 	SILICIUM_USE_RESULT
 	inline auto file_exists(absolute_path const &file, ErrorHandler &&handle_error)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<bool>()))
-#endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::file_status status = boost::filesystem::status(file.to_boost_path(), ec);
@@ -239,9 +237,17 @@ namespace Si
 #endif
 	}
 
-	inline absolute_path temporary_directory()
+	template <class ErrorHandler>
+	inline auto temporary_directory(ErrorHandler &&handle_error)
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
 	{
-		return *absolute_path::create(boost::filesystem::temp_directory_path());
+		boost::system::error_code ec;
+		auto temp = boost::filesystem::temp_directory_path(ec);
+		if (!!ec)
+		{
+			return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
+		}
+		return *absolute_path::create(std::move(temp));
 	}
 #endif
 }
