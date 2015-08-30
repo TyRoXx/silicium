@@ -1,7 +1,7 @@
 #Boost.Test uses typeid for no reason
 if(NOT SILICIUM_NO_RTTI AND SILICIUM_HAS_CDM)
 	include_directories(.)
-	include_directories(../cdm)
+	include_directories(../cdm/modules)
 	file(GLOB sources "*.cpp")
 	file(GLOB_RECURSE headers "../cdm/modules/*.hpp")
 	file(GLOB cdmSources "cdm/*.cpp")
