@@ -47,8 +47,8 @@ namespace cdm
 		result.library = lib_dir / *Si::path_segment::create("libgtest.a");
 		result.library_main = lib_dir / *Si::path_segment::create("libgtest_main.a");
 
-		Si::throw_if_error(Si::copy(temporarily_writable / *Si::path_segment::create("libgtest.a"), result.library));
-		Si::throw_if_error(Si::copy(temporarily_writable / *Si::path_segment::create("libgtest_main.a"), result.library_main));
+		Si::copy(temporarily_writable / *Si::path_segment::create("libgtest.a"), result.library, Si::throw_);
+		Si::copy(temporarily_writable / *Si::path_segment::create("libgtest_main.a"), result.library_main, Si::throw_);
 		Si::remove_all(result.include).move_value();
 		Si::copy_recursively(gtest_source / *Si::path_segment::create("include"), result.include, &output, Si::throw_);
 

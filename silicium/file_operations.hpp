@@ -137,22 +137,27 @@ namespace Si
 	static detail::throwing_error_handler const throw_;
 	static detail::variant_error_handler const variant_;
 
-	SILICIUM_USE_RESULT
-	inline boost::system::error_code copy(absolute_path const &from, absolute_path const &to)
+	template <class ErrorHandler>
+	auto copy(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+#endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::copy(from.to_boost_path(), to.to_boost_path(), ec);
-		return ec;
+		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 
 	template <class ErrorHandler>
-	inline auto copy_recursively(
+	auto copy_recursively(
 		absolute_path const &from,
 		absolute_path const &to,
 		Sink<char, success>::interface *output,
 		ErrorHandler &&handle_error
 	)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+#endif
 	{
 #ifdef _WIN32
 		boost::ignore_unused_variable_warning(from);
@@ -180,7 +185,7 @@ namespace Si
 
 	template <class ErrorHandler>
 	SILICIUM_USE_RESULT
-	inline auto file_exists(absolute_path const &file, ErrorHandler &&handle_error)
+	auto file_exists(absolute_path const &file, ErrorHandler &&handle_error)
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<bool>()))
 	{
 		boost::system::error_code ec;
@@ -197,7 +202,7 @@ namespace Si
 	}
 
 	template <class ErrorHandler>
-	inline auto rename(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
+	auto rename(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
 #endif
@@ -208,7 +213,7 @@ namespace Si
 	}
 
 	template <class ErrorHandler>
-	inline auto get_current_executable_path(ErrorHandler &&handle_error)
+	auto get_current_executable_path(ErrorHandler &&handle_error)
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
 	{
 #ifdef _WIN32
@@ -246,7 +251,7 @@ namespace Si
 	}
 
 	template <class ErrorHandler>
-	inline auto temporary_directory(ErrorHandler &&handle_error)
+	auto temporary_directory(ErrorHandler &&handle_error)
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
 	{
 		boost::system::error_code ec;
