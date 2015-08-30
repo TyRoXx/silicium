@@ -14,9 +14,9 @@ namespace
 	Si::absolute_path const absolute_root = *Si::absolute_path::create(SILICIUM_TEST_ROOT);
 }
 
-BOOST_AUTO_TEST_CASE(absolute_path_get_current_executable_path)
+BOOST_AUTO_TEST_CASE(get_current_executable_path_throw)
 {
-	Si::absolute_path p = Si::get_current_executable_path().move_value();
+	Si::absolute_path p = Si::get_current_executable_path(Si::throw_);
 	auto const expected =
 		"unit_test"
 #ifdef _WIN32
@@ -24,6 +24,19 @@ BOOST_AUTO_TEST_CASE(absolute_path_get_current_executable_path)
 #endif
 		;
 	BOOST_CHECK_EQUAL(expected, p.to_boost_path().leaf());
+}
+
+BOOST_AUTO_TEST_CASE(get_current_executable_path_variant)
+{
+	Si::error_or<Si::absolute_path> const p = Si::get_current_executable_path(Si::variant_);
+	BOOST_REQUIRE(!p.is_error());
+	auto const expected =
+		"unit_test"
+#ifdef _WIN32
+		".exe"
+#endif
+		;
+	BOOST_CHECK_EQUAL(expected, p.get().to_boost_path().leaf());
 }
 
 BOOST_AUTO_TEST_CASE(test_file_exists_true_throw)

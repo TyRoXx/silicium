@@ -201,7 +201,9 @@ namespace Si
 		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 
-	inline Si::error_or<Si::absolute_path> get_current_executable_path()
+	template <class ErrorHandler>
+	inline auto get_current_executable_path(ErrorHandler &&handle_error)
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
 	{
 #ifdef _WIN32
 		//will be enough for most cases
@@ -209,8 +211,8 @@ namespace Si
 		for (;;)
 		{
 			auto const length = GetModuleFileNameW(NULL, buffer.data(), buffer.size());
-			auto const error = Si::get_last_error();
-			switch (error.value())
+			auto const ec = Si::get_last_error();
+			switch (ec.value())
 			{
 			case ERROR_INSUFFICIENT_BUFFER:
 				buffer.resize(buffer.size() * 2);
@@ -223,7 +225,7 @@ namespace Si
 			}
 
 			default:
-				return error;
+				return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
 			}
 		}
 #else
@@ -231,7 +233,7 @@ namespace Si
 		auto result = boost::filesystem::read_symlink("/proc/self/exe", ec);
 		if (!!ec)
 		{
-			return ec;
+			return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
 		}
 		return *Si::absolute_path::create(std::move(result));
 #endif

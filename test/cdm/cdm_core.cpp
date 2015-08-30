@@ -5,7 +5,7 @@
 
 BOOST_AUTO_TEST_CASE(cdm_core_trivial)
 {
-	auto const directory_containing_test_exe = Si::get_current_executable_path().get().to_boost_path().parent_path();
+	auto const directory_containing_test_exe = Si::get_current_executable_path(Si::throw_).to_boost_path().parent_path();
 #ifdef _MSC_VER
 	auto const build_type = directory_containing_test_exe.leaf();
 #endif
