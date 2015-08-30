@@ -145,10 +145,14 @@ namespace Si
 		return ec;
 	}
 
-	inline void copy_recursively(
+	template <class ErrorHandler>
+	inline auto copy_recursively(
 		absolute_path const &from,
 		absolute_path const &to,
-		Sink<char, success>::interface *output)
+		Sink<char, success>::interface *output,
+		ErrorHandler &&handle_error
+	)
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
 	{
 #ifdef _WIN32
 		boost::ignore_unused_variable_warning(from);
@@ -165,10 +169,12 @@ namespace Si
 		{
 			output = &null_output;
 		}
-		if (run_process(*Si::absolute_path::create("/bin/cp"), arguments, from, *output) != 0)
+		error_or<int> result = run_process(*Si::absolute_path::create("/bin/cp"), arguments, from, *output);
+		if (!result.is_error() && (result.get() != 0))
 		{
-			throw std::runtime_error("cp failed");
+			throw std::runtime_error("cp failed"); //TODO: return a custom error_code for that
 		}
+		return std::forward<ErrorHandler>(handle_error)(result.error(), identity<void>());
 #endif
 	}
 

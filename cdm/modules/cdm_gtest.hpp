@@ -50,7 +50,7 @@ namespace cdm
 		Si::throw_if_error(Si::copy(temporarily_writable / *Si::path_segment::create("libgtest.a"), result.library));
 		Si::throw_if_error(Si::copy(temporarily_writable / *Si::path_segment::create("libgtest_main.a"), result.library_main));
 		Si::remove_all(result.include).move_value();
-		Si::copy_recursively(gtest_source / *Si::path_segment::create("include"), result.include, &output);
+		Si::copy_recursively(gtest_source / *Si::path_segment::create("include"), result.include, &output, Si::throw_);
 
 		return std::move(result);
 	}
