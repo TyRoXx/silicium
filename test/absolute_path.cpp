@@ -202,17 +202,3 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_wchar_not_ok)
 	BOOST_CHECK(!p);
 }
 #endif
-
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
-BOOST_AUTO_TEST_CASE(absolute_path_get_current_executable_path)
-{
-	Si::absolute_path p = Si::get_current_executable_path().move_value();
-	auto const expected =
-		"unit_test"
-#ifdef _WIN32
-		".exe"
-#endif
-		;
-	BOOST_CHECK_EQUAL(expected, p.to_boost_path().leaf());
-}
-#endif

@@ -2,6 +2,7 @@
 #define SILICIUM_FILE_OPERATIONS_HPP
 
 #include <silicium/run_process.hpp>
+#include <silicium/identity.hpp>
 #ifdef _WIN32
 #	include <silicium/win32/win32.hpp>
 #endif
@@ -87,22 +88,45 @@ namespace Si
 	template <class ErrorHandler>
 	auto recreate_directories(absolute_path const &directories, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
 #endif
 	{
 		boost::system::error_code error = detail::recreate_directories(directories);
-		return std::forward<ErrorHandler>(handle_error)(error);
+		return std::forward<ErrorHandler>(handle_error)(error, identity<void>());
 	}
 
-	inline boost::system::error_code return_(boost::system::error_code error)
+	namespace detail
 	{
-		return error;
+		struct returning_error_handler
+		{
+			boost::system::error_code operator()(boost::system::error_code error, identity<void>) const
+			{
+				return error;
+			}
+		};
+
+		struct throwing_error_handler
+		{
+			template <class Result>
+			Result operator()(boost::system::error_code error, identity<Result>) const
+			{
+				throw_error(error);
+			}
+		};
+
+		struct variant_error_handler
+		{
+			template <class Result>
+			error_or<Result> operator()(boost::system::error_code error, identity<Result>) const
+			{
+				return error;
+			}
+		};
 	}
 
-	inline void throw_(boost::system::error_code error)
-	{
-		throw_if_error(error);
-	}
+	static detail::returning_error_handler const return_;
+	static detail::throwing_error_handler const throw_;
+	static detail::variant_error_handler const variant_;
 
 	SILICIUM_USE_RESULT
 	inline boost::system::error_code copy(absolute_path const &from, absolute_path const &to)
@@ -139,8 +163,12 @@ namespace Si
 #endif
 	}
 
+	template <class ErrorHandler>
 	SILICIUM_USE_RESULT
-	inline error_or<bool> file_exists(absolute_path const &file)
+	inline auto file_exists(absolute_path const &file, ErrorHandler &&handle_error)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<bool>()))
+#endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::file_status status = boost::filesystem::status(file.to_boost_path(), ec);
@@ -150,7 +178,7 @@ namespace Si
 		}
 		if (ec)
 		{
-			return ec;
+			return std::forward<ErrorHandler>(handle_error)(ec, identity<bool>());
 		}
 		return true;
 	}

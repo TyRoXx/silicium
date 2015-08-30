@@ -38,7 +38,7 @@ namespace
 		}
 
 		Si::absolute_path const complete_output_directory = install_root / *boost_archive_name;
-		if (Si::file_exists(complete_output_directory).get())
+		if (Si::file_exists(complete_output_directory, Si::throw_))
 		{
 			return complete_output_directory;
 		}
