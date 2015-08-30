@@ -1,9 +1,9 @@
 #include <modules/cdm_cppnetlib.hpp>
 #include <modules/cdm_gtest.hpp>
+#include <silicium/cmake.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 
-#ifndef _WIN32
 namespace
 {
 	Si::absolute_path const this_file = *Si::absolute_path::create(__FILE__);
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(test_cdm_gtest)
 	Si::absolute_path const install_dir = tmp / *Si::path_segment::create("install");
 	Si::throw_if_error(Si::recreate_directories(build_dir));
 	Si::throw_if_error(Si::recreate_directories(install_dir));
-	cdm::gtest_paths const built = cdm::install_gtest(source, build_dir, install_dir);
+	cdm::gtest_paths const built = cdm::install_gtest(source, build_dir, install_dir, Si::cmake_exe);
 	BOOST_CHECK_EQUAL(install_dir / *Si::path_segment::create("include"), built.include);
 	BOOST_CHECK(boost::filesystem::exists(built.include.to_boost_path()));
 	BOOST_CHECK(boost::filesystem::exists(built.library.to_boost_path()));
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 	Si::absolute_path const tmp = Si::temporary_directory();
 	Si::absolute_path const install_dir = tmp / *Si::path_segment::create("install");
 	Si::throw_if_error(Si::recreate_directories(install_dir));
-	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, install_dir);
+	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, install_dir, Si::cmake_exe);
 	BOOST_CHECK_EQUAL(install_dir, built.cmake_prefix_path);
 	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "cppnetlibTargets.cmake"));
 	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "libs/network/src/libcppnetlib-client-connections.so"));
@@ -50,25 +50,24 @@ BOOST_AUTO_TEST_CASE(test_using_gtest)
 	Si::absolute_path const install_dir = tmp / *Si::path_segment::create("install");
 	Si::throw_if_error(Si::recreate_directories(build_dir));
 	Si::throw_if_error(Si::recreate_directories(install_dir));
-	cdm::gtest_paths const gtest_installed = cdm::install_gtest(gtest_source, build_dir, install_dir);
+	cdm::gtest_paths const gtest_installed = cdm::install_gtest(gtest_source, build_dir, install_dir, Si::cmake_exe);
 	auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_INCLUDE_DIRS=")) + gtest_installed.include.c_str());
-		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_LIBRARIES=")) + gtest_installed.library.c_str() + ";" + gtest_installed.library_main.c_str());
+		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_LIBRARIES=")) + to_os_string(gtest_installed.library) + SILICIUM_SYSTEM_LITERAL(";") + to_os_string(gtest_installed.library_main));
 		arguments.push_back(Si::to_os_string(using_gtest_source.c_str()));
 		Si::throw_if_error(Si::recreate_directories(build_dir));
-		BOOST_REQUIRE_EQUAL(0, Si::run_process(*Si::absolute_path::create("/usr/bin/cmake"), arguments, build_dir, output));
+		BOOST_REQUIRE_EQUAL(0, Si::run_process(Si::cmake_exe, arguments, build_dir, output));
 	}
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("--build"));
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("."));
-		BOOST_REQUIRE_EQUAL(0, Si::run_process(*Si::absolute_path::create("/usr/bin/cmake"), arguments, build_dir, output));
+		BOOST_REQUIRE_EQUAL(0, Si::run_process(Si::cmake_exe, arguments, build_dir, output));
 	}
 	{
 		std::vector<Si::os_string> arguments;
 		BOOST_REQUIRE_EQUAL(0, Si::run_process(build_dir / *Si::path_segment::create("using_gtest"), arguments, build_dir, output));
 	}
 }
-#endif

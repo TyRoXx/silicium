@@ -5,6 +5,7 @@
 #include <silicium/path_segment.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/error_or.hpp>
+#include <silicium/os_string.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/get_last_error.hpp>
@@ -300,6 +301,16 @@ namespace Si
 	inline noexcept_string to_utf8_string(absolute_path const &path)
 	{
 		return to_utf8_string(path.to_boost_path());
+	}
+
+	inline os_string to_os_string(absolute_path const &path)
+	{
+		return path.to_boost_path().
+#ifdef _WIN32
+			wstring();
+#else
+			string();
+#endif
 	}
 }
 

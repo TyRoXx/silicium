@@ -14,9 +14,9 @@ namespace cdm
 
 	inline cppnetlib_paths install_cppnetlib(
 		Si::absolute_path const &cppnetlib_source,
-		Si::absolute_path const &install_root)
+		Si::absolute_path const &install_root,
+		Si::absolute_path const &cmake_exe)
 	{
-		Si::absolute_path const cmake_exe = *Si::absolute_path::create("/usr/bin/cmake");
 		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
 		{
 			std::vector<Si::os_string> arguments;

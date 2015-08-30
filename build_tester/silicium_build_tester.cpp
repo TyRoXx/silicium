@@ -9,6 +9,7 @@
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/html/tree.hpp>
 #include <silicium/make_array.hpp>
+#include <silicium/cmake.hpp>
 #include <silicium/source/file_source.hpp>
 #include <silicium/terminate_on_exception.hpp>
 #include <silicium/program_options.hpp>
@@ -102,14 +103,6 @@ namespace
 		L"C:\\Program Files (x86)\\Git\\bin\\git.exe"
 #else
 		"/usr/bin/git"
-#endif
-		);
-
-	Si::absolute_path const cmake_exe = *Si::absolute_path::create(
-#ifdef _WIN32
-		L"C:\\Program Files (x86)\\CMake\\bin\\cmake.exe"
-#else
-		"/usr/bin/cmake"
 #endif
 		);
 
@@ -378,7 +371,7 @@ namespace
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DURIPARSER_INCLUDE_DIR=C:\\dev\\libs\\uriparser-0.8.1\\include"));
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DURIPARSER_LIBRARY=C:\\dev\\libs\\uriparser-0.8.1\\win32\\uriparser.lib"));
 #endif
-		Si::optional<int> const result = log_error(execute_process(cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake generator");
+		Si::optional<int> const result = log_error(execute_process(Si::cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake generator");
 		if (!result)
 		{
 			return success_or_failure::failure;
@@ -401,7 +394,7 @@ namespace
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("--"));
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-j12"));
 #endif
-		Si::optional<int> const result = log_error(execute_process(cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake to build");
+		Si::optional<int> const result = log_error(execute_process(Si::cmake_exe, std::move(arguments), build, std::cerr), "Could not run cmake to build");
 		if (!result)
 		{
 			return success_or_failure::failure;

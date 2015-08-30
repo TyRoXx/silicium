@@ -17,9 +17,9 @@ namespace cdm
 	inline gtest_paths install_gtest(
 		Si::absolute_path const &gtest_source,
 		Si::absolute_path const &temporarily_writable,
-		Si::absolute_path const &install_root)
+		Si::absolute_path const &install_root,
+		Si::absolute_path const &cmake_exe)
 	{
-		Si::absolute_path const cmake_exe = *Si::absolute_path::create("/usr/bin/cmake");
 		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
 		{
 			std::vector<Si::os_string> arguments;
