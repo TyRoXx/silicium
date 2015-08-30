@@ -6,6 +6,7 @@
 #include <silicium/identity.hpp>
 #ifdef _WIN32
 #	include <silicium/win32/win32.hpp>
+#	include <Shellapi.h>
 #endif
 
 //Boost filesystem requires exceptions
@@ -15,6 +16,7 @@
 #	include <boost/filesystem/operations.hpp>
 #endif
 
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 
 namespace Si
@@ -123,6 +125,20 @@ namespace Si
 		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 
+#ifdef _WIN32
+	namespace detail
+	{
+		template <class String>
+		std::vector<wchar_t> double_zero_terminate(String const &str)
+		{
+			std::vector<wchar_t> result(str.begin(), str.end());
+			result.push_back(0);
+			result.push_back(0);
+			return result;
+		}
+	}
+#endif
+
 	template <class ErrorHandler>
 	auto copy_recursively(
 		absolute_path const &from,
@@ -135,11 +151,21 @@ namespace Si
 #endif
 	{
 #ifdef _WIN32
-		boost::ignore_unused_variable_warning(from);
-		boost::ignore_unused_variable_warning(to);
 		boost::ignore_unused_variable_warning(output);
-		boost::ignore_unused_variable_warning(handle_error);
-		throw std::logic_error("copy_recursively: not implemented");
+		auto to_double_zero = detail::double_zero_terminate(to.to_boost_path().native());
+		auto from_double_zero = detail::double_zero_terminate(from.to_boost_path().native());
+		SHFILEOPSTRUCTW s = {0};
+		s.hwnd = NULL;
+		s.wFunc = FO_COPY;
+		s.fFlags = FOF_SILENT;
+		s.pTo = to_double_zero.data();
+		s.pFrom = from_double_zero.data();
+		int rc = SHFileOperationW(&s);
+		if (rc)
+		{
+			throw std::runtime_error("SHFileOperationW failed with return code " + boost::lexical_cast<std::string>(rc));
+		}
+		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), identity<void>());
 #else
 		std::vector<os_string> arguments;
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("-Rv"));

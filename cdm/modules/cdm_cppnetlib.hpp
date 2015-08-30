@@ -22,6 +22,10 @@ namespace cdm
 			std::vector<Si::os_string> arguments;
 			arguments.push_back(cppnetlib_source.c_str());
 			arguments.push_back(SILICIUM_SYSTEM_LITERAL("-DCPP-NETLIB_BUILD_SHARED_LIBS=ON"));
+#ifdef _WIN32
+			//TODO: deal with OpenSSL later..
+			arguments.push_back(SILICIUM_SYSTEM_LITERAL("-DCPP-NETLIB_ENABLE_HTTPS=OFF"));
+#endif
 			int rc = Si::run_process(cmake_exe, arguments, install_root, output).get();
 			if (rc != 0)
 			{
