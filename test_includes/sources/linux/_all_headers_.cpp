@@ -18,6 +18,7 @@
 #include <silicium/byte.hpp>
 #include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
+#include <silicium/cmake.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
@@ -28,6 +29,7 @@
 #include <silicium/dynamic_library.hpp>
 #include <silicium/environment_variables.hpp>
 #include <silicium/error_code.hpp>
+#include <silicium/error_handler.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/expected.hpp>

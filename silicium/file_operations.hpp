@@ -1,6 +1,7 @@
 #ifndef SILICIUM_FILE_OPERATIONS_HPP
 #define SILICIUM_FILE_OPERATIONS_HPP
 
+#include <silicium/error_handler.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/identity.hpp>
 #ifdef _WIN32
@@ -94,48 +95,6 @@ namespace Si
 		boost::system::error_code error = detail::recreate_directories(directories);
 		return std::forward<ErrorHandler>(handle_error)(error, identity<void>());
 	}
-
-	namespace detail
-	{
-		struct returning_error_handler
-		{
-			boost::system::error_code operator()(boost::system::error_code error, identity<void>) const
-			{
-				return error;
-			}
-		};
-
-		struct throwing_error_handler
-		{
-			template <class Result>
-			Result operator()(boost::system::error_code error, identity<Result>) const
-			{
-				throw_error(error);
-			}
-
-			void operator()(boost::system::error_code error, identity<void>) const
-			{
-				if (!error)
-				{
-					return;
-				}
-				throw_error(error);
-			}
-		};
-
-		struct variant_error_handler
-		{
-			template <class Result>
-			error_or<Result> operator()(boost::system::error_code error, identity<Result>) const
-			{
-				return error;
-			}
-		};
-	}
-
-	static detail::returning_error_handler const return_;
-	static detail::throwing_error_handler const throw_;
-	static detail::variant_error_handler const variant_;
 
 	template <class ErrorHandler>
 	auto copy(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
