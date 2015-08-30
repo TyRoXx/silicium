@@ -18,7 +18,7 @@ namespace Si
 		process_parameters parameters;
 		parameters.executable = *absolute_path::create("/usr/bin/which");
 		parameters.arguments.emplace_back("which");
-		parameters.current_path = get_current_working_directory();
+		parameters.current_path = get_current_working_directory(Si::throw_);
 		std::vector<char> out;
 		auto sink = Si::virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;
@@ -34,7 +34,7 @@ namespace Si
 	{
 		process_parameters parameters;
 		parameters.executable = *Si::absolute_path::create(L"C:\\Windows\\System32\\where.exe");
-		parameters.current_path = Si::get_current_working_directory();
+		parameters.current_path = Si::get_current_working_directory(Si::throw_);
 		std::vector<char> out;
 		auto sink = virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;
@@ -62,7 +62,7 @@ namespace Si
 	{
 		process_parameters parameters;
 		parameters.executable = absolute_root / SILICIUM_SYSTEM_LITERAL("does-not-exist");
-		parameters.current_path = Si::get_current_working_directory();
+		parameters.current_path = Si::get_current_working_directory(Si::throw_);
 		BOOST_CHECK_EXCEPTION(run_process(parameters), boost::system::system_error, [](boost::system::system_error const &e)
 		{
 			return e.code() == boost::system::error_code(ENOENT, boost::system::system_category());
@@ -74,7 +74,7 @@ namespace Si
 	{
 		process_parameters parameters;
 		parameters.executable = *Si::absolute_path::create("/bin/cat");
-		parameters.current_path = Si::get_current_working_directory();
+		parameters.current_path = Si::get_current_working_directory(Si::throw_);
 		auto message = Si::make_c_str_range("Hello, cat");
 		auto input = Si::Source<char>::erase(Si::make_range_source(message));
 		parameters.in = &input;

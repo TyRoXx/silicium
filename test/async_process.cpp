@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 	Si::async_process_parameters parameters;
 	parameters.executable = *Si::absolute_path::create("/usr/bin/which");
 	parameters.arguments.emplace_back("which");
-	parameters.current_path = Si::get_current_working_directory();
+	parameters.current_path = Si::get_current_working_directory(Si::throw_);
 
 	process_output result = run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::inherit);
 
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 {
 	Si::async_process_parameters parameters;
 	parameters.executable = arbitrary_root_dir / "does-not-exist";
-	parameters.current_path = Si::get_current_working_directory();
+	parameters.current_path = Si::get_current_working_directory(Si::throw_);
 
 	BOOST_CHECK_EXCEPTION(run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::no_inherit), boost::system::system_error, [](boost::system::system_error const &ex)
 	{
@@ -136,7 +136,7 @@ namespace
 			"/usr/bin/env"
 #endif
 			);
-		parameters.current_path = Si::get_current_working_directory();
+		parameters.current_path = Si::get_current_working_directory(Si::throw_);
 #ifdef _WIN32
 		parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("/C"));
 		parameters.arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("set"));

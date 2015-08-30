@@ -24,7 +24,7 @@ namespace Si
 		void touch(Si::absolute_path const &name)
 		{
 			//remove existing file to reset the attributes
-			Si::throw_if_error(Si::remove_file(name));
+			Si::remove_file(name, Si::throw_);
 
 			std::ofstream file(name.c_str());
 			BOOST_REQUIRE(file);
@@ -65,9 +65,9 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_add_regular)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file = watched_dir / Si::relative_path("test.txt");
-		Si::remove_file(test_file);
+		Si::remove_file(test_file, Si::throw_);
 
 		test_single_event(
 			watched_dir,
@@ -81,9 +81,9 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_add_directory)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file = watched_dir / "test";
-		Si::remove_file(test_file);
+		Si::remove_file(test_file, Si::throw_);
 
 		test_single_event(
 			watched_dir,
@@ -100,7 +100,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file = watched_dir / "test.txt";
 
 		touch(test_file);
@@ -120,7 +120,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_directory)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file = watched_dir / "test";
 
 		boost::filesystem::create_directory(test_file.to_boost_path());
@@ -142,7 +142,7 @@ namespace Si
 #if SILICIUM_HAS_FILE_SINK
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_write)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file = watched_dir / "test.txt";
 		
 		boost::filesystem::create_directories(watched_dir.to_boost_path());
@@ -167,7 +167,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_close)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file = watched_dir / "test.txt";
 
 		touch(test_file);
@@ -193,7 +193,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_metadata)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file = watched_dir / "test.txt";
 
 		touch(test_file);
@@ -223,7 +223,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_move_out)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory();
+		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const watched_dir = root_dir / "watched";
 		Si::absolute_path const original_name = watched_dir / "test.txt";
 		Si::absolute_path const new_name = root_dir / "renamed.txt";
@@ -249,7 +249,7 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_move_in)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory();
+		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const watched_dir = root_dir / "watched";
 		Si::absolute_path const original_name = root_dir / "test.txt";
 		Si::absolute_path const new_name = watched_dir / "renamed.txt";
@@ -276,7 +276,7 @@ namespace Si
 	//we cannot yet detect the renaming of the watched directory
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_watched_dir)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory();
+		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const watched_dir = root_dir / "watched";
 		Si::absolute_path const new_name = root_dir / "renamed";
 
@@ -305,7 +305,7 @@ namespace Si
 	//https://github.com/travis-ci/travis-ci/issues/2342
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_watched_dir)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory();
+		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const watched_dir = root_dir / "watched";
 
 		boost::filesystem::remove_all(watched_dir.to_boost_path());
@@ -329,7 +329,7 @@ namespace Si
 #if SILICIUM_HAS_SPAWN_COROUTINE
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_in_dir)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory();
+		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
 		Si::absolute_path const test_file_a = watched_dir / "test_a.txt";
 		Si::absolute_path const test_file_b = watched_dir / "test_b.txt";
 

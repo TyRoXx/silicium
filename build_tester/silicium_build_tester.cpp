@@ -267,14 +267,14 @@ namespace
 		{
 			std::cerr << "The cache does not exist or points to the wrong remote. Doing an initial clone of " << Si::to_utf8_string(origin) << "\n";
 			{
-				Si::error_or<boost::uint64_t> const removed = Si::remove_all(repository_cache);
+				Si::error_or<boost::uint64_t> const removed = Si::remove_all(repository_cache, Si::variant_);
 				if (removed.is_error())
 				{
 					std::cerr << "Could not remove the repository cache at " << repository_cache << "\n";
 					return success_or_failure::failure;
 				}
 			}
-			if (handle_error(Si::create_directories(repository_cache), "Could not create repository cache directory"))
+			if (handle_error(Si::create_directories(repository_cache, Si::return_), "Could not create repository cache directory"))
 			{
 				return success_or_failure::failure;
 			}

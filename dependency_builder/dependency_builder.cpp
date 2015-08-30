@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 			LOG("The install root argument is not an absolute path: " << Si::to_utf8_string(install_root_argument));
 			return 1;
 		}
-		Si::create_directories(*maybe_install_root);
+		Si::create_directories(*maybe_install_root, Si::throw_);
 
 		for (Si::os_string const &boost_archive_argument : boost_archives)
 		{

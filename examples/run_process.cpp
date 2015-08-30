@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 #if SILICIUM_HAS_RUN_PROCESS
 	Si::process_parameters parameters;
 	parameters.executable = *Si::absolute_path::create("/usr/bin/file");
-	parameters.current_path = Si::get_current_working_directory();
+	parameters.current_path = Si::get_current_working_directory(Si::throw_);
 	parameters.arguments.emplace_back(argv[0]);
 	auto output = Si::Sink<char, Si::success>::erase(
 		Si::make_function_sink<char>(

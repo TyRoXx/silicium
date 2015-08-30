@@ -20,36 +20,52 @@
 namespace Si
 {
 #if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
-	SILICIUM_USE_RESULT
-	inline absolute_path get_current_working_directory()
+	template <class ErrorHandler>
+	inline auto get_current_working_directory(ErrorHandler &&handle_error)
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
 	{
-		return *absolute_path::create(boost::filesystem::current_path());
+		boost::system::error_code ec;
+		auto result = boost::filesystem::current_path(ec);
+		if (!ec)
+		{
+			return *absolute_path::create(std::move(result));
+		}
+		return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
 	}
 
-	SILICIUM_USE_RESULT
-	inline boost::system::error_code remove_file(absolute_path const &name)
+	template <class ErrorHandler>
+	inline auto remove_file(absolute_path const &name, ErrorHandler &&handle_error)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+#endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::remove(name.to_boost_path(), ec);
-		return ec;
+		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 
-	SILICIUM_USE_RESULT
-	inline boost::system::error_code create_directories(absolute_path const &directories)
+	template <class ErrorHandler>
+	inline auto create_directories(absolute_path const &directories, ErrorHandler &&handle_error)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+#endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::create_directories(directories.to_boost_path(), ec);
-		return ec;
+		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 
-	SILICIUM_USE_RESULT
-	inline error_or<boost::uint64_t> remove_all(absolute_path const &directories)
+	template <class ErrorHandler>
+	inline auto remove_all(absolute_path const &directories, ErrorHandler &&handle_error)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<boost::uintmax_t>()))
+#endif
 	{
 		boost::system::error_code ec;
 		auto count = boost::filesystem::remove_all(directories.to_boost_path(), ec);
 		if (!!ec)
 		{
-			return ec;
+			return std::forward<ErrorHandler>(handle_error)(ec, identity<boost::uintmax_t>());
 		}
 		return count;
 	}
@@ -59,7 +75,7 @@ namespace Si
 		SILICIUM_USE_RESULT
 		inline boost::system::error_code recreate_directories(absolute_path const &directories)
 		{
-			boost::system::error_code error = create_directories(directories);
+			boost::system::error_code error = create_directories(directories, Si::return_);
 			if (!!error)
 			{
 				return error;
