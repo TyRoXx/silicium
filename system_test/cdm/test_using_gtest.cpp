@@ -1,5 +1,4 @@
 #include "../../cdm/application/using_gtest/cdm.hpp"
-#include <silicium/cmake.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace
