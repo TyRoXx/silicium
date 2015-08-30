@@ -59,9 +59,7 @@ namespace Si
 
 	template <class ErrorHandler>
 	inline auto remove_all(absolute_path const &directories, ErrorHandler &&handle_error)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<boost::uintmax_t>()))
-#endif
 	{
 		boost::system::error_code ec;
 		auto count = boost::filesystem::remove_all(directories.to_boost_path(), ec);
