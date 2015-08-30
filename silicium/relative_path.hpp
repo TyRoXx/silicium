@@ -20,6 +20,11 @@ namespace Si
 		{
 		}
 
+		explicit relative_path(path_segment const &segment)
+			: m_value(segment.underlying())
+		{
+		}
+
 		explicit relative_path(boost::filesystem::path const &value)
 #ifdef _WIN32
 		    : m_value(value)

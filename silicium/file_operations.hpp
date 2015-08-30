@@ -138,6 +138,7 @@ namespace Si
 		boost::ignore_unused_variable_warning(from);
 		boost::ignore_unused_variable_warning(to);
 		boost::ignore_unused_variable_warning(output);
+		boost::ignore_unused_variable_warning(handle_error);
 		throw std::logic_error("copy_recursively: not implemented");
 #else
 		std::vector<os_string> arguments;
