@@ -453,7 +453,7 @@ namespace
 		Si::absolute_path const &repository_cache,
 		cmake_build_type build_type)
 	{
-		if (handle_error(Si::recreate_directories(build_directory), "Could not clear the build directory"))
+		if (handle_error(Si::recreate_directories(build_directory, Si::return_), "Could not clear the build directory"))
 		{
 			return success_or_failure::failure;
 		}

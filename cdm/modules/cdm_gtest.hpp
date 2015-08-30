@@ -43,7 +43,7 @@ namespace cdm
 		gtest_paths result;
 		result.include = install_root / *Si::path_segment::create("include");
 		auto lib_dir = install_root / *Si::path_segment::create("lib");
-		Si::recreate_directories(lib_dir);
+		Si::recreate_directories(lib_dir, Si::throw_);
 		result.library = lib_dir / *Si::path_segment::create("libgtest.a");
 		result.library_main = lib_dir / *Si::path_segment::create("libgtest_main.a");
 

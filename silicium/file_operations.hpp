@@ -52,33 +52,56 @@ namespace Si
 		return count;
 	}
 
-	SILICIUM_USE_RESULT
-	inline boost::system::error_code recreate_directories(absolute_path const &directories)
+	namespace detail
 	{
-		boost::system::error_code error = create_directories(directories);
-		if (!!error)
+		SILICIUM_USE_RESULT
+		inline boost::system::error_code recreate_directories(absolute_path const &directories)
 		{
-			return error;
-		}
-		boost::filesystem::directory_iterator i(directories.to_boost_path(), error);
-		if (!!error)
-		{
-			return error;
-		}
-		for (; i != boost::filesystem::directory_iterator(); )
-		{
-			boost::filesystem::remove_all(i->path(), error);
+			boost::system::error_code error = create_directories(directories);
 			if (!!error)
 			{
 				return error;
 			}
-			i.increment(error);
+			boost::filesystem::directory_iterator i(directories.to_boost_path(), error);
 			if (!!error)
 			{
 				return error;
 			}
+			for (; i != boost::filesystem::directory_iterator();)
+			{
+				boost::filesystem::remove_all(i->path(), error);
+				if (!!error)
+				{
+					return error;
+				}
+				i.increment(error);
+				if (!!error)
+				{
+					return error;
+				}
+			}
+			return error;
 		}
+	}
+
+	template <class ErrorHandler>
+	auto recreate_directories(absolute_path const &directories, ErrorHandler &&handle_error)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>()))
+#endif
+	{
+		boost::system::error_code error = detail::recreate_directories(directories);
+		return std::forward<ErrorHandler>(handle_error)(error);
+	}
+
+	inline boost::system::error_code return_(boost::system::error_code error)
+	{
 		return error;
+	}
+
+	inline void throw_(boost::system::error_code error)
+	{
+		throw_if_error(error);
 	}
 
 	SILICIUM_USE_RESULT
