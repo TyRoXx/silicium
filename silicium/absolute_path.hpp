@@ -309,7 +309,7 @@ namespace Si
 #ifdef _WIN32
 			wstring();
 #else
-			string();
+			c_str();
 #endif
 	}
 }
