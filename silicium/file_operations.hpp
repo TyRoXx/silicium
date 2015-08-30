@@ -192,12 +192,15 @@ namespace Si
 		return true;
 	}
 
-	SILICIUM_USE_RESULT
-	inline boost::system::error_code rename(absolute_path const &from, absolute_path const &to)
+	template <class ErrorHandler>
+	inline auto rename(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+#endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::rename(from.to_boost_path(), to.to_boost_path(), ec);
-		return ec;
+		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 
 	inline Si::error_or<Si::absolute_path> get_current_executable_path()

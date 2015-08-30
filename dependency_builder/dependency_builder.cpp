@@ -57,7 +57,7 @@ namespace
 			return Si::none;
 		}
 
-		Si::throw_if_error(Si::rename(incomplete_output_directory, complete_output_directory));
+		Si::rename(incomplete_output_directory, complete_output_directory, Si::throw_);
 		return complete_output_directory;
 	}
 
