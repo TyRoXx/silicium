@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_using_gtest)
 	auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
 	{
 		std::vector<Si::os_string> arguments;
-		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_INCLUDE_DIRS=")) + gtest_installed.include.c_str());
+		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_INCLUDE_DIRS=")) + to_os_string(gtest_installed.include));
 		arguments.push_back(Si::os_string(SILICIUM_SYSTEM_LITERAL("-DGTEST_LIBRARIES=")) + to_os_string(gtest_installed.library) + SILICIUM_SYSTEM_LITERAL(";") + to_os_string(gtest_installed.library_main));
 		arguments.push_back(Si::to_os_string(using_gtest_source.c_str()));
 		Si::recreate_directories(build_dir, Si::throw_);
