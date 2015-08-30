@@ -12,7 +12,6 @@ namespace
 
 BOOST_AUTO_TEST_CASE(test_using_gtest)
 {
-	Si::absolute_path const gtest_source = silicium / Si::relative_path("cdm/original_sources/gtest-1.7.0");
 	Si::absolute_path const using_gtest_source = silicium / Si::relative_path("cdm/application/using_gtest");
 	Si::absolute_path const tmp = Si::temporary_directory(Si::throw_) / *Si::path_segment::create("cdm_test");
 	Si::absolute_path const module_temporaries = tmp / *Si::path_segment::create("module_temporaries");
@@ -22,7 +21,7 @@ BOOST_AUTO_TEST_CASE(test_using_gtest)
 	Si::recreate_directories(module_permanent, Si::throw_);
 	Si::recreate_directories(application_build_dir, Si::throw_);
 	auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
-	using_gtest::configure(gtest_source, module_temporaries, module_permanent, using_gtest_source, application_build_dir, output);
+	configure(module_temporaries, module_permanent, using_gtest_source, application_build_dir, output);
 	{
 		std::vector<Si::os_string> arguments;
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("--build"));
