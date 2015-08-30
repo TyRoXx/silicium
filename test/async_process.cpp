@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(async_process_win32_where)
 {
 	Si::async_process_parameters parameters;
 	parameters.executable = *Si::absolute_path::create(L"C:\\Windows\\System32\\where.exe");
-	parameters.current_path = Si::get_current_working_directory();
+	parameters.current_path = Si::get_current_working_directory(Si::throw_);
 
 	process_output result = run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::no_inherit);
 

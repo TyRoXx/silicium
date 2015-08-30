@@ -36,11 +36,11 @@ namespace Si
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class ...Args>
-		explicit expected(Args &&...args)
+		template <class A0, class ...Args>
+		explicit expected(A0 &&a0, Args &&...args)
 			: m_state(has_value)
 		{
-			new (&value_address()) value_type(std::forward<Args>(args)...);
+			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<Args>(args)...);
 		}
 #else
 		template <class A0, class A1>
