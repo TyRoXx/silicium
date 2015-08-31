@@ -1,12 +1,9 @@
+#include "cdm.hpp"
 #include <silicium/os_string.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
 #include <silicium/program_options.hpp>
 #include <iostream>
-
-#define SILICIUM_HAS_CDM (SILICIUM_HAS_RUN_PROCESS && SILICIUM_HAS_PROGRAM_OPTIONS)
-
-#if SILICIUM_HAS_CDM
 
 #ifdef _MSC_VER
 #	define SILICIUM_WHILE_FALSE while (0,0)
@@ -28,9 +25,6 @@ namespace
 
 int main(int argc, char **argv)
 {
-	std::vector<Si::os_string> boost_archives;
-	Si::os_string install_root_argument;
-
 	boost::program_options::options_description options("options");
 	options.add_options()
 		("help,h", "produce help message")
@@ -57,6 +51,13 @@ int main(int argc, char **argv)
 
 	try
 	{
+
+		Si::absolute_path const module_temporaries;
+		Si::absolute_path const module_permanent;
+		Si::absolute_path const application_source;
+		Si::absolute_path const application_build_dir;
+		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
+		::configure(module_temporaries, module_permanent, application_source, application_build_dir, output);
 	}
 	catch (std::exception const &ex)
 	{
@@ -64,10 +65,3 @@ int main(int argc, char **argv)
 		return 1;
 	}
 }
-#else
-int main()
-{
-	std::cerr << "The compiler or a library is too old.\n";
-	return 1;
-}
-#endif

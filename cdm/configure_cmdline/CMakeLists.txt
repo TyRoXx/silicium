@@ -1,0 +1,5 @@
+include_directories(./dummy)
+file(GLOB sources "*.hpp" "*.cpp")
+add_executable(cdm_configure_cmdline ${sources})
+target_link_libraries(cdm_configure_cmdline ${Boost_LIBRARIES})
+set_target_properties(cdm_configure_cmdline PROPERTIES FOLDER cdm)
