@@ -3,6 +3,7 @@
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
 #include <silicium/program_options.hpp>
+#include <silicium/file_operations.hpp>
 #include <iostream>
 
 #ifdef _MSC_VER
@@ -13,21 +14,18 @@
 
 #define LOG(...) do { std::cerr << __VA_ARGS__ << '\n'; } SILICIUM_WHILE_FALSE
 
-namespace
-{
-}
-
-#ifdef _WIN32
-#	define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::wvalue
-#else
-#	define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::value
-#endif
-
 int main(int argc, char **argv)
 {
+	std::string module_permanent_argument;
+	std::string application_source_argument;
+	std::string application_build_argument;
+
 	boost::program_options::options_description options("options");
 	options.add_options()
 		("help,h", "produce help message")
+		("modules,m", boost::program_options::value(&module_permanent_argument), "absolute path to the permanent module binary cache")
+		("application,a", boost::program_options::value(&application_source_argument), "absolute path to the root of your application source code")
+		("build,b", boost::program_options::value(&application_build_argument), "absolute path to the CMake build directory of your application")
 		;
 	boost::program_options::positional_options_description positional;
 	boost::program_options::variables_map variables;
@@ -51,13 +49,18 @@ int main(int argc, char **argv)
 
 	try
 	{
-
-		Si::absolute_path const module_temporaries;
-		Si::absolute_path const module_permanent;
-		Si::absolute_path const application_source;
-		Si::absolute_path const application_build_dir;
+		Si::absolute_path const module_temporaries = Si::temporary_directory(Si::throw_) / *Si::path_segment::create("cdm_modules");
+		Si::absolute_path const module_permanent = Si::absolute_path::create(module_permanent_argument).or_throw(
+			[]{ throw std::invalid_argument("The permanent module cache argument must be an absolute path."); }
+		);
+		Si::absolute_path const application_source = Si::absolute_path::create(application_source_argument).or_throw(
+			[]{ throw std::invalid_argument("The application source argument must be an absolute path."); }
+		);
+		Si::absolute_path const application_build = Si::absolute_path::create(application_build_argument).or_throw(
+			[]{ throw std::invalid_argument("The application build directory argument must be an absolute path."); }
+		);
 		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
-		::configure(module_temporaries, module_permanent, application_source, application_build_dir, output);
+		::configure(module_temporaries, module_permanent, application_source, application_build, output);
 	}
 	catch (std::exception const &ex)
 	{

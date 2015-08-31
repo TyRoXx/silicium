@@ -2,6 +2,7 @@
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
 #include <silicium/program_options.hpp>
+#include <silicium/file_operations.hpp>
 #include <iostream>
 
 #define SILICIUM_HAS_CDM (SILICIUM_HAS_RUN_PROCESS && SILICIUM_HAS_PROGRAM_OPTIONS)
@@ -18,19 +19,37 @@
 
 namespace
 {
-}
+	void build_configure_command_line(
+		Si::absolute_path const &application_source)
+	{
+		boost::ignore_unused_variable_warning(application_source);
+		throw std::logic_error("not implemented");
+	}
 
-#ifdef _WIN32
-#	define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::wvalue
-#else
-#	define SILICIUM_PROGRAM_OPTIONS_NATIVE_VALUE boost::program_options::value
-#endif
+	void run_configure_command_line(
+		Si::absolute_path const &module_permanent,
+		Si::absolute_path const &application_source,
+		Si::absolute_path const &application_build_dir)
+	{
+		boost::ignore_unused_variable_warning(module_permanent);
+		boost::ignore_unused_variable_warning(application_source);
+		boost::ignore_unused_variable_warning(application_build_dir);
+		throw std::logic_error("not implemented");
+	}
+}
 
 int main(int argc, char **argv)
 {
+	std::string module_permanent_argument;
+	std::string application_source_argument;
+	std::string application_build_argument;
+
 	boost::program_options::options_description options("options");
 	options.add_options()
 		("help,h", "produce help message")
+		("modules,m", boost::program_options::value(&module_permanent_argument), "absolute path to the permanent module binary cache")
+		("application,a", boost::program_options::value(&application_source_argument), "absolute path to the root of your application source code")
+		("build,b", boost::program_options::value(&application_build_argument), "absolute path to the CMake build directory of your application")
 		;
 	boost::program_options::positional_options_description positional;
 	boost::program_options::variables_map variables;
@@ -54,6 +73,17 @@ int main(int argc, char **argv)
 
 	try
 	{
+		Si::absolute_path const module_permanent = Si::absolute_path::create(module_permanent_argument).or_throw(
+			[]{ throw std::invalid_argument("The permanent module cache argument must be an absolute path."); }
+		);
+		Si::absolute_path const application_source = Si::absolute_path::create(application_source_argument).or_throw(
+			[]{ throw std::invalid_argument("The application source argument must be an absolute path."); }
+		);
+		Si::absolute_path const application_build = Si::absolute_path::create(application_build_argument).or_throw(
+			[]{ throw std::invalid_argument("The application build directory argument must be an absolute path."); }
+		);
+		build_configure_command_line(application_source);
+		run_configure_command_line(module_permanent, application_source, application_build);
 	}
 	catch (std::exception const &ex)
 	{
