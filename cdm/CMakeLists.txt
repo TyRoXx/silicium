@@ -1,7 +1,5 @@
 if(SILICIUM_HAS_CDM)
 	include_directories(.)
-	add_subdirectory(websocketpp)
-	add_subdirectory(cdm_core)
 	add_subdirectory(command_line)
 	add_subdirectory(application/using_gtest)
 	set_target_properties(using_gtest PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
