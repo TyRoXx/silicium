@@ -6,7 +6,7 @@ inline void configure(
 	Si::absolute_path const &module_permanent,
 	Si::absolute_path const &application_source,
 	Si::absolute_path const &application_build_dir,
-	Si::sink<char, Si::success> &output
+	Si::Sink<char, Si::success>::interface &output
 	)
 {
 	Si::optional<Si::absolute_path> const applications = Si::parent(application_source);
