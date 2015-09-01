@@ -1,4 +1,20 @@
+#include <silicium/absolute_path.hpp>
+#include <silicium/sink/sink.hpp>
+
+//The forward declaration for the function that has to be implemented by the header
+//which is #included next.
+void configure(
+	Si::absolute_path const &module_temporaries,
+	Si::absolute_path const &module_permanent,
+	Si::absolute_path const &application_source,
+	Si::absolute_path const &application_build_dir,
+	Si::Sink<char, Si::success>::interface &output
+);
+
+//This header is provided by the client application and is expected to define the
+//'configure' function (see above for the signature).
 #include "cdm.hpp"
+
 #include <silicium/os_string.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
