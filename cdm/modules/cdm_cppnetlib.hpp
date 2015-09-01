@@ -4,6 +4,7 @@
 #include <silicium/file_operations.hpp>
 #include <silicium/run_process.hpp>
 #include <silicium/sink/ostream_sink.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace cdm
 {
@@ -15,7 +16,8 @@ namespace cdm
 	inline cppnetlib_paths install_cppnetlib(
 		Si::absolute_path const &cppnetlib_source,
 		Si::absolute_path const &install_root,
-		Si::absolute_path const &cmake_exe)
+		Si::absolute_path const &cmake_exe,
+		unsigned make_parallelism)
 	{
 		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
 		{
@@ -26,7 +28,7 @@ namespace cdm
 			//TODO: deal with OpenSSL later..
 			arguments.push_back(SILICIUM_SYSTEM_LITERAL("-DCPP-NETLIB_ENABLE_HTTPS=OFF"));
 #endif
-			int rc = Si::run_process(cmake_exe, arguments, install_root, output).get();
+			int const rc = Si::run_process(cmake_exe, arguments, install_root, output).get();
 			if (rc != 0)
 			{
 				throw std::runtime_error("cmake configure failed");
@@ -36,7 +38,13 @@ namespace cdm
 			std::vector<Si::os_string> arguments;
 			arguments.push_back(SILICIUM_SYSTEM_LITERAL("--build"));
 			arguments.push_back(SILICIUM_SYSTEM_LITERAL("."));
-			int rc = Si::run_process(cmake_exe, arguments, install_root, output).get();
+#ifndef _WIN32
+			arguments.push_back(SILICIUM_SYSTEM_LITERAL("--"));
+			arguments.push_back(SILICIUM_SYSTEM_LITERAL("-j" + boost::lexical_cast<Si::os_string>(make_parallelism)));
+#else
+			boost::ignore_unused_variable_warning(make_parallelism);
+#endif
+			int const rc = Si::run_process(cmake_exe, arguments, install_root, output).get();
 			if (rc != 0)
 			{
 				throw std::runtime_error("cmake build failed");
