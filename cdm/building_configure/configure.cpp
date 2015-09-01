@@ -5,10 +5,9 @@
 
 namespace
 {
-	void build_configure(
+	Si::absolute_path build_configure(
 		Si::absolute_path const &application_source,
 		Si::absolute_path const &temporary,
-		Si::absolute_path const &resulting_executable,
 		Si::Sink<char, Si::success>::interface &output)
 	{
 		Si::absolute_path const cdm = Si::parent(
@@ -65,8 +64,8 @@ namespace
 				throw std::runtime_error("Could not CMake --build the cdm configure executable");
 			}
 		}
-		Si::absolute_path const built_executable = build / Si::relative_path("configure");
-		Si::copy(built_executable, resulting_executable, Si::throw_);
+		Si::absolute_path built_executable = build / Si::relative_path("configure");
+		return built_executable;
 	}
 
 	void run_configure(
@@ -101,8 +100,7 @@ namespace cdm
 		Si::Sink<char, Si::success>::interface &output
 	)
 	{
-		Si::absolute_path const configure_executable = temporary / Si::relative_path("configure");
-		build_configure(application_source, temporary, configure_executable, output);
+		Si::absolute_path const configure_executable = build_configure(application_source, temporary, output);
 		run_configure(configure_executable, module_permanent, application_source, application_build_dir, output);
 	}
 }
