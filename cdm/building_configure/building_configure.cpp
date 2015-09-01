@@ -49,7 +49,7 @@ namespace cdm
 				arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DSILICIUM_INCLUDE_DIR=") + Si::to_os_string(silicium));
 			}
 			Si::absolute_path const modules = cdm / Si::relative_path("modules");
-			arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DCDM_CONFIGURE_INCLUDE_DIRS=") + Si::to_os_string(application_source) + ";" + Si::to_os_string(modules));
+			arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-DCDM_CONFIGURE_INCLUDE_DIRS=") + Si::to_os_string(application_source) + SILICIUM_SYSTEM_LITERAL(";") + Si::to_os_string(modules));
 			arguments.emplace_back(Si::to_os_string(source));
 			if (Si::run_process(Si::cmake_exe, arguments, build, output).get() != 0)
 			{
