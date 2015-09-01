@@ -1,11 +1,11 @@
-#include "building_configure.hpp"
+#include "configure.hpp"
 #include <silicium/file_operations.hpp>
 #include <silicium/cmake.hpp>
 #include <fstream>
 
-namespace cdm
+namespace
 {
-	void build_configure_command_line(
+	void build_configure(
 		Si::absolute_path const &application_source,
 		Si::absolute_path const &temporary,
 		Si::absolute_path const &resulting_executable,
@@ -69,7 +69,7 @@ namespace cdm
 		Si::copy(built_executable, resulting_executable, Si::throw_);
 	}
 
-	void run_configure_command_line(
+	void run_configure(
 		Si::absolute_path const &configure_executable,
 		Si::absolute_path const &module_permanent,
 		Si::absolute_path const &application_source,
@@ -88,5 +88,21 @@ namespace cdm
 		{
 			throw std::runtime_error("Could not configure the application: " + boost::lexical_cast<std::string>(rc));
 		}
+	}
+}
+
+namespace cdm
+{
+	void do_configure(
+		Si::absolute_path const &temporary,
+		Si::absolute_path const &module_permanent,
+		Si::absolute_path const &application_source,
+		Si::absolute_path const &application_build_dir,
+		Si::Sink<char, Si::success>::interface &output
+	)
+	{
+		Si::absolute_path const configure_executable = temporary / Si::relative_path("configure");
+		build_configure(application_source, temporary, configure_executable, output);
+		run_configure(configure_executable, module_permanent, application_source, application_build_dir, output);
 	}
 }

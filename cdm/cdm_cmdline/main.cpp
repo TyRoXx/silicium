@@ -1,4 +1,4 @@
-#include "building_configure/building_configure.hpp"
+#include "building_configure/configure.hpp"
 #include <silicium/program_options.hpp>
 #include <silicium/file_operations.hpp>
 #include <silicium/sink/ostream_sink.hpp>
@@ -57,11 +57,8 @@ int main(int argc, char **argv)
 			[]{ throw std::invalid_argument("The application build directory argument must be an absolute path."); }
 		);
 		Si::absolute_path const temporary_root = Si::temporary_directory(Si::throw_) / Si::relative_path("cdm_cmdline");
-		Si::absolute_path const build = temporary_root / Si::relative_path("build");
-		Si::absolute_path const configure_exe = temporary_root / Si::relative_path("configure_exe");
 		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
-		cdm::build_configure_command_line(application_source, build, configure_exe, output);
-		cdm::run_configure_command_line(configure_exe, module_permanent, application_source, application_build, output);
+		cdm::do_configure(temporary_root, module_permanent, application_source, application_build, output);
 	}
 	catch (std::exception const &ex)
 	{
