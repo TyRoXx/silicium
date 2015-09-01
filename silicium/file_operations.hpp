@@ -119,7 +119,9 @@ namespace Si
 #endif
 	{
 		boost::system::error_code ec;
-		boost::filesystem::copy_file(from.to_boost_path(), to.to_boost_path(), option, ec);
+		//We use detail::copy_file because copy_file cannot be used when Boost.Filesystem was built with a standard older than C++11
+		//due to the copy_option parameter begin an enum class in C++11 and something else in C++ <= 03.
+		boost::filesystem::detail::copy_file(from.to_boost_path(), to.to_boost_path(), static_cast<boost::filesystem::detail::copy_option>(option), &ec);
 		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 
