@@ -65,8 +65,8 @@ namespace cdm
 		result.library = lib_dir / make_static_lib_install_path(*Si::path_segment::create("gtest"));
 		result.library_main = lib_dir / make_static_lib_install_path(*Si::path_segment::create("gtest_main"));
 
-		Si::copy(temporarily_writable / make_static_lib_build_path(*Si::path_segment::create("gtest")), result.library, boost::filesystem::copy_option::fail_if_exists, Si::throw_);
-		Si::copy(temporarily_writable / make_static_lib_build_path(*Si::path_segment::create("gtest_main")), result.library_main, boost::filesystem::copy_option::fail_if_exists, Si::throw_);
+		Si::copy(temporarily_writable / make_static_lib_build_path(*Si::path_segment::create("gtest")), result.library, Si::throw_);
+		Si::copy(temporarily_writable / make_static_lib_build_path(*Si::path_segment::create("gtest_main")), result.library_main, Si::throw_);
 		Si::remove_all(result.include, Si::throw_);
 		Si::copy_recursively(gtest_source / *Si::path_segment::create("include"), result.include, &output, Si::throw_);
 

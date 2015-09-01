@@ -113,19 +113,13 @@ namespace Si
 	}
 
 	template <class ErrorHandler>
-	auto copy(absolute_path const &from, absolute_path const &to, boost::filesystem::copy_option option, ErrorHandler &&handle_error)
+	auto copy(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
-		//We use detail::copy_file because copy_file cannot be used when Boost.Filesystem was built with a standard older than C++11
-		//due to the copy_option parameter begin an enum class in C++11 and something else in C++ <= 03.
-		boost::filesystem::detail::copy_file(from.to_boost_path(), to.to_boost_path(),
-#if BOOST_VERSION >= 105600
-			static_cast<boost::filesystem::detail::copy_option>
-#endif
-			(option), &ec);
+		boost::filesystem::copy(from.to_boost_path(), to.to_boost_path(), ec);
 		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
 	}
 

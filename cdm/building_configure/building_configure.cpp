@@ -22,7 +22,7 @@ namespace cdm
 		Si::absolute_path const source = temporary / Si::relative_path("source");
 		Si::recreate_directories(source, Si::throw_);
 		Si::absolute_path const copied_main_cpp = source / Si::relative_path("main.cpp");
-		Si::copy(original_main_cpp, copied_main_cpp, boost::filesystem::copy_option::fail_if_exists, Si::throw_);
+		Si::copy(original_main_cpp, copied_main_cpp, Si::throw_);
 		{
 			Si::absolute_path const cmakeLists = source / Si::relative_path("CMakeLists.txt");
 			std::ofstream cmakeListsFile(cmakeLists.c_str());
@@ -66,7 +66,7 @@ namespace cdm
 			}
 		}
 		Si::absolute_path const built_executable = build / Si::relative_path("configure");
-		Si::copy(built_executable, resulting_executable, boost::filesystem::copy_option::fail_if_exists, Si::throw_);
+		Si::copy(built_executable, resulting_executable, Si::throw_);
 	}
 
 	void run_configure_command_line(
