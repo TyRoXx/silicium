@@ -1,5 +1,6 @@
 if(SILICIUM_HAS_CDM)
 	include_directories(.)
+	add_subdirectory(building_configure)
 	add_subdirectory(configure_cmdline)
 	add_subdirectory(cdm_cmdline)
 	add_subdirectory(application/using_gtest)
