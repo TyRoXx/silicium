@@ -102,6 +102,7 @@ namespace Si
 		});
 		parameters.current_path = absolute_path::create(std::move(current_path)).or_throw([]{ throw std::invalid_argument("The current directory must be an absolute path."); });
 		parameters.out = &output;
+		parameters.err = &output;
 		return run_process(parameters);
 	}
 
@@ -118,6 +119,7 @@ namespace Si
 		parameters.arguments = std::move(arguments);
 		parameters.current_path = std::move(current_directory);
 		parameters.out = &output;
+		parameters.err = &output;
 		return run_process(parameters);
 	}
 }

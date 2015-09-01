@@ -1,6 +1,7 @@
 #ifndef SILICIUM_NOEXCEPT_STRING_HPP
 #define SILICIUM_NOEXCEPT_STRING_HPP
 
+#include <silicium/config.hpp>
 #include <string>
 
 #ifndef _MSC_VER
@@ -23,13 +24,22 @@ namespace Si
 		return str;
 	}
 #else
+
+#if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ >= 5))
+	typedef std::string noexcept_string;
+
+	inline noexcept_string to_noexcept_string(boost::container::string const &str)
+	{
+		return noexcept_string(str.data(), str.size());
+	}
+#else
 	typedef boost::container::string noexcept_string;
 
 	inline noexcept_string to_noexcept_string(std::string const &str)
 	{
 		return noexcept_string(str.data(), str.size());
 	}
-
+#endif
 	inline noexcept_string &&to_noexcept_string(noexcept_string &&str)
 	{
 		return std::move(str);

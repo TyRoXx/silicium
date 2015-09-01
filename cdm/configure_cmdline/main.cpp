@@ -50,6 +50,7 @@ int main(int argc, char **argv)
 	try
 	{
 		Si::absolute_path const module_temporaries = Si::temporary_directory(Si::throw_) / *Si::path_segment::create("cdm_modules");
+		Si::recreate_directories(module_temporaries, Si::throw_);
 		Si::absolute_path const module_permanent = Si::absolute_path::create(module_permanent_argument).or_throw(
 			[]{ throw std::invalid_argument("The permanent module cache argument must be an absolute path."); }
 		);

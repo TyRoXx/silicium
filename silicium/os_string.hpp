@@ -28,13 +28,13 @@ namespace Si
 	typedef noexcept_string os_string;
 #endif
 
-	inline os_string to_os_string(os_string original)
-	{
-		return original;
-	}
-
 #ifndef _WIN32
 	inline os_string to_os_string(std::string const &original)
+	{
+		return os_string(original.begin(), original.end());
+	}
+
+	inline os_string to_os_string(boost::container::string const &original)
 	{
 		return os_string(original.begin(), original.end());
 	}
@@ -124,11 +124,6 @@ namespace Si
 	inline noexcept_string to_utf8_string(wchar_t const *utf16)
 	{
 		return win32::to_utf8_string(utf16, std::wcslen(utf16));
-	}
-#else
-	inline noexcept_string to_utf8_string(os_string str)
-	{
-		return str;
 	}
 #endif
 }
