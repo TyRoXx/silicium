@@ -31,7 +31,7 @@ namespace cdm
 			cmakeListsFile << "if(UNIX)\n";
 			cmakeListsFile << "	add_definitions(-std=c++1y)\n";
 			cmakeListsFile << "endif()\n";
-			cmakeListsFile << "find_package(Boost REQUIRED filesystem coroutine program_options system)\n";
+			cmakeListsFile << "find_package(Boost REQUIRED filesystem coroutine program_options context system)\n";
 			cmakeListsFile << "include_directories(${SILICIUM_INCLUDE_DIR} ${BOOST_INCLUDE_DIR} ${CDM_CONFIGURE_INCLUDE_DIRS})\n";
 			cmakeListsFile << "add_executable(configure main.cpp)\n";
 			cmakeListsFile << "target_link_libraries(configure ${Boost_LIBRARIES})\n";
