@@ -199,7 +199,7 @@ endif()
 
 #We need Boost.Filesystem and Filesystem needs exception support
 #for no reason.
-if(NOT SILICIUM_NO_EXCEPTIONS)
+if(NOT SILICIUM_NO_EXCEPTIONS AND NOT SILICIUM_NO_RTTI)
 	set(SILICIUM_HAS_CDM ON)
 endif()
 
