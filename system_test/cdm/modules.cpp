@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 	Si::recreate_directories(install_dir, Si::throw_);
 	unsigned const make_parallelism =
 #ifdef SILICIUM_TESTS_RUNNING_ON_TRAVIS_CI
-		1;
+		2;
 #else
 		boost::thread::hardware_concurrency();
 #endif
