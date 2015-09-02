@@ -3,10 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <string>
-
-#ifndef _MSC_VER
-#	include <boost/container/string.hpp>
-#endif
+#include <boost/container/string.hpp>
 
 namespace Si
 {
