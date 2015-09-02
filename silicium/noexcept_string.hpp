@@ -56,13 +56,46 @@ namespace Si
 		return utf8;
 	}
 
+	namespace detail
+	{
+		template <class Target, class Original>
+		Target convert_range_impl(Original const &original, std::false_type)
+		{
+			using std::begin;
+			using std::end;
+			return Target(begin(original), end(original));
+		}
+
+		template <class Target, class Original>
+		Target const &convert_range_impl(Original const &original, std::true_type)
+		{
+			return original;
+		}
+
+		template <class Target, class Original>
+		auto convert_range(Original const &original) ->
+#if SILICIUM_COMPILER_HAS_DECLTYPE_AUTO
+			decltype(auto)
+#else
+			decltype(convert_range_impl<Target>(original, typename std::is_same<Target, Original>::type()))
+#endif
+		{
+			return convert_range_impl<Target>(original, typename std::is_same<Target, Original>::type());
+		}
+	}
+
 	inline noexcept_string to_utf8_string(std::string const &utf8)
 	{
 #ifdef _WIN32
 		return utf8;
 #else
-		return noexcept_string(utf8.begin(), utf8.end());
+		return detail::convert_range<noexcept_string>(utf8);
 #endif
+	}
+
+	inline noexcept_string to_utf8_string(boost::container::string const &utf8)
+	{
+		return detail::convert_range<noexcept_string>(utf8);
 	}
 }
 
