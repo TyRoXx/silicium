@@ -51,6 +51,6 @@ script:
  - cmake .. -DSILICIUM_USE_WEBSOCKETPP=$WEBSOCKETPP -DSILICIUM_TEST_INCLUDES=$TEST_INCLUDES -DSILICIUM_PEDANTIC=$PEDANTIC -DSILICIUM_NO_EXCEPTIONS=$NO_EXCEPTIONS -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSILICIUM_TESTS_RUNNING_ON_TRAVIS_CI=ON -DSILICIUM_NO_RTTI=$NO_RTTI
  - cmake --build . -- -j2
  - cd test
- - if [ $NO_RTTI != "ON" ]; then valgrind --leak-check=full --error-exitcode=1 ./unit_test; fi
+ - if [ $NO_RTTI != "ON" ]; then valgrind -v --track-origins=yes --leak-check=full --error-exitcode=1 ./unit_test; fi
  - cd ../system_test
- - if [ $NO_RTTI != "ON" ] && [ $NO_EXCEPTIONS != "ON" ]; then valgrind --leak-check=full --error-exitcode=1 ./system_test; fi
+ - if [ $NO_RTTI != "ON" ] && [ $NO_EXCEPTIONS != "ON" ]; then valgrind -v --track-origins=yes --leak-check=full --error-exitcode=1 ./system_test; fi
