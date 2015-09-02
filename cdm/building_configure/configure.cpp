@@ -28,7 +28,12 @@ namespace
 			cmakeListsFile << "cmake_minimum_required(VERSION 2.8)\n";
 			cmakeListsFile << "project(configure_cmdline_generated)\n";
 			cmakeListsFile << "if(UNIX)\n";
-			cmakeListsFile << "	add_definitions(-std=c++1y)\n";
+			cmakeListsFile << "  execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)\n";
+			cmakeListsFile << "  if(GCC_VERSION VERSION_GREATER 4.7)\n";
+			cmakeListsFile << "    add_definitions(-std=c++1y)\n";
+			cmakeListsFile << "  else()\n";
+			cmakeListsFile << "    add_definitions(-std=c++0x)\n";
+			cmakeListsFile << "  endif()\n";
 			cmakeListsFile << "endif()\n";
 			cmakeListsFile << "find_package(Boost REQUIRED filesystem coroutine program_options context system)\n";
 			cmakeListsFile << "include_directories(${SILICIUM_INCLUDE_DIR} ${BOOST_INCLUDE_DIR} ${CDM_CONFIGURE_INCLUDE_DIRS})\n";
