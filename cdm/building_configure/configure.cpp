@@ -80,6 +80,8 @@ namespace
 		Si::absolute_path const &application_build_dir,
 		Si::Sink<char, Si::success>::interface &output)
 	{
+		Si::create_directories(module_permanent, Si::throw_);
+		Si::create_directories(application_build_dir, Si::throw_);
 		std::vector<Si::os_string> arguments;
 		arguments.emplace_back(SILICIUM_SYSTEM_LITERAL("-m"));
 		arguments.emplace_back(Si::to_os_string(module_permanent));
