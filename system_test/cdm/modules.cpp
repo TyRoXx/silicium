@@ -32,19 +32,19 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 {
 	Si::absolute_path const source = silicium / Si::relative_path("cdm/original_sources/cpp-netlib-0.11.2-final");
 	Si::absolute_path const tmp = Si::temporary_directory(Si::throw_);
-	Si::absolute_path const install_dir = tmp / *Si::path_segment::create("install");
-	Si::recreate_directories(install_dir, Si::throw_);
+	Si::absolute_path const modules = tmp / *Si::path_segment::create("modules");
+	Si::recreate_directories(modules, Si::throw_);
 	unsigned const make_parallelism =
 #ifdef SILICIUM_TESTS_RUNNING_ON_TRAVIS_CI
 		2;
 #else
 		boost::thread::hardware_concurrency();
 #endif
-	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, install_dir, Si::cmake_exe, make_parallelism);
-	BOOST_CHECK_EQUAL(install_dir, built.cmake_prefix_path);
-	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "cppnetlibTargets.cmake"));
-	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "libs/network/src/libcppnetlib-client-connections.so"));
-	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "libs/network/src/libcppnetlib-server-parsers.so"));
-	BOOST_CHECK(boost::filesystem::exists(install_dir.to_boost_path() / "libs/network/src/libcppnetlib-uri.so"));
+	Si::absolute_path const writeable_temp = tmp / *Si::path_segment::create("writeable");
+	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, writeable_temp, modules, Si::cmake_exe, make_parallelism);
+	BOOST_CHECK_EQUAL(modules / Si::relative_path("cppnetlib"), built.cmake_prefix_path);
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlibTargets.cmake"));
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "libs/network/src/libcppnetlib-client-connections.so"));
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "libs/network/src/libcppnetlib-server-parsers.so"));
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "libs/network/src/libcppnetlib-uri.so"));
 }
-
