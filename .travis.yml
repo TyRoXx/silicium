@@ -18,6 +18,7 @@ addons:
     - g++-4.8
     - g++-4.7
     - g++-4.6
+    - libboost1.55-all-dev
     
 env:
 #TODO: make Boost.Chrono optional because it was introduced in Boost 1.47 
