@@ -1,15 +1,18 @@
 #include <silicium/absolute_path.hpp>
 #include <silicium/sink/sink.hpp>
 
-//The forward declaration for the function that has to be implemented by the header
-//which is #included next.
-void configure(
-	Si::absolute_path const &module_temporaries,
-	Si::absolute_path const &module_permanent,
-	Si::absolute_path const &application_source,
-	Si::absolute_path const &application_build_dir,
-	Si::Sink<char, Si::success>::interface &output
-);
+namespace CDM_CONFIGURE_NAMESPACE
+{
+	//The forward declaration for the function that has to be implemented by the header
+	//which is #included next.
+	void configure(
+		Si::absolute_path const &module_temporaries,
+		Si::absolute_path const &module_permanent,
+		Si::absolute_path const &application_source,
+		Si::absolute_path const &application_build_dir,
+		Si::Sink<char, Si::success>::interface &output
+	);
+}
 
 //This header is provided by the client application and is expected to define the
 //'configure' function (see above for the signature).
@@ -77,7 +80,7 @@ int main(int argc, char **argv)
 			[]{ throw std::invalid_argument("The application build directory argument must be an absolute path."); }
 		);
 		auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
-		::configure(module_temporaries, module_permanent, application_source, application_build, output);
+		CDM_CONFIGURE_NAMESPACE::configure(module_temporaries, module_permanent, application_source, application_build, output);
 	}
 	catch (std::exception const &ex)
 	{

@@ -1,5 +1,5 @@
-#define CDM_CONFIGURE_NAMESPACE t1185ace
-#include "../../cdm/application/using_gtest/cdm.hpp"
+#define CDM_CONFIGURE_NAMESPACE a0038871
+#include "../../cdm/application/using_cppnetlib/cdm.hpp"
 #include <boost/test/unit_test.hpp>
 
 namespace
@@ -10,9 +10,9 @@ namespace
 	Si::absolute_path const silicium = *Si::parent(test);
 }
 
-BOOST_AUTO_TEST_CASE(test_using_gtest)
+BOOST_AUTO_TEST_CASE(test_using_cppnetlib)
 {
-	Si::absolute_path const app_source = silicium / Si::relative_path("cdm/application/using_gtest");
+	Si::absolute_path const app_source = silicium / Si::relative_path("cdm/application/using_cppnetlib");
 	Si::absolute_path const tmp = Si::temporary_directory(Si::throw_) / *Si::path_segment::create("cdm_test");
 	Si::absolute_path const module_temporaries = tmp / *Si::path_segment::create("module_temporaries");
 	Si::absolute_path const module_permanent = tmp / *Si::path_segment::create("module_permanent");
@@ -30,6 +30,6 @@ BOOST_AUTO_TEST_CASE(test_using_gtest)
 	}
 	{
 		std::vector<Si::os_string> arguments;
-		BOOST_REQUIRE_EQUAL(0, Si::run_process(application_build_dir / *Si::path_segment::create("using_gtest"), arguments, application_build_dir, output));
+		BOOST_REQUIRE_EQUAL(0, Si::run_process(application_build_dir / *Si::path_segment::create("using_cppnetlib"), arguments, application_build_dir, output));
 	}
 }

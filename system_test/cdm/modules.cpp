@@ -40,8 +40,7 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 #else
 		boost::thread::hardware_concurrency();
 #endif
-	Si::absolute_path const writeable_temp = tmp / *Si::path_segment::create("writeable");
-	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, writeable_temp, modules, Si::cmake_exe, make_parallelism);
+	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, modules, Si::cmake_exe, make_parallelism);
 	BOOST_CHECK_EQUAL(modules / Si::relative_path("cppnetlib"), built.cmake_prefix_path);
 	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlibTargets.cmake"));
 	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "libs/network/src/libcppnetlib-client-connections.so"));

@@ -15,7 +15,6 @@ namespace cdm
 
 	inline cppnetlib_paths install_cppnetlib(
 		Si::absolute_path const &cppnetlib_source,
-		Si::absolute_path const &temporarily_writable,
 		Si::absolute_path const &install_root,
 		Si::absolute_path const &cmake_exe,
 		unsigned make_parallelism)
@@ -23,7 +22,7 @@ namespace cdm
 		Si::absolute_path const module_in_cache = install_root / Si::relative_path("cppnetlib");
 		if (!Si::file_exists(module_in_cache, Si::throw_))
 		{
-			Si::absolute_path const &build_dir = temporarily_writable;
+			Si::absolute_path const &build_dir = module_in_cache;
 			Si::create_directories(build_dir, Si::throw_);
 			auto output = Si::Sink<char, Si::success>::erase(Si::ostream_ref_sink(std::cerr));
 			{
@@ -56,7 +55,6 @@ namespace cdm
 					throw std::runtime_error("cmake build failed");
 				}
 			}
-			Si::rename(build_dir, module_in_cache, Si::throw_);
 		}
 		cppnetlib_paths result;
 		result.cmake_prefix_path = module_in_cache;
