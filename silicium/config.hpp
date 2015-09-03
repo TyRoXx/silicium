@@ -96,7 +96,7 @@
 #		define SILICIUM_UNREACHABLE() __builtin_unreachable()
 #	endif
 #else
-#	define SILICIUM_UNREACHABLE() throw ::std::logic_error("unreachable " __FILE__ ":" BOOST_STRINGIZE(__LINE__))
+#	define SILICIUM_UNREACHABLE() throw ::std::logic_error("SILICIUM_UNREACHABLE was executed at " __FILE__ ":" BOOST_STRINGIZE(__LINE__))
 #endif
 
 #if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
