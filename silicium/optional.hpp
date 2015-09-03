@@ -366,7 +366,7 @@ namespace Si
 			{
 				return **this;
 			}
-			std::forward<EmptyHandler>(handle_empty);
+			std::forward<EmptyHandler>(handle_empty)();
 			SILICIUM_UNREACHABLE();
 		}
 
