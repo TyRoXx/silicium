@@ -36,7 +36,7 @@ namespace CDM_CONFIGURE_NAMESPACE
 #else
 			boost::thread::hardware_concurrency();
 #endif
-		cdm::cppnetlib_paths const cppnetlib_installed = cdm::install_cppnetlib(cppnetlib_source, module_permanent, Si::cmake_exe, parallelism);
+		cdm::cppnetlib_paths const cppnetlib_installed = cdm::install_cppnetlib(cppnetlib_source, module_temporaries, module_permanent, Si::cmake_exe, parallelism);
 
 		std::vector<Si::os_string> arguments;
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("-DCPPNETLIB_PREFIX_PATH=") + to_os_string(cppnetlib_installed.cmake_prefix_path));

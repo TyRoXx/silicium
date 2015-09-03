@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 {
 	Si::absolute_path const source = silicium / Si::relative_path("cdm/original_sources/cpp-netlib-0.11.2-final");
 	Si::absolute_path const tmp = Si::temporary_directory(Si::throw_);
-	Si::absolute_path const modules = tmp / *Si::path_segment::create("modules");
+	Si::absolute_path const modules = tmp / *Si::path_segment::create("cdm_modules");
 	Si::recreate_directories(modules, Si::throw_);
 	unsigned const make_parallelism =
 #ifdef SILICIUM_TESTS_RUNNING_ON_TRAVIS_CI
@@ -40,10 +40,12 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 #else
 		boost::thread::hardware_concurrency();
 #endif
-	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, modules, Si::cmake_exe, make_parallelism);
-	BOOST_CHECK_EQUAL(modules / Si::relative_path("cppnetlib"), built.cmake_prefix_path);
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlibTargets.cmake"));
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "libs/network/src/libcppnetlib-client-connections.so"));
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "libs/network/src/libcppnetlib-server-parsers.so"));
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "libs/network/src/libcppnetlib-uri.so"));
+	Si::absolute_path const build_dir = tmp / *Si::path_segment::create("build");
+	Si::recreate_directories(build_dir, Si::throw_);
+	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, build_dir, modules, Si::cmake_exe, make_parallelism);
+	BOOST_CHECK_EQUAL(modules / Si::relative_path("cppnetlib/lib/x86_64-linux-gnu/cmake"), built.cmake_prefix_path);
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibConfig.cmake"));
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibConfigVersion.cmake"));
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibTargets.cmake"));
+	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibTargets-noconfig.cmake"));
 }
