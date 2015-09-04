@@ -19,7 +19,6 @@ addons:
     - g++-4.7
     - g++-4.6
     - libboost1.55-all-dev
-    - valgrind
     
 env:
  - CPP=g++-5   WEBSOCKETPP=OFF PEDANTIC=ON  NO_EXCEPTIONS=ON  NO_RTTI=OFF TEST_INCLUDES=OFF BUILD_TYPE=Release
@@ -46,10 +45,8 @@ script:
  - cd test
  - if [ $NO_RTTI != "ON" ]; then
      ./unit_test || exit 1;
-     valgrind --leak-check=full --error-exitcode=1 ./unit_test || exit 1;
    fi
  - cd ../system_test
  - if [ $NO_RTTI != "ON" ] && [ $NO_EXCEPTIONS != "ON" ]; then
      ./system_test || exit 1;
-     valgrind --leak-check=full --error-exitcode=1 ./system_test || exit 1;
    fi
