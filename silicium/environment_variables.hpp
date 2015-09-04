@@ -1,5 +1,5 @@
-#ifndef SILICIUM_DYNAMIC_LIBRARY_HPP
-#define SILICIUM_DYNAMIC_LIBRARY_HPP
+#ifndef SILICIUM_ENVIRONMENT_VARIABLES_HPP
+#define SILICIUM_ENVIRONMENT_VARIABLES_HPP
 
 #include <silicium/c_string.hpp>
 #include <silicium/get_last_error.hpp>
@@ -10,7 +10,7 @@
 namespace Si
 {
 	SILICIUM_USE_RESULT
-	boost::system::error_code set_environment_variable(os_c_string key, os_c_string value)
+	inline boost::system::error_code set_environment_variable(os_c_string key, os_c_string value)
 	{
 #ifdef _WIN32
 		if (!SetEnvironmentVariableW(key.c_str(), value.c_str()))
