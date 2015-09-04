@@ -46,7 +46,3 @@ script:
  - if [ $NO_RTTI != "ON" ]; then
      ./unit_test || exit 1;
    fi
- - cd ../system_test
- - if [ $NO_RTTI != "ON" ] && [ $NO_EXCEPTIONS != "ON" ]; then
-     ./system_test || exit 1;
-   fi

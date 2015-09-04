@@ -197,16 +197,8 @@ if(NOT (Boost_VERSION LESS 105300))
 	add_subdirectory("c_binding")
 endif()
 
-#We need Boost.Filesystem and Filesystem needs exception support
-#for no reason.
-if(NOT SILICIUM_NO_EXCEPTIONS AND NOT SILICIUM_NO_RTTI)
-	set(SILICIUM_HAS_CDM ON)
-endif()
-
 add_subdirectory("test")
-add_subdirectory("system_test")
 add_subdirectory("test_includes")
 add_subdirectory("build_tester")
-add_subdirectory("cdm")
 add_subdirectory("dependency_builder")
 add_subdirectory("examples")
