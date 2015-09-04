@@ -19,6 +19,7 @@ addons:
     - g++-4.7
     - g++-4.6
     - libboost1.55-all-dev
+    - valgrind
     
 env:
  - CPP=g++-5   WEBSOCKETPP=OFF PEDANTIC=ON  NO_EXCEPTIONS=ON  NO_RTTI=OFF TEST_INCLUDES=OFF BUILD_TYPE=Release
