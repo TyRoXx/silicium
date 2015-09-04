@@ -63,7 +63,11 @@ namespace cdm
 			}
 		}
 		cppnetlib_paths result;
-		result.cmake_prefix_path = module_in_cache / Si::relative_path("lib/x86_64-linux-gnu/cmake");
+		result.cmake_prefix_path = module_in_cache / Si::relative_path("lib/"
+#ifndef SILICIUM_TESTS_RUNNING_ON_TRAVIS_CI
+																	   "x86_64-linux-gnu/"
+#endif
+																	   "cmake");
 		return std::move(result);
 	}
 }

@@ -43,9 +43,8 @@ BOOST_AUTO_TEST_CASE(test_cdm_cppnetlib)
 	Si::absolute_path const build_dir = tmp / *Si::path_segment::create("build");
 	Si::recreate_directories(build_dir, Si::throw_);
 	cdm::cppnetlib_paths const built = cdm::install_cppnetlib(source, build_dir, modules, Si::cmake_exe, make_parallelism);
-	BOOST_CHECK_EQUAL(modules / Si::relative_path("cppnetlib/lib/x86_64-linux-gnu/cmake"), built.cmake_prefix_path);
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibConfig.cmake"));
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibConfigVersion.cmake"));
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibTargets.cmake"));
-	BOOST_CHECK(boost::filesystem::exists(built.cmake_prefix_path.to_boost_path() / "cppnetlib/cppnetlibTargets-noconfig.cmake"));
+	BOOST_CHECK(Si::file_exists(built.cmake_prefix_path / Si::relative_path("cppnetlib/cppnetlibConfig.cmake"), Si::throw_));
+	BOOST_CHECK(Si::file_exists(built.cmake_prefix_path / Si::relative_path("cppnetlib/cppnetlibConfigVersion.cmake"), Si::throw_));
+	BOOST_CHECK(Si::file_exists(built.cmake_prefix_path / Si::relative_path("cppnetlib/cppnetlibTargets.cmake"), Si::throw_));
+	BOOST_CHECK(Si::file_exists(built.cmake_prefix_path / Si::relative_path("cppnetlib/cppnetlibTargets-noconfig.cmake"), Si::throw_));
 }
