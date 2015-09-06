@@ -153,7 +153,7 @@ namespace Si
 		auto to_double_zero = detail::double_zero_terminate(to.to_boost_path().native());
 		auto from_double_zero = detail::double_zero_terminate(from.to_boost_path().native());
 		SHFILEOPSTRUCTW s = {0};
-		s.hwnd = NULL;
+		s.hwnd = ::GetConsoleWindow();
 		s.wFunc = FO_COPY;
 		s.fFlags = FOF_SILENT;
 		s.pTo = to_double_zero.data();
