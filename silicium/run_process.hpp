@@ -41,17 +41,20 @@ namespace Si
 
 		boost::asio::io_service io;
 
+		std::promise<void> stop_polling;
+		std::shared_future<void> stopped_polling = stop_polling.get_future().share();
+
 		auto std_output_consumer = make_multi_sink<char, success>([&parameters]()
 		{
 			return make_iterator_range(&parameters.out, &parameters.out + (parameters.out != nullptr));
 		});
-		experimental::read_from_anonymous_pipe(io, std_output_consumer, std::move(std_output.read));
+		experimental::read_from_anonymous_pipe(io, std_output_consumer, std::move(std_output.read), stopped_polling);
 
 		auto std_error_consumer = make_multi_sink<char, success>([&parameters]()
 		{
 			return make_iterator_range(&parameters.err, &parameters.err + (parameters.err != nullptr));
 		});
-		experimental::read_from_anonymous_pipe(io, std_error_consumer, std::move(std_error.read));
+		experimental::read_from_anonymous_pipe(io, std_error_consumer, std::move(std_error.read), stopped_polling);
 
 		input.read.close();
 		std_output.write.close();
@@ -81,10 +84,21 @@ namespace Si
 			input.write.close();
 		});
 
+#ifdef _WIN32
+		auto waited = std::async(std::launch::deferred, [&process, &stop_polling]()
+		{
+			int rc = process.wait_for_exit().get();
+			stop_polling.set_value();
+			return rc;
+		});
 		io.run();
 		copy_input.get();
-
+		return waited.get();
+#else
+		io.run();
+		copy_input.get();
 		return process.wait_for_exit().get();
+#endif
 	}
 
 	SILICIUM_USE_RESULT

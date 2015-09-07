@@ -426,7 +426,7 @@ namespace Si
 	namespace win32
 	{
 		template <class ByteSink>
-		void copy_whole_pipe(HANDLE pipe_in, ByteSink &&sink_out)
+		void copy_whole_pipe(HANDLE pipe_in, ByteSink &&sink_out, std::shared_future<void> stop_polling)
 		{
 			auto buffered_out = make_buffering_sink(std::forward<ByteSink>(sink_out));
 			for (;;)
@@ -449,7 +449,15 @@ namespace Si
 				}
 				if (available == 0)
 				{
-					boost::this_thread::sleep_for(boost::chrono::milliseconds(300));
+					switch (stop_polling.wait_for(std::chrono::milliseconds(300)))
+					{
+					case std::future_status::ready:
+						return;
+
+					case std::future_status::deferred:
+					case std::future_status::timeout:
+						break;
+					}
 					continue;
 				}
 				if (ReadFile(pipe_in, buffer.begin(), available, &read_bytes, nullptr))
@@ -472,17 +480,18 @@ namespace Si
 #if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
 		//TODO: find a more generic API for reading from a pipe portably
 		template <class CharSink>
-		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file)
+		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file, std::shared_future<void> stop_polling)
 		{
 #ifdef _WIN32
 			auto copyable_file = Si::to_shared(std::move(file));
 			auto work = std::make_shared<boost::asio::io_service::work>(io);
+			auto stop_polling_shared = Si::to_shared(std::move(stop_polling));
 			Si::spawn_observable(
 				Si::asio::make_posting_observable(
 					io,
-					Si::make_thread_observable<Si::std_threading>([work, copyable_file, destination]()
+					Si::make_thread_observable<Si::std_threading>([work, copyable_file, destination, stop_polling_shared]()
 					{
-						Si::win32::copy_whole_pipe(copyable_file->handle, destination);
+						Si::win32::copy_whole_pipe(copyable_file->handle, destination, std::move(*stop_polling_shared));
 						return Si::nothing();
 					})
 				)
