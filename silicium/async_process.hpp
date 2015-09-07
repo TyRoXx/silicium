@@ -497,6 +497,7 @@ namespace Si
 				)
 			);
 #elif SILICIUM_HAS_SPAWN_COROUTINE
+			boost::ignore_unused_variable_warning(stop_polling);
 			auto copyable_file = Si::to_shared(std::move(file));
 			Si::spawn_coroutine([&io, destination, copyable_file](Si::spawn_context yield)
 			{
@@ -519,6 +520,7 @@ namespace Si
 				}
 			});
 #else
+			boost::ignore_unused_variable_warning(stop_polling);
 			typedef typename std::decay<CharSink>::type clean_destination;
 			struct pipe_reader : std::enable_shared_from_this<pipe_reader>
 			{
