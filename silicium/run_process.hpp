@@ -81,22 +81,10 @@ namespace Si
 			input.write.close();
 		});
 
-#ifdef _WIN32
-		auto wait_for_exit_async = std::async(std::launch::async, [&process, &std_output, &std_error]()
-		{
-			int rc = process.wait_for_exit().get();
-			std_output.read.close();
-			std_error.read.close();
-			return rc;
-		});
 		io.run();
 		copy_input.get();
-		return wait_for_exit_async.get();
-#else
-		io.run();
-		copy_input.get();
+
 		return process.wait_for_exit().get();
-#endif
 	}
 
 	SILICIUM_USE_RESULT
