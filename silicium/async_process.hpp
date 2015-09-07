@@ -18,6 +18,7 @@
 #include <silicium/asio/process_output.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/sink/append.hpp>
+#include <boost/thread/thread.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #	include <boost/filesystem/operations.hpp>
@@ -448,25 +449,8 @@ namespace Si
 				}
 				if (available == 0)
 				{
-					auto buffer1 = buffered_out.make_append_space(1);
-					DWORD read_bytes1 = 0;
-					BOOL const read_result = ReadFile(pipe_in, buffer1.begin(), static_cast<DWORD>(buffer1.size()), &read_bytes1, nullptr);
-					if (read_result)
-					{
-						buffered_out.flush_append_space();
-						continue;
-					}
-					else
-					{
-						auto error = ::GetLastError();
-						if (error == ERROR_BROKEN_PIPE)
-						{
-							buffered_out.make_append_space(read_bytes1);
-							buffered_out.flush_append_space();
-							break;
-						}
-						throw boost::system::system_error(error, boost::system::native_ecat);
-					}
+					boost::this_thread::sleep_for(boost::chrono::milliseconds(300));
+					continue;
 				}
 				if (ReadFile(pipe_in, buffer.begin(), available, &read_bytes, nullptr))
 				{
