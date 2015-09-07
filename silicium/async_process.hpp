@@ -450,7 +450,7 @@ namespace Si
 				}
 				if (available == 0)
 				{
-					switch (stop_polling.wait_for(std::chrono::milliseconds(300)))
+					switch (stop_polling.wait_for(boost::chrono::milliseconds(300)))
 					{
 					case std::future_status::ready:
 						return;
