@@ -85,9 +85,10 @@ namespace Si
 		});
 
 #ifdef _WIN32
-		auto waited = std::async(std::launch::deferred, [&process, &stop_polling]()
+		auto waited = std::async(std::launch::deferred, [&process, &stop_polling, &io]()
 		{
 			int rc = process.wait_for_exit().get();
+			io.stop();
 			stop_polling.set_value();
 			return rc;
 		});
