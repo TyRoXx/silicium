@@ -41,8 +41,8 @@ namespace Si
 
 		boost::asio::io_service io;
 
-		std::promise<void> stop_polling;
-		std::shared_future<void> stopped_polling = stop_polling.get_future().share();
+		boost::promise<void> stop_polling;
+		boost::shared_future<void> stopped_polling = stop_polling.get_future().share();
 
 		auto std_output_consumer = make_multi_sink<char, success>([&parameters]()
 		{

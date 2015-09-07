@@ -19,6 +19,7 @@
 #include <silicium/std_threading.hpp>
 #include <silicium/sink/append.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/thread/future.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #	include <boost/filesystem/operations.hpp>
@@ -426,7 +427,7 @@ namespace Si
 	namespace win32
 	{
 		template <class ByteSink>
-		void copy_whole_pipe(HANDLE pipe_in, ByteSink &&sink_out, std::shared_future<void> stop_polling)
+		void copy_whole_pipe(HANDLE pipe_in, ByteSink &&sink_out, boost::shared_future<void> stop_polling)
 		{
 			auto buffered_out = make_buffering_sink(std::forward<ByteSink>(sink_out));
 			for (;;)
@@ -480,7 +481,7 @@ namespace Si
 #if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
 		//TODO: find a more generic API for reading from a pipe portably
 		template <class CharSink>
-		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file, std::shared_future<void> stop_polling)
+		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file, boost::shared_future<void> stop_polling)
 		{
 #ifdef _WIN32
 			auto copyable_file = Si::to_shared(std::move(file));

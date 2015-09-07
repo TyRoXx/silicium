@@ -51,8 +51,8 @@ namespace
 
 		process_output result;
 
-		std::promise<void> stop_polling;
-		std::shared_future<void> stopped_polling = stop_polling.get_future().share();
+		boost::promise<void> stop_polling;
+		boost::shared_future<void> stopped_polling = stop_polling.get_future().share();
 
 		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.output), std::move(standard_output.read), stopped_polling);
 		Si::experimental::read_from_anonymous_pipe(io, Si::make_container_sink(result.error), std::move(standard_error.read), stopped_polling);
