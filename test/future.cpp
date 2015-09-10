@@ -3,7 +3,13 @@
 #include <boost/asio/io_service.hpp>
 
 #if SILICIUM_HAS_FUTURE
+
+//asio::spawn should be immediately resumable since 1.58
+#define SILICIUM_TEST_SPAWN ((BOOST_VERSION >= 105800) && SILICIUM_HAS_EXCEPTIONS)
+
+#if SILICIUM_TEST_SPAWN
 #include <boost/asio/spawn.hpp>
+#endif
 
 BOOST_AUTO_TEST_CASE(future_default_constructor)
 {
@@ -26,8 +32,7 @@ BOOST_AUTO_TEST_CASE(ready_future)
 	BOOST_CHECK(got_result);
 }
 
-#if BOOST_VERSION >= 105800
-//asio::spawn should be immediately resumable since 1.58
+#if SILICIUM_TEST_SPAWN
 BOOST_AUTO_TEST_CASE(future_async_wait_in_asio_spawn)
 {
 	Si::future<int> f = Si::make_ready_future(5);
