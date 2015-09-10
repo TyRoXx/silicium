@@ -5,7 +5,7 @@
 #if SILICIUM_HAS_FUTURE
 
 //asio::spawn should be immediately resumable since 1.58
-#define SILICIUM_TEST_SPAWN ((BOOST_VERSION >= 105800) && SILICIUM_HAS_EXCEPTIONS)
+#define SILICIUM_TEST_SPAWN ((BOOST_VERSION >= 105800) && SILICIUM_HAS_EXCEPTIONS && !SILICIUM_AVOID_BOOST_COROUTINE)
 
 #if SILICIUM_TEST_SPAWN
 #include <boost/asio/spawn.hpp>
