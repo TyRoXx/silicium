@@ -40,6 +40,7 @@
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/function.hpp>
+#include <silicium/future.hpp>
 #include <silicium/get_last_error.hpp>
 #include <silicium/html/generator.hpp>
 #include <silicium/html/tree.hpp>
