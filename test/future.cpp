@@ -3,6 +3,8 @@
 #include <boost/asio/io_service.hpp>
 
 #if SILICIUM_HAS_FUTURE
+#include <boost/asio/spawn.hpp>
+
 BOOST_AUTO_TEST_CASE(future_default_constructor)
 {
 	Si::future<int> f;
@@ -23,4 +25,24 @@ BOOST_AUTO_TEST_CASE(ready_future)
 	io.run();
 	BOOST_CHECK(got_result);
 }
+
+#if BOOST_VERSION >= 105800
+//asio::spawn should be immediately resumable since 1.58
+BOOST_AUTO_TEST_CASE(future_async_wait_in_asio_spawn)
+{
+	Si::future<int> f = Si::make_ready_future(5);
+	boost::asio::io_service io;
+	bool got_result = false;
+	boost::asio::spawn(io, [&got_result, &f](boost::asio::yield_context yield)
+	{
+		BOOST_REQUIRE(!got_result);
+		int result = f.async_wait(yield);
+		BOOST_CHECK_EQUAL(5, result);
+		got_result = true;
+	});
+	BOOST_CHECK(!got_result);
+	io.run();
+	BOOST_CHECK(got_result);
+}
+#endif
 #endif
