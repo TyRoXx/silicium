@@ -3,6 +3,7 @@
 
 #include <silicium/variant.hpp>
 #include <boost/asio/async_result.hpp>
+#include <boost/throw_exception.hpp>
 
 #define SILICIUM_HAS_FUTURE SILICIUM_HAS_VARIANT
 
@@ -31,7 +32,7 @@ namespace Si
 				m_state,
 				[](empty)
 				{
-					throw std::logic_error("to do");
+					boost::throw_exception(std::logic_error("to do"));
 				},
 				[this, &real_handler](T &value)
 				{
