@@ -70,15 +70,15 @@ important
 * continuous integration
   * [x] create .travis.yml and let travis-ci run it
   * [x] travis support finished
-  * [ ] travis upgrade: http://docs.travis-ci.com/user/migrating-from-legacy/?utm_source=legacy-notice&utm_medium=banner&utm_campaign=legacy-upgrade
+  * [x] travis upgrade: http://docs.travis-ci.com/user/migrating-from-legacy/?utm_source=legacy-notice&utm_medium=banner&utm_campaign=legacy-upgrade
   * [ ] use travis for OSX
-  * [x] appveyor integration finished
-  * advanced appveyor stuff
+  * appveyor improvements
     * [ ] Visual Studio 2012
-    * [ ] Visual Studio 2013
+    * [x] Visual Studio 2013
     * [ ] Visual Studio 2015
     * [ ] Boost versions other than 1.56
-* measure test coverage
+  * get valgrind to work without false positives
+  * measure test coverage
 * allow for recursive variants
 * check whether variant&lt;T &amp;&gt; makes sense
 * Asio-style async_wait for the end of a child process
@@ -88,7 +88,9 @@ important
 * noexcept function to load a dynamic library
 * rename the "trait" concept to something less ambiguous
 * try precompiled headers
-* rename error_or&lt;T, boost::system::error_code&gt; to system_result&lt;T&gt;
+* rename error_or&lt;T, boost::system::error_code&gt; to system_result&lt;T&gt;?
+* clang-format
+* move everything HTTP into a separate library
 
 nice to have
 ------------
@@ -98,17 +100,20 @@ nice to have
 * move the zlib wrapper to a separate library
 * reduce sizeof(fast_variant&lt;T&gt;) to sizeof(T)
 * reduce sizeof(fast_variant&lt;char&gt;) to (sizeof(char) * 2)
-* move everything HTTP into a separate library
 * do not #include <boost/concept_check.hpp> just to get boost::ignore_unused_variable_warning
-* play with Visual C++ 2015 await: http://blogs.msdn.com/b/vcblog/archive/2014/11/12/resumable-functions-in-c.aspx
 * define operator<< for basic_ostream, not ostream
 * optimize safe integer arithmetic
   * GCC/Clang intrinsics?
   * avoid the div in operator*
+* emulate variadic templates so that variant works on old compilers for a limited number of arguments
+* drop-in replacement for boost::asio::spawn that works properly with old Boost versions
+  * spawn does not support immediate completion prior to Boost 1.58
+* a generic, ASIO-style "AsyncSource" concept which replaces Observable
 
 probably outside of scope
 -------------------------
 
-* Asio-style websockets
+* ASIO-style websockets
 * investigate async read and write for files
 * further investigation of container wrappers like Si::vector
+* play with Visual C++ 2015 await: http://blogs.msdn.com/b/vcblog/archive/2014/11/12/resumable-functions-in-c.aspx
