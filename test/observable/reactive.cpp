@@ -23,6 +23,7 @@
 #include <boost/bind.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/thread.hpp>
+#include <boost/utility/in_place_factory.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/assign/list_of.hpp>
 #include <unordered_map>
