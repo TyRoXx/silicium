@@ -673,6 +673,48 @@ namespace Si
 			base::assign(static_cast<typename std::decay<Other>::type::base const &>(other));
 		}
 	};
+
+	template <class ...T>
+	struct non_copyable_variant : detail::variant_base<false, T...>
+	{
+		typedef typename detail::variant_base<false, T...> base;
+
+		non_copyable_variant() BOOST_NOEXCEPT
+		{
+		}
+
+		template <class First, class ...Initializer, class = typename boost::disable_if<boost::is_same<typename boost::decay<First>::type, non_copyable_variant>, void>::type>
+		non_copyable_variant(First &&first, Initializer &&...init)
+			: base(std::forward<First>(first), std::forward<Initializer>(init)...)
+		{
+		}
+
+		non_copyable_variant(non_copyable_variant &&other) BOOST_NOEXCEPT
+			: base(std::move(static_cast<base &>(other)))
+		{
+		}
+
+		template <class Content, class = typename boost::disable_if<boost::is_same<typename boost::decay<Content>::type, non_copyable_variant>, void>::type>
+		non_copyable_variant &operator = (Content &&other)
+		{
+			static_cast<base &>(*this) = std::forward<Content>(other);
+			return *this;
+		}
+
+		non_copyable_variant &operator = (non_copyable_variant &&other) BOOST_NOEXCEPT
+		{
+			static_cast<base &>(*this) = std::move(static_cast<base &>(other));
+			return *this;
+		}
+
+		template <class Other>
+		void assign(Other &&other)
+		{
+			base::assign(static_cast<typename std::decay<Other>::type::base const &>(other));
+		}
+
+		SILICIUM_DISABLE_COPY(non_copyable_variant)
+	};
 #endif
 
 #if !SILICIUM_COMPILER_HAS_USING
