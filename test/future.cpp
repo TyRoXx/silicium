@@ -14,11 +14,13 @@
 BOOST_AUTO_TEST_CASE(future_default_constructor)
 {
 	Si::future<int> f;
+	BOOST_CHECK(!f.valid());
 }
 
 BOOST_AUTO_TEST_CASE(ready_future)
 {
 	Si::future<int> f = Si::make_ready_future(5);
+	BOOST_CHECK(f.valid());
 	boost::asio::io_service io;
 	bool got_result = false;
 	f.async_wait(io.wrap([&got_result](int result)
@@ -31,6 +33,29 @@ BOOST_AUTO_TEST_CASE(ready_future)
 	io.run();
 	BOOST_CHECK(got_result);
 }
+
+BOOST_AUTO_TEST_CASE(promise_early)
+{
+	Si::promise<int> p;
+	p.set_value(4);
+	Si::future<int> f = p.get_future();
+	BOOST_CHECK(f.valid());
+	BOOST_CHECK_EQUAL(4, f.async_wait(Si::asio::block_thread));
+	BOOST_CHECK(!f.valid());
+}
+
+#ifdef WIP
+BOOST_AUTO_TEST_CASE(promise_late)
+{
+	Si::promise<int> p;
+	Si::future<int> f = p.get_future();
+	BOOST_CHECK(f.valid());
+	p.set_value(4);
+	BOOST_CHECK(f.valid());
+	BOOST_CHECK_EQUAL(4, f.async_wait(Si::asio::block_thread));
+	BOOST_CHECK(!f.valid());
+}
+#endif
 
 #if SILICIUM_TEST_SPAWN
 BOOST_AUTO_TEST_CASE(future_async_wait_in_asio_spawn)
