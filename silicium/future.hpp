@@ -2,12 +2,13 @@
 #define SILICIUM_FUTURE_HPP
 
 #include <silicium/variant.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/throw_exception.hpp>
 
 #define SILICIUM_HAS_FUTURE SILICIUM_HAS_VARIANT
 
 #if SILICIUM_HAS_FUTURE
+#include <future>
+#include <boost/asio/async_result.hpp>
+#include <boost/throw_exception.hpp>
 namespace Si
 {
 	namespace detail
