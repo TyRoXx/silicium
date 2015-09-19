@@ -8,9 +8,9 @@
 #if SILICIUM_HAS_FUTURE
 #include <boost/asio/async_result.hpp>
 #include <boost/throw_exception.hpp>
-#include <silicium/future.hpp>
 #include <silicium/function.hpp>
 #include <silicium/null_mutex.hpp>
+#include <mutex>
 namespace Si
 {
 	namespace detail
