@@ -1,6 +1,7 @@
 #ifndef SILICIUM_BLOCK_THREAD_HPP
 #define SILICIUM_BLOCK_THREAD_HPP
 
+#include <silicium/config.hpp>
 #include <future>
 #include <boost/asio/async_result.hpp>
 
