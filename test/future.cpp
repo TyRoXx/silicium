@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(ready_future)
 	BOOST_CHECK(got_result);
 }
 
-BOOST_AUTO_TEST_CASE(promise_early)
+BOOST_AUTO_TEST_CASE(promise_early_blocking)
 {
 	Si::promise<int> p;
 	p.set_value(4);
@@ -44,8 +44,7 @@ BOOST_AUTO_TEST_CASE(promise_early)
 	BOOST_CHECK(!f.valid());
 }
 
-#ifdef WIP
-BOOST_AUTO_TEST_CASE(promise_late)
+BOOST_AUTO_TEST_CASE(promise_late_blocking)
 {
 	Si::promise<int> p;
 	Si::future<int> f = p.get_future();
@@ -55,7 +54,42 @@ BOOST_AUTO_TEST_CASE(promise_late)
 	BOOST_CHECK_EQUAL(4, f.async_get(Si::asio::block_thread));
 	BOOST_CHECK(!f.valid());
 }
-#endif
+
+BOOST_AUTO_TEST_CASE(promise_early_non_blocking)
+{
+	Si::promise<int> p;
+	p.set_value(4);
+	Si::future<int> f = p.get_future();
+	BOOST_CHECK(f.valid());
+	bool once = false;
+	f.async_get([&once](int result)
+	{
+		BOOST_REQUIRE(!once);
+		once = true;
+		BOOST_CHECK_EQUAL(4, result);
+	});
+	BOOST_CHECK(!f.valid());
+	BOOST_CHECK(once);
+}
+
+BOOST_AUTO_TEST_CASE(promise_late_non_blocking)
+{
+	Si::promise<int> p;
+	Si::future<int> f = p.get_future();
+	BOOST_CHECK(f.valid());
+	bool once = false;
+	f.async_get([&once](int result)
+	{
+		BOOST_REQUIRE(!once);
+		once = true;
+		BOOST_CHECK_EQUAL(4, result);
+	});
+	BOOST_CHECK(f.valid());
+	BOOST_CHECK(!once);
+	p.set_value(4);
+	BOOST_CHECK(once);
+	BOOST_CHECK(!f.valid());
+}
 
 #if SILICIUM_TEST_SPAWN
 BOOST_AUTO_TEST_CASE(future_async_wait_in_asio_spawn)

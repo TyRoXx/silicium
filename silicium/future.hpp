@@ -2,6 +2,7 @@
 #define SILICIUM_FUTURE_HPP
 
 #include <silicium/variant.hpp>
+#include <silicium/function.hpp>
 
 #define SILICIUM_HAS_FUTURE SILICIUM_HAS_VARIANT
 
@@ -43,14 +44,23 @@ public:
 				: m_other_side(other.m_other_side)
 			{
 				other.m_other_side = nullptr;
-				m_other_side->m_other_side = this;
+				if (m_other_side)
+				{
+					m_other_side->m_other_side = this;
+				}
 			}
 
 			link &operator = (link &&other) BOOST_NOEXCEPT
 			{
-				using boost::swap;
-				swap(m_other_side->m_other_side, other.m_other_side->m_other_side);
-				swap(m_other_side, other.m_other_side);
+				if (m_other_side)
+				{
+					m_other_side->m_other_side = &other;
+				}
+				if (other.m_other_side)
+				{
+					other.m_other_side->m_other_side = this;
+				}
+				boost::swap(m_other_side, other.m_other_side);
 				return *this;
 			}
 
@@ -66,6 +76,9 @@ public:
 	}
 
 	template <class T>
+	struct promise;
+
+	template <class T>
 	struct future
 	{
 		future()
@@ -77,8 +90,8 @@ public:
 		{
 		}
 
-		explicit future(detail::link promise)
-			: m_state(std::move(promise))
+		explicit future(detail::link &promise)
+			: m_state(detail::link(promise))
 		{
 		}
 
@@ -92,16 +105,20 @@ public:
 				m_state,
 				[](empty)
 				{
-					boost::throw_exception(std::logic_error("to do"));
+					SILICIUM_UNREACHABLE();
 				},
 				[this, &real_handler](T &value)
 				{
 					real_handler(std::forward<T>(value));
 					m_state = empty();
 				},
-				[](detail::link &)
+				[this, &real_handler](detail::link &promise)
 				{
-					boost::throw_exception(std::logic_error("to do"));
+					m_state = getting{std::move(promise), std::move(real_handler)};
+				},
+				[](getting &)
+				{
+					SILICIUM_UNREACHABLE();
 				}
 			);
 			return result.get();
@@ -114,11 +131,44 @@ public:
 
 	private:
 
+		friend class promise<T>;
+		void internal_set_value(T value)
+		{
+			visit<void>(
+				m_state,
+				[](empty)
+				{
+					SILICIUM_UNREACHABLE();
+				},
+				[](T &)
+				{
+					SILICIUM_UNREACHABLE();
+				},
+				[this, &value](detail::link &)
+				{
+					m_state = std::move(value);
+				},
+				[this, &value](getting &get)
+				{
+					auto handler = std::move(get.handler);
+					m_state = empty();
+					handler(std::move(value));
+				}
+			);
+		}
+
 		struct empty
 		{
 		};
 
-		variant<empty, T, detail::link> m_state;
+		struct getting
+		{
+			//has to be the first member for a hack in promise<T> to work
+			detail::link promise;
+			function<void(T)> handler;
+		};
+
+		variant<empty, T, detail::link, getting> m_state;
 	};
 
 	template <class T>
@@ -136,10 +186,8 @@ public:
 				m_state,
 				[this](empty) -> future<T>
 				{
-					detail::link first;
-					detail::link second(first);
-					m_state = std::move(first);
-					return future<T>(std::move(second));
+					m_state = waiting_for_set_value();
+					return future<T>(try_get_ptr<waiting_for_set_value>(m_state)->future);
 				},
 				[this](T &value)
 				{
@@ -147,10 +195,9 @@ public:
 					m_state = empty();
 					return future<T>(std::move(result));
 				},
-				[](detail::link &) -> future<T>
+				[](waiting_for_set_value &) -> future<T>
 				{
-					boost::throw_exception(std::logic_error("get_future can be called only once"));
-					SILICIUM_UNREACHABLE();
+					throw std::logic_error("get_future can only be called once");
 				}
 			);
 		}
@@ -158,7 +205,25 @@ public:
 		template <class ...Args>
 		void set_value(Args &&...args)
 		{
-			m_state = T(std::forward<Args>(args)...);
+			T arg(std::forward<Args>(args)...);
+			visit<void>(
+				m_state,
+				[this, &arg](empty)
+				{
+					m_state = std::move(arg);
+				},
+				[&arg](T &value)
+				{
+					value = std::move(arg);
+				},
+				[this, &arg](waiting_for_set_value &waiting)
+				{
+					//A dirty hack, but it works as long as the class layouts are as expected.
+					future<T> &future_ = *reinterpret_cast<future<T> *>(waiting.future.get_other_side());
+					m_state = empty();
+					future_.internal_set_value(std::move(arg));
+				}
+			);
 		}
 
 	private:
@@ -167,7 +232,12 @@ public:
 		{
 		};
 
-		variant<empty, T, detail::link> m_state;
+		struct waiting_for_set_value
+		{
+			detail::link future;
+		};
+
+		variant<empty, T, waiting_for_set_value> m_state;
 	};
 
 	namespace asio
