@@ -2,13 +2,15 @@
 #define SILICIUM_FUTURE_HPP
 
 #include <silicium/variant.hpp>
-#include <silicium/function.hpp>
 
 #define SILICIUM_HAS_FUTURE SILICIUM_HAS_VARIANT
 
 #if SILICIUM_HAS_FUTURE
 #include <boost/asio/async_result.hpp>
 #include <boost/throw_exception.hpp>
+#include <silicium/future.hpp>
+#include <silicium/function.hpp>
+#include <silicium/null_mutex.hpp>
 namespace Si
 {
 	namespace detail
@@ -328,17 +330,6 @@ public:
 		};
 
 		non_copyable_variant<empty, T, waiting_for_set_value> m_state;
-	};
-
-	struct null_mutex
-	{
-		void lock()
-		{
-		}
-
-		void unlock()
-		{
-		}
 	};
 
 	template <class Mutex>

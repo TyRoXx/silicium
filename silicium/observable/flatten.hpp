@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/null_mutex.hpp>
 #include <memory>
 #include <unordered_map>
 #include <cassert>
@@ -12,17 +13,6 @@
 
 namespace Si
 {
-	struct null_mutex
-	{
-		void lock()
-		{
-		}
-
-		void unlock()
-		{
-		}
-	};
-
 	template <class ObservableObservable, class Mutex>
 	struct flattener
 		: private observer<typename ObservableObservable::element_type>

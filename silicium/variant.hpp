@@ -800,23 +800,27 @@ namespace Si
 		}
 	};
 
+#if SILICIUM_GCC46
+	template <class Element, class Variant>
+	Element *try_get_ptr(Variant &from) BOOST_NOEXCEPT
+	{
+		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
+	}
+#else
 	template <class Element, bool IsCopyable, class ...T>
 	Element *try_get_ptr(detail::variant_base<IsCopyable, T...> &from) BOOST_NOEXCEPT
 	{
-#if !SILICIUM_GCC46
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
-#endif
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
 
 	template <class Element, bool IsCopyable, class ...T>
 	typename std::add_const<Element>::type *try_get_ptr(detail::variant_base<IsCopyable, T...> const &from) BOOST_NOEXCEPT
 	{
-#if !SILICIUM_GCC46
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
-#endif
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
 	}
+#endif
 
 	namespace detail
 	{
@@ -869,6 +873,14 @@ namespace Si
 		};
 	}
 
+#if SILICIUM_GCC46
+	template <class Result, class Variant, class ...Visitors>
+	Result visit(Variant &variant, Visitors &&...visitors)
+	{
+		detail::overloader<Result, Visitors...> ov(visitors...);
+		return Si::apply_visitor(ov, variant);
+	}
+#else
 	template <class Result, bool IsCopyable, class ...T, class ...Visitors>
 	Result visit(detail::variant_base<IsCopyable, T...> &variant, Visitors &&...visitors)
 	{
@@ -882,6 +894,7 @@ namespace Si
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
+#endif
 #endif
 }
 

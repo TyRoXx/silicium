@@ -70,6 +70,7 @@
 #include <silicium/move_if_noexcept.hpp>
 #include <silicium/native_file_descriptor.hpp>
 #include <silicium/noexcept_string.hpp>
+#include <silicium/null_mutex.hpp>
 #include <silicium/observable/bridge.hpp>
 #include <silicium/observable/cache.hpp>
 #include <silicium/observable/constant.hpp>
