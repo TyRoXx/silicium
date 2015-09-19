@@ -150,6 +150,7 @@ public:
 				[](detail::link &) -> future<T>
 				{
 					boost::throw_exception(std::logic_error("get_future can be called only once"));
+					SILICIUM_UNREACHABLE();
 				}
 			);
 		}
