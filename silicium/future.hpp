@@ -13,6 +13,8 @@ namespace Si
 {
 	namespace detail
 	{
+		struct avoid_msvc_warning_about_multiple_copy_ctors {};
+
 		struct link
 		{
 			link() BOOST_NOEXCEPT
@@ -20,7 +22,7 @@ namespace Si
 			{
 			}
 
-			explicit link(link &other_side)
+			explicit link(link &other_side, avoid_msvc_warning_about_multiple_copy_ctors)
 				: m_other_side(&other_side)
 			{
 				assert(!other_side.m_other_side);
@@ -80,17 +82,33 @@ public:
 	template <class T>
 	struct future
 	{
-		future()
+		future() BOOST_NOEXCEPT
 		{
 		}
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		SILICIUM_DISABLE_COPY(future)
+	public:
+
+		future(future &&other) BOOST_NOEXCEPT
+		: m_state(std::move(other.m_state))
+		{
+		}
+
+		future &operator = (future &&other) BOOST_NOEXCEPT
+		{
+			m_state = std::move(other.m_state);
+			return *this;
+		}
+#endif
 
 		explicit future(T value)
 			: m_state(std::move(value))
 		{
 		}
 
-		explicit future(detail::link &promise)
-			: m_state(detail::link(promise))
+		explicit future(detail::link &promise) BOOST_NOEXCEPT
+			: m_state(detail::link(promise, detail::avoid_msvc_warning_about_multiple_copy_ctors()))
 		{
 		}
 
@@ -113,7 +131,7 @@ public:
 				},
 				[this, &real_handler](detail::link &promise)
 				{
-					m_state = getting{std::move(promise), std::move(real_handler)};
+					m_state = getting(std::move(promise), std::move(real_handler));
 				},
 				[](getting &)
 				{
@@ -130,7 +148,7 @@ public:
 
 	private:
 
-		friend class promise<T>;
+		friend struct promise<T>;
 		void internal_set_value(T value)
 		{
 			visit<void>(
@@ -165,9 +183,36 @@ public:
 			//has to be the first member for a hack in promise<T> to work
 			detail::link promise;
 			function<void(T)> handler;
+
+			getting(detail::link promise, function<void(T)> handler) BOOST_NOEXCEPT
+				: promise(std::move(promise))
+				, handler(std::move(handler))
+			{
+			}
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+			getting() BOOST_NOEXCEPT
+			{
+			}
+
+			getting(getting &&other) BOOST_NOEXCEPT
+				: promise(std::move(other.promise))
+				, handler(std::move(other.handler))
+			{
+			}
+
+			getting &operator = (getting &&other) BOOST_NOEXCEPT
+			{
+				promise = std::move(other.promise);
+				handler = std::move(other.handler);
+				return *this;
+			}
+
+			SILICIUM_DISABLE_COPY(getting)
+#endif
 		};
 
-		variant<empty, T, detail::link, getting> m_state;
+		non_copyable_variant<empty, T, detail::link, getting> m_state;
 	};
 
 	template <class T>
@@ -179,6 +224,26 @@ public:
 	template <class T>
 	struct promise
 	{
+		promise() BOOST_NOEXCEPT
+		{
+		}
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+		SILICIUM_DISABLE_COPY(promise)
+	public:
+
+		promise(promise &&other) BOOST_NOEXCEPT
+			: m_state(std::move(other.m_state))
+		{
+		}
+
+		promise &operator = (promise &&other) BOOST_NOEXCEPT
+		{
+			m_state = std::move(other.m_state);
+			return *this;
+		}
+#endif
+
 		future<T> get_future()
 		{
 			return visit<future<T>>(
@@ -235,9 +300,28 @@ public:
 		struct waiting_for_set_value
 		{
 			detail::link future;
+
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+			waiting_for_set_value() BOOST_NOEXCEPT
+			{
+			}
+
+			waiting_for_set_value(waiting_for_set_value &&other) BOOST_NOEXCEPT
+				: future(std::move(other.future))
+			{
+			}
+
+			waiting_for_set_value &operator = (waiting_for_set_value &&other) BOOST_NOEXCEPT
+			{
+				future = std::move(other.future);
+				return *this;
+			}
+
+			SILICIUM_DISABLE_COPY(waiting_for_set_value)
+#endif
 		};
 
-		variant<empty, T, waiting_for_set_value> m_state;
+		non_copyable_variant<empty, T, waiting_for_set_value> m_state;
 	};
 }
 #endif

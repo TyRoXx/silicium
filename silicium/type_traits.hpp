@@ -75,7 +75,6 @@ namespace Si
 	template <class T>
 	struct is_copy_assignable : std::true_type {};
 #endif
-
 	template <class T>
 	struct is_copy_constructible : boost::is_copy_constructible<T>
 	{

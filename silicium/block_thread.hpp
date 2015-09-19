@@ -21,6 +21,19 @@ namespace Si
 			template <class Element>
 			struct blocking_thread_handler
 			{
+#if !SILICIUM_COMPILER_GENERATES_MOVES
+				blocking_thread_handler(blocking_thread_handler &&other)
+					: m_promised(std::move(other.m_promised))
+				{
+				}
+
+				blocking_thread_handler &operator = (blocking_thread_handler &&other)
+				{
+					m_promised = std::move(other.m_promised);
+					return *this;
+				}
+#endif
+
 				explicit blocking_thread_handler(block_thread_t)
 				{
 				}

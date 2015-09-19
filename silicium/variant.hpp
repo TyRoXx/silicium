@@ -619,6 +619,9 @@ namespace Si
 #if SILICIUM_COMPILER_HAS_USING
 	template <class ...T>
 	using variant = detail::select_variant_base<T...>;
+
+	template <class ...T>
+	using non_copyable_variant = detail::variant_base<false, T...>;
 #else
 	template <class ...T>
 	struct variant : detail::select_variant_base<T...>::type
@@ -755,8 +758,8 @@ namespace Si
 		}
 	};
 
-	template <class Element, class ...T>
-	Element *try_get_ptr(variant<T...> &from) BOOST_NOEXCEPT
+	template <class Element, bool IsCopyable, class ...T>
+	Element *try_get_ptr(detail::variant_base<IsCopyable, T...> &from) BOOST_NOEXCEPT
 	{
 #if !SILICIUM_GCC46
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
@@ -764,8 +767,8 @@ namespace Si
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
 
-	template <class Element, class ...T>
-	typename std::add_const<Element>::type *try_get_ptr(variant<T...> const &from) BOOST_NOEXCEPT
+	template <class Element, bool IsCopyable, class ...T>
+	typename std::add_const<Element>::type *try_get_ptr(detail::variant_base<IsCopyable, T...> const &from) BOOST_NOEXCEPT
 	{
 #if !SILICIUM_GCC46
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
@@ -824,15 +827,15 @@ namespace Si
 		};
 	}
 
-	template <class Result, class ...T, class ...Visitors>
-	Result visit(variant<T...> &variant, Visitors &&...visitors)
+	template <class Result, bool IsCopyable, class ...T, class ...Visitors>
+	Result visit(detail::variant_base<IsCopyable, T...> &variant, Visitors &&...visitors)
 	{
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
 
-	template <class Result, class ...T, class ...Visitors>
-	Result visit(variant<T...> const &variant, Visitors &&...visitors)
+	template <class Result, bool IsCopyable, class ...T, class ...Visitors>
+	Result visit(detail::variant_base<IsCopyable, T...> const &variant, Visitors &&...visitors)
 	{
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
