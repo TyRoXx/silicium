@@ -13,6 +13,7 @@
 #include <silicium/asio/use_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/async_process.hpp>
+#include <silicium/block_thread.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
 #include <silicium/byte.hpp>
