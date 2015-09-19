@@ -337,6 +337,10 @@ public:
 		template <class T>
 		struct uninitialized
 		{
+			uninitialized()
+			{
+			}
+
 			T &storage()
 			{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
