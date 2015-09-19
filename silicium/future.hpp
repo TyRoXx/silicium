@@ -332,17 +332,44 @@ public:
 		non_copyable_variant<empty, T, waiting_for_set_value> m_state;
 	};
 
+	namespace detail
+	{
+		template <class T>
+		struct uninitialized
+		{
+			T &storage()
+			{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+				return m_storage;
+#else
+				return *reinterpret_cast<T *>(&m_storage);
+#endif
+			}
+
+		private:
+
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+			union
+			{
+				T m_storage;
+			};
+#else
+			typename std::aligned_storage<sizeof(T)>::type m_storage;
+#endif
+		};
+	}
+
 	template <class Mutex>
 	struct mutex_move_wrapper
 	{
 		mutex_move_wrapper()
 		{
-			new (&m_mutex) Mutex();
+			new (&m_mutex.storage()) Mutex();
 		}
 
 		mutex_move_wrapper(mutex_move_wrapper &&)
 		{
-			new (&m_mutex) Mutex();
+			new (&m_mutex.storage()) Mutex();
 		}
 
 		mutex_move_wrapper &operator = (mutex_move_wrapper &&)
@@ -352,27 +379,24 @@ public:
 
 		~mutex_move_wrapper()
 		{
-			m_mutex.~Mutex();
+			m_mutex.storage().~Mutex();
 		}
 
 		void lock()
 		{
-			m_mutex.lock();
+			m_mutex.storage().lock();
 		}
 
 		void unlock()
 		{
-			m_mutex.unlock();
+			m_mutex.storage().unlock();
 		}
 
 		SILICIUM_DISABLE_COPY(mutex_move_wrapper)
 
 	private:
 
-		union
-		{
-			Mutex m_mutex;
-		};
+		detail::uninitialized<Mutex> m_mutex;
 	};
 
 	struct single_threaded
