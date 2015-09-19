@@ -76,10 +76,10 @@ public:
 		};
 	}
 
-	template <class T>
+	template <class T, class ThreadSafety>
 	struct promise;
 
-	template <class T>
+	template <class T, class ThreadSafety>
 	struct future
 	{
 		future() BOOST_NOEXCEPT
@@ -118,39 +118,44 @@ public:
 		{
 			typename boost::asio::handler_type<Handler, void(T)>::type real_handler(std::forward<Handler>(handler));
 			typename boost::asio::async_result<decltype(real_handler)> result(real_handler);
-			visit<void>(
-				m_state,
-				[](empty)
-				{
-					SILICIUM_UNREACHABLE();
-				},
-				[this, &real_handler](T &value)
-				{
-					real_handler(std::forward<T>(value));
-					m_state = empty();
-				},
-				[this, &real_handler](detail::link &promise)
-				{
-					m_state = getting(std::move(promise), std::move(real_handler));
-				},
-				[](getting &)
-				{
-					SILICIUM_UNREACHABLE();
-				}
-			);
+			{
+				std::lock_guard<typename ThreadSafety::future_mutex> lock(m_mutex);
+				visit<void>(
+					m_state,
+					[](empty)
+					{
+						SILICIUM_UNREACHABLE();
+					},
+					[this, &real_handler](T &value)
+					{
+						real_handler(std::forward<T>(value));
+						m_state = empty();
+					},
+					[this, &real_handler](detail::link &promise)
+					{
+						m_state = getting(std::move(promise), std::move(real_handler));
+					},
+					[](getting &)
+					{
+						SILICIUM_UNREACHABLE();
+					}
+				);
+			}
 			return result.get();
 		}
 
 		bool valid() const BOOST_NOEXCEPT
 		{
+			std::lock_guard<typename ThreadSafety::future_mutex> lock(m_mutex);
 			return try_get_ptr<empty>(m_state) == nullptr;
 		}
 
 	private:
 
-		friend struct promise<T>;
+		friend struct promise<T, ThreadSafety>;
 		void internal_set_value(T value)
 		{
+			std::lock_guard<typename ThreadSafety::future_mutex> lock(m_mutex);
 			visit<void>(
 				m_state,
 				[](empty)
@@ -213,15 +218,16 @@ public:
 		};
 
 		non_copyable_variant<empty, T, detail::link, getting> m_state;
+		mutable typename ThreadSafety::future_mutex m_mutex;
 	};
 
-	template <class T>
-	future<typename std::decay<T>::type> make_ready_future(T &&value)
+	template <class ThreadSafety, class T>
+	future<typename std::decay<T>::type, ThreadSafety> make_ready_future(T &&value)
 	{
-		return future<typename std::decay<T>::type>(std::forward<T>(value));
+		return future<typename std::decay<T>::type, ThreadSafety>(std::forward<T>(value));
 	}
 
-	template <class T>
+	template <class T, class ThreadSafety>
 	struct promise
 	{
 		promise() BOOST_NOEXCEPT
@@ -244,22 +250,22 @@ public:
 		}
 #endif
 
-		future<T> get_future()
+		future<T, ThreadSafety> get_future()
 		{
-			return visit<future<T>>(
+			return visit<future<T, ThreadSafety>>(
 				m_state,
-				[this](empty) -> future<T>
+				[this](empty)
 				{
 					m_state = waiting_for_set_value();
-					return future<T>(try_get_ptr<waiting_for_set_value>(m_state)->future);
+					return future<T, ThreadSafety>(try_get_ptr<waiting_for_set_value>(m_state)->future);
 				},
 				[this](T &value)
 				{
 					T result = std::move(value);
 					m_state = empty();
-					return future<T>(std::move(result));
+					return future<T, ThreadSafety>(std::move(result));
 				},
-				[](waiting_for_set_value &) -> future<T>
+				[](waiting_for_set_value &) -> future<T, ThreadSafety>
 				{
 					boost::throw_exception(std::logic_error("get_future can only be called once"));
 					SILICIUM_UNREACHABLE();
@@ -284,8 +290,8 @@ public:
 				[this, &arg](waiting_for_set_value &waiting)
 				{
 					//A dirty hack, but it works as long as the class layouts are as expected.
-					future<T> &future_ = *reinterpret_cast<future<T> *>(waiting.future.get_other_side());
-					m_state = empty();
+					future<T, ThreadSafety> &future_ = *reinterpret_cast<future<T, ThreadSafety> *>(waiting.future.get_other_side());
+					//TODO: change state in a safe way
 					future_.internal_set_value(std::move(arg));
 				}
 			);
@@ -322,6 +328,70 @@ public:
 		};
 
 		non_copyable_variant<empty, T, waiting_for_set_value> m_state;
+	};
+
+	struct null_mutex
+	{
+		void lock()
+		{
+		}
+
+		void unlock()
+		{
+		}
+	};
+
+	template <class Mutex>
+	struct mutex_move_wrapper
+	{
+		mutex_move_wrapper()
+		{
+			new (&m_mutex) Mutex();
+		}
+
+		mutex_move_wrapper(mutex_move_wrapper &&)
+		{
+			new (&m_mutex) Mutex();
+		}
+
+		mutex_move_wrapper &operator = (mutex_move_wrapper &&)
+		{
+			return *this;
+		}
+
+		~mutex_move_wrapper()
+		{
+			m_mutex.~Mutex();
+		}
+
+		void lock()
+		{
+			m_mutex.lock();
+		}
+
+		void unlock()
+		{
+			m_mutex.unlock();
+		}
+
+		SILICIUM_DISABLE_COPY(mutex_move_wrapper)
+
+	private:
+
+		union
+		{
+			Mutex m_mutex;
+		};
+	};
+
+	struct single_threaded
+	{
+		typedef null_mutex future_mutex;
+	};
+
+	struct multi_threaded
+	{
+		typedef mutex_move_wrapper<std::mutex> future_mutex;
 	};
 }
 #endif
