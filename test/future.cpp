@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(ready_future)
 	BOOST_CHECK(f.valid());
 	boost::asio::io_service io;
 	bool got_result = false;
-	f.async_wait(io.wrap([&got_result](int result)
+	f.async_get(io.wrap([&got_result](int result)
 	{
 		BOOST_REQUIRE(!got_result);
 		BOOST_CHECK_EQUAL(5, result);
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(promise_early)
 	p.set_value(4);
 	Si::future<int> f = p.get_future();
 	BOOST_CHECK(f.valid());
-	BOOST_CHECK_EQUAL(4, f.async_wait(Si::asio::block_thread));
+	BOOST_CHECK_EQUAL(4, f.async_get(Si::asio::block_thread));
 	BOOST_CHECK(!f.valid());
 }
 
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(promise_late)
 	BOOST_CHECK(f.valid());
 	p.set_value(4);
 	BOOST_CHECK(f.valid());
-	BOOST_CHECK_EQUAL(4, f.async_wait(Si::asio::block_thread));
+	BOOST_CHECK_EQUAL(4, f.async_get(Si::asio::block_thread));
 	BOOST_CHECK(!f.valid());
 }
 #endif
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(future_async_wait_in_asio_spawn)
 	boost::asio::spawn(io, [&got_result, &f](boost::asio::yield_context yield)
 	{
 		BOOST_REQUIRE(!got_result);
-		int result = f.async_wait(yield);
+		int result = f.async_get(yield);
 		BOOST_CHECK_EQUAL(5, result);
 		got_result = true;
 	});

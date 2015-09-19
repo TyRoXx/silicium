@@ -83,7 +83,7 @@ public:
 		}
 
 		template <class Handler>
-		auto async_wait(Handler &&handler)
+		auto async_get(Handler &&handler)
 			-> typename boost::asio::async_result<typename boost::asio::handler_type<Handler, void(T)>::type>::type
 		{
 			typename boost::asio::handler_type<Handler, void(T)>::type real_handler(std::forward<Handler>(handler));
