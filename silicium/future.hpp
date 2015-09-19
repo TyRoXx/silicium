@@ -197,7 +197,7 @@ public:
 				},
 				[](waiting_for_set_value &) -> future<T>
 				{
-					throw std::logic_error("get_future can only be called once");
+					boost::throw_exception(std::logic_error("get_future can only be called once"));
 				}
 			);
 		}
