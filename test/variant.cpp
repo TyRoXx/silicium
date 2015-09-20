@@ -590,14 +590,14 @@ BOOST_AUTO_TEST_CASE(variant_const_try_get_ptr)
 
 BOOST_AUTO_TEST_CASE(variant_sizeof)
 {
-	//TODO: which is always 0, so this can be made as small as sizeof(int)
-	BOOST_CHECK_EQUAL((2 * sizeof(boost::uint32_t)), sizeof(Si::variant<boost::uint32_t>));
-
-	//TODO: which is always 0, so this can be made as small as sizeof(int *)
-	BOOST_CHECK_EQUAL((alignof(int *) + sizeof(int *)), sizeof(Si::variant<int *>));
-
-	BOOST_CHECK_EQUAL(sizeof(unsigned char) + sizeof(std::hash<Si::variant<int>>), sizeof(Si::variant<std::hash<Si::variant<int>>>));
-
+	BOOST_CHECK_EQUAL(sizeof(std::string), sizeof(Si::variant<std::string>));
+	BOOST_CHECK_EQUAL(sizeof(boost::uint8_t), sizeof(Si::variant<boost::uint8_t>));
+	BOOST_CHECK_EQUAL(sizeof(boost::uint16_t), sizeof(Si::variant<boost::uint16_t>));
+	BOOST_CHECK_EQUAL(sizeof(boost::uint32_t), sizeof(Si::variant<boost::uint32_t>));
+	BOOST_CHECK_EQUAL(sizeof(boost::uint64_t), sizeof(Si::variant<boost::uint64_t>));
+	BOOST_CHECK_EQUAL(sizeof(int *), sizeof(Si::variant<int *>));
+	BOOST_CHECK_EQUAL(sizeof(std::hash<Si::variant<int>>), sizeof(Si::variant<std::hash<Si::variant<int>>>));
 	BOOST_CHECK_EQUAL((alignof(int *) + sizeof(int *)), sizeof(Si::variant<int *, int, Si::nothing>));
+	BOOST_CHECK_EQUAL(alignof(std::string) + sizeof(std::string), sizeof(Si::variant<std::string, Si::nothing>));
 }
 #endif

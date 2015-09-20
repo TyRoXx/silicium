@@ -98,8 +98,6 @@ nice to have
 * static analysis
 * move the web server stuff to a separate library (including the uriparser dependency)
 * move the zlib wrapper to a separate library
-* reduce sizeof(fast_variant&lt;T&gt;) to sizeof(T)
-* reduce sizeof(fast_variant&lt;char&gt;) to (sizeof(char) * 2)
 * do not #include <boost/concept_check.hpp> just to get boost::ignore_unused_variable_warning
 * define operator<< for basic_ostream, not ostream
 * optimize safe integer arithmetic

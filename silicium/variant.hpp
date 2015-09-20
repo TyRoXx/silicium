@@ -85,6 +85,33 @@ namespace Si
 			which_type m_which;
 		};
 
+		template <class Single>
+		struct combined_storage<Single> : private union_<Single>
+		{
+			typedef unsigned char which_type;
+
+			which_type which() const BOOST_NOEXCEPT
+			{
+				return 0;
+			}
+
+			void which(which_type value) BOOST_NOEXCEPT
+			{
+				assert(value == 0);
+				(void)value;
+			}
+
+			char &storage() BOOST_NOEXCEPT
+			{
+				return reinterpret_cast<char &>(*this);
+			}
+
+			char const &storage() const BOOST_NOEXCEPT
+			{
+				return reinterpret_cast<char const &>(*this);
+			}
+		};
+
 		template <class T>
 		void destroy_storage(void *storage) BOOST_NOEXCEPT
 		{
