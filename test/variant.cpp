@@ -547,4 +547,42 @@ namespace Si
 		BOOST_CHECK_EQUAL("123", boost::lexical_cast<std::string>(Si::variant<int>(123)));
 	}
 }
+
+BOOST_AUTO_TEST_CASE(variant_try_get_ptr)
+{
+	Si::variant<Si::nothing, int, std::unique_ptr<long>> u, v(123), w(Si::make_unique<long>(456));
+	BOOST_STATIC_ASSERT(std::is_same<Si::nothing *, decltype(Si::try_get_ptr<Si::nothing>(u))>::value);
+	BOOST_STATIC_ASSERT(std::is_same<int *, decltype(Si::try_get_ptr<int>(u))>::value);
+	BOOST_STATIC_ASSERT(std::is_same<std::unique_ptr<long> *, decltype(Si::try_get_ptr<std::unique_ptr<long>>(u))>::value);
+	BOOST_CHECK_NE(static_cast<Si::nothing *>(nullptr), Si::try_get_ptr<Si::nothing>(u));
+	BOOST_CHECK_EQUAL(static_cast<Si::nothing *>(nullptr), Si::try_get_ptr<Si::nothing>(v));
+	BOOST_CHECK_EQUAL(static_cast<Si::nothing *>(nullptr), Si::try_get_ptr<Si::nothing>(w));
+	BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), Si::try_get_ptr<int>(u));
+	BOOST_REQUIRE_NE(static_cast<int *>(nullptr), Si::try_get_ptr<int>(v));
+	BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), Si::try_get_ptr<int>(w));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(u));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(v));
+	BOOST_REQUIRE_NE(static_cast<std::unique_ptr<long> *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(w));
+	BOOST_CHECK_EQUAL(123, *Si::try_get_ptr<int>(v));
+	BOOST_CHECK_EQUAL(456, **Si::try_get_ptr<std::unique_ptr<long>>(w));
+}
+
+BOOST_AUTO_TEST_CASE(variant_const_try_get_ptr)
+{
+	Si::variant<Si::nothing, int, std::unique_ptr<long>> const u, v(123), w(Si::make_unique<long>(456));
+	BOOST_STATIC_ASSERT(std::is_same<Si::nothing const *, decltype(Si::try_get_ptr<Si::nothing>(u))>::value);
+	BOOST_STATIC_ASSERT(std::is_same<int const *, decltype(Si::try_get_ptr<int>(u))>::value);
+	BOOST_STATIC_ASSERT(std::is_same<std::unique_ptr<long> const *, decltype(Si::try_get_ptr<std::unique_ptr<long>>(u))>::value);
+	BOOST_CHECK_NE(static_cast<Si::nothing const *>(nullptr), Si::try_get_ptr<Si::nothing>(u));
+	BOOST_CHECK_EQUAL(static_cast<Si::nothing const *>(nullptr), Si::try_get_ptr<Si::nothing>(v));
+	BOOST_CHECK_EQUAL(static_cast<Si::nothing const *>(nullptr), Si::try_get_ptr<Si::nothing>(w));
+	BOOST_CHECK_EQUAL(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(u));
+	BOOST_REQUIRE_NE(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(v));
+	BOOST_CHECK_EQUAL(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(w));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> const *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(u));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> const *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(v));
+	BOOST_REQUIRE_NE(static_cast<std::unique_ptr<long> const *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(w));
+	BOOST_CHECK_EQUAL(123, *Si::try_get_ptr<int>(v));
+	BOOST_CHECK_EQUAL(456, **Si::try_get_ptr<std::unique_ptr<long>>(w));
+}
 #endif

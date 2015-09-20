@@ -109,6 +109,7 @@ nice to have
 * drop-in replacement for boost::asio::spawn that works properly with old Boost versions
   * spawn does not support immediate completion prior to Boost 1.58
 * a generic, ASIO-style "AsyncSource" concept which replaces Observable
+* support volatile
 
 probably outside of scope
 -------------------------
