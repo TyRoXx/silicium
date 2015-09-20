@@ -599,5 +599,6 @@ BOOST_AUTO_TEST_CASE(variant_sizeof)
 	BOOST_CHECK_EQUAL(sizeof(std::hash<Si::variant<int>>), sizeof(Si::variant<std::hash<Si::variant<int>>>));
 	BOOST_CHECK_EQUAL((Si::alignment_of<int *>::value + sizeof(int *)), sizeof(Si::variant<int *, int, Si::nothing>));
 	BOOST_CHECK_EQUAL((Si::alignment_of<std::string>::value + sizeof(std::string)), sizeof(Si::variant<std::string, Si::nothing>));
+	BOOST_CHECK_EQUAL((sizeof(unsigned char) + sizeof(Si::nothing)), sizeof(Si::variant<Si::nothing, Si::none_t>));
 }
 #endif
