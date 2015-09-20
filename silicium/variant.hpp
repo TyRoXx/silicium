@@ -806,6 +806,12 @@ namespace Si
 	{
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
+
+	template <class Element, class Variant>
+	Element const *try_get_ptr(Variant const &from) BOOST_NOEXCEPT
+	{
+		return apply_visitor(try_get_ptr_visitor<Element const>{}, from);
+	}
 #else
 	template <class Element, bool IsCopyable, class ...T>
 	Element *try_get_ptr(detail::variant_base<IsCopyable, T...> &from) BOOST_NOEXCEPT
