@@ -1,4 +1,5 @@
 #include <silicium/absolute_path.hpp>
+#include <silicium/alignment_of.hpp>
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
@@ -13,11 +14,13 @@
 #include <silicium/asio/use_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/async_process.hpp>
+#include <silicium/block_thread.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/buffer.hpp>
 #include <silicium/byte.hpp>
 #include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
+#include <silicium/cmake.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
@@ -28,14 +31,18 @@
 #include <silicium/dynamic_library.hpp>
 #include <silicium/environment_variables.hpp>
 #include <silicium/error_code.hpp>
+#include <silicium/error_handler.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/expected.hpp>
 #include <silicium/explicit_operator_bool.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/file_notification.hpp>
+#include <silicium/file_operations.hpp>
 #include <silicium/file_size.hpp>
 #include <silicium/flush.hpp>
 #include <silicium/function.hpp>
+#include <silicium/future.hpp>
 #include <silicium/get_last_error.hpp>
 #include <silicium/html/generator.hpp>
 #include <silicium/html/tree.hpp>
@@ -49,6 +56,7 @@
 #include <silicium/http/request_parser_sink.hpp>
 #include <silicium/http/uri.hpp>
 #include <silicium/identity.hpp>
+#include <silicium/initialize_array.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/make_array.hpp>
@@ -58,6 +66,7 @@
 #include <silicium/move_if_noexcept.hpp>
 #include <silicium/native_file_descriptor.hpp>
 #include <silicium/noexcept_string.hpp>
+#include <silicium/null_mutex.hpp>
 #include <silicium/observable/bridge.hpp>
 #include <silicium/observable/cache.hpp>
 #include <silicium/observable/constant.hpp>
@@ -71,6 +80,7 @@
 #include <silicium/observable/erase_shared.hpp>
 #include <silicium/observable/erase_unique.hpp>
 #include <silicium/observable/erased_observer.hpp>
+#include <silicium/observable/error_or_enumerate.hpp>
 #include <silicium/observable/extensible_observer.hpp>
 #include <silicium/observable/filter.hpp>
 #include <silicium/observable/finite_state_machine.hpp>
@@ -108,13 +118,17 @@
 #include <silicium/path_segment.hpp>
 #include <silicium/process_handle.hpp>
 #include <silicium/process_parameters.hpp>
+#include <silicium/program_options.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/relative_path.hpp>
 #include <silicium/run_process.hpp>
+#include <silicium/safe_arithmetic.hpp>
 #include <silicium/serialization.hpp>
 #include <silicium/single_directory_watcher.hpp>
+#include <silicium/sink/append.hpp>
+#include <silicium/sink/buffer.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/file_sink.hpp>
@@ -145,6 +159,7 @@
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/sqlite3.hpp>
 #include <silicium/std_threading.hpp>
+#include <silicium/steady_clock.hpp>
 #include <silicium/success.hpp>
 #include <silicium/terminate_on_exception.hpp>
 #include <silicium/then.hpp>
@@ -152,6 +167,7 @@
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>
+#include <silicium/type_traits.hpp>
 #include <silicium/utility.hpp>
 #include <silicium/variant.hpp>
 #include <silicium/vector.hpp>

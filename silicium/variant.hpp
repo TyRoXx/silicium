@@ -2,6 +2,7 @@
 #define SILICIUM_VARIANT_HPP
 
 #include <silicium/is_handle.hpp>
+#include <silicium/alignment_of.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <new>
 #include <array>
@@ -38,7 +39,7 @@ namespace Si
 		{
 			union
 			{
-				typename std::aligned_storage<sizeof(First), alignof(First)>::type head;
+				typename std::aligned_storage<sizeof(First), alignment_of<First>::value>::type head;
 				union_<T...> tail;
 			}
 			content;

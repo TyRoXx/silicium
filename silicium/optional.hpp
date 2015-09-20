@@ -3,6 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <silicium/is_handle.hpp>
+#include <silicium/alignment_of.hpp>
 #include <silicium/explicit_operator_bool.hpp>
 #include <ostream>
 #include <type_traits>
@@ -16,17 +17,6 @@
 
 namespace Si
 {
-	template <class T>
-	struct alignment_of : std::integral_constant<std::size_t,
-#ifdef _MSC_VER
-		__alignof(T)
-#else
-		alignof(T)
-#endif
-	>
-	{
-	};
-
 	struct none_t
 	{
 		BOOST_CONSTEXPR none_t() {}
