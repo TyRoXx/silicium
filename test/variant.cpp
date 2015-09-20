@@ -587,4 +587,17 @@ BOOST_AUTO_TEST_CASE(variant_const_try_get_ptr)
 	BOOST_CHECK_EQUAL(123, *Si::try_get_ptr<int>(v));
 	BOOST_CHECK_EQUAL(456, **Si::try_get_ptr<std::unique_ptr<long>>(w));
 }
+
+BOOST_AUTO_TEST_CASE(variant_sizeof)
+{
+	//TODO: which is always 0, so this can be made as small as sizeof(int)
+	BOOST_CHECK_EQUAL((2 * sizeof(boost::uint32_t)), sizeof(Si::variant<boost::uint32_t>));
+
+	//TODO: which is always 0, so this can be made as small as sizeof(int *)
+	BOOST_CHECK_EQUAL((alignof(int *) + sizeof(int *)), sizeof(Si::variant<int *>));
+
+	BOOST_CHECK_EQUAL(sizeof(unsigned char) + sizeof(std::hash<Si::variant<int>>), sizeof(Si::variant<std::hash<Si::variant<int>>>));
+
+	BOOST_CHECK_EQUAL((alignof(int *) + sizeof(int *)), sizeof(Si::variant<int *, int, Si::nothing>));
+}
 #endif

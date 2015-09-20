@@ -11,7 +11,6 @@
 #include <boost/mpl/push_front.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/contains.hpp>
-#include <boost/integer.hpp>
 #include <boost/optional.hpp>
 #include <boost/type_traits.hpp>
 
@@ -39,12 +38,7 @@ namespace Si
 		{
 			union
 			{
-#ifndef _MSC_VER
-#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 408
-				alignas(First)
-#endif
-#endif
-					std::array<char, sizeof(First)> head;
+				typename std::aligned_storage<sizeof(First), alignof(First)>::type head;
 				union_<T...> tail;
 			}
 			content;
@@ -55,47 +49,40 @@ namespace Si
 		{
 		};
 
-		template <class Which, std::size_t Size>
+		template <class ...T>
 		struct combined_storage
 		{
-			typedef Which which_type;
+			typedef unsigned char which_type;
 
 			combined_storage() BOOST_NOEXCEPT
+				: m_which(0)
 			{
-				which(0);
 			}
 
 			which_type which() const BOOST_NOEXCEPT
 			{
-				return *reinterpret_cast<which_type const *>(bytes.data() + which_offset);
+				return m_which;
 			}
 
 			void which(which_type value) BOOST_NOEXCEPT
 			{
-				*reinterpret_cast<which_type *>(bytes.data() + which_offset) = value;
+				m_which = value;
 			}
 
 			char &storage() BOOST_NOEXCEPT
 			{
-				return *bytes.data();
+				return reinterpret_cast<char &>(m_storage);
 			}
 
 			char const &storage() const BOOST_NOEXCEPT
 			{
-				return *bytes.data();
+				return reinterpret_cast<char const &>(m_storage);
 			}
 
 		private:
 
-			typedef unsigned alignment_unit;
-			enum
-			{
-				which_offset = (Size + sizeof(which_type) - 1) / sizeof(which_type) * sizeof(which_type),
-				used_size = which_offset + sizeof(which_type),
-				padding = sizeof(alignment_unit),
-				padded_size = (used_size + padding - 1) / padding * padding
-			};
-			std::array<char, padded_size> bytes;
+			union_<T...> m_storage;
+			which_type m_which;
 		};
 
 		template <class T>
@@ -404,8 +391,7 @@ namespace Si
 
 		protected: //TODO: make private somehow
 
-			typedef typename boost::uint_value_t<sizeof...(T)>::least internal_which_type;
-			typedef combined_storage<internal_which_type, sizeof(union_<T...>)> storage_type; //TODO: ensure proper alignment
+			typedef combined_storage<T...> storage_type;
 
 			storage_type storage;
 
@@ -895,14 +881,6 @@ namespace std
 		}
 	};
 }
-
-//TODO: which is always 0, so this can be made as small as sizeof(int)
-BOOST_STATIC_ASSERT(sizeof(Si::variant<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
-
-//TODO: which is always 0, so this can be made as small as sizeof(int *)
-BOOST_STATIC_ASSERT(sizeof(Si::variant<int *>) == (sizeof(boost::uint32_t) + sizeof(int *)));
-
-BOOST_STATIC_ASSERT(sizeof(Si::variant<std::hash<Si::variant<int>>>) == sizeof(boost::uint32_t));
 #endif
 
 #endif
