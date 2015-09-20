@@ -25,32 +25,34 @@ namespace Si
 	{
 		variant<int> v;
 		BOOST_CHECK_EQUAL(0U, v.which());
-		BOOST_CHECK_EQUAL(boost::make_optional(0), try_get<int>(v));
+		int *p = try_get_ptr<int>(v);
+		BOOST_REQUIRE(p);
+		BOOST_CHECK_EQUAL(0, *p);
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_assignment_same)
 	{
 		typedef variant<int, noexcept_string> variant;
 		variant v(1), w(2);
-		BOOST_CHECK_EQUAL(boost::make_optional(1), try_get<int>(v));
-		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(w));
+		BOOST_CHECK_EQUAL(1, *try_get_ptr<int>(v));
+		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(w));
 		v = w;
 		BOOST_CHECK_EQUAL(v.which(), w.which());
 		BOOST_CHECK_EQUAL(v.which(), 0u);
-		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(v));
-		BOOST_CHECK_EQUAL(boost::make_optional(2), try_get<int>(w));
+		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(v));
+		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(w));
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_assignment_different)
 	{
 		variant<int, noexcept_string> v, w(noexcept_string("S"));
-		BOOST_CHECK_EQUAL(boost::make_optional(0), try_get<int>(v));
-		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(w));
+		BOOST_CHECK_EQUAL(0, *try_get_ptr<int>(v));
+		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(w));
 		v = w;
 		BOOST_CHECK_EQUAL(v.which(), w.which());
 		BOOST_CHECK_EQUAL(v.which(), 1u);
-		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(v));
-		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(w));
+		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(v));
+		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(w));
 	}
 
 	struct is_int_visitor : boost::static_visitor<bool>
@@ -87,10 +89,10 @@ namespace Si
 	{
 		variant<variant<int>, noexcept_string> f;
 		f = noexcept_string("S");
-		BOOST_CHECK_EQUAL(boost::make_optional(noexcept_string("S")), try_get<noexcept_string>(f));
+		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(f));
 
 		f = variant<int>(2);
-		BOOST_CHECK(boost::make_optional(variant<int>(2)) == try_get<variant<int>>(f));
+		BOOST_CHECK(variant<int>(2) == *try_get_ptr<variant<int>>(f));
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_construct_const)
@@ -390,7 +392,7 @@ namespace Si
 		variant<int> v(2);
 		variant<float, int> w;
 		w.assign(v);
-		BOOST_CHECK_EQUAL(boost::make_optional<int>(2), try_get<int>(w));
+		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(w));
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_copyable_const_assign_subset)
@@ -398,7 +400,7 @@ namespace Si
 		variant<int> const v(2);
 		variant<float, int> w;
 		w.assign(v);
-		BOOST_CHECK_EQUAL(boost::make_optional<int>(2), try_get<int>(w));
+		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(w));
 	}
 
 #if 0 //TODO: make this work

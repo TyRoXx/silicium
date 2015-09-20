@@ -765,27 +765,6 @@ namespace Si
 	};
 
 	template <class Element>
-	struct try_get_visitor : boost::static_visitor<boost::optional<Element>>
-	{
-		boost::optional<Element> operator()(Element value) const
-		{
-			return std::move(value);
-		}
-
-		template <class Other>
-		boost::optional<Element> operator()(Other const &) const
-		{
-			return boost::none;
-		}
-	};
-
-	template <class Element, class ...T>
-	boost::optional<Element> try_get(variant<T...> &from)
-	{
-		return apply_visitor(try_get_visitor<Element>{}, from);
-	}
-
-	template <class Element>
 	struct try_get_ptr_visitor : boost::static_visitor<Element *>
 	{
 		Element * operator()(Element &value) const BOOST_NOEXCEPT
