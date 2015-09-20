@@ -341,6 +341,10 @@ public:
 			{
 			}
 
+			~uninitialized()
+			{
+			}
+
 			T &storage()
 			{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
