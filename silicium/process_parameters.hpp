@@ -12,6 +12,12 @@
 
 namespace Si
 {
+	enum class environment_inheritance
+	{
+		inherit,
+		no_inherit
+	};
+
 	struct process_parameters
 	{
 		absolute_path executable;
@@ -31,6 +37,10 @@ namespace Si
 		/// provides stdin to the child process. When nullptr, the input will be empty.
 		Source<char>::interface *in;
 
+		std::vector<std::pair<os_char const *, os_char const *>> additional_environment;
+
+		environment_inheritance inheritance;
+
 		process_parameters();
 	};
 	
@@ -38,6 +48,7 @@ namespace Si
 		: out(nullptr)
 		, err(nullptr)
 		, in(nullptr)
+	    , inheritance(environment_inheritance::inherit)
 	{
 	}
 }

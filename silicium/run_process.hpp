@@ -37,7 +37,7 @@ namespace Si
 		auto std_output = make_pipe().move_value();
 		auto std_error = make_pipe().move_value();
 		async_process process =
-			launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle, std::vector<std::pair<os_char const *, os_char const *>>(), environment_inheritance::inherit).move_value();
+			launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle, parameters.additional_environment, parameters.inheritance).move_value();
 
 		boost::asio::io_service io;
 
@@ -135,6 +135,27 @@ namespace Si
 		parameters.current_path = std::move(current_directory);
 		parameters.out = &output;
 		parameters.err = &output;
+		return run_process(parameters);
+	}
+
+	SILICIUM_USE_RESULT
+	inline error_or<int> run_process(
+		absolute_path executable,
+		std::vector<os_string> arguments,
+		absolute_path current_directory,
+		Sink<char, success>::interface &output,
+		std::vector<std::pair<os_char const *, os_char const *>> additional_environment,
+		environment_inheritance inheritance
+		)
+	{
+		process_parameters parameters;
+		parameters.executable = std::move(executable);
+		parameters.arguments = std::move(arguments);
+		parameters.current_path = std::move(current_directory);
+		parameters.out = &output;
+		parameters.err = &output;
+		parameters.additional_environment = std::move(additional_environment);
+		parameters.inheritance = inheritance;
 		return run_process(parameters);
 	}
 }

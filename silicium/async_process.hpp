@@ -125,12 +125,6 @@ namespace Si
 			return process.wait_for_exit();
 		}
 	};
-
-	enum class environment_inheritance
-	{
-		inherit,
-		no_inherit
-	};
 	
 #if SILICIUM_HAS_LAUNCH_PROCESS
 
