@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_get_home)
 	Si::absolute_path const home = Si::get_home();
 #ifdef _WIN32
 	BOOST_CHECK(boost::algorithm::starts_with(Si::to_os_string(home), L"C:\\Users\\"));
-	BOOST_CHECK(boost::algorithm::ends_with(Si::to_os_string(home), L"\\AppData"));
+	BOOST_CHECK(boost::algorithm::ends_with(Si::to_os_string(home), L"\\AppData\\Local"));
 #else
 	BOOST_CHECK(boost::algorithm::starts_with(Si::to_os_string(home), "/home/"));
 #endif
