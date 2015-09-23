@@ -1,5 +1,6 @@
 #include <silicium/file_operations.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 
@@ -74,5 +75,16 @@ BOOST_AUTO_TEST_CASE(test_temporary_directory_variant)
 	Si::error_or<Si::absolute_path> const p = Si::temporary_directory(Si::variant_);
 	BOOST_REQUIRE(!p.is_error());
 	BOOST_CHECK(!p.get().empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_get_home)
+{
+	Si::absolute_path const home = Si::get_home();
+#ifdef _WIN32
+	BOOST_CHECK(boost::algorithm::starts_with(Si::to_os_string(home), L"C:\\Users\\"));
+	BOOST_CHECK(boost::algorithm::ends_with(Si::to_os_string(home), L"\\AppData"));
+#else
+	BOOST_CHECK(boost::algorithm::starts_with(Si::to_os_string(home), "/home/"));
+#endif
 }
 #endif

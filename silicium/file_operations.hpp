@@ -7,6 +7,9 @@
 #ifdef _WIN32
 #	include <silicium/win32/win32.hpp>
 #	include <Shellapi.h>
+#	include <shlobj.h>
+#else
+#	include <pwd.h>
 #endif
 
 //Boost filesystem requires exceptions
@@ -262,6 +265,37 @@ namespace Si
 		}
 		return *absolute_path::create(std::move(temp));
 	}
+
+#ifdef _WIN32
+	namespace detail
+	{
+		struct co_task_mem_deleter
+		{
+			void operator()(void *memory) const
+			{
+				CoTaskMemFree(memory);
+			}
+		};
+	}
+
+	inline Si::absolute_path get_home()
+	{
+		PWSTR path;
+		HRESULT rc = SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
+		if (rc != S_OK)
+		{
+			throw std::runtime_error("Could not get home");
+		}
+		std::unique_ptr<wchar_t, detail::co_task_mem_deleter> raii_path(path);
+		return Si::absolute_path::create(raii_path.get()).or_throw([] { throw std::runtime_error("Windows returned a non-absolute path for home"); });
+	}
+#else
+	inline Si::absolute_path get_home()
+	{
+		return *Si::absolute_path::create(getpwuid(getuid())->pw_dir);
+	}
+#endif
+
 #endif
 }
 
