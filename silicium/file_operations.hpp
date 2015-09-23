@@ -8,6 +8,7 @@
 #	include <silicium/win32/win32.hpp>
 #	include <Shellapi.h>
 #	include <shlobj.h>
+#	undef interface
 #else
 #	include <pwd.h>
 #endif
