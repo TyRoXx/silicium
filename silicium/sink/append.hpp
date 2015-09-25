@@ -64,6 +64,15 @@ namespace Si
 	{
 		return out.append(elements);
 	}
+
+	template <class Sink>
+	auto append_range(Sink &&out, iterator_range<typename std::decay<Sink>::type::element_type const *> const &elements)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		-> typename error_type<Sink>::type
+#endif
+	{
+		return out.append(elements);
+	}
 }
 
 #endif
