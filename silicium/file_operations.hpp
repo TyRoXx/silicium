@@ -165,7 +165,7 @@ namespace Si
 		int rc = SHFileOperationW(&s);
 		if (rc)
 		{
-			throw std::runtime_error("SHFileOperationW failed with return code " + boost::lexical_cast<std::string>(rc));
+			throw std::runtime_error("SHFileOperationW FO_COPY from " + Si::to_utf8_string(from) + " to " + Si::to_utf8_string(to) + " failed with return code " + boost::lexical_cast<std::string>(rc));
 		}
 		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), identity<void>());
 #else
