@@ -601,4 +601,20 @@ BOOST_AUTO_TEST_CASE(variant_sizeof)
 	BOOST_CHECK_EQUAL((Si::alignment_of<std::string>::value + sizeof(std::string)), sizeof(Si::variant<std::string, Si::nothing>));
 	BOOST_CHECK_EQUAL((sizeof(unsigned char) + sizeof(Si::nothing)), sizeof(Si::variant<Si::nothing, Si::none_t>));
 }
+
+struct leaf
+{
+};
+
+struct tree : Si::variant<leaf, std::vector<tree>>
+{
+	typedef Si::variant<leaf, std::vector<tree>> base;
+};
+
+BOOST_AUTO_TEST_CASE(variant_recursive)
+{
+	tree::base t;
+	t = leaf();
+	t = std::vector<tree>();
+}
 #endif
