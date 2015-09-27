@@ -34,11 +34,7 @@
 #endif
 
 //TODO: avoid the Boost filesystem operations that require exceptions
-#ifdef __APPLE__
-#	define SILICIUM_HAS_LAUNCH_PROCESS 0
-#else
-#	define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
-#endif
+#define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
 
 namespace Si
 {
@@ -360,11 +356,15 @@ namespace Si
 				close(i); //ignore errors because we will close many non-file-descriptors
 			}
 
+#ifdef __linux__
 			//kill the child when the parent exits
 			if (prctl(PR_SET_PDEATHSIG, SIGHUP) < 0)
 			{
 				fail();
 			}
+#else
+			//TODO: OSX etc
+#endif
 
 			switch (inheritance)
 			{
@@ -396,7 +396,12 @@ namespace Si
 						environment_for_exec.emplace_back(formatted);
 					}
 					environment_for_exec.emplace_back(nullptr);
-					execvpe(parameters.executable.c_str(), argument_pointers.data(), environment_for_exec.data());
+#ifdef __linux__
+					execvpe
+#else
+					execve
+#endif
+						(parameters.executable.c_str(), argument_pointers.data(), environment_for_exec.data());
 					fail();
 					break;
 				}

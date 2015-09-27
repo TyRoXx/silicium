@@ -5,7 +5,7 @@
 #include <silicium/file_handle.hpp>
 #include <silicium/c_string.hpp>
 
-#ifdef __unix
+#if defined(__unix) || defined(__APPLE__)
 #	include <fcntl.h>
 #endif
 

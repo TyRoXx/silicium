@@ -10,6 +10,10 @@ namespace Si
 	{
 		struct returning_error_handler
 		{
+			BOOST_CONSTEXPR returning_error_handler()
+			{
+			}
+
 			boost::system::error_code operator()(boost::system::error_code error, identity<void>) const
 			{
 				return error;
@@ -18,6 +22,10 @@ namespace Si
 
 		struct throwing_error_handler
 		{
+			BOOST_CONSTEXPR throwing_error_handler()
+			{
+			}
+
 			template <class Result>
 			Result operator()(boost::system::error_code error, identity<Result>) const
 			{
@@ -36,6 +44,10 @@ namespace Si
 
 		struct variant_error_handler
 		{
+			BOOST_CONSTEXPR variant_error_handler()
+			{
+			}
+
 			template <class Result>
 			error_or<Result> operator()(boost::system::error_code error, identity<Result>) const
 			{

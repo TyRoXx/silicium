@@ -13,6 +13,10 @@
 #	include <pwd.h>
 #endif
 
+#ifdef __APPLE__
+#	include <mach-o/dyld.h>
+#endif
+
 //Boost filesystem requires exceptions
 #define SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS SILICIUM_HAS_EXCEPTIONS
 
@@ -243,7 +247,7 @@ namespace Si
 				return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
 			}
 		}
-#else
+#elif defined(__linux__)
 		boost::system::error_code ec;
 		auto result = boost::filesystem::read_symlink("/proc/self/exe", ec);
 		if (!!ec)
@@ -251,6 +255,19 @@ namespace Si
 			return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
 		}
 		return *Si::absolute_path::create(std::move(result));
+#else
+		std::vector<char> buffer(256);
+		std::uint32_t length = static_cast<std::uint32_t>(buffer.size());
+		if (_NSGetExecutablePath(buffer.data(), &length) != 0)
+		{
+			buffer.resize(length);
+			int result = _NSGetExecutablePath(buffer.data(), &length);
+			if (result != 0)
+			{
+				boost::throw_exception(std::logic_error("_NSGetExecutablePath failed unexpectedly"));
+			}
+		}
+		return *Si::absolute_path::create(buffer.data());
 #endif
 	}
 
