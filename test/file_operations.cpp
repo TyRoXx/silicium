@@ -1,4 +1,5 @@
 #include <silicium/file_operations.hpp>
+#include <silicium/write_file.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -89,5 +90,21 @@ BOOST_AUTO_TEST_CASE(test_get_home)
 	//OSX
 	BOOST_CHECK(boost::algorithm::starts_with(Si::to_os_string(home), "/Users/"));
 #endif
+}
+
+BOOST_AUTO_TEST_CASE(test_copy_recursively)
+{
+	Si::absolute_path const temp = Si::temporary_directory(Si::throw_) / Si::relative_path("silicium-test_copy_recursively");
+	Si::recreate_directories(temp, Si::throw_);
+	Si::absolute_path const from = temp / Si::relative_path("from");
+	Si::absolute_path const to = temp / Si::relative_path("to");
+	Si::create_directories(from, Si::throw_);
+	auto const expected = Si::make_c_str_range("Hello");
+	Si::throw_if_error(Si::write_file((from / Si::relative_path("file.txt")).safe_c_str(), expected));
+	Si::copy_recursively(from, to, nullptr, Si::throw_);
+	std::ifstream file((to / Si::relative_path("file.txt")).c_str(), std::ios::binary);
+	BOOST_REQUIRE(file);
+	std::vector<char> const file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	BOOST_CHECK_EQUAL_COLLECTIONS(file_content.begin(), file_content.end(), expected.begin(), expected.end());
 }
 #endif
