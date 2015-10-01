@@ -2,6 +2,7 @@
 #include <silicium/write_file.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <fstream>
 
 #if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 
