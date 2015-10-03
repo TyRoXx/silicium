@@ -370,31 +370,31 @@ namespace Si
 			variant_base() BOOST_NOEXCEPT
 			{
 				typedef typename first<T...>::type constructed;
-				new (reinterpret_cast<constructed *>(&storage.storage())) constructed();
+				new (reinterpret_cast<constructed *>(&this->storage())) constructed();
 			}
 
 			~variant_base() BOOST_NOEXCEPT
 			{
-				destroy_storage(storage.which(), storage.storage());
+				destroy_storage(this->which(), this->storage());
 			}
 
 			variant_base(variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
-				storage.which(other.storage.which());
-				move_construct_storage(storage.which(), storage.storage(), other.storage.storage());
+				this->set_which(other.which());
+				move_construct_storage(this->which(), this->storage(), other.storage());
 			}
 
 			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
-				if (storage.which() == other.which())
+				if (this->which() == other.which())
 				{
-					move_storage(storage.which(), storage.storage(), other.storage.storage());
+					move_storage(this->which(), this->storage(), other.storage());
 				}
 				else
 				{
-					destroy_storage(storage.which(), storage.storage());
-					move_construct_storage(other.storage.which(), storage.storage(), other.storage.storage());
-					storage.which(other.storage.which());
+					destroy_storage(this->which(), this->storage());
+					move_construct_storage(other.which(), this->storage(), other.storage());
+					this->set_which(other.which());
 				}
 				return *this;
 			}
@@ -417,8 +417,8 @@ namespace Si
 				>::type>
 			variant_base(U &&value)
 			{
-				storage.which(Index);
-				new (&storage.storage()) CleanU(std::forward<U>(value));
+				this->set_which(Index);
+				new (&this->storage()) CleanU(std::forward<U>(value));
 			}
 
 			template <
@@ -428,13 +428,13 @@ namespace Si
 			>
 			explicit variant_base(inplace<Requested>, Args &&...args)
 			{
-				storage.which(Index);
-				new (&storage.storage()) Requested(std::forward<Args>(args)...);
+				this->set_which(Index);
+				new (&this->storage()) Requested(std::forward<Args>(args)...);
 			}
 
 			which_type which() const BOOST_NOEXCEPT
 			{
-				return storage.which();
+				return m_storage.which();
 			}
 
 			template <class Visitor>
@@ -445,7 +445,7 @@ namespace Si
 				{{
 					&apply_visitor_impl<Visitor, T, result>...
 				}};
-				return f[storage.which()](std::forward<Visitor>(visitor), &storage.storage());
+				return f[this->which()](std::forward<Visitor>(visitor), &this->storage());
 			}
 
 			template <class Visitor>
@@ -456,12 +456,12 @@ namespace Si
 				{{
 					&apply_visitor_const_impl<Visitor, T, result>...
 				}};
-				return f[storage.which()](std::forward<Visitor>(visitor), &storage.storage());
+				return f[this->which()](std::forward<Visitor>(visitor), &this->storage());
 			}
 
 			bool operator == (variant_base const &other) const
 			{
-				if (storage.which() != other.storage.which())
+				if (this->which() != other.which())
 				{
 					return false;
 				}
@@ -469,16 +469,16 @@ namespace Si
 				{{
 					&equals<T>...
 				}};
-				return f[storage.which()](&storage.storage(), &other.storage.storage());
+				return f[this->which()](&this->storage(), &other.storage());
 			}
 
 			bool operator < (variant_base const &other) const
 			{
-				if (storage.which() > other.storage.which())
+				if (this->which() > other.which())
 				{
 					return false;
 				}
-				if (storage.which() < other.storage.which())
+				if (this->which() < other.which())
 				{
 					return true;
 				}
@@ -486,7 +486,7 @@ namespace Si
 				{{
 					&less<T>...
 				}};
-				return f[storage.which()](&storage.storage(), &other.storage.storage());
+				return f[this->which()](&this->storage(), &other.storage());
 			}
 
 			template <bool IsOtherCopyable, class ...U>
@@ -499,7 +499,22 @@ namespace Si
 
 			typedef combined_storage<T...> storage_type;
 
-			storage_type storage;
+			storage_type m_storage;
+
+			char &storage()
+			{
+				return m_storage.storage();
+			}
+
+			char const &storage() const
+			{
+				return m_storage.storage();
+			}
+
+			void set_which(which_type w)
+			{
+				m_storage.which(w);
+			}
 
 			static void move_construct_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
@@ -577,8 +592,8 @@ namespace Si
 			variant_base(variant_base const &other)
 				: base()
 			{
-				this->storage.which(other.storage.which());
-				copy_construct_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
+				this->set_which(other.which());
+				copy_construct_storage(this->which(), this->storage(), other.storage());
 			}
 
 			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(base::is_noexcept_movable)
@@ -589,17 +604,17 @@ namespace Si
 
 			variant_base &operator = (variant_base const &other)
 			{
-				if (this->storage.which() == other.storage.which())
+				if (this->which() == other.which())
 				{
-					copy_storage(this->storage.which(), this->storage.storage(), other.storage.storage());
+					copy_storage(this->which(), this->storage(), other.storage());
 				}
 				else
 				{
 					typename base::storage_type temporary;
-					copy_construct_storage(other.storage.which(), temporary.storage(), other.storage.storage());
-					base::destroy_storage(this->storage.which(), this->storage.storage());
-					base::move_construct_storage(other.storage.which(), this->storage.storage(), temporary.storage());
-					this->storage.which(other.storage.which());
+					copy_construct_storage(other.which(), reinterpret_cast<char &>(temporary), other.storage());
+					base::destroy_storage(this->which(), this->storage());
+					base::move_construct_storage(other.which(), this->storage(), reinterpret_cast<char &>(temporary));
+					this->set_which(other.which());
 				}
 				return *this;
 			}
