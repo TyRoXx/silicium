@@ -32,112 +32,96 @@ namespace Si
 	namespace detail
 	{
 		template <class ...T>
-		struct union_;
+		union union_;
 
 		template <>
-		struct union_<>
+		union union_<>
 		{
 		};
 
 		template <class T0>
-		struct union_<T0>
+		union union_<T0>
 		{
-			union content_t
-			{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-				T0 t0;
+			T0 t0;
 
-				content_t()
-				{
-				}
-
-				~content_t()
-				{
-				}
-#else
-				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
-#endif
+			union_()
+			{
 			}
-			content;
+
+			~union_()
+			{
+			}
+#else
+			typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
+#endif
 		};
 
 		template <class T0, class T1>
-		struct union_<T0, T1>
+		union union_<T0, T1>
 		{
-			union content_t
-			{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-				T0 t0;
-				T1 t1;
+			T0 t0;
+			T1 t1;
 
-				content_t()
-				{
-				}
-
-				~content_t()
-				{
-				}
-#else
-				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
-				typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
-#endif
+			union_()
+			{
 			}
-			content;
+
+			~union_()
+			{
+			}
+#else
+			typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
+			typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
+#endif
 		};
 
 		template <class T0, class T1, class T2>
-		struct union_<T0, T1, T2>
+		union union_<T0, T1, T2>
 		{
-			union content_t
-			{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-				T0 t0;
-				T1 t1;
-				T2 t2;
+			T0 t0;
+			T1 t1;
+			T2 t2;
 
-				content_t()
-				{
-				}
-
-				~content_t()
-				{
-				}
-#else
-				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
-				typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
-				typename std::aligned_storage<sizeof(T2), alignment_of<T2>::value>::type t2;
-#endif
+			union_()
+			{
 			}
-			content;
+
+			~union_()
+			{
+			}
+#else
+			typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
+			typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
+			typename std::aligned_storage<sizeof(T2), alignment_of<T2>::value>::type t2;
+#endif
 		};
 
 		template <class T0, class T1, class T2, class T3, class ...T>
-		struct union_<T0, T1, T2, T3, T...>
+		union union_<T0, T1, T2, T3, T...>
 		{
-			union content_t
-			{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-				T0 t0;
-				T1 t1;
-				T2 t2;
-				T3 t3;
+			T0 t0;
+			T1 t1;
+			T2 t2;
+			T3 t3;
 
-				content_t()
-				{
-				}
-
-				~content_t()
-				{
-				}
-#else
-				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
-				typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
-				typename std::aligned_storage<sizeof(T2), alignment_of<T2>::value>::type t2;
-				typename std::aligned_storage<sizeof(T3), alignment_of<T3>::value>::type t3;
-#endif
-				union_<T...> tail;
+			union_()
+			{
 			}
-			content;
+
+			~union_()
+			{
+			}
+#else
+			typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
+			typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
+			typename std::aligned_storage<sizeof(T2), alignment_of<T2>::value>::type t2;
+			typename std::aligned_storage<sizeof(T3), alignment_of<T3>::value>::type t3;
+#endif
+			union_<T...> tail;
 		};
 
 		template <class ...T>
@@ -177,7 +161,7 @@ namespace Si
 		};
 
 		template <class Single>
-		struct combined_storage<Single> : private union_<Single>
+		struct combined_storage<Single>
 		{
 			typedef unsigned char which_type;
 
@@ -194,13 +178,17 @@ namespace Si
 
 			char &storage() BOOST_NOEXCEPT
 			{
-				return reinterpret_cast<char &>(*this);
+				return reinterpret_cast<char &>(m_storage);
 			}
 
 			char const &storage() const BOOST_NOEXCEPT
 			{
-				return reinterpret_cast<char const &>(*this);
+				return reinterpret_cast<char const &>(m_storage);
 			}
+
+		private:
+
+			union_<Single> m_storage;
 		};
 
 		template <class T>
