@@ -189,6 +189,16 @@ namespace Si
 		BOOST_CHECK(v != w);
 	}
 
+	BOOST_AUTO_TEST_CASE(variant_copyable_operator_move_to_self)
+	{
+		typedef variant<std::unique_ptr<int>, double> variant;
+		variant v(Si::make_unique<int>(23));
+		v = std::move(v);
+		std::unique_ptr<int> * const content = Si::try_get_ptr<std::unique_ptr<int>>(v);
+		BOOST_REQUIRE(content);
+		BOOST_CHECK_EQUAL(23, **content);
+	}
+
 	// copy operator
 
 	BOOST_AUTO_TEST_CASE(variant_copyable_operator_copy_to_same)
@@ -223,6 +233,16 @@ namespace Si
 		BOOST_CHECK(v != w);
 		v = 2.0;
 		BOOST_CHECK(v == w);
+	}
+
+	BOOST_AUTO_TEST_CASE(variant_copyable_operator_copy_to_self)
+	{
+		typedef variant<std::shared_ptr<int>, double> variant;
+		variant v(std::make_shared<int>(23));
+		v = v;
+		std::shared_ptr<int> * const content = Si::try_get_ptr<std::shared_ptr<int>>(v);
+		BOOST_REQUIRE(content);
+		BOOST_CHECK_EQUAL(23, **content);
 	}
 
 	// apply_visitor
