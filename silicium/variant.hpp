@@ -34,13 +34,18 @@ namespace Si
 		template <class ...T>
 		struct union_;
 
-		template <class First, class ...T>
-		struct union_<First, T...>
+		template <>
+		struct union_<>
+		{
+		};
+
+		template <class T0>
+		struct union_<T0>
 		{
 			union content_t
 			{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-				First head;
+				T0 t0;
 
 				content_t()
 				{
@@ -50,16 +55,89 @@ namespace Si
 				{
 				}
 #else
-				typename std::aligned_storage<sizeof(First), alignment_of<First>::value>::type head;
+				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
 #endif
-				union_<T...> tail;
 			}
 			content;
 		};
 
-		template <>
-		struct union_<>
+		template <class T0, class T1>
+		struct union_<T0, T1>
 		{
+			union content_t
+			{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+				T0 t0;
+				T1 t1;
+
+				content_t()
+				{
+				}
+
+				~content_t()
+				{
+				}
+#else
+				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
+				typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
+#endif
+			}
+			content;
+		};
+
+		template <class T0, class T1, class T2>
+		struct union_<T0, T1, T2>
+		{
+			union content_t
+			{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+				T0 t0;
+				T1 t1;
+				T2 t2;
+
+				content_t()
+				{
+				}
+
+				~content_t()
+				{
+				}
+#else
+				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
+				typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
+				typename std::aligned_storage<sizeof(T2), alignment_of<T2>::value>::type t2;
+#endif
+			}
+			content;
+		};
+
+		template <class T0, class T1, class T2, class T3, class ...T>
+		struct union_<T0, T1, T2, T3, T...>
+		{
+			union content_t
+			{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+				T0 t0;
+				T1 t1;
+				T2 t2;
+				T3 t3;
+
+				content_t()
+				{
+				}
+
+				~content_t()
+				{
+				}
+#else
+				typename std::aligned_storage<sizeof(T0), alignment_of<T0>::value>::type t0;
+				typename std::aligned_storage<sizeof(T1), alignment_of<T1>::value>::type t1;
+				typename std::aligned_storage<sizeof(T2), alignment_of<T2>::value>::type t2;
+				typename std::aligned_storage<sizeof(T3), alignment_of<T3>::value>::type t3;
+#endif
+				union_<T...> tail;
+			}
+			content;
 		};
 
 		template <class ...T>
