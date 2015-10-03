@@ -37,9 +37,21 @@ namespace Si
 		template <class First, class ...T>
 		struct union_<First, T...>
 		{
-			union
+			union content_t
 			{
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+				First head;
+
+				content_t()
+				{
+				}
+
+				~content_t()
+				{
+				}
+#else
 				typename std::aligned_storage<sizeof(First), alignment_of<First>::value>::type head;
+#endif
 				union_<T...> tail;
 			}
 			content;
