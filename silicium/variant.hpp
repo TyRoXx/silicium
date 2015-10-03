@@ -513,7 +513,7 @@ namespace Si
 
 			void set_which(which_type w)
 			{
-				m_storage.which(w);
+				m_storage.which(static_cast<unsigned char>(w));
 			}
 
 			static void move_construct_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
