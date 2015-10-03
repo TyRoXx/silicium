@@ -121,7 +121,7 @@ namespace Si
 			typename std::aligned_storage<sizeof(T2), alignment_of<T2>::value>::type t2;
 			typename std::aligned_storage<sizeof(T3), alignment_of<T3>::value>::type t3;
 #endif
-			union_<T...> tail;
+			union_<T...> t4;
 		};
 
 		template <class ...T>
