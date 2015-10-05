@@ -10,6 +10,8 @@ namespace Si
 	template <class Unsigned>
 	struct safe_number
 	{
+		typedef Unsigned value_type;
+
 		BOOST_STATIC_ASSERT(std::is_unsigned<Unsigned>::value);
 
 		Unsigned value;
