@@ -92,6 +92,11 @@ namespace Si
 		{
 			return make_error_code(sqlite3_bind_text(&statement, zero_based_index, begin, length, nullptr));
 		}
+
+		inline boost::system::error_code step(sqlite3_stmt &statement)
+		{
+			return make_error_code(sqlite3_step(&statement));
+		}
 	}
 }
 
