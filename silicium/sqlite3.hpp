@@ -93,9 +93,45 @@ namespace Si
 			return make_error_code(sqlite3_bind_text(&statement, zero_based_index, begin, length, nullptr));
 		}
 
-		inline boost::system::error_code step(sqlite3_stmt &statement)
+		enum class step_result
 		{
-			return make_error_code(sqlite3_step(&statement));
+			row = SQLITE_ROW,
+			done = SQLITE_DONE,
+			busy = SQLITE_BUSY,
+			misuse = SQLITE_MISUSE,
+			error = SQLITE_ERROR
+		};
+
+		inline std::ostream &operator << (std::ostream &out, step_result result)
+		{
+			return out << static_cast<int>(result);
+		}
+
+		inline error_or<step_result> step(sqlite3_stmt &statement)
+		{
+			int rc = sqlite3_step(&statement);
+			switch (rc)
+			{
+			case SQLITE_ROW: return step_result::row;
+			case SQLITE_DONE: return step_result::done;
+			case SQLITE_BUSY: return step_result::busy;
+			case SQLITE_MISUSE: return step_result::misuse;
+			case SQLITE_ERROR: return step_result::error;
+			default:
+				return make_error_code(rc);
+			}
+		}
+
+		inline int column_count(sqlite3_stmt &statement)
+		{
+			return sqlite3_column_count(&statement);
+		}
+
+		inline sqlite3_int64 column_int64(sqlite3_stmt &statement, int zero_based_index)
+		{
+			assert(zero_based_index >= 0);
+			assert(zero_based_index < column_count(statement));
+			return sqlite3_column_int64(&statement, zero_based_index);
 		}
 	}
 }

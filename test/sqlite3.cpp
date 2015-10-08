@@ -32,3 +32,12 @@ BOOST_AUTO_TEST_CASE(sqlite_bind_int64)
 	Si::SQLite3::statement_handle statement = Si::SQLite3::prepare(*database, "SELECT ?").move_value();
 	BOOST_CHECK(!Si::SQLite3::bind(*statement, 1, 123456));
 }
+
+BOOST_AUTO_TEST_CASE(sqlite_step)
+{
+	Si::SQLite3::database_handle database = Si::SQLite3::open(":memory:").move_value();
+	Si::SQLite3::statement_handle statement = Si::SQLite3::prepare(*database, "SELECT 1").move_value();
+	BOOST_REQUIRE_EQUAL(Si::SQLite3::step_result::row, Si::SQLite3::step(*statement).get());
+	BOOST_REQUIRE_EQUAL(1, Si::SQLite3::column_count(*statement));
+	BOOST_CHECK_EQUAL(1, Si::SQLite3::column_int64(*statement, 0));
+}
