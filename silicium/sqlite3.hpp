@@ -2,6 +2,7 @@
 #define SILICIUM_SQLITE3_HPP
 
 #include <silicium/c_string.hpp>
+#include <silicium/memory_range.hpp>
 #include <silicium/error_or.hpp>
 #include <sqlite3.h>
 #include <memory>
@@ -126,6 +127,22 @@ namespace Si
 			assert(zero_based_index >= 0);
 			assert(zero_based_index < column_count(statement));
 			return sqlite3_column_int64(&statement, zero_based_index);
+		}
+
+		inline double column_double(sqlite3_stmt &statement, int zero_based_index)
+		{
+			assert(zero_based_index >= 0);
+			assert(zero_based_index < column_count(statement));
+			return sqlite3_column_double(&statement, zero_based_index);
+		}
+
+		inline memory_range column_text(sqlite3_stmt &statement, int zero_based_index)
+		{
+			assert(zero_based_index >= 0);
+			assert(zero_based_index < column_count(statement));
+			char const *data = reinterpret_cast<char const *>(sqlite3_column_text(&statement, zero_based_index));
+			int length = sqlite3_column_bytes(&statement, zero_based_index);
+			return memory_range(data, data + length);
 		}
 	}
 }

@@ -42,3 +42,23 @@ BOOST_AUTO_TEST_CASE(sqlite_step)
 	BOOST_CHECK_EQUAL(1, Si::SQLite3::column_int64(*statement, 0));
 	BOOST_CHECK_EQUAL(Si::SQLite3::step_result::done, Si::SQLite3::step(*statement).get());
 }
+
+BOOST_AUTO_TEST_CASE(sqlite_column_double)
+{
+	Si::SQLite3::database_handle database = Si::SQLite3::open(":memory:").move_value();
+	Si::SQLite3::statement_handle statement = Si::SQLite3::prepare(*database, "SELECT 1.5").move_value();
+	BOOST_REQUIRE_EQUAL(Si::SQLite3::step_result::row, Si::SQLite3::step(*statement).get());
+	BOOST_REQUIRE_EQUAL(1, Si::SQLite3::column_count(*statement));
+	BOOST_CHECK_EQUAL(1.5, Si::SQLite3::column_double(*statement, 0));
+}
+
+BOOST_AUTO_TEST_CASE(sqlite_column_text)
+{
+	Si::SQLite3::database_handle database = Si::SQLite3::open(":memory:").move_value();
+	Si::SQLite3::statement_handle statement = Si::SQLite3::prepare(*database, "SELECT \"abc\"").move_value();
+	BOOST_REQUIRE_EQUAL(Si::SQLite3::step_result::row, Si::SQLite3::step(*statement).get());
+	BOOST_REQUIRE_EQUAL(1, Si::SQLite3::column_count(*statement));
+	Si::memory_range const expected = Si::make_c_str_range("abc");
+	Si::memory_range const got = Si::SQLite3::column_text(*statement, 0);
+	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), got.begin(), got.end());
+}
