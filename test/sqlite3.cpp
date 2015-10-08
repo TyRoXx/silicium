@@ -40,4 +40,5 @@ BOOST_AUTO_TEST_CASE(sqlite_step)
 	BOOST_REQUIRE_EQUAL(Si::SQLite3::step_result::row, Si::SQLite3::step(*statement).get());
 	BOOST_REQUIRE_EQUAL(1, Si::SQLite3::column_count(*statement));
 	BOOST_CHECK_EQUAL(1, Si::SQLite3::column_int64(*statement, 0));
+	BOOST_CHECK_EQUAL(Si::SQLite3::step_result::done, Si::SQLite3::step(*statement).get());
 }

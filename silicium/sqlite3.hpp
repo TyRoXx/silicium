@@ -96,10 +96,7 @@ namespace Si
 		enum class step_result
 		{
 			row = SQLITE_ROW,
-			done = SQLITE_DONE,
-			busy = SQLITE_BUSY,
-			misuse = SQLITE_MISUSE,
-			error = SQLITE_ERROR
+			done = SQLITE_DONE
 		};
 
 		inline std::ostream &operator << (std::ostream &out, step_result result)
@@ -114,9 +111,6 @@ namespace Si
 			{
 			case SQLITE_ROW: return step_result::row;
 			case SQLITE_DONE: return step_result::done;
-			case SQLITE_BUSY: return step_result::busy;
-			case SQLITE_MISUSE: return step_result::misuse;
-			case SQLITE_ERROR: return step_result::error;
 			default:
 				return make_error_code(rc);
 			}
