@@ -4,6 +4,7 @@
 #include <silicium/c_string.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/error_or.hpp>
+#include <silicium/bounded_int.hpp>
 #include <sqlite3.h>
 #include <memory>
 
@@ -84,14 +85,16 @@ namespace Si
 			return statement_handle(statement);
 		}
 
-		inline boost::system::error_code bind(sqlite3_stmt &statement, int zero_based_index, sqlite3_int64 value)
+		typedef bounded_int<int, 0, (std::numeric_limits<int>::max)()> positive_int;
+
+		inline boost::system::error_code bind(sqlite3_stmt &statement, positive_int zero_based_index, sqlite3_int64 value)
 		{
-			return make_error_code(sqlite3_bind_int64(&statement, zero_based_index, value));
+			return make_error_code(sqlite3_bind_int64(&statement, zero_based_index.value(), value));
 		}
 
-		inline boost::system::error_code bind(sqlite3_stmt &statement, int zero_based_index, char const *begin, int length)
+		inline boost::system::error_code bind(sqlite3_stmt &statement, positive_int zero_based_index, char const *begin, int length)
 		{
-			return make_error_code(sqlite3_bind_text(&statement, zero_based_index, begin, length, nullptr));
+			return make_error_code(sqlite3_bind_text(&statement, zero_based_index.value(), begin, length, nullptr));
 		}
 
 		enum class step_result
@@ -117,31 +120,28 @@ namespace Si
 			}
 		}
 
-		inline int column_count(sqlite3_stmt &statement)
+		inline positive_int column_count(sqlite3_stmt &statement)
 		{
-			return sqlite3_column_count(&statement);
+			return *positive_int::create(sqlite3_column_count(&statement));
 		}
 
-		inline sqlite3_int64 column_int64(sqlite3_stmt &statement, int zero_based_index)
+		inline sqlite3_int64 column_int64(sqlite3_stmt &statement, positive_int zero_based_index)
 		{
-			assert(zero_based_index >= 0);
 			assert(zero_based_index < column_count(statement));
-			return sqlite3_column_int64(&statement, zero_based_index);
+			return sqlite3_column_int64(&statement, zero_based_index.value());
 		}
 
-		inline double column_double(sqlite3_stmt &statement, int zero_based_index)
+		inline double column_double(sqlite3_stmt &statement, positive_int zero_based_index)
 		{
-			assert(zero_based_index >= 0);
 			assert(zero_based_index < column_count(statement));
-			return sqlite3_column_double(&statement, zero_based_index);
+			return sqlite3_column_double(&statement, zero_based_index.value());
 		}
 
-		inline memory_range column_text(sqlite3_stmt &statement, int zero_based_index)
+		inline memory_range column_text(sqlite3_stmt &statement, positive_int zero_based_index)
 		{
-			assert(zero_based_index >= 0);
 			assert(zero_based_index < column_count(statement));
-			char const *data = reinterpret_cast<char const *>(sqlite3_column_text(&statement, zero_based_index));
-			int length = sqlite3_column_bytes(&statement, zero_based_index);
+			char const *data = reinterpret_cast<char const *>(sqlite3_column_text(&statement, zero_based_index.value()));
+			int length = sqlite3_column_bytes(&statement, zero_based_index.value());
 			return memory_range(data, data + length);
 		}
 	}
