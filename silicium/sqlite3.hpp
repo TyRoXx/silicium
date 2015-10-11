@@ -85,7 +85,13 @@ namespace Si
 			return statement_handle(statement);
 		}
 
-		typedef bounded_int<int, 0, (std::numeric_limits<int>::max)()> positive_int;
+		typedef bounded_int<int, 0,
+#if SILICIUM_COMPILER_HAS_CONSTEXPR_NUMERIC_LIMITS
+			(std::numeric_limits<int>::max)()
+#else
+			INT_MAX
+#endif
+		> positive_int;
 
 		inline boost::system::error_code bind(sqlite3_stmt &statement, positive_int zero_based_index, sqlite3_int64 value)
 		{
