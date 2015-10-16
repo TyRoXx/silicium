@@ -31,7 +31,7 @@ namespace Si
 	template <class T>
 	safe_number<T> safe(T value)
 	{
-		return std::move(value);
+		return value;
 	}
 
 	struct overflow_type
