@@ -87,6 +87,25 @@ namespace Si
 		}
 		return result;
 	}
+
+	template <class Unsigned>
+	overflow_or<Unsigned> &operator += (overflow_or<Unsigned> &left, overflow_or<Unsigned> const &right)
+	{
+		if (left.is_overflow() || right.is_overflow())
+		{
+			return left;
+		}
+		left = checked_add(*left.value(), *right.value());
+		return left;
+	}
+
+	template <class Unsigned>
+	overflow_or<Unsigned> operator + (overflow_or<Unsigned> const &left, overflow_or<Unsigned> const &right)
+	{
+		overflow_or<Unsigned> result = left;
+		result += right;
+		return result;
+	}
 }
 
 #endif
