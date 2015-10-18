@@ -5,7 +5,7 @@
 #include <boost/swap.hpp>
 #include <sys/inotify.h>
 
-namespace Si
+namespace ventura
 {
 	namespace linux
 	{

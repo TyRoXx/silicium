@@ -16,7 +16,7 @@
 
 #define SILICIUM_HAS_INOTIFY_OBSERVABLE SILICIUM_HAS_EXCEPTIONS
 
-namespace Si
+namespace ventura
 {
 	namespace linux
 	{
@@ -55,7 +55,7 @@ namespace Si
 				int fd = inotify_init();
 				if (fd < 0)
 				{
-					throw_last_error();
+					Si::throw_last_error();
 				}
 				try
 				{
@@ -68,13 +68,13 @@ namespace Si
 				}
 			}
 
-			error_or<watch_descriptor> watch(absolute_path const &target, boost::uint32_t mask) BOOST_NOEXCEPT
+			Si::error_or<watch_descriptor> watch(absolute_path const &target, boost::uint32_t mask) BOOST_NOEXCEPT
 			{
 				assert(notifier);
 				int const wd = inotify_add_watch(notifier->native_handle(), target.c_str(), mask);
 				if (wd < 0)
 				{
-					return get_last_error();
+					return Si::get_last_error();
 				}
 				return watch_descriptor(notifier->native_handle(), wd);
 			}
@@ -104,7 +104,7 @@ namespace Si
 						for (std::size_t i = 0; i < bytes_read; )
 						{
 							inotify_event const &event = *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-							optional<path_segment> segment = path_segment::create(boost::filesystem::path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
+							Si::optional<path_segment> segment = path_segment::create(boost::filesystem::path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
 							assert(segment);
 							changes.emplace_back(file_notification{event.mask, std::move(*segment), event.wd});
 							i += sizeof(inotify_event);

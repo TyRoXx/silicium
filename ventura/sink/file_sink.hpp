@@ -4,7 +4,7 @@
 #include <ventura/write.hpp>
 #include <silicium/sink/sink.hpp>
 #include <silicium/variant.hpp>
-#include <ventura/file_handle.hpp>
+#include <silicium/file_handle.hpp>
 #include <silicium/memory_range.hpp>
 #include <ventura/flush.hpp>
 
@@ -20,7 +20,7 @@
 #	define SILICIUM_HAS_FILE_SINK SILICIUM_HAS_VARIANT
 #endif
 
-namespace Si
+namespace ventura
 {
 #if SILICIUM_HAS_FILE_SINK
 	struct seek_set
@@ -33,7 +33,7 @@ namespace Si
 		boost::int64_t from_current;
 	};
 
-	typedef variant<flush, memory_range, seek_set, seek_add> file_sink_element;
+	typedef Si::variant<flush, Si::memory_range, seek_set, seek_add> file_sink_element;
 
 	struct file_sink
 	{
@@ -44,19 +44,19 @@ namespace Si
 		{
 		}
 
-		explicit file_sink(native_file_descriptor destination)
+		explicit file_sink(Si::native_file_descriptor destination)
 			: m_destination(destination)
 		{
 		}
 
-		error_type append(iterator_range<element_type const *> data)
+		error_type append(Si::iterator_range<element_type const *> data)
 		{
 			return append_impl(data);
 		}
 
 	private:
 
-		native_file_descriptor m_destination;
+		Si::native_file_descriptor m_destination;
 
 #ifdef _WIN32
 		error_type append_impl(iterator_range<element_type const *> data)
@@ -116,7 +116,7 @@ namespace Si
 			);
 		}
 #else
-		error_type append_impl(iterator_range<element_type const *> data)
+		error_type append_impl(Si::iterator_range<element_type const *> data)
 		{
 			boost::optional<size_t> write_streak_length;
 			ptrdiff_t i = 0;
@@ -128,7 +128,7 @@ namespace Si
 				}
 				if (*write_streak_length == 1)
 				{
-					auto error = write_piece(*try_get_ptr<memory_range>(*(data.begin() + i - *write_streak_length)));
+					auto error = write_piece(*Si::try_get_ptr<Si::memory_range>(*(data.begin() + i - *write_streak_length)));
 					write_streak_length = boost::none;
 					return error;
 				}
@@ -143,7 +143,7 @@ namespace Si
 			{
 				auto &element = data[i];
 				size_t const max_streak_length = 1024;
-				if (try_get_ptr<memory_range>(element))
+				if (Si::try_get_ptr<Si::memory_range>(element))
 				{
 					if (write_streak_length)
 					{
@@ -177,7 +177,7 @@ namespace Si
 
 		error_type append_one(element_type const &element)
 		{
-			return visit<error_type>(
+			return Si::visit<error_type>(
 				element,
 				[this](flush) -> error_type
 				{
@@ -185,9 +185,9 @@ namespace Si
 					{
 						return error_type();
 					}
-					return get_last_error();
+					return Si::get_last_error();
 				},
-				[this](memory_range const &content) -> error_type
+				[this](Si::memory_range const &content) -> error_type
 				{
 					return write_piece(content);
 				},
@@ -195,7 +195,7 @@ namespace Si
 				{
 					if (lseek64(m_destination, request.from_beginning, SEEK_SET) == static_cast<off_t>(-1))
 					{
-						return get_last_error();
+						return Si::get_last_error();
 					}
 					return error_type();
 				},
@@ -203,16 +203,16 @@ namespace Si
 				{
 					if (lseek64(m_destination, request.from_current, SEEK_CUR) == static_cast<off_t>(-1))
 					{
-						return get_last_error();
+						return Si::get_last_error();
 					}
 					return error_type();
 				}
 			);
 		}
 
-		error_type write_piece(memory_range const &content)
+		error_type write_piece(Si::memory_range const &content)
 		{
-			error_or<std::size_t> written = write(m_destination, content);
+			Si::error_or<std::size_t> written = ventura::write(m_destination, content);
 			if (!written.is_error())
 			{
 				assert(written.get() == static_cast<size_t>(content.size()));
@@ -225,15 +225,15 @@ namespace Si
 			std::vector<iovec> vector(std::distance(begin, end));
 			for (size_t i = 0; i < vector.size(); ++i, ++begin)
 			{
-				memory_range const &piece = *try_get_ptr<memory_range>(*begin);
+				Si::memory_range const &piece = *Si::try_get_ptr<Si::memory_range>(*begin);
 				vector[i].iov_base = const_cast<void *>(static_cast<void const *>(piece.begin()));
 				vector[i].iov_len = piece.size();
 			}
-			assert(vector.size() <= static_cast<size_t>(std::numeric_limits<int>::max()));
+			assert(vector.size() <= static_cast<size_t>((std::numeric_limits<int>::max)()));
 			ssize_t rc = ::writev(m_destination, vector.data(), static_cast<int>(vector.size()));
 			if (rc < 0)
 			{
-				return get_last_error();
+				return Si::get_last_error();
 			}
 			//assume that everything has been written
 			return error_type();

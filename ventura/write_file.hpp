@@ -8,19 +8,19 @@
 
 #define SILICIUM_HAS_WRITE_FILE SILICIUM_HAS_FILE_SINK
 
-namespace Si
+namespace ventura
 {
 #if SILICIUM_HAS_WRITE_FILE
 	SILICIUM_USE_RESULT
-	inline boost::system::error_code write_file(native_path_string name, memory_range data)
+	inline boost::system::error_code write_file(Si::native_path_string name, Si::memory_range data)
 	{
-		Si::error_or<Si::file_handle> const file = Si::overwrite_file(name);
+		Si::error_or<Si::file_handle> const file = overwrite_file(name);
 		if (file.is_error())
 		{
 			return file.error();
 		}
-		Si::file_sink sink(file.get().handle);
-		return Si::append(sink, Si::file_sink_element{data});
+		file_sink sink(file.get().handle);
+		return Si::append(sink, file_sink_element{data});
 	}
 #endif
 }

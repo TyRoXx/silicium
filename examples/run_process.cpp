@@ -1,4 +1,4 @@
-#include <silicium/run_process.hpp>
+#include <ventura/run_process.hpp>
 #include <ventura/file_operations.hpp>
 #include <silicium/sink/function_sink.hpp>
 
@@ -6,9 +6,9 @@ int main(int argc, char **argv)
 {
 	boost::ignore_unused_variable_warning(argc);
 #if SILICIUM_HAS_RUN_PROCESS
-	Si::process_parameters parameters;
-	parameters.executable = *Si::absolute_path::create("/usr/bin/file");
-	parameters.current_path = Si::get_current_working_directory(Si::throw_);
+	ventura::process_parameters parameters;
+	parameters.executable = *ventura::absolute_path::create("/usr/bin/file");
+	parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 	parameters.arguments.emplace_back(argv[0]);
 	auto output = Si::Sink<char, Si::success>::erase(
 		Si::make_function_sink<char>(
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	);
 	parameters.out = &output;
 	std::cerr << "This executable is:\n";
-	return Si::run_process(parameters);
+	return ventura::run_process(parameters);
 #else
 	boost::ignore_unused_variable_warning(argv);
 	std::cerr << "This example requires Si::run_process to be available\n";

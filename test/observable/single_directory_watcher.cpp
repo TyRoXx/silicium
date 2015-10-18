@@ -21,25 +21,25 @@ namespace Si
 #if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace
 	{
-		void touch(Si::absolute_path const &name)
+		void touch(ventura::absolute_path const &name)
 		{
 			//remove existing file to reset the attributes
-			Si::remove_file(name, Si::throw_);
+			ventura::remove_file(name, Si::throw_);
 
 			std::ofstream file(name.c_str());
 			BOOST_REQUIRE(file);
 		}
 
 		void test_single_event(
-			Si::absolute_path const &watched_dir,
+			ventura::absolute_path const &watched_dir,
 			std::function<void ()> const &provoke_event,
-			std::function<void (file_notification const &)> const &on_event)
+			std::function<void (ventura::file_notification const &)> const &on_event)
 		{
 			boost::asio::io_service io;
-			single_directory_watcher watcher(io, watched_dir);
+			ventura::single_directory_watcher watcher(io, watched_dir);
 
 			bool got_event = false;
-			auto consumer = consume<error_or<file_notification>>([&io, &got_event, &on_event](error_or<file_notification> const &event)
+			auto consumer = consume<error_or<ventura::file_notification>>([&io, &got_event, &on_event](error_or<ventura::file_notification> const &event)
 			{
 				io.stop();
 				on_event(event.get());
@@ -65,25 +65,25 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_add_regular)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file = watched_dir / Si::relative_path("test.txt");
-		Si::remove_file(test_file, Si::throw_);
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file = watched_dir / ventura::relative_path("test.txt");
+		ventura::remove_file(test_file, Si::throw_);
 
 		test_single_event(
 			watched_dir,
 			std::bind(touch, test_file),
-			[&test_file](file_notification const &event)
+			[&test_file](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::add == event.type);
+			BOOST_CHECK(ventura::file_notification_type::add == event.type);
 			BOOST_CHECK(equivalent(test_file.to_boost_path(), event.name.to_boost_path()));
 		});
 	}
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_add_directory)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file = watched_dir / "test";
-		Si::remove_file(test_file, Si::throw_);
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file = watched_dir / "test";
+		ventura::remove_file(test_file, Si::throw_);
 
 		test_single_event(
 			watched_dir,
@@ -91,17 +91,17 @@ namespace Si
 		{
 			boost::filesystem::create_directory(test_file.to_boost_path());
 		},
-			[&test_file](file_notification const &event)
+			[&test_file](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::add == event.type);
+			BOOST_CHECK(ventura::file_notification_type::add == event.type);
 			BOOST_CHECK(equivalent(test_file.to_boost_path(), event.name.to_boost_path()));
 		});
 	}
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file = watched_dir / "test.txt";
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file = watched_dir / "test.txt";
 
 		touch(test_file);
 
@@ -111,17 +111,17 @@ namespace Si
 		{
 			boost::filesystem::remove(test_file.to_boost_path());
 		},
-			[&test_file, &watched_dir](file_notification const &event)
+			[&test_file, &watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::remove == event.type);
+			BOOST_CHECK(ventura::file_notification_type::remove == event.type);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
 		});
 	}
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_directory)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file = watched_dir / "test";
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file = watched_dir / "test";
 
 		boost::filesystem::create_directory(test_file.to_boost_path());
 
@@ -131,9 +131,9 @@ namespace Si
 		{
 			boost::filesystem::remove(test_file.to_boost_path());
 		},
-			[&test_file, &watched_dir](file_notification const &event)
+			[&test_file, &watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::remove == event.type);
+			BOOST_CHECK(ventura::file_notification_type::remove == event.type);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
 		});
 	}
@@ -142,24 +142,24 @@ namespace Si
 #if SILICIUM_HAS_FILE_SINK
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_write)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file = watched_dir / "test.txt";
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file = watched_dir / "test.txt";
 		
 		boost::filesystem::create_directories(watched_dir.to_boost_path());
-		Si::file_handle file = Si::overwrite_file(Si::native_path_string(test_file.c_str())).move_value();
+		Si::file_handle file = ventura::overwrite_file(Si::native_path_string(test_file.c_str())).move_value();
 
 		test_single_event(
 			watched_dir,
 			[&file]
 		{
-			Si::file_sink sink(file.handle);
-			Si::throw_if_error(Si::append(sink, Si::file_sink_element(Si::make_c_str_range("hello\n"))));
-			Si::throw_if_error(Si::append(sink, Si::file_sink_element(Si::flush())));
+			ventura::file_sink sink(file.handle);
+			Si::throw_if_error(Si::append(sink, ventura::file_sink_element(Si::make_c_str_range("hello\n"))));
+			Si::throw_if_error(Si::append(sink, ventura::file_sink_element(ventura::flush())));
 			//we write to the file without closing it
 		},
-			[&test_file, &watched_dir](file_notification const &event)
+			[&test_file, &watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(event.type == file_notification_type::change_content || event.type == file_notification_type::change_content_or_metadata);
+			BOOST_CHECK(event.type == ventura::file_notification_type::change_content || event.type == ventura::file_notification_type::change_content_or_metadata);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
 		});
 	}
@@ -167,8 +167,8 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_close)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file = watched_dir / "test.txt";
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file = watched_dir / "test.txt";
 
 		touch(test_file);
 
@@ -184,17 +184,17 @@ namespace Si
 			//The closing of the file is expected to trigger a change event.
 			file.close();
 		},
-			[&test_file, &watched_dir](file_notification const &event)
+			[&test_file, &watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(event.type == file_notification_type::change_content || event.type == file_notification_type::change_content_or_metadata);
+			BOOST_CHECK(event.type == ventura::file_notification_type::change_content || event.type == ventura::file_notification_type::change_content_or_metadata);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
 		});
 	}
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_metadata)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file = watched_dir / "test.txt";
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file = watched_dir / "test.txt";
 
 		touch(test_file);
 
@@ -214,19 +214,19 @@ namespace Si
 			BOOST_REQUIRE(!chmod(test_file.c_str(), 0755));
 #endif
 		},
-			[&test_file, &watched_dir](file_notification const &event)
+			[&test_file, &watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::change_content_or_metadata == event.type || file_notification_type::change_metadata == event.type);
+			BOOST_CHECK(ventura::file_notification_type::change_content_or_metadata == event.type || ventura::file_notification_type::change_metadata == event.type);
 			BOOST_CHECK_EQUAL(test_file, watched_dir / event.name);
 		});
 	}
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_move_out)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const watched_dir = root_dir / "watched";
-		Si::absolute_path const original_name = watched_dir / "test.txt";
-		Si::absolute_path const new_name = root_dir / "renamed.txt";
+		ventura::absolute_path const root_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const watched_dir = root_dir / "watched";
+		ventura::absolute_path const original_name = watched_dir / "test.txt";
+		ventura::absolute_path const new_name = root_dir / "renamed.txt";
 
 		boost::filesystem::remove_all(new_name.to_boost_path());
 		boost::filesystem::remove_all(watched_dir.to_boost_path());
@@ -240,19 +240,19 @@ namespace Si
 		{
 			boost::filesystem::rename(original_name.to_boost_path(), new_name.to_boost_path());
 		},
-			[&original_name, &watched_dir](file_notification const &event)
+			[&original_name, &watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::remove == event.type);
+			BOOST_CHECK(ventura::file_notification_type::remove == event.type);
 			BOOST_CHECK_EQUAL(original_name, watched_dir / event.name);
 		});
 	}
 
 	BOOST_AUTO_TEST_CASE(file_system_watcher_move_in)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const watched_dir = root_dir / "watched";
-		Si::absolute_path const original_name = root_dir / "test.txt";
-		Si::absolute_path const new_name = watched_dir / "renamed.txt";
+		ventura::absolute_path const root_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const watched_dir = root_dir / "watched";
+		ventura::absolute_path const original_name = root_dir / "test.txt";
+		ventura::absolute_path const new_name = watched_dir / "renamed.txt";
 
 		boost::filesystem::remove_all(watched_dir.to_boost_path());
 
@@ -265,9 +265,9 @@ namespace Si
 		{
 			boost::filesystem::rename(original_name.to_boost_path(), new_name.to_boost_path());
 		},
-			[&new_name, &watched_dir](file_notification const &event)
+			[&new_name, &watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::add == event.type);
+			BOOST_CHECK(ventura::file_notification_type::add == event.type);
 			BOOST_CHECK_EQUAL(new_name, watched_dir / event.name);
 		});
 	}
@@ -276,9 +276,9 @@ namespace Si
 	//we cannot yet detect the renaming of the watched directory
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_watched_dir)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const watched_dir = root_dir / "watched";
-		Si::absolute_path const new_name = root_dir / "renamed";
+		ventura::absolute_path const root_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const watched_dir = root_dir / "watched";
+		ventura::absolute_path const new_name = root_dir / "renamed";
 
 		boost::filesystem::remove_all(watched_dir.to_boost_path());
 		boost::filesystem::remove_all(new_name.to_boost_path());
@@ -291,9 +291,9 @@ namespace Si
 		{
 			boost::filesystem::rename(watched_dir.to_boost_path(), new_name.to_boost_path());
 		},
-			[&watched_dir](file_notification const &event)
+			[&watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::move_self == event.type);
+			BOOST_CHECK(ventura::file_notification_type::move_self == event.type);
 			BOOST_CHECK_EQUAL("", event.name.underlying());
 		});
 	}
@@ -305,8 +305,8 @@ namespace Si
 	//https://github.com/travis-ci/travis-ci/issues/2342
 	BOOST_AUTO_TEST_CASE(file_system_watcher_remove_watched_dir)
 	{
-		Si::absolute_path const root_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const watched_dir = root_dir / "watched";
+		ventura::absolute_path const root_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const watched_dir = root_dir / "watched";
 
 		boost::filesystem::remove_all(watched_dir.to_boost_path());
 
@@ -318,9 +318,9 @@ namespace Si
 		{
 			boost::filesystem::remove(watched_dir.to_boost_path());
 		},
-			[&watched_dir](file_notification const &event)
+			[&watched_dir](ventura::file_notification const &event)
 		{
-			BOOST_CHECK(file_notification_type::remove_self == event.type);
+			BOOST_CHECK(ventura::file_notification_type::remove_self == event.type);
 			BOOST_CHECK_EQUAL("", event.name.underlying());
 		});
 	}
@@ -329,39 +329,39 @@ namespace Si
 #if SILICIUM_HAS_SPAWN_COROUTINE
 	BOOST_AUTO_TEST_CASE(file_system_watcher_rename_in_dir)
 	{
-		Si::absolute_path const watched_dir = Si::get_current_working_directory(Si::throw_);
-		Si::absolute_path const test_file_a = watched_dir / "test_a.txt";
-		Si::absolute_path const test_file_b = watched_dir / "test_b.txt";
+		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);
+		ventura::absolute_path const test_file_a = watched_dir / "test_a.txt";
+		ventura::absolute_path const test_file_b = watched_dir / "test_b.txt";
 
 		touch(test_file_a);
 		boost::filesystem::remove(test_file_b.to_boost_path());
 
 		boost::asio::io_service io;
-		single_directory_watcher watcher(io, watched_dir);
+		ventura::single_directory_watcher watcher(io, watched_dir);
 
 		bool got_something = false;
 
 		spawn_coroutine([&watcher, &test_file_a, &test_file_b, &got_something](spawn_context &yield)
 		{
-			optional<error_or<file_notification>> first_event = yield.get_one(Si::ref(watcher));
+			optional<error_or<ventura::file_notification>> first_event = yield.get_one(Si::ref(watcher));
 			BOOST_REQUIRE(first_event);
-			optional<error_or<file_notification>> second_event = yield.get_one(Si::ref(watcher));
+			optional<error_or<ventura::file_notification>> second_event = yield.get_one(Si::ref(watcher));
 			BOOST_REQUIRE(second_event);
 
 			got_something = true;
 
-			file_notification *remove = &first_event->get();
-			file_notification *add = &second_event->get();
-			if (add->type != file_notification_type::add)
+			ventura::file_notification *remove = &first_event->get();
+			ventura::file_notification *add = &second_event->get();
+			if (add->type != ventura::file_notification_type::add)
 			{
 				using std::swap;
 				swap(remove, add);
 			}
 
-			BOOST_CHECK(file_notification_type::remove == remove->type);
+			BOOST_CHECK(ventura::file_notification_type::remove == remove->type);
 			BOOST_CHECK_EQUAL(leaf(test_file_a), remove->name);
 
-			BOOST_CHECK(file_notification_type::add == add->type);
+			BOOST_CHECK(ventura::file_notification_type::add == add->type);
 			BOOST_CHECK_EQUAL(leaf(test_file_b), add->name);
 		});
 

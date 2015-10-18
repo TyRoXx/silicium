@@ -3,14 +3,14 @@
 
 #include <algorithm>
 #include <boost/asio.hpp>
-#include <silicium/absolute_path.hpp>
+#include <ventura/absolute_path.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/observable/observer.hpp>
-#include <silicium/win32/file_notification.hpp>
+#include <ventura/win32/file_notification.hpp>
 
-namespace Si
+namespace ventura
 {
 	namespace win32
 	{

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_FLUSH_HPP
 #define SILICIUM_FLUSH_HPP
 
-namespace Si
+namespace ventura
 {
 	struct flush
 	{

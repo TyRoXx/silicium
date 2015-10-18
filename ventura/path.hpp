@@ -6,7 +6,7 @@
 #include <silicium/noexcept_string.hpp>
 #include <boost/filesystem/path.hpp>
 
-namespace Si
+namespace ventura
 {
 	struct path
 	{
@@ -15,7 +15,7 @@ namespace Si
 #ifdef _WIN32
 			boost::filesystem::path
 #else
-			noexcept_string
+			Si::noexcept_string
 #endif
 			underlying_type;
 
@@ -23,7 +23,7 @@ namespace Si
 		{
 		}
 
-		explicit path(noexcept_string const &value)
+		explicit path(Si::noexcept_string const &value)
 			: m_value(value)
 		{
 		}
@@ -119,7 +119,7 @@ namespace Si
 #ifdef _WIN32
 		boost::filesystem::path const &
 #else
-		noexcept_string const &
+		Si::noexcept_string const &
 #endif
 		underlying() const BOOST_NOEXCEPT
 		{
@@ -142,7 +142,7 @@ namespace Si
 	};
 
 #if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(is_handle<path>::value);
+	BOOST_STATIC_ASSERT(Si::is_handle<path>::value);
 #endif
 
 	inline std::ostream &operator << (std::ostream &out, path const &p)
@@ -222,9 +222,9 @@ namespace Si
 namespace std
 {
 	template <>
-	struct hash< ::Si::path>
+	struct hash< ::ventura::path>
 	{
-		std::size_t operator()(Si::path const &value) const
+		std::size_t operator()(ventura::path const &value) const
 		{
 			return hash_value(value);
 		}

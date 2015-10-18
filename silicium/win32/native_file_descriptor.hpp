@@ -5,7 +5,7 @@
 #include <silicium/win32/win32.hpp>
 #include <boost/config.hpp>
 
-namespace Si
+namespace ventura
 {
 	typedef HANDLE native_file_descriptor;
 

@@ -4,7 +4,7 @@
 #include <boost/detail/scoped_enum_emulation.hpp>
 #include <ventura/relative_path.hpp>
 
-namespace Si
+namespace ventura
 {
 #ifdef BOOST_SCOPED_ENUM_DECLARE_BEGIN
 	BOOST_SCOPED_ENUM_DECLARE_BEGIN(file_notification_type)
@@ -47,7 +47,7 @@ namespace Si
 	};
 
 #if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(is_handle<file_notification>::value);
+	BOOST_STATIC_ASSERT(Si::is_handle<file_notification>::value);
 #endif
 }
 

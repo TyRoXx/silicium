@@ -3,9 +3,9 @@
 
 #include <ventura/absolute_path.hpp>
 
-namespace Si
+namespace ventura
 {
-	Si::absolute_path const cmake_exe = *Si::absolute_path::create(
+	absolute_path const cmake_exe = *absolute_path::create(
 #ifdef _WIN32
 		L"C:\\Program Files (x86)\\CMake\\bin\\cmake.exe"
 #else

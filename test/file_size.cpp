@@ -18,26 +18,26 @@ namespace
 BOOST_AUTO_TEST_CASE(file_size_empty)
 {
 	auto const file = test_root() / "file_size_empty.txt";
-	Si::file_handle handle = Si::overwrite_file(Si::native_path_string(file.c_str())).move_value();
-	BOOST_CHECK_EQUAL(Si::make_optional<boost::uint64_t>(0), Si::file_size(handle.handle).get());
+	Si::file_handle handle = ventura::overwrite_file(Si::native_path_string(file.c_str())).move_value();
+	BOOST_CHECK_EQUAL(Si::make_optional<boost::uint64_t>(0), ventura::file_size(handle.handle).get());
 }
 
 #if SILICIUM_HAS_FILE_SINK
 BOOST_AUTO_TEST_CASE(file_size_non_empty)
 {
 	auto const file = test_root() / "file_size_non_empty.txt";
-	Si::file_handle handle = Si::overwrite_file(Si::native_path_string(file.c_str())).move_value();
+	Si::file_handle handle = ventura::overwrite_file(Si::native_path_string(file.c_str())).move_value();
 	{
-		Si::file_sink sink(handle.handle);
-		Si::append(sink, Si::file_sink::element_type{Si::make_c_str_range("Test")});
+		ventura::file_sink sink(handle.handle);
+		Si::append(sink, ventura::file_sink::element_type{Si::make_c_str_range("Test")});
 	}
-	BOOST_CHECK_EQUAL(Si::make_optional<boost::uintmax_t>(4), Si::file_size(handle.handle).get());
+	BOOST_CHECK_EQUAL(Si::make_optional<boost::uintmax_t>(4), ventura::file_size(handle.handle).get());
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(file_size_error)
 {
-	Si::error_or<Si::optional<boost::uint64_t>> size = Si::file_size(
+	Si::error_or<Si::optional<boost::uint64_t>> size = ventura::file_size(
 #ifdef _WIN32
 		INVALID_HANDLE_VALUE
 #else

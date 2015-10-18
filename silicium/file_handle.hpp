@@ -64,7 +64,7 @@ namespace Si
 	};
 
 #if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(is_handle<file_handle>::value);
+	BOOST_STATIC_ASSERT(Si::is_handle<file_handle>::value);
 #endif
 }
 

@@ -1,7 +1,7 @@
 #ifndef SILICIUM_FILE_SIZE_HPP
 #define SILICIUM_FILE_SIZE_HPP
 
-#include <ventura/file_handle.hpp>
+#include <silicium/file_handle.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/get_last_error.hpp>
 
@@ -9,7 +9,7 @@
 #	include <sys/stat.h>
 #endif
 
-namespace Si
+namespace ventura
 {
 	/// Returns the size of the regular file given by the file descriptor or none if the
 	/// file is not regular.
@@ -27,7 +27,7 @@ namespace Si
 		struct stat buffer;
 		if (fstat(file, &buffer) < 0)
 		{
-			return get_last_error();
+			return Si::get_last_error();
 		}
 		if ((buffer.st_mode & S_IFMT) != S_IFREG)
 		{

@@ -3,7 +3,7 @@
 
 #include <silicium/is_handle.hpp>
 
-namespace Si
+namespace ventura
 {
 	typedef
 #ifdef _WIN32
@@ -13,7 +13,7 @@ namespace Si
 #endif
 		native_path_char;
 
-	BOOST_STATIC_ASSERT(is_handle<native_path_char>::value);
+	BOOST_STATIC_ASSERT(Si::is_handle<native_path_char>::value);
 }
 
 #endif

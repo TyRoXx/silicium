@@ -2,7 +2,7 @@
 #define SILICIUM_FILE_OPERATIONS_HPP
 
 #include <silicium/error_handler.hpp>
-#include <silicium/run_process.hpp>
+#include <ventura/run_process.hpp>
 #include <silicium/identity.hpp>
 #ifdef _WIN32
 #	include <silicium/win32/win32.hpp>
@@ -27,12 +27,12 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 
-namespace Si
+namespace ventura
 {
 #if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
 	template <class ErrorHandler>
 	inline auto get_current_working_directory(ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<absolute_path>()))
 	{
 		boost::system::error_code ec;
 		auto result = boost::filesystem::current_path(ec);
@@ -40,40 +40,40 @@ namespace Si
 		{
 			return *absolute_path::create(std::move(result));
 		}
-		return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
+		return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<absolute_path>());
 	}
 
 	template <class ErrorHandler>
 	inline auto remove_file(absolute_path const &name, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::remove(name.to_boost_path(), ec);
-		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
+		return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
 	}
 
 	template <class ErrorHandler>
 	inline auto create_directories(absolute_path const &directories, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::create_directories(directories.to_boost_path(), ec);
-		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
+		return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
 	}
 
 	template <class ErrorHandler>
 	inline auto remove_all(absolute_path const &directories, ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<boost::uintmax_t>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<boost::uintmax_t>()))
 	{
 		boost::system::error_code ec;
 		auto count = boost::filesystem::remove_all(directories.to_boost_path(), ec);
 		if (!!ec)
 		{
-			return std::forward<ErrorHandler>(handle_error)(ec, identity<boost::uintmax_t>());
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<boost::uintmax_t>());
 		}
 		return count;
 	}
@@ -113,22 +113,22 @@ namespace Si
 	template <class ErrorHandler>
 	auto recreate_directories(absolute_path const &directories, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code error = detail::recreate_directories(directories);
-		return std::forward<ErrorHandler>(handle_error)(error, identity<void>());
+		return std::forward<ErrorHandler>(handle_error)(error, Si::identity<void>());
 	}
 
 	template <class ErrorHandler>
 	auto copy(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::copy(from.to_boost_path(), to.to_boost_path(), ec);
-		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
+		return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
 	}
 
 #ifdef _WIN32
@@ -149,11 +149,11 @@ namespace Si
 	auto copy_recursively(
 		absolute_path const &from,
 		absolute_path const &to,
-		Sink<char, success>::interface *output,
+		Si::Sink<char, Si::success>::interface *output,
 		ErrorHandler &&handle_error
 	)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
 #endif
 	{
 #ifdef _WIN32
@@ -171,30 +171,30 @@ namespace Si
 		{
 			throw std::runtime_error("SHFileOperationW FO_COPY from " + Si::to_utf8_string(from) + " to " + Si::to_utf8_string(to) + " failed with return code " + boost::lexical_cast<std::string>(rc));
 		}
-		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), identity<void>());
+		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), Si::identity<void>());
 #else
-		std::vector<os_string> arguments;
+		std::vector<Si::os_string> arguments;
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("-Rv"));
 		arguments.push_back(from.c_str());
 		arguments.push_back(to.c_str());
-		auto null_output = Sink<char, success>::erase(null_sink<char, success>());
+		auto null_output = Si::Sink<char, Si::success>::erase(Si::null_sink<char, Si::success>());
 		if (!output)
 		{
 			output = &null_output;
 		}
-		error_or<int> result = run_process(*Si::absolute_path::create("/bin/cp"), arguments, from, *output);
+		Si::error_or<int> result = run_process(*absolute_path::create("/bin/cp"), arguments, from, *output);
 		if (!result.is_error() && (result.get() != 0))
 		{
 			throw std::runtime_error("cp failed"); //TODO: return a custom error_code for that
 		}
-		return std::forward<ErrorHandler>(handle_error)(result.error(), identity<void>());
+		return std::forward<ErrorHandler>(handle_error)(result.error(), Si::identity<void>());
 #endif
 	}
 
 	template <class ErrorHandler>
 	SILICIUM_USE_RESULT
 	auto file_exists(absolute_path const &file, ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<bool>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<bool>()))
 	{
 		boost::system::error_code ec;
 		boost::filesystem::file_status status = boost::filesystem::status(file.to_boost_path(), ec);
@@ -204,7 +204,7 @@ namespace Si
 		}
 		if (ec)
 		{
-			return std::forward<ErrorHandler>(handle_error)(ec, identity<bool>());
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<bool>());
 		}
 		return true;
 	}
@@ -212,17 +212,17 @@ namespace Si
 	template <class ErrorHandler>
 	auto rename(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<void>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
 		boost::filesystem::rename(from.to_boost_path(), to.to_boost_path(), ec);
-		return std::forward<ErrorHandler>(handle_error)(ec, identity<void>());
+		return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
 	}
 
 	template <class ErrorHandler>
 	auto get_current_executable_path(ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<absolute_path>()))
 	{
 #ifdef _WIN32
 		//will be enough for most cases
@@ -240,7 +240,7 @@ namespace Si
 			case ERROR_SUCCESS:
 			{
 				boost::filesystem::path path(buffer.begin(), buffer.begin() + length);
-				return *Si::absolute_path::create(std::move(path));
+				return *ventura::absolute_path::create(std::move(path));
 			}
 
 			default:
@@ -252,9 +252,9 @@ namespace Si
 		auto result = boost::filesystem::read_symlink("/proc/self/exe", ec);
 		if (!!ec)
 		{
-			return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<absolute_path>());
 		}
-		return *Si::absolute_path::create(std::move(result));
+		return *absolute_path::create(std::move(result));
 #else
 		std::vector<char> buffer(256);
 		std::uint32_t length = static_cast<std::uint32_t>(buffer.size());
@@ -267,19 +267,19 @@ namespace Si
 				boost::throw_exception(std::logic_error("_NSGetExecutablePath failed unexpectedly"));
 			}
 		}
-		return *Si::absolute_path::create(buffer.data());
+		return *absolute_path::create(buffer.data());
 #endif
 	}
 
 	template <class ErrorHandler>
 	auto temporary_directory(ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), identity<absolute_path>()))
+		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<absolute_path>()))
 	{
 		boost::system::error_code ec;
 		auto temp = boost::filesystem::temp_directory_path(ec);
 		if (!!ec)
 		{
-			return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<absolute_path>());
 		}
 		return *absolute_path::create(std::move(temp));
 	}
@@ -296,7 +296,7 @@ namespace Si
 		};
 	}
 
-	inline Si::absolute_path get_home()
+	inline ventura::absolute_path get_home()
 	{
 		PWSTR path;
 		HRESULT rc = SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
@@ -305,12 +305,12 @@ namespace Si
 			throw std::runtime_error("Could not get home");
 		}
 		std::unique_ptr<wchar_t, detail::co_task_mem_deleter> raii_path(path);
-		return Si::absolute_path::create(raii_path.get()).or_throw([] { throw std::runtime_error("Windows returned a non-absolute path for home"); });
+		return absolute_path::create(raii_path.get()).or_throw([] { throw std::runtime_error("Windows returned a non-absolute path for home"); });
 	}
 #else
-	inline Si::absolute_path get_home()
+	inline absolute_path get_home()
 	{
-		return *Si::absolute_path::create(getpwuid(getuid())->pw_dir);
+		return *absolute_path::create(getpwuid(getuid())->pw_dir);
 	}
 #endif
 

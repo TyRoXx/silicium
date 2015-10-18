@@ -2,11 +2,11 @@
 #define SILICIUM_WIN32_OPEN_HPP
 
 #include <silicium/error_or.hpp>
-#include <silicium/file_handle.hpp>
+#include <ventura/file_handle.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/get_last_error.hpp>
 
-namespace Si
+namespace ventura
 {
 	SILICIUM_USE_RESULT
 	inline error_or<file_handle> open_reading(native_path_string name)

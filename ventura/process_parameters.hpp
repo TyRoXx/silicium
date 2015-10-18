@@ -10,7 +10,7 @@
 #include <string>
 #include <boost/filesystem/path.hpp>
 
-namespace Si
+namespace ventura
 {
 	enum class environment_inheritance
 	{
@@ -23,21 +23,21 @@ namespace Si
 		absolute_path executable;
 
 		/// the values for the child's argv[1...]
-		std::vector<os_string> arguments;
+		std::vector<Si::os_string> arguments;
 
 		/// must be an existing path, otherwise the child cannot launch properly
 		absolute_path current_path;
 
 		/// stdout of the child process will be written to this sink. When nullptr, output is discarded.
-		Sink<char, success>::interface *out;
+		Si::Sink<char, Si::success>::interface *out;
 
 		/// stderr of the child process will be written to this sink. When nullptr, output is discarded.
-		Sink<char, success>::interface *err;
+		Si::Sink<char, Si::success>::interface *err;
 
 		/// provides stdin to the child process. When nullptr, the input will be empty.
-		Source<char>::interface *in;
+		Si::Source<char>::interface *in;
 
-		std::vector<std::pair<os_char const *, os_char const *>> additional_environment;
+		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> additional_environment;
 
 		environment_inheritance inheritance;
 

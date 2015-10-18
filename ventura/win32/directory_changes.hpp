@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <boost/asio/io_service.hpp>
 #include <silicium/observable/observer.hpp>
-#include <silicium/win32/file_notification.hpp>
+#include <ventura/win32/file_notification.hpp>
 #include <silicium/config.hpp>
-#include <silicium/path.hpp>
+#include <ventura/path.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
 #include <boost/ref.hpp>
@@ -15,7 +15,7 @@
 #if SILICIUM_HAS_EXCEPTIONS
 #include <future>
 
-namespace Si
+namespace ventura
 {
 	namespace win32
 	{

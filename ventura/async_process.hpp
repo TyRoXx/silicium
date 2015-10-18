@@ -3,8 +3,8 @@
 
 #include <silicium/os_string.hpp>
 #include <ventura/absolute_path.hpp>
-#include <silicium/process_parameters.hpp>
-#include <ventura/file_handle.hpp>
+#include <ventura/process_parameters.hpp>
+#include <silicium/file_handle.hpp>
 #include <silicium/process_handle.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/observable/virtualized.hpp>
@@ -36,14 +36,14 @@
 //TODO: avoid the Boost filesystem operations that require exceptions
 #define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
 
-namespace Si
+namespace ventura
 {
 	struct async_process_parameters
 	{
 		absolute_path executable;
 
 		/// the values for the child's argv[1...]
-		std::vector<os_string> arguments;
+		std::vector<Si::os_string> arguments;
 
 		/// must be an existing path, otherwise the child cannot launch properly
 		absolute_path current_path;
@@ -51,9 +51,9 @@ namespace Si
 
 	struct async_process
 	{
-		process_handle process;
+		Si::process_handle process;
 #ifndef _WIN32
-		file_handle child_error;
+		Si::file_handle child_error;
 #endif
 
 		async_process() BOOST_NOEXCEPT
@@ -61,12 +61,12 @@ namespace Si
 		}
 
 #ifdef _WIN32
-		explicit async_process(process_handle process) BOOST_NOEXCEPT
+		explicit async_process(Si::process_handle process) BOOST_NOEXCEPT
 			: process(std::move(process))
 		{
 		}
 #else
-		explicit async_process(process_handle process, file_handle child_error) BOOST_NOEXCEPT
+		explicit async_process(Si::process_handle process, Si::file_handle child_error) BOOST_NOEXCEPT
 			: process(std::move(process))
 			, child_error(std::move(child_error))
 		{
@@ -103,14 +103,14 @@ namespace Si
 		{
 		}
 
-		error_or<int> wait_for_exit() BOOST_NOEXCEPT
+		Si::error_or<int> wait_for_exit() BOOST_NOEXCEPT
 		{
 #ifndef _WIN32
 			int error = 0;
 			ssize_t read_error = read(child_error.handle, &error, sizeof(error));
 			if (read_error < 0)
 			{
-				return get_last_error();
+				return Si::get_last_error();
 			}
 			if (read_error != 0)
 			{
@@ -127,9 +127,9 @@ namespace Si
 #ifdef _WIN32
 	namespace detail
 	{
-		inline os_string build_command_line(std::vector<os_string> const &arguments)
+		inline Si::os_string build_command_line(std::vector<Si::os_string> const &arguments)
 		{
-			os_string command_line;
+			Si::os_string command_line;
 			for (auto a = begin(arguments); a != end(arguments); ++a)
 			{
 				if (a != begin(arguments))
@@ -142,15 +142,15 @@ namespace Si
 		}
 	}
 
-	inline error_or<async_process> launch_process(
+	inline Si::error_or<async_process> launch_process(
 		async_process_parameters parameters,
-		native_file_descriptor standard_input,
-		native_file_descriptor standard_output,
-		native_file_descriptor standard_error,
-		std::vector<std::pair<os_char const *, os_char const *>> environment,
+		Si::native_file_descriptor standard_input,
+		Si::native_file_descriptor standard_output,
+		Si::native_file_descriptor standard_error,
+		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment,
 		environment_inheritance inheritance)
 	{
-		std::vector<os_string> all_arguments;
+		std::vector<Si::os_string> all_arguments;
 		all_arguments.emplace_back(L"\"" + parameters.executable.underlying().wstring() + L"\"");
 		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
 		win32::winapi_string command_line = detail::build_command_line(all_arguments);
@@ -273,12 +273,12 @@ namespace Si
 		return async_process(std::move(process_closer));
 	}
 #else
-	inline error_or<async_process> launch_process(
+	inline Si::error_or<async_process> launch_process(
 		async_process_parameters parameters,
-		native_file_descriptor standard_input,
-		native_file_descriptor standard_output,
-		native_file_descriptor standard_error,
-		std::vector<std::pair<os_char const *, os_char const *>> environment,
+		Si::native_file_descriptor standard_input,
+		Si::native_file_descriptor standard_output,
+		Si::native_file_descriptor standard_error,
+		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment,
 		environment_inheritance inheritance)
 	{
 		auto executable = parameters.executable.underlying();
@@ -291,7 +291,7 @@ namespace Si
 		});
 		argument_pointers.emplace_back(nullptr);
 
-		pipe child_error = make_pipe().move_value();
+		Si::pipe child_error = Si::make_pipe().move_value();
 
 		pid_t const forked = fork();
 		if (forked < 0)
@@ -333,7 +333,7 @@ namespace Si
 
 			child_error.read.close();
 
-			boost::system::error_code ec = detail::set_close_on_exec(child_error.write.handle);
+			boost::system::error_code ec = Si::detail::set_close_on_exec(child_error.write.handle);
 			if (ec)
 			{
 				fail_with_error(ec.value());
@@ -413,7 +413,7 @@ namespace Si
 		//parent
 		else
 		{
-			return async_process(process_handle(forked), std::move(child_error.read));
+			return async_process(Si::process_handle(forked), std::move(child_error.read));
 		}
 	}
 #endif

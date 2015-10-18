@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-namespace Si
+namespace ventura
 {
 	struct absolute_path
 	{
@@ -68,7 +68,7 @@ namespace Si
 #ifdef _WIN32
 		boost::filesystem::path const &
 #else
-		noexcept_string const &
+		Si::noexcept_string const &
 #endif
 		underlying() const BOOST_NOEXCEPT
 		{
@@ -82,9 +82,9 @@ namespace Si
 		}
 
 		SILICIUM_USE_RESULT
-		native_path_string safe_c_str() const BOOST_NOEXCEPT
+		Si::native_path_string safe_c_str() const BOOST_NOEXCEPT
 		{
-			return native_path_string(c_str());
+			return Si::native_path_string(c_str());
 		}
 
 		void combine(relative_path const &back)
@@ -107,41 +107,41 @@ namespace Si
 		}
 
 		SILICIUM_USE_RESULT
-		static optional<absolute_path> create(boost::filesystem::path const &maybe_absolute)
+		static Si::optional<absolute_path> create(boost::filesystem::path const &maybe_absolute)
 		{
 			if (maybe_absolute.is_absolute())
 			{
 				return absolute_path(maybe_absolute);
 			}
-			return none;
+			return Si::none;
 		}
 
 		SILICIUM_USE_RESULT
-		static optional<absolute_path> create(noexcept_string const &maybe_absolute)
+		static Si::optional<absolute_path> create(Si::noexcept_string const &maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute.c_str()));
 		}
 
 		SILICIUM_USE_RESULT
-		static optional<absolute_path> create(char const *maybe_absolute)
+		static Si::optional<absolute_path> create(char const *maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute));
 		}
 
 #ifdef _WIN32
 		SILICIUM_USE_RESULT
-		static optional<absolute_path> create(wchar_t const *maybe_absolute)
+		static Si::optional<absolute_path> create(wchar_t const *maybe_absolute)
 		{
 			return create(boost::filesystem::path(maybe_absolute));
 		}
 #endif
 
-		optional<path_segment> name() const
+		Si::optional<path_segment> name() const
 		{
 			auto &&path = to_boost_path();
 			if (!path.has_filename())
 			{
-				return none;
+				return Si::none;
 			}
 			return path_segment::create(path.filename());
 		}
@@ -173,7 +173,7 @@ namespace Si
 		{
 			return in;
 		}
-		optional<absolute_path> checked = absolute_path::create(std::move(temp));
+		Si::optional<absolute_path> checked = absolute_path::create(std::move(temp));
 		if (!checked)
 		{
 			in.setstate(std::ios::failbit);
@@ -250,7 +250,7 @@ namespace Si
 	}
 
 	SILICIUM_USE_RESULT
-	inline optional<absolute_path> parent(absolute_path const &whole)
+	inline Si::optional<absolute_path> parent(absolute_path const &whole)
 	{
 		//TODO: do this efficiently
 		auto boosted = whole.to_boost_path();
@@ -258,7 +258,7 @@ namespace Si
 		{
 			return *absolute_path::create(boosted.parent_path());
 		}
-		return none;
+		return Si::none;
 	}
 
 	SILICIUM_USE_RESULT
@@ -293,17 +293,17 @@ namespace Si
 		return result;
 	}
 
-	inline noexcept_string to_utf8_string(boost::filesystem::path const &path)
+	inline Si::noexcept_string to_utf8_string(boost::filesystem::path const &path)
 	{
-		return to_utf8_string(path.string());
+		return Si::to_utf8_string(path.string());
 	}
 
-	inline noexcept_string to_utf8_string(absolute_path const &path)
+	inline Si::noexcept_string to_utf8_string(absolute_path const &path)
 	{
 		return to_utf8_string(path.to_boost_path());
 	}
 
-	inline os_string to_os_string(absolute_path const &path)
+	inline Si::os_string to_os_string(absolute_path const &path)
 	{
 		return path.to_boost_path().
 #ifdef _WIN32
@@ -317,10 +317,10 @@ namespace Si
 namespace std
 {
 	template <>
-	struct hash< ::Si::absolute_path>
+	struct hash< ::ventura::absolute_path>
 	{
 		SILICIUM_USE_RESULT
-		std::size_t operator()(Si::absolute_path const &value) const
+		std::size_t operator()(ventura::absolute_path const &value) const
 		{
 			return hash_value(value);
 		}

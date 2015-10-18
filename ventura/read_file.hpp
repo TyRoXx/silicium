@@ -5,9 +5,9 @@
 #include <silicium/memory_range.hpp>
 #include <silicium/native_file_descriptor.hpp>
 
-namespace Si
+namespace ventura
 {
-	inline error_or<std::size_t> read(native_file_descriptor file, mutable_memory_range destination)
+	inline Si::error_or<std::size_t> read(Si::native_file_descriptor file, Si::mutable_memory_range destination)
 	{
 #ifdef _WIN32
 		DWORD read_bytes = 0;
@@ -26,7 +26,7 @@ namespace Si
 		ssize_t const read_bytes = ::read(file, destination.begin(), static_cast<std::size_t>(destination.size()));
 		if (read_bytes < 0)
 		{
-			return get_last_error();
+			return Si::get_last_error();
 		}
 #endif
 		if (read_bytes == 0)

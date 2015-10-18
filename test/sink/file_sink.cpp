@@ -28,13 +28,13 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 {
 	boost::filesystem::path const file_name = boost::filesystem::temp_directory_path() / "silicium_file_sink_success.txt";
 	{
-		Si::file_handle file = get(Si::overwrite_file(Si::native_path_string(file_name.c_str())));
-		Si::file_sink sink(file.handle);
-		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::make_c_str_range("test")}));
-		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::flush{}}));
-		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::seek_set{4}}));
-		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::seek_add{-1}}));
-		std::array<Si::file_sink_element, 3> write_vector
+		Si::file_handle file = get(ventura::overwrite_file(Si::native_path_string(file_name.c_str())));
+		ventura::file_sink sink(file.handle);
+		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, ventura::file_sink_element{Si::make_c_str_range("test")}));
+		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, ventura::file_sink_element{ventura::flush{}}));
+		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, ventura::file_sink_element{ventura::seek_set{4}}));
+		BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, ventura::file_sink_element{ventura::seek_add{-1}}));
+		std::array<ventura::file_sink_element, 3> write_vector
 		{{
 			Si::make_c_str_range("aaa"),
 			Si::make_c_str_range("bbbb"),
@@ -51,13 +51,13 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 #if SILICIUM_HAS_FILE_SINK
 namespace
 {
-	Si::absolute_path get_readonly_file()
+	ventura::absolute_path get_readonly_file()
 	{
 #ifdef __linux__
-		return *Si::absolute_path::create("/proc/cpuinfo");
+		return *ventura::absolute_path::create("/proc/cpuinfo");
 #endif
 #ifdef _WIN32
-		Si::absolute_path file_name = *Si::absolute_path::create(boost::filesystem::temp_directory_path()) / Si::relative_path("silicium_file_sink_readonly.txt");
+		ventura::absolute_path file_name = *ventura::absolute_path::create(boost::filesystem::temp_directory_path()) / ventura::relative_path("silicium_file_sink_readonly.txt");
 		{
 			Si::error_or<Si::file_handle> file = Si::create_file(file_name.safe_c_str());
 			if (file.is_error() && (file.error() != boost::system::error_code(ERROR_FILE_EXISTS, boost::system::get_system_category())))
@@ -72,25 +72,25 @@ namespace
 		return file_name;
 #endif
 #ifdef BOOST_OS_MACOS
-		return *Si::absolute_path::create("/bin/ls");
+		return *ventura::absolute_path::create("/bin/ls");
 #endif
 	}
 }
 
 BOOST_AUTO_TEST_CASE(file_sink_error)
 {
-	auto file = get(Si::open_reading(Si::native_path_string(get_readonly_file().c_str())));
-	Si::file_sink sink(file.handle);
+	auto file = get(ventura::open_reading(Si::native_path_string(get_readonly_file().c_str())));
+	ventura::file_sink sink(file.handle);
 
 #ifdef _WIN32
 #	define SILICIUM_PLATFORM_ERROR(linux_, win32_) win32_
 #else
 #	define SILICIUM_PLATFORM_ERROR(linux_, win32_) linux_
 #endif
-	BOOST_CHECK_EQUAL(boost::system::error_code(SILICIUM_PLATFORM_ERROR(9, ERROR_ACCESS_DENIED), boost::system::system_category()), Si::append(sink, Si::file_sink_element{Si::make_c_str_range("test")}));
-	BOOST_CHECK_EQUAL(boost::system::error_code(SILICIUM_PLATFORM_ERROR(22, ERROR_ACCESS_DENIED), boost::system::system_category()), Si::append(sink, Si::file_sink_element{Si::flush{}}));
-	BOOST_CHECK_EQUAL(boost::system::error_code(SILICIUM_PLATFORM_ERROR(22, ERROR_NEGATIVE_SEEK), boost::system::system_category()), Si::append(sink, Si::file_sink_element{Si::seek_add{-4}}));
-	BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, Si::file_sink_element{Si::seek_set{2}}));
+	BOOST_CHECK_EQUAL(boost::system::error_code(SILICIUM_PLATFORM_ERROR(9, ERROR_ACCESS_DENIED), boost::system::system_category()), Si::append(sink, ventura::file_sink_element{Si::make_c_str_range("test")}));
+	BOOST_CHECK_EQUAL(boost::system::error_code(SILICIUM_PLATFORM_ERROR(22, ERROR_ACCESS_DENIED), boost::system::system_category()), Si::append(sink, ventura::file_sink_element{ventura::flush{}}));
+	BOOST_CHECK_EQUAL(boost::system::error_code(SILICIUM_PLATFORM_ERROR(22, ERROR_NEGATIVE_SEEK), boost::system::system_category()), Si::append(sink, ventura::file_sink_element{ventura::seek_add{-4}}));
+	BOOST_CHECK_EQUAL(boost::system::error_code(), Si::append(sink, ventura::file_sink_element{ventura::seek_set{2}}));
 #undef SILICIUM_PLATFORM_ERROR
 }
 
@@ -98,10 +98,10 @@ BOOST_AUTO_TEST_CASE(file_sink_error)
 BOOST_AUTO_TEST_CASE(file_sink_writev)
 {
 	Si::pipe buffer = Si::make_pipe().move_value();
-	Si::file_sink sink(buffer.write.handle);
+	ventura::file_sink sink(buffer.write.handle);
 	std::array<char, 9001> read_buffer;
-	auto source = Si::make_file_source(buffer.read.handle, Si::make_contiguous_range(read_buffer));
-	std::vector<Si::file_sink::element_type> writes;
+	auto source = ventura::make_file_source(buffer.read.handle, Si::make_contiguous_range(read_buffer));
+	std::vector<ventura::file_sink::element_type> writes;
 	std::vector<char> const payload(0x1000000, 'a');
 	writes.emplace_back(Si::make_memory_range(payload));
 	writes.emplace_back(Si::make_memory_range(payload));

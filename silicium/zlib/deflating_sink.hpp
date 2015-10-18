@@ -14,6 +14,10 @@
 #if SILICIUM_HAS_DEFLATING_SINK
 namespace Si
 {
+	struct flush
+	{
+	};
+
 	struct zlib_deflate_stream
 	{
 		zlib_deflate_stream() BOOST_NOEXCEPT

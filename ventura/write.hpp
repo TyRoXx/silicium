@@ -7,10 +7,10 @@
 #include <silicium/memory_range.hpp>
 #include <limits>
 
-namespace Si
+namespace ventura
 {
 	SILICIUM_USE_RESULT
-	inline error_or<std::size_t> write(native_file_descriptor file, memory_range data)
+	inline Si::error_or<std::size_t> write(Si::native_file_descriptor file, Si::memory_range data)
 	{
 		std::size_t total_written = 0;
 		do
@@ -24,13 +24,13 @@ namespace Si
 			));
 			if (!WriteFile(file, data.begin() + total_written, piece, &written, nullptr))
 			{
-				return get_last_error();
+				return Si::get_last_error();
 			}
 #else
 			ssize_t const written = ::write(file, data.begin() + total_written, static_cast<std::size_t>(data.size()) - total_written);
 			if (written < 0)
 			{
-				return get_last_error();
+				return Si::get_last_error();
 			}
 #endif
 			if (written == 0)

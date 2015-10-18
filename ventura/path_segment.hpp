@@ -5,7 +5,7 @@
 #include <silicium/optional.hpp>
 #include <boost/filesystem/path.hpp>
 
-namespace Si
+namespace ventura
 {
 	struct path_segment
 	{
@@ -54,7 +54,7 @@ namespace Si
 #ifdef _WIN32
 		boost::filesystem::path const &
 #else
-		noexcept_string const &
+		Si::noexcept_string const &
 #endif
 		underlying() const BOOST_NOEXCEPT
 		{
@@ -71,13 +71,13 @@ namespace Si
 			m_value.append(right.m_value);
 		}
 
-		static optional<path_segment> create(boost::filesystem::path const &maybe_segment)
+		static Si::optional<path_segment> create(boost::filesystem::path const &maybe_segment)
 		{
 			if (maybe_segment.parent_path().empty())
 			{
 				return path_segment(maybe_segment);
 			}
-			return none;
+			return Si::none;
 		}
 
 	private:
@@ -91,7 +91,7 @@ namespace Si
 	};
 
 #if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(is_handle<path_segment>::value);
+	BOOST_STATIC_ASSERT(Si::is_handle<path_segment>::value);
 #endif
 
 	inline std::ostream &operator << (std::ostream &out, path_segment const &p)
@@ -159,9 +159,9 @@ namespace Si
 namespace std
 {
 	template <>
-	struct hash< ::Si::path_segment>
+	struct hash< ::ventura::path_segment>
 	{
-		std::size_t operator()(Si::path_segment const &value) const
+		std::size_t operator()(ventura::path_segment const &value) const
 		{
 			return hash_value(value);
 		}
