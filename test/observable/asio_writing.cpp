@@ -1,10 +1,10 @@
 #include <silicium/asio/reading_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/observable/function_observer.hpp>
+#include <silicium/posix/pipe.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/array.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
-#include <ventura/run_process.hpp>
 
 #ifndef _WIN32
 BOOST_AUTO_TEST_CASE(asio_writing_observable)
