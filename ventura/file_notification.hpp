@@ -2,7 +2,7 @@
 #define SILICIUM_FILE_NOTIFICATION_HPP
 
 #include <boost/detail/scoped_enum_emulation.hpp>
-#include <silicium/relative_path.hpp>
+#include <ventura/relative_path.hpp>
 
 namespace Si
 {

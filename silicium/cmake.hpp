@@ -1,7 +1,7 @@
 #ifndef SILICIUM_CMAKE_HPP
 #define SILICIUM_CMAKE_HPP
 
-#include <silicium/absolute_path.hpp>
+#include <ventura/absolute_path.hpp>
 
 namespace Si
 {
