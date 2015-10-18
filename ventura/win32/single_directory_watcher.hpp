@@ -20,7 +20,7 @@ namespace ventura
 #if defined(_WIN32) && SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace win32
 	{
-		inline optional<file_notification_type> to_portable_file_notification_type(DWORD action)
+		inline Si::optional<file_notification_type> to_portable_file_notification_type(DWORD action)
 		{
 			switch (action)
 			{
@@ -36,35 +36,35 @@ namespace ventura
 				return file_notification_type::change_content_or_metadata;
 
 			default:
-				return none; //TODO
+				return Si::none; //TODO
 			}
 		}
 
-		inline optional<error_or<Si::file_notification>> to_portable_file_notification(error_or<win32::file_notification> &&original)
+		inline Si::optional<Si::error_or<ventura::file_notification>> to_portable_file_notification(Si::error_or<win32::file_notification> &&original)
 		{
 			if (original.is_error())
 			{
-				return error_or<Si::file_notification>(original.error());
+				return Si::error_or<ventura::file_notification>(original.error());
 			}
 			auto const type = to_portable_file_notification_type(original.get().action);
 			if (!type)
 			{
-				return none;
+				return Si::none;
 			}
-			return error_or<Si::file_notification>(Si::file_notification(*type, std::move(original.get().name), true));
+			return Si::error_or<ventura::file_notification>(ventura::file_notification(*type, std::move(original.get().name), true));
 		}
 	}
 	
 	struct single_directory_watcher
 	{
-		typedef error_or<file_notification> element_type;
+		typedef Si::error_or<file_notification> element_type;
 
 		single_directory_watcher()
 		{
 		}
 
 		explicit single_directory_watcher(boost::asio::io_service &io, ventura::absolute_path const &watched)
-			: impl(error_or_enumerate(win32::overlapped_directory_changes(io, watched, false)), win32::to_portable_file_notification)
+			: impl(Si::error_or_enumerate(win32::overlapped_directory_changes(io, watched, false)), win32::to_portable_file_notification)
 			, work(boost::in_place(boost::ref(io)))
 		{
 		}
@@ -73,12 +73,12 @@ namespace ventura
 		void async_get_one(Observer &&observer)
 		{
 			impl.async_get_one(
-				function_observer<std::function<void(optional<error_or<file_notification>>)>>(
+				Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>(
 				[observer
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
 					= std::forward<Observer>(observer)
 #endif
-				](optional<error_or<file_notification>> element) mutable
+				](Si::optional<Si::error_or<file_notification>> element) mutable
 				{
 					if (element)
 					{
@@ -95,11 +95,11 @@ namespace ventura
 	private:
 
 		//TODO: save the memory for the function pointer
-		conditional_transformer<
-			error_or<file_notification>,
-			error_or_enumerator<win32::overlapped_directory_changes>,
-			optional<error_or<file_notification>>(*)(error_or<win32::file_notification> &&),
-			function_observer<std::function<void(optional<error_or<file_notification>>)>>
+		Si::conditional_transformer<
+			Si::error_or<file_notification>,
+			Si::error_or_enumerator<win32::overlapped_directory_changes>,
+			Si::optional<Si::error_or<file_notification>>(*)(Si::error_or<win32::file_notification> &&),
+			Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>
 		> impl;
 		boost::optional<boost::asio::io_service::work> work;
 	};

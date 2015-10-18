@@ -59,7 +59,7 @@ namespace
 #ifdef _WIN32
 		ventura::absolute_path file_name = *ventura::absolute_path::create(boost::filesystem::temp_directory_path()) / ventura::relative_path("silicium_file_sink_readonly.txt");
 		{
-			Si::error_or<Si::file_handle> file = Si::create_file(file_name.safe_c_str());
+			Si::error_or<Si::file_handle> file = ventura::create_file(file_name.safe_c_str());
 			if (file.is_error() && (file.error() != boost::system::error_code(ERROR_FILE_EXISTS, boost::system::get_system_category())))
 			{
 				file.throw_if_error();

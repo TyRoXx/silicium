@@ -83,13 +83,13 @@ BOOST_AUTO_TEST_CASE(test_get_home)
 {
 	ventura::absolute_path const home = ventura::get_home();
 #ifdef _WIN32
-	BOOST_CHECK(boost::algorithm::starts_with(Si::to_os_string(home), L"C:\\Users\\"));
-	BOOST_CHECK(boost::algorithm::ends_with(Si::to_os_string(home), L"\\AppData\\Local"));
+	BOOST_CHECK(boost::algorithm::starts_with(to_os_string(home), L"C:\\Users\\"));
+	BOOST_CHECK(boost::algorithm::ends_with(to_os_string(home), L"\\AppData\\Local"));
 #elif defined(__linux__)
 	BOOST_CHECK(boost::algorithm::starts_with(ventura::to_os_string(home), "/home/"));
 #else
 	//OSX
-	BOOST_CHECK(boost::algorithm::starts_with(Si::to_os_string(home), "/Users/"));
+	BOOST_CHECK(boost::algorithm::starts_with(to_os_string(home), "/Users/"));
 #endif
 }
 

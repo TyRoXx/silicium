@@ -59,7 +59,7 @@ namespace ventura
 		Si::native_file_descriptor m_destination;
 
 #ifdef _WIN32
-		error_type append_impl(iterator_range<element_type const *> data)
+		error_type append_impl(Si::iterator_range<element_type const *> data)
 		{
 			for (auto const &element : data)
 			{
@@ -74,7 +74,7 @@ namespace ventura
 
 		error_type append_one(element_type const &element)
 		{
-			return visit<error_type>(
+			return Si::visit<error_type>(
 				element,
 				[this](flush) -> error_type
 			{
@@ -82,11 +82,11 @@ namespace ventura
 				{
 					return error_type();
 				}
-				return get_last_error();
+				return Si::get_last_error();
 			},
-				[this](memory_range const &content) -> error_type
+				[this](Si::memory_range const &content) -> error_type
 			{
-				error_or<std::size_t> written = write(m_destination, content);
+				Si::error_or<std::size_t> written = write(m_destination, content);
 				if (!written.is_error())
 				{
 					assert(written.get() == static_cast<std::size_t>(content.size()));
@@ -101,7 +101,7 @@ namespace ventura
 				{
 					return error_type();
 				}
-				return get_last_error();
+				return Si::get_last_error();
 			},
 				[this](seek_add const request) -> error_type
 			{
@@ -111,7 +111,7 @@ namespace ventura
 				{
 					return error_type();
 				}
-				return get_last_error();
+				return Si::get_last_error();
 			}
 			);
 		}

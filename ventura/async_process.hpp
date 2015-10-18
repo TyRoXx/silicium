@@ -153,7 +153,7 @@ namespace ventura
 		std::vector<Si::os_string> all_arguments;
 		all_arguments.emplace_back(L"\"" + parameters.executable.underlying().wstring() + L"\"");
 		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
-		win32::winapi_string command_line = detail::build_command_line(all_arguments);
+		Si::win32::winapi_string command_line = detail::build_command_line(all_arguments);
 
 		SECURITY_ATTRIBUTES security = {};
 		security.nLength = sizeof(security);
@@ -173,7 +173,7 @@ namespace ventura
 			flags |= CREATE_UNICODE_ENVIRONMENT;
 
 			//@environment will contain pointers into this block of memory:
-			std::vector<os_char> mutable_parent_variables;
+			std::vector<Si::os_char> mutable_parent_variables;
 
 			switch (
 #if SILICIUM_VC2012
@@ -183,8 +183,8 @@ namespace ventura
 			{
 			case environment_inheritance::inherit:
 				{
-					os_char const * const parent_variables = GetEnvironmentStringsW();
-					os_char const *terminator_found = parent_variables;
+					Si::os_char const * const parent_variables = GetEnvironmentStringsW();
+					Si::os_char const *terminator_found = parent_variables;
 					while (*terminator_found != L'\0')
 					{
 						terminator_found += wcslen(terminator_found) + 1;
@@ -205,8 +205,8 @@ namespace ventura
 							assign = std::find(assign + 1, mutable_parent_variables.end(), L'=');
 						}
 						*assign = L'\0';
-						os_char const * const key = &*i;
-						os_char const * const value = (&*assign) + 1;
+						Si::os_char const * const key = &*i;
+						Si::os_char const * const value = (&*assign) + 1;
 						environment.emplace_back(std::make_pair(key, value));
 						i = assign + 1 + wcslen(value) + 1;
 					}
@@ -219,7 +219,7 @@ namespace ventura
 				}
 			}
 
-			typedef std::pair<os_char const *, os_char const *> environment_entry;
+			typedef std::pair<Si::os_char const *, Si::os_char const *> environment_entry;
 			std::sort(environment.begin(), environment.end(), [](environment_entry const &left, environment_entry const &right)
 			{
 				return (wcscmp(left.first, right.first) < 0);
@@ -265,11 +265,11 @@ namespace ventura
 			flags, environment_block.empty() ? NULL : environment_block.data(),
 			parameters.current_path.c_str(), &startup, &process))
 		{
-			return get_last_error();
+			return Si::get_last_error();
 		}
 
-		win32::unique_handle thread_closer(process.hThread);
-		process_handle process_closer(process.hProcess);
+		Si::win32::unique_handle thread_closer(process.hThread);
+		Si::process_handle process_closer(process.hProcess);
 		return async_process(std::move(process_closer));
 	}
 #else
@@ -468,7 +468,7 @@ namespace ventura
 				}
 				else
 				{
-					throw_last_error();
+					Si::throw_last_error();
 				}
 			}
 			buffered_out.flush();
@@ -491,7 +491,7 @@ namespace ventura
 					io,
 					Si::make_thread_observable<Si::std_threading>([work, copyable_file, destination, stop_polling_shared]()
 					{
-						Si::win32::copy_whole_pipe(copyable_file->handle, destination, std::move(*stop_polling_shared));
+						win32::copy_whole_pipe(copyable_file->handle, destination, std::move(*stop_polling_shared));
 						return Si::nothing();
 					})
 				)

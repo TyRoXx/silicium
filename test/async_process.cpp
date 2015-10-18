@@ -86,9 +86,9 @@ BOOST_AUTO_TEST_CASE(async_process_win32_where)
 {
 	ventura::async_process_parameters parameters;
 	parameters.executable = *ventura::absolute_path::create(L"C:\\Windows\\System32\\where.exe");
-	parameters.current_path = Si::get_current_working_directory(Si::throw_);
+	parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 
-	process_output result = run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), Si::environment_inheritance::no_inherit);
+	process_output result = run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(), ventura::environment_inheritance::no_inherit);
 
 	std::size_t const windows7whereHelpSize = 1830;
 	std::size_t const windowsServer2012whereHelpSize = 1705;

@@ -20,7 +20,7 @@ namespace ventura
 
 	inline auto make_file_source(Si::native_file_descriptor file, Si::iterator_range<char *> read_buffer)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> generator_source<std::function<Si::optional<file_read_result>()>>
+		-> Si::generator_source<std::function<Si::optional<file_read_result>()>>
 #endif
 	{
 		return Si::make_generator_source(

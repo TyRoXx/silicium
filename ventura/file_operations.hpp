@@ -169,7 +169,7 @@ namespace ventura
 		int rc = SHFileOperationW(&s);
 		if (rc)
 		{
-			throw std::runtime_error("SHFileOperationW FO_COPY from " + Si::to_utf8_string(from) + " to " + Si::to_utf8_string(to) + " failed with return code " + boost::lexical_cast<std::string>(rc));
+			throw std::runtime_error("SHFileOperationW FO_COPY from " + to_utf8_string(from) + " to " + to_utf8_string(to) + " failed with return code " + boost::lexical_cast<std::string>(rc));
 		}
 		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), Si::identity<void>());
 #else
@@ -244,7 +244,7 @@ namespace ventura
 			}
 
 			default:
-				return std::forward<ErrorHandler>(handle_error)(ec, identity<absolute_path>());
+				return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<absolute_path>());
 			}
 		}
 #elif defined(__linux__)

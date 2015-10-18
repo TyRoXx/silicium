@@ -16,7 +16,7 @@ namespace ventura
 	{
 		struct overlapped_directory_changes
 		{
-			typedef error_or<std::vector<file_notification>> element_type;
+			typedef Si::error_or<std::vector<file_notification>> element_type;
 
 			overlapped_directory_changes()
 				: is_recursive(false)
@@ -52,7 +52,7 @@ namespace ventura
 			{
 				if (watch_file.get() == INVALID_HANDLE_VALUE)
 				{
-					throw_last_error();
+					Si::throw_last_error();
 				}
 				auto &service = boost::asio::use_service<boost::asio::detail::win_iocp_io_service>(io);
 				boost::system::error_code ec;
@@ -93,7 +93,7 @@ namespace ventura
 				return *this;
 			}
 
-			void async_get_one(ptr_observer<observer<element_type>> receiver)
+			void async_get_one(Si::ptr_observer<Si::observer<element_type>> receiver)
 			{
 				assert(!receiver_);
 				receiver_ = receiver.get();
@@ -136,7 +136,7 @@ namespace ventura
 
 			bool is_recursive;
 			boost::asio::io_service *io;
-			observer<element_type> *receiver_;
+			Si::observer<element_type> *receiver_;
 			DWORD received;
 			std::array<char, 0x10000> buffer;
 			Si::win32::unique_handle watch_file;

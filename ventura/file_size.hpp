@@ -19,7 +19,7 @@ namespace ventura
 		LARGE_INTEGER size;
 		if (!GetFileSizeEx(file, &size))
 		{
-			return get_last_error();
+			return Si::get_last_error();
 		}
 		assert(size.QuadPart >= 0);
 		return static_cast<boost::uint64_t>(size.QuadPart);
