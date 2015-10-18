@@ -1,8 +1,7 @@
 #Boost.Test uses typeid for no reason
 if(NOT SILICIUM_NO_RTTI)
 	include_directories(.)
-	include_directories(../cdm)
-	file(GLOB sources "*.hpp" "*.cpp" "observable/*" "source/*" "sink/*")
+	file(GLOB sources "*.hpp" "*.cpp" "observable/*" "source/*" "sink/*" "../ventura_tests/*.cpp")
 	file(GLOB_RECURSE headers "../silicium/*.hpp" "../ventura/*.hpp")
 	if(LUA51_FOUND)
 		file(GLOB luaSources "lua/*.cpp")

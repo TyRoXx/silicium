@@ -115,6 +115,7 @@
 #include <silicium/program_options.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
+#include <silicium/read_file.hpp>
 #include <silicium/safe_arithmetic.hpp>
 #include <silicium/serialization.hpp>
 #include <silicium/sink/append.hpp>
@@ -160,6 +161,7 @@
 #include <silicium/variant.hpp>
 #include <silicium/vector.hpp>
 #include <silicium/version.hpp>
+#include <silicium/write.hpp>
 #include <silicium/zlib/deflating_sink.hpp>
 #include <silicium/zlib/inflating_sink.hpp>
 #include <silicium/zlib/zlib.hpp>

@@ -82,7 +82,7 @@ namespace
 	output_chunk_result handle_output_chunk(Si::native_file_descriptor readable_output, std::ostream &destination)
 	{
 		std::array<char, 8192> read_buffer;
-		Si::error_or<std::size_t> const read_result = ventura::read(readable_output, Si::make_memory_range(read_buffer));
+		Si::error_or<std::size_t> const read_result = Si::read(readable_output, Si::make_memory_range(read_buffer));
 		if (read_result.is_error())
 		{
 			std::cerr << "Reading the output of the process failed with " << read_result.error() << '\n';
