@@ -17,7 +17,7 @@
 
 namespace ventura
 {
-#if defined(_WIN32) && SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
+#if defined(_WIN32) && VENTURA_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace win32
 	{
 		inline Si::optional<file_notification_type> to_portable_file_notification_type(DWORD action)
