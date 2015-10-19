@@ -1,5 +1,5 @@
-#ifndef SILICIUM_WIN32_OPEN_HPP
-#define SILICIUM_WIN32_OPEN_HPP
+#ifndef VENTURA_WIN32_OPEN_HPP
+#define VENTURA_WIN32_OPEN_HPP
 
 #include <silicium/error_or.hpp>
 #include <silicium/file_handle.hpp>

@@ -1,5 +1,5 @@
-#ifndef SILICIUM_PATH_SEGMENT_HPP
-#define SILICIUM_PATH_SEGMENT_HPP
+#ifndef VENTURA_PATH_SEGMENT_HPP
+#define VENTURA_PATH_SEGMENT_HPP
 
 #include <ventura/path.hpp>
 #include <silicium/optional.hpp>

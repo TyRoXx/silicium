@@ -1,5 +1,5 @@
-#ifndef SILICIUM_CMAKE_HPP
-#define SILICIUM_CMAKE_HPP
+#ifndef VENTURA_CMAKE_HPP
+#define VENTURA_CMAKE_HPP
 
 #include <ventura/absolute_path.hpp>
 

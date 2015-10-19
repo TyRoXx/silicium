@@ -1,5 +1,5 @@
-#ifndef SILICIUM_PATH_CHAR_HPP
-#define SILICIUM_PATH_CHAR_HPP
+#ifndef VENTURA_PATH_CHAR_HPP
+#define VENTURA_PATH_CHAR_HPP
 
 #include <silicium/is_handle.hpp>
 

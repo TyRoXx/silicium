@@ -1,5 +1,5 @@
-#ifndef SILICIUM_PATH_HPP
-#define SILICIUM_PATH_HPP
+#ifndef VENTURA_PATH_HPP
+#define VENTURA_PATH_HPP
 
 #include <ventura/path_char.hpp>
 #include <boost/functional/hash.hpp>

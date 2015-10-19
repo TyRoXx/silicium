@@ -1,5 +1,5 @@
-#ifndef SILICIUM_LINUX_OPEN_HPP
-#define SILICIUM_LINUX_OPEN_HPP
+#ifndef VENTURA_LINUX_OPEN_HPP
+#define VENTURA_LINUX_OPEN_HPP
 
 #include <silicium/error_or.hpp>
 #include <silicium/file_handle.hpp>

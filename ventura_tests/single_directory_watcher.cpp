@@ -12,13 +12,13 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <fstream>
 #include <chrono>
-#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
+#if VENTURA_HAS_SINGLE_DIRECTORY_WATCHER
 #	include <boost/filesystem/operations.hpp>
 #endif
 
 namespace Si
 {
-#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
+#if VENTURA_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace
 	{
 		void touch(ventura::absolute_path const &name)

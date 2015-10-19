@@ -1,5 +1,5 @@
-#ifndef SILICIUM_FILE_SINK_HPP
-#define SILICIUM_FILE_SINK_HPP
+#ifndef VENTURA_FILE_SINK_HPP
+#define VENTURA_FILE_SINK_HPP
 
 #include <silicium/write.hpp>
 #include <silicium/sink/sink.hpp>

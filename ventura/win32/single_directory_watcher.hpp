@@ -1,5 +1,5 @@
-#ifndef SILICIUM_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
-#define SILICIUM_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
+#ifndef VENTURA_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
+#define VENTURA_WIN32_SINGLE_DIRECTORY_WATCHER_HPP
 
 #include <ventura/win32/overlapped_directory_changes.hpp>
 #include <ventura/file_notification.hpp>
@@ -13,7 +13,7 @@
 #include <boost/ref.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
-#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER SILICIUM_HAS_ERROR_OR_ENUMERATE
+#define VENTURA_HAS_SINGLE_DIRECTORY_WATCHER SILICIUM_HAS_ERROR_OR_ENUMERATE
 
 namespace ventura
 {

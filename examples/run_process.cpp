@@ -5,7 +5,7 @@
 int main(int argc, char **argv)
 {
 	boost::ignore_unused_variable_warning(argc);
-#if SILICIUM_HAS_RUN_PROCESS
+#if VENTURA_HAS_RUN_PROCESS
 	ventura::process_parameters parameters;
 	parameters.executable = *ventura::absolute_path::create("/usr/bin/file");
 	parameters.current_path = ventura::get_current_working_directory(Si::throw_);

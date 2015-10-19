@@ -4,7 +4,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <fstream>
 
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS
 
 #ifdef _WIN32
 #	define SILICIUM_TEST_ROOT L"C:/"

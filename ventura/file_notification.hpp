@@ -1,5 +1,5 @@
-#ifndef SILICIUM_FILE_NOTIFICATION_HPP
-#define SILICIUM_FILE_NOTIFICATION_HPP
+#ifndef VENTURA_FILE_NOTIFICATION_HPP
+#define VENTURA_FILE_NOTIFICATION_HPP
 
 #include <boost/detail/scoped_enum_emulation.hpp>
 #include <ventura/relative_path.hpp>

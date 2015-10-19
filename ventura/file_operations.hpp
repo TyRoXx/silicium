@@ -1,5 +1,5 @@
-#ifndef SILICIUM_FILE_OPERATIONS_HPP
-#define SILICIUM_FILE_OPERATIONS_HPP
+#ifndef VENTURA_FILE_OPERATIONS_HPP
+#define VENTURA_FILE_OPERATIONS_HPP
 
 #include <silicium/error_handler.hpp>
 #include <ventura/run_process.hpp>
@@ -18,9 +18,9 @@
 #endif
 
 //Boost filesystem requires exceptions
-#define SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS SILICIUM_HAS_EXCEPTIONS
+#define VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS SILICIUM_HAS_EXCEPTIONS
 
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS
 #	include <boost/filesystem/operations.hpp>
 #endif
 
@@ -29,7 +29,7 @@
 
 namespace ventura
 {
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS
+#if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS
 	template <class ErrorHandler>
 	inline auto get_current_working_directory(ErrorHandler &&handle_error)
 		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<absolute_path>()))

@@ -6,7 +6,7 @@
 
 int main()
 {
-#if SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER && SILICIUM_HAS_FOR_EACH_OBSERVABLE
+#if VENTURA_HAS_SINGLE_DIRECTORY_WATCHER && SILICIUM_HAS_FOR_EACH_OBSERVABLE
 	boost::asio::io_service io;
 	auto const watched_dir = ventura::get_current_working_directory(Si::throw_);
 	std::cerr << "Watching " << watched_dir << '\n';

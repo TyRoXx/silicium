@@ -1,5 +1,5 @@
-#ifndef SILICIUM_WIN32_FILE_NOTICATION_HPP
-#define SILICIUM_WIN32_FILE_NOTICATION_HPP
+#ifndef VENTURA_WIN32_FILE_NOTICATION_HPP
+#define VENTURA_WIN32_FILE_NOTICATION_HPP
 
 #include <ventura/relative_path.hpp>
 #include <silicium/win32/win32.hpp>

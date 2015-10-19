@@ -5,13 +5,13 @@
 #include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/source/range_source.hpp>
 #include <boost/test/unit_test.hpp>
-#if SILICIUM_HAS_RUN_PROCESS
+#if VENTURA_HAS_RUN_PROCESS
 #	include <boost/filesystem/operations.hpp>
 #endif
 
 namespace Si
 {
-#if SILICIUM_HAS_RUN_PROCESS
+#if VENTURA_HAS_RUN_PROCESS
 #ifndef _WIN32
 	BOOST_AUTO_TEST_CASE(run_process_1_unix_which)
 	{

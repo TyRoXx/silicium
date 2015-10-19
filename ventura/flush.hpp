@@ -1,5 +1,5 @@
-#ifndef SILICIUM_FLUSH_HPP
-#define SILICIUM_FLUSH_HPP
+#ifndef VENTURA_FLUSH_HPP
+#define VENTURA_FLUSH_HPP
 
 namespace ventura
 {

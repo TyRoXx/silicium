@@ -24,7 +24,7 @@ namespace
 		Si::noexcept_string output, error;
 	};
 
-#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE && SILICIUM_HAS_LAUNCH_PROCESS
+#if VENTURA_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE && VENTURA_HAS_LAUNCH_PROCESS
 	process_output run_process(
 		ventura::async_process_parameters parameters,
 		std::vector<std::pair<Si::os_char const *, Si::os_char const *>> environment_variables,
@@ -65,7 +65,7 @@ namespace
 #endif
 }
 
-#if !defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_LAUNCH_PROCESS
+#if !defined(_WIN32) && VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS && VENTURA_HAS_LAUNCH_PROCESS
 BOOST_AUTO_TEST_CASE(async_process_unix_which)
 {
 	ventura::async_process_parameters parameters;
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(async_process_unix_which)
 }
 #endif
 
-#if defined(_WIN32) && SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_RUN_PROCESS
+#if defined(_WIN32) && VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS && VENTURA_HAS_RUN_PROCESS
 BOOST_AUTO_TEST_CASE(async_process_win32_where)
 {
 	ventura::async_process_parameters parameters;
@@ -110,7 +110,7 @@ namespace
 	);
 }
 
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_RUN_PROCESS
+#if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS && VENTURA_HAS_RUN_PROCESS
 BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 {
 	ventura::async_process_parameters parameters;
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 }
 #endif
 
-#if SILICIUM_HAS_ABSOLUTE_PATH_OPERATIONS && SILICIUM_HAS_RUN_PROCESS
+#if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS && VENTURA_HAS_RUN_PROCESS
 namespace
 {
 	void test_environment_variables(

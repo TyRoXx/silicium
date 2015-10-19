@@ -1,5 +1,5 @@
-#ifndef SILICIUM_ASYNC_PROCESS_HPP
-#define SILICIUM_ASYNC_PROCESS_HPP
+#ifndef VENTURA_ASYNC_PROCESS_HPP
+#define VENTURA_ASYNC_PROCESS_HPP
 
 #include <silicium/os_string.hpp>
 #include <ventura/absolute_path.hpp>
@@ -34,7 +34,7 @@
 #endif
 
 //TODO: avoid the Boost filesystem operations that require exceptions
-#define SILICIUM_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
+#define VENTURA_HAS_LAUNCH_PROCESS SILICIUM_HAS_EXCEPTIONS
 
 namespace ventura
 {
@@ -122,7 +122,7 @@ namespace ventura
 		}
 	};
 	
-#if SILICIUM_HAS_LAUNCH_PROCESS
+#if VENTURA_HAS_LAUNCH_PROCESS
 
 #ifdef _WIN32
 	namespace detail
@@ -420,9 +420,9 @@ namespace ventura
 
 #endif
 
-#define SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE (SILICIUM_HAS_THREAD_OBSERVABLE && SILICIUM_HAS_BUFFERING_SINK)
+#define VENTURA_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE (SILICIUM_HAS_THREAD_OBSERVABLE && SILICIUM_HAS_BUFFERING_SINK)
 
-#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE && defined(_WIN32)
+#if VENTURA_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE && defined(_WIN32)
 	namespace win32
 	{
 		template <class ByteSink>
@@ -477,7 +477,7 @@ namespace ventura
 #endif
 	namespace experimental
 	{
-#if SILICIUM_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
+#if VENTURA_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
 		//TODO: find a more generic API for reading from a pipe portably
 		template <class CharSink>
 		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file, boost::shared_future<void> stop_polling)

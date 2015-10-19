@@ -1,5 +1,5 @@
-#ifndef SILICIUM_PROCESS_PARAMETERS_HPP
-#define SILICIUM_PROCESS_PARAMETERS_HPP
+#ifndef VENTURA_PROCESS_PARAMETERS_HPP
+#define VENTURA_PROCESS_PARAMETERS_HPP
 
 #include <silicium/source/source.hpp>
 #include <silicium/sink/sink.hpp>

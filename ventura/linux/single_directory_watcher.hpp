@@ -1,5 +1,5 @@
-#ifndef SILICIUM_LINUX_SINGLE_DIRECTORY_WATCHER_HPP
-#define SILICIUM_LINUX_SINGLE_DIRECTORY_WATCHER_HPP
+#ifndef VENTURA_LINUX_SINGLE_DIRECTORY_WATCHER_HPP
+#define VENTURA_LINUX_SINGLE_DIRECTORY_WATCHER_HPP
 
 #include <ventura/linux/inotify.hpp>
 #include <ventura/file_notification.hpp>
@@ -10,11 +10,11 @@
 #include <silicium/observable/function_observer.hpp>
 #include <boost/optional.hpp>
 
-#define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER SILICIUM_HAS_INOTIFY_OBSERVABLE
+#define VENTURA_HAS_SINGLE_DIRECTORY_WATCHER VENTURA_HAS_INOTIFY_OBSERVABLE
 
 namespace ventura
 {
-#if defined(__linux__) && SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER
+#if defined(__linux__) && VENTURA_HAS_SINGLE_DIRECTORY_WATCHER
 	namespace linux
 	{
 		namespace detail
