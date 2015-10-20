@@ -16,10 +16,6 @@ add_executable(safe_unsigned "safe_unsigned.cpp")
 target_link_libraries(safe_unsigned ${Boost_LIBRARIES})
 set_target_properties(safe_unsigned PROPERTIES FOLDER examples)
 
-add_executable(directory_watcher "directory_watcher.cpp")
-target_link_libraries(directory_watcher ${Boost_LIBRARIES})
-set_target_properties(directory_watcher PROPERTIES FOLDER examples)
-
 if(NOT (Boost_VERSION LESS 105300)) #Boost.Coroutine required
 	add_executable(sleep "sleep.cpp")
 	target_link_libraries(sleep ${Boost_LIBRARIES})
@@ -58,12 +54,6 @@ if(SILICIUM_HAS_WEBSOCKETPP)
 	endif()
 	target_link_libraries(websocketpp ${Boost_LIBRARIES})
 	set_target_properties(websocketpp PROPERTIES FOLDER examples)
-endif()
-
-if(UNIX) #TODO: Windows
-	add_executable(run_process "run_process.cpp")
-	target_link_libraries(run_process ${Boost_LIBRARIES})
-	set_target_properties(run_process PROPERTIES FOLDER examples)
 endif()
 
 if(MSVC14 AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
