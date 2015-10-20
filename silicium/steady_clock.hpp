@@ -7,7 +7,7 @@
 
 namespace Si
 {
-#if defined(BOOST_CHRONO_HAS_STEADY_CLOCK)
+#if defined(BOOST_CHRONO_HAS_CLOCK_STEADY)
 #define SILICIUM_HAS_STEADY_CLOCK 1
 	using boost::chrono::steady_clock;
 	namespace chrono = boost::chrono;
