@@ -109,7 +109,6 @@
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/os_string.hpp>
-#include <silicium/posix/native_file_descriptor.hpp>
 #include <silicium/posix/pipe.hpp>
 #include <silicium/process_handle.hpp>
 #include <silicium/program_options.hpp>
