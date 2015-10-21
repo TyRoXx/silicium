@@ -42,15 +42,14 @@ namespace Si
 	template <class T, class U>
 	T exchange(T &dest, U &&source)
 	{
-		return detail::exchange_impl(dest, std::forward<U>(source), std::integral_constant<bool,
-#if !SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
-		                                                                                   true
+		return detail::exchange_impl(dest, std::forward<U>(source),
+		                             std::integral_constant<bool,
+#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
+		                                                    BOOST_NOEXCEPT_EXPR(dest = std::forward<U>(source))
 #else
-		                                                                                   BOOST_NOEXCEPT_EXPR(
-		                                                                                       dest = std::forward<U>(
-		                                                                                           source))
+		                                                    true
 #endif
-		                                                                                   >());
+		                                                    >());
 	}
 }
 
