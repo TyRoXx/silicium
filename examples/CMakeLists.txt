@@ -62,3 +62,6 @@ if(MSVC14 AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
 	target_compile_options(vs2015_await PRIVATE "/await")
 	set_target_properties(vs2015_await PROPERTIES FOLDER examples)
 endif()
+
+file(GLOB exampleSources "*.cpp" "*.hpp")
+set(formatted ${formatted} ${exampleSources} PARENT_SCOPE)
