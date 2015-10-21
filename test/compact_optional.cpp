@@ -10,83 +10,82 @@ namespace Si
 		typedef typename Policy::value_type value_type;
 
 		compact_optional()
-			: m_storage(Policy::get_none())
+		    : m_storage(Policy::get_none())
 		{
 			assert(!*this);
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class ...Args>
-		compact_optional(some_t, Args &&...args)
-			: m_storage(std::forward<Args>(args)...)
+		template <class... Args>
+		compact_optional(some_t, Args &&... args)
+		    : m_storage(std::forward<Args>(args)...)
 		{
 			assert(*this);
 		}
 #else
 		compact_optional(some_t)
-			: m_storage()
+		    : m_storage()
 		{
 			assert(*this);
 		}
 
 		template <class A0>
 		compact_optional(some_t, A0 &&a0)
-			: m_storage(std::forward<A0>(a0))
+		    : m_storage(std::forward<A0>(a0))
 		{
 			assert(*this);
 		}
 #endif
 
 		compact_optional(none_t)
-			: m_storage(Policy::get_none())
+		    : m_storage(Policy::get_none())
 		{
 			assert(!*this);
 		}
 
 		compact_optional(value_type value)
-			: m_storage(std::move(value))
+		    : m_storage(std::move(value))
 		{
 			assert(*this);
 		}
 
-		bool operator !() const BOOST_NOEXCEPT
+		bool operator!() const BOOST_NOEXCEPT
 		{
 			return Policy::is_none(m_storage);
 		}
 
 		SILICIUM_EXPLICIT_OPERATOR_BOOL()
 
-		value_type &operator *() BOOST_NOEXCEPT
+		value_type &operator*() BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return m_storage;
 		}
 
-		value_type const &operator *() const BOOST_NOEXCEPT
+		value_type const &operator*() const BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return m_storage;
 		}
 
-		value_type *operator ->() BOOST_NOEXCEPT
+		value_type *operator->() BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return &m_storage;
 		}
 
-		value_type const *operator ->() const BOOST_NOEXCEPT
+		value_type const *operator->() const BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return &m_storage;
 		}
 
 	private:
-
 		value_type m_storage;
 	};
 
 	template <class Policy>
-	bool operator == (compact_optional<Policy> const &left, compact_optional<Policy> const &right)
+	bool operator==(compact_optional<Policy> const &left, compact_optional<Policy> const &right)
 	{
 		if (left)
 		{
@@ -107,7 +106,7 @@ namespace Si
 	}
 
 	template <class Policy>
-	bool operator == (compact_optional<Policy> const &left, typename Policy::value_type const &right)
+	bool operator==(compact_optional<Policy> const &left, typename Policy::value_type const &right)
 	{
 		if (left)
 		{
@@ -117,7 +116,7 @@ namespace Si
 	}
 
 	template <class Policy>
-	bool operator == (typename Policy::value_type const &left, compact_optional<Policy> const &right)
+	bool operator==(typename Policy::value_type const &left, compact_optional<Policy> const &right)
 	{
 		if (right)
 		{
@@ -127,37 +126,37 @@ namespace Si
 	}
 
 	template <class Policy>
-	bool operator == (compact_optional<Policy> const &left, none_t)
+	bool operator==(compact_optional<Policy> const &left, none_t)
 	{
 		return !left;
 	}
 
 	template <class Policy>
-	bool operator == (none_t, compact_optional<Policy> const &right)
+	bool operator==(none_t, compact_optional<Policy> const &right)
 	{
 		return !right;
 	}
 
 	template <class Policy>
-	bool operator != (compact_optional<Policy> const &left, compact_optional<Policy> const &right)
+	bool operator!=(compact_optional<Policy> const &left, compact_optional<Policy> const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class Policy>
-	bool operator != (compact_optional<Policy> const &left, none_t)
+	bool operator!=(compact_optional<Policy> const &left, none_t)
 	{
 		return !!left;
 	}
 
 	template <class Policy>
-	bool operator != (none_t, compact_optional<Policy> const &right)
+	bool operator!=(none_t, compact_optional<Policy> const &right)
 	{
 		return !!right;
 	}
 
 	template <class Policy>
-	std::ostream &operator << (std::ostream &out, compact_optional<Policy> const &value)
+	std::ostream &operator<<(std::ostream &out, compact_optional<Policy> const &value)
 	{
 		if (value)
 		{
@@ -207,8 +206,7 @@ namespace Si
 			static union
 			{
 				Pointee a, b;
-			}
-			none_dummy;
+			} none_dummy;
 			return &none_dummy.a;
 		}
 	};

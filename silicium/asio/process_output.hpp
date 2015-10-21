@@ -5,9 +5,9 @@
 #include <silicium/file_handle.hpp>
 
 #ifdef _WIN32
-#	include <boost/asio/windows/stream_handle.hpp>
+#include <boost/asio/windows/stream_handle.hpp>
 #else
-#	include <boost/asio/posix/stream_descriptor.hpp>
+#include <boost/asio/posix/stream_descriptor.hpp>
 #endif
 
 namespace Si
@@ -17,24 +17,23 @@ namespace Si
 		typedef error_or<memory_range> element_type;
 		typedef
 #ifdef _WIN32
-			boost::asio::windows::stream_handle
+		    boost::asio::windows::stream_handle
 #else
-			boost::asio::posix::stream_descriptor
+		    boost::asio::posix::stream_descriptor
 #endif
-			stream;
+		        stream;
 
 		process_output()
 		{
 		}
 
-		process_output(process_output &&other) BOOST_NOEXCEPT
-			: m_pipe_reader(std::move(other.m_pipe_reader))
-			, m_buffer(std::move(other.m_buffer))
-			, m_observable(std::move(other.m_observable))
+		process_output(process_output &&other) BOOST_NOEXCEPT : m_pipe_reader(std::move(other.m_pipe_reader)),
+		                                                        m_buffer(std::move(other.m_buffer)),
+		                                                        m_observable(std::move(other.m_observable))
 		{
 		}
 
-		process_output &operator = (process_output &&other) BOOST_NOEXCEPT
+		process_output &operator=(process_output &&other) BOOST_NOEXCEPT
 		{
 			m_pipe_reader = std::move(other.m_pipe_reader);
 			m_buffer = std::move(other.m_buffer);
@@ -43,9 +42,9 @@ namespace Si
 		}
 
 		explicit process_output(std::unique_ptr<stream> pipe_reader)
-			: m_pipe_reader(std::move(pipe_reader))
-			, m_buffer(4096)
-			, m_observable(*m_pipe_reader, make_memory_range(m_buffer))
+		    : m_pipe_reader(std::move(pipe_reader))
+		    , m_buffer(4096)
+		    , m_observable(*m_pipe_reader, make_memory_range(m_buffer))
 		{
 		}
 
@@ -56,17 +55,15 @@ namespace Si
 		}
 
 	private:
-
 		std::unique_ptr<stream> m_pipe_reader;
 		std::vector<char> m_buffer;
 		asio::reading_observable<stream> m_observable;
-		
+
 		SILICIUM_DISABLE_COPY(process_output)
 	};
 
 	template <class AsioFileStream>
-	SILICIUM_USE_RESULT
-	AsioFileStream make_asio_file_stream(boost::asio::io_service &io, file_handle file)
+	SILICIUM_USE_RESULT AsioFileStream make_asio_file_stream(boost::asio::io_service &io, file_handle file)
 	{
 		return AsioFileStream(io, file.release());
 	}

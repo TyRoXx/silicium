@@ -33,8 +33,8 @@ namespace Si
 			}
 
 			explicit posting_observable(Dispatcher &io, Next next)
-				: m_io(&io)
-				, m_next(std::move(next))
+			    : m_io(&io)
+			    , m_next(std::move(next))
 			{
 			}
 
@@ -43,69 +43,66 @@ namespace Si
 			{
 				auto keep_io_running =
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-					Si::make_unique
+				    Si::make_unique
 #else
-					std::make_shared
+				    std::make_shared
 #endif
-					<boost::asio::io_service::work>(get_io_service(*m_io));
+				    <boost::asio::io_service::work>(get_io_service(*m_io));
 
-				//VC++ 2013 bug: this cannot be captured by the following lambda for some reason (fails with
-				//nonsense compiler error about a generated posting_observable copy operator)
+				// VC++ 2013 bug: this cannot be captured by the following lambda for some reason (fails with
+				// nonsense compiler error about a generated posting_observable copy operator)
 				boost::asio::io_service *io = this->m_io;
-				m_next.async_get_one(
-					make_function_observer([io,
-					SILICIUM_CAPTURE_EXPRESSION(keep_io_running, std::move(keep_io_running)),
-					SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))
+				m_next.async_get_one(make_function_observer(
+				    [
+					  io,
+					  SILICIUM_CAPTURE_EXPRESSION(keep_io_running, std::move(keep_io_running)),
+					  SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))
 					](Si::optional<element_type> element) mutable
-				{
-					if (element)
-					{
+				    {
+					    if (element)
+					    {
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-						io->post(
-							//The additional indirection makes the function object copyable even
-							//if element_type is not. post() would not take a noncopyable function.
-							//TODO: do this only when necessary
-							function<void ()>
-							([
-								SILICIUM_CAPTURE_EXPRESSION(element, std::move(element)),
-								SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))
-							]() mutable
-							{
-								std::forward<Observer>(observer_).got_element(std::move(*element));
-							})
-						);
+						    io->post(
+						        // The additional indirection makes the function object copyable even
+						        // if element_type is not. post() would not take a noncopyable function.
+						        // TODO: do this only when necessary
+						        function<void()>([
+							        SILICIUM_CAPTURE_EXPRESSION(element, std::move(element)),
+							        SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))
+							    ]() mutable
+						                         {
+							                         std::forward<Observer>(observer_).got_element(std::move(*element));
+							                     }));
 #else
-						auto copyable_element = to_shared(std::move(*element));
-						io->post([
-							copyable_element,
-							observer_
-						]() mutable
-						{
-							std::forward<Observer>(observer_).got_element(std::move(*copyable_element));
-						});
+						    auto copyable_element = to_shared(std::move(*element));
+						    io->post([copyable_element, observer_]() mutable
+						             {
+							             std::forward<Observer>(observer_).got_element(std::move(*copyable_element));
+							         });
 #endif
-					}
-					else
-					{
-						io->post([SILICIUM_CAPTURE_EXPRESSION(observer_, std::forward<Observer>(observer_))]() mutable
-						{
-							std::forward<Observer>(observer_).ended();
-						});
-					}
-				}));
+					    }
+					    else
+					    {
+						    io->post([SILICIUM_CAPTURE_EXPRESSION(observer_,
+						                                          std::forward<Observer>(observer_))]() mutable
+						             {
+							             std::forward<Observer>(observer_).ended();
+							         });
+					    }
+					}));
 			}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 			posting_observable(posting_observable &&) = default;
-			posting_observable &operator = (posting_observable &&) = default;
+			posting_observable &operator=(posting_observable &&) = default;
 #else
 			posting_observable(posting_observable &&other)
-				: m_io(std::move(other.m_io))
-				, m_next(std::move(other.m_next))
+			    : m_io(std::move(other.m_io))
+			    , m_next(std::move(other.m_next))
 			{
 			}
 
-			posting_observable &operator = (posting_observable &&other)
+			posting_observable &operator=(posting_observable &&other)
 			{
 				m_io = std::move(other.m_io);
 				m_next = std::move(other.m_next);
@@ -119,18 +116,17 @@ namespace Si
 			}
 
 		private:
-
 			Dispatcher *m_io;
 			Next m_next;
 
 			SILICIUM_DELETED_FUNCTION(posting_observable(posting_observable const &))
-			SILICIUM_DELETED_FUNCTION(posting_observable &operator = (posting_observable const &))
+			SILICIUM_DELETED_FUNCTION(posting_observable &operator=(posting_observable const &))
 		};
 
 		template <class Next>
 		auto make_posting_observable(boost::asio::io_service &io, Next &&next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> posting_observable<typename std::decay<Next>::type>
+		    -> posting_observable<typename std::decay<Next>::type>
 #endif
 		{
 			return posting_observable<typename std::decay<Next>::type>(io, std::forward<Next>(next));

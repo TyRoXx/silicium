@@ -12,12 +12,12 @@ namespace Si
 		typedef typename std::decay<decltype(*std::declval<SourcePtr>())>::type::element_type element_type;
 
 		ptr_source()
-			: m_ptr(SourcePtr())
+		    : m_ptr(SourcePtr())
 		{
 		}
 
 		explicit ptr_source(SourcePtr ptr)
-			: m_ptr(std::move(ptr))
+		    : m_ptr(std::move(ptr))
 		{
 		}
 
@@ -26,22 +26,22 @@ namespace Si
 		SILICIUM_DEFAULT_COPY(ptr_source)
 #else
 		ptr_source(ptr_source &&other)
-			: m_ptr(std::move(other.m_ptr))
+		    : m_ptr(std::move(other.m_ptr))
 		{
 		}
 
 		ptr_source(ptr_source const &other)
-			: m_ptr(other.m_ptr)
+		    : m_ptr(other.m_ptr)
 		{
 		}
 
-		ptr_source &operator = (ptr_source &&other)
+		ptr_source &operator=(ptr_source &&other)
 		{
 			m_ptr = std::move(other.m_ptr);
 			return *this;
 		}
 
-		ptr_source &operator = (ptr_source const &other)
+		ptr_source &operator=(ptr_source const &other)
 		{
 			m_ptr = other.m_ptr;
 			return *this;
@@ -59,19 +59,18 @@ namespace Si
 		}
 
 	private:
-
 		SourcePtr m_ptr;
 	};
 
 	template <class Source>
 	auto erase_source(Source &&input)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> ptr_source<std::unique_ptr<typename Si::Source<typename std::decay<Source>::type::element_type>::interface>>
+	    -> ptr_source<std::unique_ptr<typename Si::Source<typename std::decay<Source>::type::element_type>::interface>>
 #endif
 	{
-		return ptr_source<std::unique_ptr<typename Si::Source<typename std::decay<Source>::type::element_type>::interface>>(
-			Si::to_unique(virtualize_source(std::forward<Source>(input)))
-		);
+		return ptr_source<
+		    std::unique_ptr<typename Si::Source<typename std::decay<Source>::type::element_type>::interface>>(
+		    Si::to_unique(virtualize_source(std::forward<Source>(input))));
 	}
 
 	template <class Source>

@@ -11,13 +11,9 @@
 namespace Si
 {
 	template <class Element>
-	SILICIUM_TRAIT_WITH_TYPEDEFS(
-		Source,
-		typedef Element element_type;
-		,
-		((map_next, (1, (std::size_t)), iterator_range<element_type const *>))
-		((copy_next, (1, (iterator_range<element_type *>)), element_type *))
-	)
+	SILICIUM_TRAIT_WITH_TYPEDEFS(Source, typedef Element element_type;
+	                             , ((map_next, (1, (std::size_t)), iterator_range<element_type const *>))(
+	                                   (copy_next, (1, (iterator_range<element_type *>)), element_type *)))
 
 #if SILICIUM_COMPILER_HAS_USING
 	template <class Element>

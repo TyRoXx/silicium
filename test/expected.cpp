@@ -78,7 +78,7 @@ namespace
 		void *payload;
 
 		explicit test_exception(void *payload)
-			: payload(payload)
+		    : payload(payload)
 		{
 		}
 	};
@@ -96,17 +96,17 @@ BOOST_AUTO_TEST_CASE(expected_construct_exception)
 		Si::expected<int> e((boost::current_exception()));
 		BOOST_CHECK(!e.valid());
 		BOOST_CHECK_EXCEPTION(e.value(), test_exception, [&dummy](test_exception const &ex)
-		{
-			return (&dummy == ex.payload);
-		});
+		                      {
+			                      return (&dummy == ex.payload);
+			                  });
 
 		Si::expected<int> moved = std::move(e);
 		BOOST_CHECK(!moved.valid());
 		BOOST_CHECK(!e.valid());
 		BOOST_CHECK_EXCEPTION(moved.value(), test_exception, [&dummy](test_exception const &ex)
-		{
-			return (&dummy == ex.payload);
-		});
+		                      {
+			                      return (&dummy == ex.payload);
+			                  });
 
 		Si::expected<int> move_assigned;
 		move_assigned = std::move(moved);
@@ -114,17 +114,17 @@ BOOST_AUTO_TEST_CASE(expected_construct_exception)
 		BOOST_CHECK(!moved.valid());
 		BOOST_CHECK(!move_assigned.valid());
 		BOOST_CHECK_EXCEPTION(move_assigned.value(), test_exception, [&dummy](test_exception const &ex)
-		{
-			return (&dummy == ex.payload);
-		});
+		                      {
+			                      return (&dummy == ex.payload);
+			                  });
 
 		moved = std::move(move_assigned);
 		BOOST_CHECK(!moved.valid());
 		BOOST_CHECK(!move_assigned.valid());
 		BOOST_CHECK_EXCEPTION(moved.value(), test_exception, [&dummy](test_exception const &ex)
-		{
-			return (&dummy == ex.payload);
-		});
+		                      {
+			                      return (&dummy == ex.payload);
+			                  });
 	}
 }
 #endif

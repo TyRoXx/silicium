@@ -6,7 +6,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>
 
-#define SILICIUM_HAS_ASIO_ACCEPTING_SOURCE (BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS && !SILICIUM_AVOID_BOOST_COROUTINE)
+#define SILICIUM_HAS_ASIO_ACCEPTING_SOURCE                                                                             \
+	(BOOST_VERSION >= 105400 && SILICIUM_HAS_EXCEPTIONS && !SILICIUM_AVOID_BOOST_COROUTINE)
 
 #if SILICIUM_HAS_ASIO_ACCEPTING_SOURCE
 #include <boost/asio/spawn.hpp>
@@ -24,14 +25,14 @@ namespace Si
 			element_type *copy_next(iterator_range<element_type *> destination);
 
 		private:
-
 			boost::asio::ip::tcp::acceptor *m_acceptor;
 			boost::asio::yield_context *m_yield;
 		};
 
-		inline accepting_source::accepting_source(boost::asio::ip::tcp::acceptor &acceptor, boost::asio::yield_context &yield)
-			: m_acceptor(&acceptor)
-			, m_yield(&yield)
+		inline accepting_source::accepting_source(boost::asio::ip::tcp::acceptor &acceptor,
+		                                          boost::asio::yield_context &yield)
+		    : m_acceptor(&acceptor)
+		    , m_yield(&yield)
 		{
 		}
 

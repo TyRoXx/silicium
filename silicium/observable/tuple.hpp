@@ -5,20 +5,21 @@
 #include <silicium/config.hpp>
 #include <bitset>
 
-#if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING || SILICIUM_GCC47 /*GCC 4.7 crashes when using tuple*/
-#	define SILICIUM_RX_TUPLE_AVAILABLE 0
+#if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING ||                                         \
+    SILICIUM_GCC47 /*GCC 4.7 crashes when using tuple*/
+#define SILICIUM_RX_TUPLE_AVAILABLE 0
 #else
-#	define SILICIUM_RX_TUPLE_AVAILABLE 1
+#define SILICIUM_RX_TUPLE_AVAILABLE 1
 #endif
 
 #if SILICIUM_RX_TUPLE_AVAILABLE
-#	include <silicium/detail/integer_sequence.hpp>
+#include <silicium/detail/integer_sequence.hpp>
 #endif
 
 namespace Si
 {
 #if SILICIUM_RX_TUPLE_AVAILABLE
-	template <class ...Parts>
+	template <class... Parts>
 	struct tuple_observable
 	{
 		typedef std::tuple<typename Parts::element_type...> element_type;
@@ -27,30 +28,30 @@ namespace Si
 
 		template <class PartsTuple>
 		explicit tuple_observable(PartsTuple &&parts)
-			: parts(std::forward<PartsTuple>(parts))
+		    : parts(std::forward<PartsTuple>(parts))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		tuple_observable(tuple_observable &&other)
-			: parts(std::move(other.parts))
-			, receiver(std::move(other.receiver))
-			, buffer(std::move(other.buffer))
-			, elements_received(std::move(other.elements_received))
-			, observers(std::move(other.observers))
+		    : parts(std::move(other.parts))
+		    , receiver(std::move(other.receiver))
+		    , buffer(std::move(other.buffer))
+		    , elements_received(std::move(other.elements_received))
+		    , observers(std::move(other.observers))
 		{
 		}
 
 		tuple_observable(tuple_observable const &other)
-			: parts(other.parts)
-			, receiver(other.receiver)
-			, buffer(other.buffer)
-			, elements_received(other.elements_received)
-			, observers(other.observers)
+		    : parts(other.parts)
+		    , receiver(other.receiver)
+		    , buffer(other.buffer)
+		    , elements_received(other.elements_received)
+		    , observers(other.observers)
 		{
 		}
 
-		tuple_observable &operator = (tuple_observable &&other)
+		tuple_observable &operator=(tuple_observable &&other)
 		{
 			parts = std::move(other.parts);
 			receiver = std::move(other.receiver);
@@ -60,7 +61,7 @@ namespace Si
 			return *this;
 		}
 
-		tuple_observable &operator = (tuple_observable const &other)
+		tuple_observable &operator=(tuple_observable const &other)
 		{
 			parts = other.parts;
 			receiver = other.receiver;
@@ -80,7 +81,6 @@ namespace Si
 		}
 
 	private:
-
 		template <class Element, std::size_t Index>
 		struct tuple_observer : observer<Element>
 		{
@@ -104,13 +104,14 @@ namespace Si
 		template <class Indices>
 		struct make_observers;
 
-		template <std::size_t ...I>
+		template <std::size_t... I>
 		struct make_observers<ranges::v3::integer_sequence<I...>>
 		{
 			typedef std::tuple<tuple_observer<typename Parts::element_type, I>...> type;
 		};
 
-		typedef typename make_observers<typename ranges::v3::make_integer_sequence<sizeof...(Parts)>::type>::type observers_type;
+		typedef typename make_observers<typename ranges::v3::make_integer_sequence<sizeof...(Parts)>::type>::type
+		    observers_type;
 
 		parts_tuple parts;
 		observer<buffer_tuple> *receiver = nullptr;
@@ -118,7 +119,7 @@ namespace Si
 		std::bitset<sizeof...(Parts)> elements_received;
 		observers_type observers;
 
-		template <std::size_t Index, class Head, class ...Tail>
+		template <std::size_t Index, class Head, class... Tail>
 		void async_get_one_impl()
 		{
 			auto &observer = std::get<Index>(observers);
@@ -146,10 +147,10 @@ namespace Si
 		}
 	};
 
-	template <class ...Parts>
-	auto make_tuple(Parts &&...parts)
+	template <class... Parts>
+	auto make_tuple(Parts &&... parts)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> tuple_observable<typename std::decay<Parts>::type...>
+	    -> tuple_observable<typename std::decay<Parts>::type...>
 #endif
 	{
 		return tuple_observable<typename std::decay<Parts>::type...>(std::make_tuple(std::forward<Parts>(parts)...));

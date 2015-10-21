@@ -11,20 +11,19 @@ namespace Si
 	{
 		typedef Char char_type;
 
-		basic_c_string() BOOST_NOEXCEPT
-			: m_begin(nullptr)
+		basic_c_string() BOOST_NOEXCEPT : m_begin(nullptr)
 		{
 		}
 
 		explicit basic_c_string(char_type const *begin)
-			: m_begin(begin)
+		    : m_begin(begin)
 		{
 			assert(m_begin);
 		}
 
 		template <size_t N>
-		basic_c_string(char_type const (&literal)[N])
-			: m_begin(&literal[0])
+		basic_c_string(char_type const(&literal)[N])
+		    : m_begin(&literal[0])
 		{
 		}
 
@@ -49,7 +48,6 @@ namespace Si
 		}
 
 	private:
-
 		char_type const *m_begin;
 	};
 
@@ -61,18 +59,18 @@ namespace Si
 
 	typedef
 #ifdef _WIN32
-		cw_string
+	    cw_string
 #else
-		c_string
+	    c_string
 #endif
-		os_c_string;
+	        os_c_string;
 
 	typedef os_c_string native_path_string;
 
 #ifdef _WIN32
-#	define SILICIUM_SYSTEM_LITERAL(x) L ## x
+#define SILICIUM_SYSTEM_LITERAL(x) L##x
 #else
-#	define SILICIUM_SYSTEM_LITERAL(x) x
+#define SILICIUM_SYSTEM_LITERAL(x) x
 #endif
 }
 

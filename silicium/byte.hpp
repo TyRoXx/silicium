@@ -21,7 +21,7 @@ namespace Si
 	}
 
 	template <class Char>
-	std::basic_ostream<Char> &operator << (std::basic_ostream<Char> &out, byte value)
+	std::basic_ostream<Char> &operator<<(std::basic_ostream<Char> &out, byte value)
 	{
 		return out << static_cast<unsigned>(value);
 	}

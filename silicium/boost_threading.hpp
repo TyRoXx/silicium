@@ -26,17 +26,18 @@ namespace Si
 		{
 			typedef boost::packaged_task<Result
 #ifdef BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
-				()
+			                             ()
 #endif
-			> type;
+			                             > type;
 		};
 #endif
 		typedef boost::mutex mutex;
 		typedef boost::condition_variable condition_variable;
 		typedef boost::unique_lock<boost::mutex> unique_lock;
 #if (BOOST_VERSION >= 105000) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class Action, class ...Args>
-		static auto launch_async(Action &&action, Args &&...args) -> boost::unique_future<decltype(action(std::forward<Args>(args)...))>
+		template <class Action, class... Args>
+		static auto launch_async(Action &&action, Args &&... args)
+		    -> boost::unique_future<decltype(action(std::forward<Args>(args)...))>
 		{
 			return boost::async(boost::launch::async, std::forward<Action>(action), std::forward<Args>(args)...);
 		}

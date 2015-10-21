@@ -11,23 +11,20 @@ namespace Si
 	{
 		native_file_descriptor handle;
 
-		file_handle() BOOST_NOEXCEPT
-			: handle(no_file_handle)
+		file_handle() BOOST_NOEXCEPT : handle(no_file_handle)
 		{
 		}
 
-		file_handle(file_handle &&other) BOOST_NOEXCEPT
-			: handle(no_file_handle)
+		file_handle(file_handle &&other) BOOST_NOEXCEPT : handle(no_file_handle)
 		{
 			swap(other);
 		}
 
-		explicit file_handle(native_file_descriptor handle) BOOST_NOEXCEPT
-			: handle(handle)
+		explicit file_handle(native_file_descriptor handle) BOOST_NOEXCEPT : handle(handle)
 		{
 		}
 
-		file_handle &operator = (file_handle &&other) BOOST_NOEXCEPT
+		file_handle &operator=(file_handle &&other) BOOST_NOEXCEPT
 		{
 			swap(other);
 			return *this;
@@ -58,9 +55,8 @@ namespace Si
 		}
 
 	private:
-
 		SILICIUM_DELETED_FUNCTION(file_handle(file_handle const &))
-		SILICIUM_DELETED_FUNCTION(file_handle &operator = (file_handle const &))
+		SILICIUM_DELETED_FUNCTION(file_handle &operator=(file_handle const &))
 	};
 
 #if SILICIUM_HAS_IS_HANDLE

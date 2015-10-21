@@ -11,13 +11,14 @@ namespace Si
 	{
 #ifdef _WIN32
 		DWORD read_bytes = 0;
-		DWORD const reading = static_cast<DWORD>(std::min<size_t>(destination.size(), std::numeric_limits<DWORD>::max()));
+		DWORD const reading =
+		    static_cast<DWORD>(std::min<size_t>(destination.size(), std::numeric_limits<DWORD>::max()));
 		if (!ReadFile(file, destination.begin(), reading, &read_bytes, nullptr))
 		{
 			DWORD error = GetLastError();
 			if (error == ERROR_BROKEN_PIPE)
 			{
-				//end of pipe
+				// end of pipe
 				return static_cast<std::size_t>(0);
 			}
 			return boost::system::error_code(error, boost::system::system_category());
@@ -31,7 +32,7 @@ namespace Si
 #endif
 		if (read_bytes == 0)
 		{
-			//end of file
+			// end of file
 			return static_cast<std::size_t>(0);
 		}
 		return static_cast<std::size_t>(read_bytes);

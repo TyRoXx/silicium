@@ -41,7 +41,8 @@ BOOST_AUTO_TEST_CASE(enumerating_source_indirectly_empty)
 BOOST_AUTO_TEST_CASE(enumerating_source_non_empty)
 {
 	int const element = 3;
-	auto s = Si::make_enumerating_source(Si::make_single_source(Si::iterator_range<int const *>(&element, &element + 1)));
+	auto s =
+	    Si::make_enumerating_source(Si::make_single_source(Si::iterator_range<int const *>(&element, &element + 1)));
 	Si::optional<int> e = Si::get(s);
 	BOOST_REQUIRE(e);
 	BOOST_CHECK_EQUAL(3, e);
@@ -50,7 +51,8 @@ BOOST_AUTO_TEST_CASE(enumerating_source_non_empty)
 BOOST_AUTO_TEST_CASE(enumerating_source_map_next_at_the_end)
 {
 	int const element = 3;
-	auto s = Si::make_enumerating_source(Si::make_single_source(Si::iterator_range<int const *>(&element, &element + 1)));
+	auto s =
+	    Si::make_enumerating_source(Si::make_single_source(Si::iterator_range<int const *>(&element, &element + 1)));
 	Si::iterator_range<int const *> m = s.map_next(2);
 	BOOST_CHECK_EQUAL(&element, m.begin());
 	BOOST_CHECK_EQUAL(1, m.size());

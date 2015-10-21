@@ -15,7 +15,7 @@ namespace Si
 		typedef Element element_type;
 
 		bridge()
-			: receiver_(nullptr)
+		    : receiver_(nullptr)
 		{
 		}
 
@@ -43,7 +43,6 @@ namespace Si
 		}
 
 	private:
-
 		observer<element_type> *receiver_;
 	};
 }

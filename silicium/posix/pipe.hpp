@@ -5,9 +5,9 @@
 #include <silicium/file_handle.hpp>
 #include <silicium/error_or.hpp>
 #ifdef _WIN32
-#	include <silicium/win32/win32.hpp>
+#include <silicium/win32/win32.hpp>
 #else
-#	include <fcntl.h>
+#include <fcntl.h>
 #endif
 
 namespace Si
@@ -46,13 +46,11 @@ namespace Si
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		pipe(pipe &&other) BOOST_NOEXCEPT
-			: write(std::move(other.write))
-			, read(std::move(other.read))
+		pipe(pipe &&other) BOOST_NOEXCEPT : write(std::move(other.write)), read(std::move(other.read))
 		{
 		}
 
-		pipe &operator = (pipe &&other) BOOST_NOEXCEPT
+		pipe &operator=(pipe &&other) BOOST_NOEXCEPT
 		{
 			write = std::move(other.write);
 			read = std::move(other.read);
@@ -60,7 +58,7 @@ namespace Si
 		}
 
 		SILICIUM_DELETED_FUNCTION(pipe(pipe const &))
-		SILICIUM_DELETED_FUNCTION(pipe &operator = (pipe const &))
+		SILICIUM_DELETED_FUNCTION(pipe &operator=(pipe const &))
 #endif
 	};
 

@@ -16,11 +16,11 @@ BOOST_AUTO_TEST_CASE(asio_post)
 	Si::bridge<int> b;
 	bool got_element = false;
 	auto forwarder = Si::asio::make_post_forwarder(io, Si::ref(b), [&got_element](int element)
-	{
-		BOOST_REQUIRE(!got_element);
-		got_element = true;
-		BOOST_CHECK_EQUAL(3, element);
-	});
+	                                               {
+		                                               BOOST_REQUIRE(!got_element);
+		                                               got_element = true;
+		                                               BOOST_CHECK_EQUAL(3, element);
+		                                           });
 	BOOST_CHECK(!got_element);
 	forwarder.start();
 	BOOST_CHECK(!got_element);
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(asio_post)
 
 BOOST_AUTO_TEST_CASE(asio_make_tcp_acceptor)
 {
-	//make sure that all overloads still compile
+	// make sure that all overloads still compile
 	boost::asio::io_service io;
 #if BOOST_VERSION >= 105400
 	auto a = Si::asio::make_tcp_acceptor(boost::asio::ip::tcp::acceptor(io));

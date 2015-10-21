@@ -8,35 +8,34 @@
 namespace Si
 {
 	template <class Input, class ElementPredicate>
-	struct while_observable
-		: private observer<typename Input::element_type>
+	struct while_observable : private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 
 		while_observable()
-			: receiver_(nullptr)
+		    : receiver_(nullptr)
 		{
 		}
 
 		while_observable(Input input, ElementPredicate is_not_end)
-			: input(std::move(input))
-			, is_not_end(std::move(is_not_end))
-			, receiver_(nullptr)
+		    : input(std::move(input))
+		    , is_not_end(std::move(is_not_end))
+		    , receiver_(nullptr)
 		{
 		}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		while_observable(while_observable &&) = default;
-		while_observable &operator = (while_observable &&) = default;
+		while_observable &operator=(while_observable &&) = default;
 #else
 		while_observable(while_observable &&other)
-			: input(std::move(other.input))
-			, is_not_end(std::move(other.is_not_end))
-			, receiver_(other.receiver_)
+		    : input(std::move(other.input))
+		    , is_not_end(std::move(other.is_not_end))
+		    , receiver_(other.receiver_)
 		{
 		}
 
-		while_observable &operator = (while_observable &&other)
+		while_observable &operator=(while_observable &&other)
 		{
 			input = std::move(other.input);
 			is_not_end = std::move(other.is_not_end);
@@ -50,11 +49,11 @@ namespace Si
 		{
 			assert(!receiver_);
 			receiver_ = receiver.get();
-			input.async_get_one(extend(std::forward<Observer>(receiver), observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this))));
+			input.async_get_one(extend(std::forward<Observer>(receiver),
+			                           observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this))));
 		}
 
 	private:
-
 		Input input;
 		ElementPredicate is_not_end;
 		observer<element_type> *receiver_;
@@ -80,13 +79,11 @@ namespace Si
 	};
 
 	template <class Input, class ElementPredicate>
-	auto while_(Input &&input, ElementPredicate &&is_not_end) -> while_observable<
-		typename std::decay<Input>::type,
-		typename std::decay<ElementPredicate>::type>
+	auto while_(Input &&input, ElementPredicate &&is_not_end)
+	    -> while_observable<typename std::decay<Input>::type, typename std::decay<ElementPredicate>::type>
 	{
-		return while_observable<
-				typename std::decay<Input>::type,
-				typename std::decay<ElementPredicate>::type>(std::forward<Input>(input), std::forward<ElementPredicate>(is_not_end));
+		return while_observable<typename std::decay<Input>::type, typename std::decay<ElementPredicate>::type>(
+		    std::forward<Input>(input), std::forward<ElementPredicate>(is_not_end));
 	}
 }
 

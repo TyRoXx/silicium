@@ -11,35 +11,34 @@
 namespace Si
 {
 	template <class Element, class Input, class Transformation, class Observer = ptr_observer<observer<Element>>>
-	struct conditional_transformer
-		: private observer<typename Input::element_type>
+	struct conditional_transformer : private observer<typename Input::element_type>
 	{
 		typedef Element element_type;
 
 		conditional_transformer()
-			: receiver_()
+		    : receiver_()
 		{
 		}
 
 		explicit conditional_transformer(Input original, Transformation transform)
-			: original(std::move(original))
-			, transform(std::move(transform))
-			, receiver_()
+		    : original(std::move(original))
+		    , transform(std::move(transform))
+		    , receiver_()
 		{
 		}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		conditional_transformer(conditional_transformer &&) = default;
-		conditional_transformer &operator = (conditional_transformer &&) = default;
+		conditional_transformer &operator=(conditional_transformer &&) = default;
 #else
 		conditional_transformer(conditional_transformer &&other)
-			: original(std::move(other.original))
-			, transform(std::move(other.transform))
-			, receiver_(std::move(other.receiver_))
+		    : original(std::move(other.original))
+		    , transform(std::move(other.transform))
+		    , receiver_(std::move(other.receiver_))
 		{
 		}
 
-		conditional_transformer &operator = (conditional_transformer &&other)
+		conditional_transformer &operator=(conditional_transformer &&other)
 		{
 			original = std::move(other.original);
 			transform = std::move(other.transform);
@@ -55,13 +54,12 @@ namespace Si
 		}
 
 	private:
-
 		Input original;
-		Transformation transform; //TODO: optimize for emptiness
+		Transformation transform; // TODO: optimize for emptiness
 		optional<Observer> receiver_;
 
 		SILICIUM_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &))
-		SILICIUM_DELETED_FUNCTION(conditional_transformer &operator = (conditional_transformer const &))
+		SILICIUM_DELETED_FUNCTION(conditional_transformer &operator=(conditional_transformer const &))
 
 		void fetch()
 		{
@@ -88,11 +86,12 @@ namespace Si
 	};
 
 	template <class Element, class Input, class Transformation>
-	auto transform_if_initialized(Input &&input, Transformation &&transform) -> conditional_transformer<Element, typename std::decay<Input>::type, typename std::decay<Transformation>::type>
+	auto transform_if_initialized(Input &&input, Transformation &&transform)
+	    -> conditional_transformer<Element, typename std::decay<Input>::type, typename std::decay<Transformation>::type>
 	{
-		return conditional_transformer<Element, typename std::decay<Input>::type, typename std::decay<Transformation>::type>(
-			std::forward<Input>(input),
-			std::forward<Transformation>(transform));
+		return conditional_transformer<Element, typename std::decay<Input>::type,
+		                               typename std::decay<Transformation>::type>(
+		    std::forward<Input>(input), std::forward<Transformation>(transform));
 	}
 }
 

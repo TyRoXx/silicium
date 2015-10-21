@@ -20,15 +20,15 @@ namespace Si
 		typedef Si::ended element_type;
 
 		end_observable()
-			: receiver_(nullptr)
-			, has_ended(false)
+		    : receiver_(nullptr)
+		    , has_ended(false)
 		{
 		}
 
 		explicit end_observable(Input input)
-			: input(std::move(input))
-			, receiver_(nullptr)
-			, has_ended(false)
+		    : input(std::move(input))
+		    , receiver_(nullptr)
+		    , has_ended(false)
 		{
 		}
 
@@ -44,7 +44,6 @@ namespace Si
 		}
 
 	private:
-
 		Input input;
 		observer<element_type> *receiver_;
 		bool has_ended;
@@ -71,7 +70,7 @@ namespace Si
 	template <class Input>
 	auto make_end_observable(Input &&input)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> end_observable<typename std::decay<Input>::type>
+	    -> end_observable<typename std::decay<Input>::type>
 #endif
 	{
 		return end_observable<typename std::decay<Input>::type>(std::forward<Input>(input));

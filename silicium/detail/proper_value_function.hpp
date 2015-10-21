@@ -11,12 +11,10 @@ namespace Si
 	namespace detail
 	{
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-		template <class F, class R, class ...Args>
-		struct proper_value_function : std::conditional<
-			Si::is_default_constructible<F>::value && Si::is_move_assignable<F>::value,
-			F,
-			Si::function<R (Args...)>
-		>
+		template <class F, class R, class... Args>
+		struct proper_value_function
+		    : std::conditional<Si::is_default_constructible<F>::value && Si::is_move_assignable<F>::value, F,
+		                       Si::function<R(Args...)>>
 		{
 		};
 #endif

@@ -41,7 +41,7 @@ namespace Si
 				return "sqlite3";
 			}
 
-	        virtual std::string message(int ev) const SILICIUM_OVERRIDE
+			virtual std::string message(int ev) const SILICIUM_OVERRIDE
 			{
 #if SQLITE_VERSION_NUMBER > 3007009
 				return sqlite3_errstr(ev);
@@ -87,18 +87,20 @@ namespace Si
 
 		typedef bounded_int<int, 0,
 #if SILICIUM_COMPILER_HAS_CONSTEXPR_NUMERIC_LIMITS
-			(std::numeric_limits<int>::max)()
+		                    (std::numeric_limits<int>::max)()
 #else
-			INT_MAX
+		                    INT_MAX
 #endif
-		> positive_int;
+		                    > positive_int;
 
-		inline boost::system::error_code bind(sqlite3_stmt &statement, positive_int zero_based_index, sqlite3_int64 value)
+		inline boost::system::error_code bind(sqlite3_stmt &statement, positive_int zero_based_index,
+		                                      sqlite3_int64 value)
 		{
 			return make_error_code(sqlite3_bind_int64(&statement, zero_based_index.value(), value));
 		}
 
-		inline boost::system::error_code bind(sqlite3_stmt &statement, positive_int zero_based_index, char const *begin, int length)
+		inline boost::system::error_code bind(sqlite3_stmt &statement, positive_int zero_based_index, char const *begin,
+		                                      int length)
 		{
 			return make_error_code(sqlite3_bind_text(&statement, zero_based_index.value(), begin, length, nullptr));
 		}
@@ -109,7 +111,7 @@ namespace Si
 			done = SQLITE_DONE
 		};
 
-		inline std::ostream &operator << (std::ostream &out, step_result result)
+		inline std::ostream &operator<<(std::ostream &out, step_result result)
 		{
 			return out << static_cast<int>(result);
 		}
@@ -119,8 +121,10 @@ namespace Si
 			int rc = sqlite3_step(&statement);
 			switch (rc)
 			{
-			case SQLITE_ROW: return step_result::row;
-			case SQLITE_DONE: return step_result::done;
+			case SQLITE_ROW:
+				return step_result::row;
+			case SQLITE_DONE:
+				return step_result::done;
 			default:
 				return make_error_code(rc);
 			}
@@ -146,7 +150,8 @@ namespace Si
 		inline memory_range column_text(sqlite3_stmt &statement, positive_int zero_based_index)
 		{
 			assert(zero_based_index < column_count(statement));
-			char const *data = reinterpret_cast<char const *>(sqlite3_column_text(&statement, zero_based_index.value()));
+			char const *data =
+			    reinterpret_cast<char const *>(sqlite3_column_text(&statement, zero_based_index.value()));
 			int length = sqlite3_column_bytes(&statement, zero_based_index.value());
 			return memory_range(data, data + length);
 		}

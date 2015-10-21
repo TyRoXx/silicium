@@ -23,7 +23,7 @@ namespace Si
 		typedef char element_type;
 
 		explicit received_from_socket_source(Source<error_or<memory_range>>::interface &original)
-			: original(&original)
+		    : original(&original)
 		{
 		}
 
@@ -59,18 +59,17 @@ namespace Si
 #ifdef _MSC_VER
 			if (copy_size == 0)
 			{
-				//The VC++ 2013 copy_n requires non-nullptr iterators although nullptr is
-				//a perfectly valid iterator in an empty range. We do not call copy_n in that special case.
+				// The VC++ 2013 copy_n requires non-nullptr iterators although nullptr is
+				// a perfectly valid iterator in an empty range. We do not call copy_n in that special case.
 				return destination.begin();
 			}
 #endif
-			char * const copied = std::copy_n(mapped.begin(), copy_size, destination.begin());
+			char *const copied = std::copy_n(mapped.begin(), copy_size, destination.begin());
 			skip(static_cast<std::size_t>(std::distance(destination.begin(), copied)));
 			return copied;
 		}
 
 	private:
-
 		Source<error_or<memory_range>>::interface *original;
 		memory_range rest;
 
@@ -84,7 +83,7 @@ namespace Si
 			skipped += rest_skipped;
 			if (count > 0)
 			{
-				//TODO
+				// TODO
 				SILICIUM_UNREACHABLE();
 			}
 			return skipped;

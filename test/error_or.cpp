@@ -57,12 +57,12 @@ struct throws_on_copy_construction
 	bool active;
 
 	throws_on_copy_construction()
-		: active(true)
+	    : active(true)
 	{
 	}
 
 	throws_on_copy_construction(throws_on_copy_construction const &other)
-		: active(other.active)
+	    : active(other.active)
 	{
 		if (active)
 		{
@@ -70,22 +70,22 @@ struct throws_on_copy_construction
 		}
 	}
 
-	SILICIUM_DELETED_FUNCTION(throws_on_copy_construction &operator = (throws_on_copy_construction const &))
+	SILICIUM_DELETED_FUNCTION(throws_on_copy_construction &operator=(throws_on_copy_construction const &))
 };
 
 BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_value_throws)
 {
 	BOOST_CHECK_EXCEPTION(
-		[]()
-	{
-		throws_on_copy_construction const original;
-		Si::error_or<throws_on_copy_construction> e((original));
-	}(),
-		expected_exception,
-		[](expected_exception const &)
-	{
-		return true;
-	});
+	    []()
+	    {
+		    throws_on_copy_construction const original;
+		    Si::error_or<throws_on_copy_construction> e((original));
+		}(),
+	    expected_exception,
+	    [](expected_exception const &)
+	    {
+		    return true;
+		});
 }
 
 BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_error_or_throws)
@@ -95,15 +95,15 @@ BOOST_AUTO_TEST_CASE(error_or_copy_construction_from_error_or_throws)
 	Si::error_or<throws_on_copy_construction> e(original);
 	e.get_ptr()->active = true;
 	BOOST_CHECK_EXCEPTION(
-		[&e]()
-	{
-		Si::error_or<throws_on_copy_construction> f((e));
-	}(),
-		expected_exception,
-		[](expected_exception const &)
-	{
-		return true;
-	});
+	    [&e]()
+	    {
+		    Si::error_or<throws_on_copy_construction> f((e));
+		}(),
+	    expected_exception,
+	    [](expected_exception const &)
+	    {
+		    return true;
+		});
 }
 
 struct throws_on_assignment
@@ -116,7 +116,7 @@ struct throws_on_assignment
 	{
 	}
 
-	throws_on_assignment &operator = (throws_on_assignment const &)
+	throws_on_assignment &operator=(throws_on_assignment const &)
 	{
 		throw expected_exception();
 	}
@@ -126,23 +126,23 @@ BOOST_AUTO_TEST_CASE(error_or_copy_assignment_from_value_to_success_throws)
 {
 	Si::error_or<throws_on_assignment> to((throws_on_assignment()));
 	BOOST_CHECK_EXCEPTION(
-		[&to]()
-	{
-		throws_on_assignment const original;
-		to = original;
-	}(),
-		expected_exception,
-		[](expected_exception const &)
-	{
-		return true;
-	});
+	    [&to]()
+	    {
+		    throws_on_assignment const original;
+		    to = original;
+		}(),
+	    expected_exception,
+	    [](expected_exception const &)
+	    {
+		    return true;
+		});
 }
 
 BOOST_AUTO_TEST_CASE(error_or_copy_assignment_from_value_to_error)
 {
 	Si::error_or<throws_on_assignment> e(boost::system::error_code(23, boost::system::system_category()));
 	throws_on_assignment const original;
-	e = original; //should not throw because of the value is copy-constructed
+	e = original; // should not throw because of the value is copy-constructed
 }
 
 BOOST_AUTO_TEST_CASE(error_or_throwing_get)
@@ -151,9 +151,9 @@ BOOST_AUTO_TEST_CASE(error_or_throwing_get)
 	Si::error_or<int> error(ec);
 	BOOST_CHECK(error.is_error());
 	BOOST_CHECK_EXCEPTION(error.get(), boost::system::system_error, [ec](boost::system::system_error const &ex)
-	{
-		return ex.code() == ec;
-	});
+	                      {
+		                      return ex.code() == ec;
+		                  });
 }
 
 BOOST_AUTO_TEST_CASE(error_or_std)
@@ -162,9 +162,9 @@ BOOST_AUTO_TEST_CASE(error_or_std)
 	Si::error_or<int, std::error_code> error(ec);
 	BOOST_CHECK(error.is_error());
 	BOOST_CHECK_EXCEPTION(error.get(), std::system_error, [ec](std::system_error const &ex)
-	{
-		return ex.code() == ec;
-	});
+	                      {
+		                      return ex.code() == ec;
+		                  });
 }
 #endif
 
@@ -190,21 +190,19 @@ BOOST_AUTO_TEST_CASE(error_or_construct_from_convertible)
 BOOST_AUTO_TEST_CASE(error_or_map_value)
 {
 	BOOST_CHECK_EQUAL(Si::error_or<long>(3L), Si::map(Si::error_or<long>(2L), [](long value)
-	{
-		return value + 1;
-	}));
+	                                                  {
+		                                                  return value + 1;
+		                                              }));
 }
 
 BOOST_AUTO_TEST_CASE(error_or_map_error)
 {
 	boost::system::error_code const test_error(2, boost::system::native_ecat);
-	BOOST_CHECK_EQUAL(
-		Si::error_or<long>(test_error),
-		Si::map(Si::error_or<long>(test_error), [](long)
-	{
-		BOOST_FAIL("no value expected");
-		return 0;
-	}));
+	BOOST_CHECK_EQUAL(Si::error_or<long>(test_error), Si::map(Si::error_or<long>(test_error), [](long)
+	                                                          {
+		                                                          BOOST_FAIL("no value expected");
+		                                                          return 0;
+		                                                      }));
 }
 
 template <class T>
@@ -221,27 +219,26 @@ struct move_only_comparable
 	}
 
 	move_only_comparable(T value)
-		: value(std::move(value))
+	    : value(std::move(value))
 	{
 	}
 
-	move_only_comparable(move_only_comparable &&other) BOOST_NOEXCEPT
-		: value(std::move(other.value))
+	move_only_comparable(move_only_comparable &&other) BOOST_NOEXCEPT : value(std::move(other.value))
 	{
 	}
 
 	move_only_comparable(move_only_comparable const &other)
-		: value(other.value)
+	    : value(other.value)
 	{
 	}
 
-	move_only_comparable &operator = (move_only_comparable &&other) BOOST_NOEXCEPT
+	move_only_comparable &operator=(move_only_comparable &&other) BOOST_NOEXCEPT
 	{
 		value = std::move(other.value);
 		return *this;
 	}
 
-	move_only_comparable &operator = (move_only_comparable const &other)
+	move_only_comparable &operator=(move_only_comparable const &other)
 	{
 		value = other.value;
 		return *this;
@@ -249,19 +246,19 @@ struct move_only_comparable
 };
 
 template <class T>
-bool operator == (move_only_comparable<T> const &left, move_only_comparable<T> const &right)
+bool operator==(move_only_comparable<T> const &left, move_only_comparable<T> const &right)
 {
 	return left.value == right.value;
 }
 
 template <class T>
-bool operator != (move_only_comparable<T> const &left, move_only_comparable<T> const &right)
+bool operator!=(move_only_comparable<T> const &left, move_only_comparable<T> const &right)
 {
 	return left.value != right.value;
 }
 
 template <class T>
-std::ostream &operator << (std::ostream &out, move_only_comparable<T> const &value)
+std::ostream &operator<<(std::ostream &out, move_only_comparable<T> const &value)
 {
 	return out << value.value;
 }
@@ -344,7 +341,7 @@ namespace boost
 {
 	// teach Boost.Test how to print std::pair
 	template <typename K, typename V>
-	wrap_stringstream &operator << (wrap_stringstream &wrapped, std::pair<const K, V> const &item)
+	wrap_stringstream &operator<<(wrap_stringstream &wrapped, std::pair<const K, V> const &item)
 	{
 		return wrapped << '{' << item.first << ", " << item.second << '}';
 	}
@@ -367,7 +364,8 @@ namespace
 		}
 		for (int i = 1000; i < 2000; ++i)
 		{
-			std::pair<Si::error_or<int>, long> entry(Si::error_or<int>(boost::system::error_code(i, boost::system::system_category())), 1000 + i);
+			std::pair<Si::error_or<int>, long> entry(
+			    Si::error_or<int>(boost::system::error_code(i, boost::system::system_category())), 1000 + i);
 			tree.insert(entry);
 			BOOST_CHECK_EQUAL(1u, tree.count(entry.first));
 			hash.insert(entry);
@@ -382,18 +380,13 @@ namespace
 
 BOOST_AUTO_TEST_CASE(error_or_as_boost_map_key)
 {
-	test_error_or_as_map_key<
-		boost::container::map<Si::error_or<int>, long>,
-		boost::unordered_map<Si::error_or<int>, long>
-		>();
+	test_error_or_as_map_key<boost::container::map<Si::error_or<int>, long>,
+	                         boost::unordered_map<Si::error_or<int>, long>>();
 }
 
 BOOST_AUTO_TEST_CASE(error_or_as_std_map_key)
 {
-	test_error_or_as_map_key<
-		std::map<Si::error_or<int>, long>,
-		std::unordered_map<Si::error_or<int>, long>
-		>();
+	test_error_or_as_map_key<std::map<Si::error_or<int>, long>, std::unordered_map<Si::error_or<int>, long>>();
 }
 
 BOOST_AUTO_TEST_CASE(error_or_move_value)

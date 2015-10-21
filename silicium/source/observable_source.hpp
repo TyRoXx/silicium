@@ -15,13 +15,13 @@ namespace Si
 		typedef typename Observable::element_type element_type;
 
 		observable_source()
-			: yield(nullptr)
+		    : yield(nullptr)
 		{
 		}
 
 		observable_source(Observable input, YieldContext &yield)
-			: input(std::move(input))
-			, yield(&yield)
+		    : input(std::move(input))
+		    , yield(&yield)
 		{
 		}
 
@@ -68,7 +68,6 @@ namespace Si
 		}
 
 	private:
-
 		Observable input;
 		YieldContext *yield;
 	};
@@ -76,10 +75,11 @@ namespace Si
 	template <class Observable, class YieldContext>
 	auto make_observable_source(Observable &&input, YieldContext &yield)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> observable_source<typename std::decay<Observable>::type, YieldContext>
+	    -> observable_source<typename std::decay<Observable>::type, YieldContext>
 #endif
 	{
-		return observable_source<typename std::decay<Observable>::type, YieldContext>(std::forward<Observable>(input), yield);
+		return observable_source<typename std::decay<Observable>::type, YieldContext>(std::forward<Observable>(input),
+		                                                                              yield);
 	}
 }
 

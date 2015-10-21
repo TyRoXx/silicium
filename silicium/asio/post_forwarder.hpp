@@ -15,15 +15,15 @@ namespace Si
 		auto make_post_forwarder(boost::asio::io_service &io, Observable &&from, Callback &&handler)
 		{
 			typedef typename std::decay<Observable>::type clean_observable;
-			return for_each(
-				std::forward<Observable>(from),
-				[&io, SILICIUM_CAPTURE_EXPRESSION(handler, std::forward<Callback>(handler))](typename clean_observable::element_type element)
-			{
-				io.post([SILICIUM_CAPTURE_EXPRESSION(element, std::move(element)), handler]() mutable
-				{
-					handler(std::move(element));
-				});
-			});
+			return for_each(std::forward<Observable>(from),
+			                [&io, SILICIUM_CAPTURE_EXPRESSION(handler, std::forward<Callback>(handler)) ](
+			                    typename clean_observable::element_type element)
+			                {
+				                io.post([ SILICIUM_CAPTURE_EXPRESSION(element, std::move(element)), handler ]() mutable
+				                        {
+					                        handler(std::move(element));
+					                    });
+				            });
 		}
 #endif
 	}

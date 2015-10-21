@@ -16,7 +16,7 @@ namespace Si
 		}
 
 		explicit multi_sink(GetChildren get_children)
-			: m_get_children(std::move(get_children))
+		    : m_get_children(std::move(get_children))
 		{
 		}
 
@@ -34,17 +34,17 @@ namespace Si
 		}
 
 	private:
-
 		GetChildren m_get_children;
 	};
 
 	template <class Element, class Error, class GetChildren>
 	auto make_multi_sink(GetChildren &&get_children)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> multi_sink<Element, Error, typename std::decay<GetChildren>::type>
+	    -> multi_sink<Element, Error, typename std::decay<GetChildren>::type>
 #endif
 	{
-		return multi_sink<Element, Error, typename std::decay<GetChildren>::type>(std::forward<GetChildren>(get_children));
+		return multi_sink<Element, Error, typename std::decay<GetChildren>::type>(
+		    std::forward<GetChildren>(get_children));
 	}
 }
 

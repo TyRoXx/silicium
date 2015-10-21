@@ -27,11 +27,13 @@ namespace Si
 	}
 
 	template <class T>
-	struct inplace {};
+	struct inplace
+	{
+	};
 
 	namespace detail
 	{
-		template <class ...T>
+		template <class... T>
 		union union_;
 
 		template <>
@@ -99,7 +101,7 @@ namespace Si
 #endif
 		};
 
-		template <class T0, class T1, class T2, class T3, class ...T>
+		template <class T0, class T1, class T2, class T3, class... T>
 		union union_<T0, T1, T2, T3, T...>
 		{
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
@@ -124,13 +126,12 @@ namespace Si
 			union_<T...> t4;
 		};
 
-		template <class ...T>
+		template <class... T>
 		struct combined_storage
 		{
 			typedef unsigned char which_type;
 
-			combined_storage() BOOST_NOEXCEPT
-				: m_which(0)
+			combined_storage() BOOST_NOEXCEPT : m_which(0)
 			{
 			}
 
@@ -155,7 +156,6 @@ namespace Si
 			}
 
 		private:
-
 			union_<T...> m_storage;
 			which_type m_which;
 		};
@@ -187,7 +187,6 @@ namespace Si
 			}
 
 		private:
-
 			union_<Single> m_storage;
 		};
 
@@ -195,7 +194,7 @@ namespace Si
 		void destroy_storage(void *storage) BOOST_NOEXCEPT
 		{
 #ifdef _MSC_VER
-			//VC++ 2013: Silence (wrong) warning about unreferenced parameter
+			// VC++ 2013: Silence (wrong) warning about unreferenced parameter
 			(void)storage;
 #endif
 			static_cast<T *>(storage)->~T();
@@ -262,16 +261,16 @@ namespace Si
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION
-		template <class First, class ...Rest>
+		template <class First, class... Rest>
 		struct first
 		{
 			typedef First type;
 		};
 #else
-		template <class ...Sequence>
+		template <class... Sequence>
 		struct first;
 
-		template <class First, class ...Rest>
+		template <class First, class... Rest>
 		struct first<First, Rest...>
 		{
 			typedef First type;
@@ -279,24 +278,21 @@ namespace Si
 #endif
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION
-		template <class ...All>
+		template <class... All>
 		struct make_mpl_vector
 		{
 			typedef boost::mpl::vector<All...> type;
 		};
 #else
-		//workaround for GCC 4.6
+		// workaround for GCC 4.6
 
-		template <class ...All>
+		template <class... All>
 		struct make_mpl_vector;
 
-		template <class Head, class ...Tail>
+		template <class Head, class... Tail>
 		struct make_mpl_vector<Head, Tail...>
 		{
-			typedef typename boost::mpl::push_front<
-				typename make_mpl_vector<Tail...>::type,
-				Head
-			>::type type;
+			typedef typename boost::mpl::push_front<typename make_mpl_vector<Tail...>::type, Head>::type type;
 		};
 
 		template <>
@@ -306,28 +302,24 @@ namespace Si
 		};
 #endif
 
-		template <class Element, class ...All>
+		template <class Element, class... All>
 		struct index_of : boost::mpl::find<typename make_mpl_vector<All...>::type, Element>::type::pos
 		{
 		};
 
-		template <class ...T>
+		template <class... T>
 		struct are_noexcept_movable;
 
-		template <class First, class ...T>
+		template <class First, class... T>
 		struct are_noexcept_movable<First, T...>
-			: boost::mpl::and_<
-				boost::mpl::and_<
+		    : boost::mpl::and_<boost::mpl::and_<
 #if BOOST_VERSION >= 105400
-					boost::is_nothrow_move_constructible<First>,
-					boost::is_nothrow_move_assignable<First>
+		                           boost::is_nothrow_move_constructible<First>, boost::is_nothrow_move_assignable<First>
 #else
-					std::is_nothrow_move_constructible<First>,
-					std::is_nothrow_move_assignable<First>
+		                           std::is_nothrow_move_constructible<First>, std::is_nothrow_move_assignable<First>
 #endif
-				>,
-				are_noexcept_movable<T...>
-			>::type
+		                           >,
+		                       are_noexcept_movable<T...>>::type
 		{
 		};
 
@@ -335,7 +327,7 @@ namespace Si
 		struct are_noexcept_movable<> : std::true_type
 		{
 		};
-		
+
 		template <class Constructed>
 		struct construction_visitor : boost::static_visitor<Constructed>
 		{
@@ -346,19 +338,19 @@ namespace Si
 			}
 		};
 
-		template <bool IsCopyable, class ...T>
+		template <bool IsCopyable, class... T>
 		struct variant_base;
 
-		template <class ...T>
+		template <class... T>
 		struct variant_base<false, T...>
 		{
 			enum
 			{
 				is_noexcept_movable =
 #if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
-					detail::are_noexcept_movable<T...>::value
+				    detail::are_noexcept_movable<T...>::value
 #else
-					1
+				    1
 #endif
 			};
 
@@ -384,7 +376,7 @@ namespace Si
 				move_construct_storage(this->which(), this->storage(), other.storage());
 			}
 
-			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
+			variant_base &operator=(variant_base &&other) BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
 				if (this->which() == other.which())
 				{
@@ -399,34 +391,20 @@ namespace Si
 				return *this;
 			}
 
-			template <
-				class U,
-				class CleanU = typename std::decay<U>::type,
-				std::size_t Index = index_of<CleanU, T...>::value,
-				class NoFastVariant = typename std::enable_if<
-					boost::mpl::and_<
-						boost::mpl::not_<
-							std::is_base_of<
-								variant_base,
-								CleanU
-							>
-						>,
-						boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>
-					>::value,
-					void
-				>::type>
+			template <class U, class CleanU = typename std::decay<U>::type,
+			          std::size_t Index = index_of<CleanU, T...>::value,
+			          class NoFastVariant = typename std::enable_if<
+			              boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
+			                               boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
+			              void>::type>
 			variant_base(U &&value)
 			{
 				this->set_which(Index);
 				new (&this->storage()) CleanU(std::forward<U>(value));
 			}
 
-			template <
-				class Requested,
-				class ...Args,
-				std::size_t Index = index_of<Requested, T...>::value
-			>
-			explicit variant_base(inplace<Requested>, Args &&...args)
+			template <class Requested, class... Args, std::size_t Index = index_of<Requested, T...>::value>
+			explicit variant_base(inplace<Requested>, Args &&... args)
 			{
 				this->set_which(Index);
 				new (&this->storage()) Requested(std::forward<Args>(args)...);
@@ -441,10 +419,8 @@ namespace Si
 			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
 			{
 				typedef typename std::decay<Visitor>::type::result_type result;
-				static std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f
-				{{
-					&apply_visitor_impl<Visitor, T, result>...
-				}};
+				static std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f{
+				    {&apply_visitor_impl<Visitor, T, result>...}};
 				return f[this->which()](std::forward<Visitor>(visitor), &this->storage());
 			}
 
@@ -452,27 +428,22 @@ namespace Si
 			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
 			{
 				typedef typename std::decay<Visitor>::type::result_type result;
-				static std::array<result(*)(Visitor &&, void const *), sizeof...(T)> const f
-				{{
-					&apply_visitor_const_impl<Visitor, T, result>...
-				}};
+				static std::array<result (*)(Visitor &&, void const *), sizeof...(T)> const f{
+				    {&apply_visitor_const_impl<Visitor, T, result>...}};
 				return f[this->which()](std::forward<Visitor>(visitor), &this->storage());
 			}
 
-			bool operator == (variant_base const &other) const
+			bool operator==(variant_base const &other) const
 			{
 				if (this->which() != other.which())
 				{
 					return false;
 				}
-				static std::array<bool(*)(void const *, void const *), sizeof...(T)> const f =
-				{{
-					&equals<T>...
-				}};
+				static std::array<bool (*)(void const *, void const *), sizeof...(T)> const f = {{&equals<T>...}};
 				return f[this->which()](&this->storage(), &other.storage());
 			}
 
-			bool operator < (variant_base const &other) const
+			bool operator<(variant_base const &other) const
 			{
 				if (this->which() > other.which())
 				{
@@ -482,21 +453,17 @@ namespace Si
 				{
 					return true;
 				}
-				static std::array<bool(*)(void const *, void const *), sizeof...(T)> const f =
-				{{
-					&less<T>...
-				}};
+				static std::array<bool (*)(void const *, void const *), sizeof...(T)> const f = {{&less<T>...}};
 				return f[this->which()](&this->storage(), &other.storage());
 			}
 
-			template <bool IsOtherCopyable, class ...U>
+			template <bool IsOtherCopyable, class... U>
 			void assign(variant_base<IsOtherCopyable, U...> &&other)
 			{
 				*this = Si::apply_visitor(construction_visitor<variant_base>(), std::move(other));
 			}
 
-		protected: //TODO: make private somehow
-
+		protected: // TODO: make private somehow
 			typedef combined_storage<T...> storage_type;
 
 			storage_type m_storage;
@@ -518,36 +485,28 @@ namespace Si
 
 			static void move_construct_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
-				static std::array<void(*)(void *, void *), sizeof...(T)> const f =
-				{{
-					&detail::move_construct_storage<T>...
-				}};
+				static std::array<void (*)(void *, void *), sizeof...(T)> const f = {
+				    {&detail::move_construct_storage<T>...}};
 				f[which](&destination, &source);
 			}
 
 			static void destroy_storage(which_type which, char &destroyed) BOOST_NOEXCEPT
 			{
-				static std::array<void(*)(void *), sizeof...(T)> const f =
-				{{
-					&detail::destroy_storage<T>...
-				}};
+				static std::array<void (*)(void *), sizeof...(T)> const f = {{&detail::destroy_storage<T>...}};
 				f[which](&destroyed);
 			}
 
 			static void move_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
 			{
-				static std::array<void(*)(void *, void *), sizeof...(T)> const f =
-				{{
-					&detail::move_storage<T>...
-				}};
+				static std::array<void (*)(void *, void *), sizeof...(T)> const f = {{&detail::move_storage<T>...}};
 				f[which](&destination, &source);
 			}
 
 			SILICIUM_DELETED_FUNCTION(variant_base(variant_base const &))
-			SILICIUM_DELETED_FUNCTION(variant_base &operator = (variant_base const &))
+			SILICIUM_DELETED_FUNCTION(variant_base &operator=(variant_base const &))
 		};
 
-		template <class ...T>
+		template <class... T>
 		struct variant_base<true, T...> : variant_base<false, T...>
 		{
 			typedef variant_base<false, T...> base;
@@ -557,52 +516,42 @@ namespace Si
 			{
 			}
 
-			template <
-				class U,
-				class CleanU = typename std::decay<U>::type,
-				std::size_t Index = index_of<CleanU, T...>::value,
-				class NoFastVariant = typename std::enable_if<
-					boost::mpl::and_<
-						boost::mpl::not_<
-							std::is_base_of<
-								variant_base,
-								CleanU
-							>
-						>,
-						boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>
-					>::value,
-					void
-				>::type>
+			template <class U, class CleanU = typename std::decay<U>::type,
+			          std::size_t Index = index_of<CleanU, T...>::value,
+			          class NoFastVariant = typename std::enable_if<
+			              boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
+			                               boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
+			              void>::type>
 			variant_base(U &&value)
-				: base(std::forward<U>(value))
+			    : base(std::forward<U>(value))
 			{
 			}
 
-			template <class Requested, class ...Args>
-			explicit variant_base(inplace<Requested> i, Args &&...args)
-				: base(i, std::forward<Args>(args)...)
+			template <class Requested, class... Args>
+			explicit variant_base(inplace<Requested> i, Args &&... args)
+			    : base(i, std::forward<Args>(args)...)
 			{
 			}
 
 			variant_base(variant_base &&other) BOOST_NOEXCEPT_IF(base::is_noexcept_movable)
-				: base(std::move(other))
+			    : base(std::move(other))
 			{
 			}
 
 			variant_base(variant_base const &other)
-				: base()
+			    : base()
 			{
 				this->set_which(other.which());
 				copy_construct_storage(this->which(), this->storage(), other.storage());
 			}
 
-			variant_base &operator = (variant_base &&other) BOOST_NOEXCEPT_IF(base::is_noexcept_movable)
+			variant_base &operator=(variant_base &&other) BOOST_NOEXCEPT_IF(base::is_noexcept_movable)
 			{
-				base::operator = (std::move(other));
+				base::operator=(std::move(other));
 				return *this;
 			}
 
-			variant_base &operator = (variant_base const &other)
+			variant_base &operator=(variant_base const &other)
 			{
 				if (this->which() == other.which())
 				{
@@ -621,46 +570,36 @@ namespace Si
 
 			using base::assign;
 
-			template <bool IsOtherCopyable, class ...U>
+			template <bool IsOtherCopyable, class... U>
 			void assign(variant_base<IsOtherCopyable, U...> const &other)
 			{
 				*this = Si::apply_visitor(construction_visitor<variant_base>(), other);
 			}
 
 		private:
-
 			static void copy_construct_storage(which_type which, char &destination, char const &source)
 			{
-				static std::array<void(*)(void *, void const *), sizeof...(T)> const f =
-				{{
-					&detail::copy_construct_storage<T>...
-				}};
+				static std::array<void (*)(void *, void const *), sizeof...(T)> const f = {
+				    {&detail::copy_construct_storage<T>...}};
 				f[which](&destination, &source);
 			}
 
 			static void copy_storage(which_type which, char &destination, char const &source)
 			{
-				static std::array<void(*)(void *, void const *), sizeof...(T)> const f =
-				{{
-					&detail::copy_storage<T>...
-				}};
+				static std::array<void (*)(void *, void const *), sizeof...(T)> const f = {
+				    {&detail::copy_storage<T>...}};
 				f[which](&destination, &source);
 			}
 		};
 
 #if SILICIUM_HAS_COPY_TRAITS
-		template <class ...T>
+		template <class... T>
 		struct are_copyable;
 
-		template <class First, class ...T>
+		template <class First, class... T>
 		struct are_copyable<First, T...>
-			: boost::mpl::and_<
-				boost::mpl::and_<
-					Si::is_copy_constructible<First>,
-					Si::is_copy_assignable<First>
-				>,
-				are_copyable<T...>
-			>::type
+		    : boost::mpl::and_<boost::mpl::and_<Si::is_copy_constructible<First>, Si::is_copy_assignable<First>>,
+		                       are_copyable<T...>>::type
 		{
 		};
 
@@ -669,7 +608,7 @@ namespace Si
 		{
 		};
 #else
-		template <class ...T>
+		template <class... T>
 		struct are_copyable : std::true_type
 		{
 		};
@@ -679,18 +618,18 @@ namespace Si
 		BOOST_STATIC_ASSERT(are_copyable<int>::value);
 		BOOST_STATIC_ASSERT((are_copyable<int, float>::value));
 
-		//In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
-		//so this assert would fail.
+// In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
+// so this assert would fail.
 #if SILICIUM_HAS_COPY_TRAITS
-		//GCC 4.6 with Boost < 1.55 is also a problem
+		// GCC 4.6 with Boost < 1.55 is also a problem
 		BOOST_STATIC_ASSERT((!are_copyable<int, std::unique_ptr<int>>::value));
 #endif
 
 #if SILICIUM_COMPILER_HAS_USING
-		template <class ...T>
+		template <class... T>
 		using select_variant_base = variant_base<are_copyable<T...>::value, T...>;
 #else
-		template <class ...T>
+		template <class... T>
 		struct select_variant_base
 		{
 			typedef variant_base<are_copyable<T...>::value, T...> type;
@@ -702,7 +641,7 @@ namespace Si
 			std::ostream *out;
 
 			explicit ostream_visitor(std::ostream &out)
-				: out(&out)
+			    : out(&out)
 			{
 			}
 
@@ -714,8 +653,8 @@ namespace Si
 		};
 
 #if SILICIUM_COMPILER_HAS_USING
-		template <bool IsCopyable, class ...T>
-		std::ostream &operator << (std::ostream &out, variant_base<IsCopyable, T...> const &v)
+		template <bool IsCopyable, class... T>
+		std::ostream &operator<<(std::ostream &out, variant_base<IsCopyable, T...> const &v)
 		{
 			Si::apply_visitor(detail::ostream_visitor(out), v);
 			return out;
@@ -724,13 +663,13 @@ namespace Si
 	}
 
 #if SILICIUM_COMPILER_HAS_USING
-	template <class ...T>
+	template <class... T>
 	using variant = detail::select_variant_base<T...>;
 
-	template <class ...T>
+	template <class... T>
 	using non_copyable_variant = detail::variant_base<false, T...>;
 #else
-	template <class ...T>
+	template <class... T>
 	struct variant : detail::select_variant_base<T...>::type
 	{
 		typedef typename detail::select_variant_base<T...>::type base;
@@ -739,36 +678,38 @@ namespace Si
 		{
 		}
 
-		template <class First, class ...Initializer, class = typename boost::disable_if<boost::is_same<typename boost::decay<First>::type, variant>, void>::type>
-		variant(First &&first, Initializer &&...init)
-			: base(std::forward<First>(first), std::forward<Initializer>(init)...)
+		template <
+		    class First, class... Initializer,
+		    class = typename boost::disable_if<boost::is_same<typename boost::decay<First>::type, variant>, void>::type>
+		variant(First &&first, Initializer &&... init)
+		    : base(std::forward<First>(first), std::forward<Initializer>(init)...)
 		{
 		}
 
-		variant(variant &&other) BOOST_NOEXCEPT
-			: base(std::move(static_cast<base &>(other)))
+		variant(variant &&other) BOOST_NOEXCEPT : base(std::move(static_cast<base &>(other)))
 		{
 		}
 
 		variant(variant const &other)
-			: base(static_cast<base const &>(other))
+		    : base(static_cast<base const &>(other))
 		{
 		}
 
-		template <class Content, class = typename boost::disable_if<boost::is_same<typename boost::decay<Content>::type, variant>, void>::type>
-		variant &operator = (Content &&other)
+		template <class Content, class = typename boost::disable_if<
+		                             boost::is_same<typename boost::decay<Content>::type, variant>, void>::type>
+		variant &operator=(Content &&other)
 		{
 			static_cast<base &>(*this) = std::forward<Content>(other);
 			return *this;
 		}
 
-		variant &operator = (variant &&other) BOOST_NOEXCEPT
+		variant &operator=(variant &&other) BOOST_NOEXCEPT
 		{
 			static_cast<base &>(*this) = std::move(static_cast<base &>(other));
 			return *this;
 		}
 
-		variant &operator = (variant const &other)
+		variant &operator=(variant const &other)
 		{
 			static_cast<base &>(*this) = static_cast<base const &>(other);
 			return *this;
@@ -781,7 +722,7 @@ namespace Si
 		}
 	};
 
-	template <class ...T>
+	template <class... T>
 	struct non_copyable_variant : detail::variant_base<false, T...>
 	{
 		typedef typename detail::variant_base<false, T...> base;
@@ -790,25 +731,28 @@ namespace Si
 		{
 		}
 
-		template <class First, class ...Initializer, class = typename boost::disable_if<boost::is_same<typename boost::decay<First>::type, non_copyable_variant>, void>::type>
-		non_copyable_variant(First &&first, Initializer &&...init)
-			: base(std::forward<First>(first), std::forward<Initializer>(init)...)
+		template <class First, class... Initializer,
+		          class = typename boost::disable_if<
+		              boost::is_same<typename boost::decay<First>::type, non_copyable_variant>, void>::type>
+		non_copyable_variant(First &&first, Initializer &&... init)
+		    : base(std::forward<First>(first), std::forward<Initializer>(init)...)
 		{
 		}
 
-		non_copyable_variant(non_copyable_variant &&other) BOOST_NOEXCEPT
-			: base(std::move(static_cast<base &>(other)))
+		non_copyable_variant(non_copyable_variant &&other) BOOST_NOEXCEPT : base(std::move(static_cast<base &>(other)))
 		{
 		}
 
-		template <class Content, class = typename boost::disable_if<boost::is_same<typename boost::decay<Content>::type, non_copyable_variant>, void>::type>
-		non_copyable_variant &operator = (Content &&other)
+		template <class Content,
+		          class = typename boost::disable_if<
+		              boost::is_same<typename boost::decay<Content>::type, non_copyable_variant>, void>::type>
+		non_copyable_variant &operator=(Content &&other)
 		{
 			static_cast<base &>(*this) = std::forward<Content>(other);
 			return *this;
 		}
 
-		non_copyable_variant &operator = (non_copyable_variant &&other) BOOST_NOEXCEPT
+		non_copyable_variant &operator=(non_copyable_variant &&other) BOOST_NOEXCEPT
 		{
 			static_cast<base &>(*this) = std::move(static_cast<base &>(other));
 			return *this;
@@ -825,8 +769,8 @@ namespace Si
 #endif
 
 #if !SILICIUM_COMPILER_HAS_USING
-	template <class ...T>
-	std::ostream &operator << (std::ostream &out, variant<T...> const &v)
+	template <class... T>
+	std::ostream &operator<<(std::ostream &out, variant<T...> const &v)
 	{
 		Si::apply_visitor(detail::ostream_visitor(out), v);
 		return out;
@@ -838,26 +782,26 @@ namespace Si
 	BOOST_STATIC_ASSERT((is_handle<variant<int, nothing>>::value));
 #endif
 
-	template <class ...T>
-	bool operator != (variant<T...> const &left, variant<T...> const &right)
+	template <class... T>
+	bool operator!=(variant<T...> const &left, variant<T...> const &right)
 	{
 		return !(left == right);
 	}
 
-	template <class ...T>
-	bool operator > (variant<T...> const &left, variant<T...> const &right)
+	template <class... T>
+	bool operator>(variant<T...> const &left, variant<T...> const &right)
 	{
 		return (right < left);
 	}
 
-	template <class ...T>
-	bool operator <= (variant<T...> const &left, variant<T...> const &right)
+	template <class... T>
+	bool operator<=(variant<T...> const &left, variant<T...> const &right)
 	{
 		return !(left > right);
 	}
 
-	template <class ...T>
-	bool operator >= (variant<T...> const &left, variant<T...> const &right)
+	template <class... T>
+	bool operator>=(variant<T...> const &left, variant<T...> const &right)
 	{
 		return !(left < right);
 	}
@@ -874,13 +818,13 @@ namespace Si
 	template <class Element>
 	struct try_get_ptr_visitor : boost::static_visitor<Element *>
 	{
-		Element * operator()(Element &value) const BOOST_NOEXCEPT
+		Element *operator()(Element &value) const BOOST_NOEXCEPT
 		{
 			return &value;
 		}
 
 		template <class Other>
-		Element * operator()(Other const &) const BOOST_NOEXCEPT
+		Element *operator()(Other const &) const BOOST_NOEXCEPT
 		{
 			return nullptr;
 		}
@@ -899,15 +843,16 @@ namespace Si
 		return apply_visitor(try_get_ptr_visitor<Element const>{}, from);
 	}
 #else
-	template <class Element, bool IsCopyable, class ...T>
+	template <class Element, bool IsCopyable, class... T>
 	Element *try_get_ptr(detail::variant_base<IsCopyable, T...> &from) BOOST_NOEXCEPT
 	{
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
 		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
 	}
 
-	template <class Element, bool IsCopyable, class ...T>
-	typename std::add_const<Element>::type *try_get_ptr(detail::variant_base<IsCopyable, T...> const &from) BOOST_NOEXCEPT
+	template <class Element, bool IsCopyable, class... T>
+	typename std::add_const<Element>::type *
+	try_get_ptr(detail::variant_base<IsCopyable, T...> const &from) BOOST_NOEXCEPT
 	{
 		BOOST_STATIC_ASSERT((boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
 		return apply_visitor(try_get_ptr_visitor<typename std::add_const<Element>::type>{}, from);
@@ -916,17 +861,17 @@ namespace Si
 
 	namespace detail
 	{
-		template <class Result, class ...Functions>
+		template <class Result, class... Functions>
 		struct overloader;
 
 		template <class Result, class Head>
 		struct overloader<Result, Head>
 		{
-			//for apply_visitor
+			// for apply_visitor
 			typedef Result result_type;
 
 			explicit overloader(Head &head)
-				: m_head(&head)
+			    : m_head(&head)
 			{
 			}
 
@@ -936,21 +881,20 @@ namespace Si
 			}
 
 		private:
-
 			Head *m_head;
 		};
 
-		template <class Result, class Head, class ...Tail>
+		template <class Result, class Head, class... Tail>
 		struct overloader<Result, Head, Tail...> : overloader<Result, Tail...>
 		{
 			using overloader<Result, Tail...>::operator();
 
-			//for apply_visitor
+			// for apply_visitor
 			typedef Result result_type;
 
-			explicit overloader(Head &head, Tail &...tail)
-				: overloader<Result, Tail...>(tail...)
-				, m_head(&head)
+			explicit overloader(Head &head, Tail &... tail)
+			    : overloader<Result, Tail...>(tail...)
+			    , m_head(&head)
 			{
 			}
 
@@ -960,28 +904,27 @@ namespace Si
 			}
 
 		private:
-
 			Head *m_head;
 		};
 	}
 
 #if SILICIUM_GCC46
-	template <class Result, class Variant, class ...Visitors>
-	Result visit(Variant &variant, Visitors &&...visitors)
+	template <class Result, class Variant, class... Visitors>
+	Result visit(Variant &variant, Visitors &&... visitors)
 	{
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
 #else
-	template <class Result, bool IsCopyable, class ...T, class ...Visitors>
-	Result visit(detail::variant_base<IsCopyable, T...> &variant, Visitors &&...visitors)
+	template <class Result, bool IsCopyable, class... T, class... Visitors>
+	Result visit(detail::variant_base<IsCopyable, T...> &variant, Visitors &&... visitors)
 	{
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
 
-	template <class Result, bool IsCopyable, class ...T, class ...Visitors>
-	Result visit(detail::variant_base<IsCopyable, T...> const &variant, Visitors &&...visitors)
+	template <class Result, bool IsCopyable, class... T, class... Visitors>
+	Result visit(detail::variant_base<IsCopyable, T...> const &variant, Visitors &&... visitors)
 	{
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
@@ -993,7 +936,7 @@ namespace Si
 #if SILICIUM_HAS_VARIANT
 namespace std
 {
-	template <class ...T>
+	template <class... T>
 	struct hash<Si::variant<T...>>
 	{
 		std::size_t operator()(Si::variant<T...> const &v) const

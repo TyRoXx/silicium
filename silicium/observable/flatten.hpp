@@ -14,29 +14,28 @@
 namespace Si
 {
 	template <class ObservableObservable, class Mutex>
-	struct flattener
-		: private observer<typename ObservableObservable::element_type>
+	struct flattener : private observer<typename ObservableObservable::element_type>
 	{
 		typedef typename ObservableObservable::element_type sub_observable;
 		typedef typename sub_observable::element_type element_type;
 
 		flattener()
-			: input_ended(false)
-			, receiver_(nullptr)
-			, is_fetching(false)
+		    : input_ended(false)
+		    , receiver_(nullptr)
+		    , is_fetching(false)
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		flattener(flattener &&other)
-			: input_ended(false)
-			, receiver_(nullptr)
-			, is_fetching(false)
+		    : input_ended(false)
+		    , receiver_(nullptr)
+		    , is_fetching(false)
 		{
 			*this = std::move(other);
 		}
-		
-		flattener &operator = (flattener &&other)
+
+		flattener &operator=(flattener &&other)
 		{
 			input = std::move(other.input);
 			input_ended = std::move(other.input_ended);
@@ -49,11 +48,11 @@ namespace Si
 #endif
 
 		explicit flattener(ObservableObservable input)
-			: input(std::move(input))
-			, input_ended(false)
-			, receiver_(nullptr)
-			, children_mutex(make_unique<Mutex>())
-			, is_fetching(false)
+		    : input(std::move(input))
+		    , input_ended(false)
+		    , receiver_(nullptr)
+		    , children_mutex(make_unique<Mutex>())
+		    , is_fetching(false)
 		{
 		}
 
@@ -69,17 +68,14 @@ namespace Si
 		}
 
 	private:
-
-		struct child
-			: private observer<element_type>
-			, private boost::noncopyable
+		struct child : private observer<element_type>, private boost::noncopyable
 		{
 			flattener &parent;
 			sub_observable observed;
 
 			explicit child(flattener &parent, sub_observable observed)
-				: parent(parent)
-				, observed(std::move(observed))
+			    : parent(parent)
+			    , observed(std::move(observed))
 			{
 			}
 
@@ -91,7 +87,7 @@ namespace Si
 			virtual void got_element(element_type value) SILICIUM_OVERRIDE
 			{
 				Si::exchange(parent.receiver_, nullptr)->got_element(std::move(value));
-				//TODO: fix the race condition between got_element and async_get_one
+				// TODO: fix the race condition between got_element and async_get_one
 				return start();
 			}
 
@@ -111,7 +107,8 @@ namespace Si
 		void fetch()
 		{
 			assert(is_fetching);
-			return input.async_get_one(observe_by_ref(static_cast<observer<typename ObservableObservable::element_type> &>(*this)));
+			return input.async_get_one(
+			    observe_by_ref(static_cast<observer<typename ObservableObservable::element_type> &>(*this)));
 		}
 
 		void remove_child(child &removing)
@@ -119,8 +116,7 @@ namespace Si
 			boost::unique_lock<Mutex> lock(*children_mutex);
 			auto const i = children.find(&removing);
 			children.erase(i);
-			if (input_ended &&
-			    children.empty())
+			if (input_ended && children.empty())
 			{
 				exchange(receiver_, nullptr)->ended();
 			}
@@ -153,7 +149,8 @@ namespace Si
 	template <class Mutex, class ObservableObservable>
 	auto flatten(ObservableObservable &&input) -> flattener<typename std::decay<ObservableObservable>::type, Mutex>
 	{
-		return flattener<typename std::decay<ObservableObservable>::type, Mutex>(std::forward<ObservableObservable>(input));
+		return flattener<typename std::decay<ObservableObservable>::type, Mutex>(
+		    std::forward<ObservableObservable>(input));
 	}
 }
 

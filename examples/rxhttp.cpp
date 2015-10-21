@@ -20,7 +20,8 @@
 #include <boost/thread/future.hpp>
 #include <cassert>
 
-#define SILICIUM_EXAMPLE_AVAILABLE (SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT && SILICIUM_HAS_COROUTINE_GENERATOR)
+#define SILICIUM_EXAMPLE_AVAILABLE                                                                                     \
+	(SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT && SILICIUM_HAS_COROUTINE_GENERATOR)
 
 #if SILICIUM_EXAMPLE_AVAILABLE
 #include <thread>
@@ -28,9 +29,7 @@
 namespace
 {
 	template <class Socket>
-	void serve_client(
-		Socket &client,
-		boost::uintmax_t visitor_number)
+	void serve_client(Socket &client, boost::uintmax_t visitor_number)
 	{
 		Si::received_from_socket_source bytes_receiver(client.receiving());
 		Si::optional<Si::http::request> request = Si::http::parse_request(bytes_receiver);
@@ -65,10 +64,13 @@ namespace
 	struct coroutine_socket
 	{
 		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, Si::push_context<Si::nothing> &yield)
-			: socket(&socket)
-			, yield(&yield)
-			, received(4096)
-			, receiving_(Si::observable_source<socket_observable, Si::push_context<Si::nothing>>(socket_observable(socket, Si::make_iterator_range(received.data(), received.data() + received.size())), yield))
+		    : socket(&socket)
+		    , yield(&yield)
+		    , received(4096)
+		    , receiving_(Si::observable_source<socket_observable, Si::push_context<Si::nothing>>(
+		          socket_observable(socket,
+		                            Si::make_iterator_range(received.data(), received.data() + received.size())),
+		          yield))
 		{
 		}
 
@@ -84,9 +86,10 @@ namespace
 
 			auto sending = Si::asio::make_writing_observable(*socket);
 			sending.set_buffer(data);
-			auto virtualized = Si::virtualize_observable<Si::ptr_observer<Si::observer<boost::system::error_code>>>(sending);
+			auto virtualized =
+			    Si::virtualize_observable<Si::ptr_observer<Si::observer<boost::system::error_code>>>(sending);
 
-			//ignore error
+			// ignore error
 			yield->get_one(virtualized);
 		}
 
@@ -97,7 +100,6 @@ namespace
 		}
 
 	private:
-
 		boost::asio::ip::tcp::socket *socket;
 		Si::push_context<Si::nothing> *yield;
 		std::vector<char> received;
@@ -109,8 +111,8 @@ namespace
 		typedef Si::error_or<Si::memory_range> element_type;
 
 		explicit thread_socket_source(boost::asio::ip::tcp::socket &socket)
-			: socket(&socket)
-			, received(4096)
+		    : socket(&socket)
+		    , received(4096)
 		{
 		}
 
@@ -147,7 +149,6 @@ namespace
 		}
 
 	private:
-
 		boost::asio::ip::tcp::socket *socket;
 		std::vector<char> received;
 	};
@@ -155,7 +156,7 @@ namespace
 	struct thread_socket
 	{
 		explicit thread_socket(boost::asio::ip::tcp::socket &socket)
-			: receiving_(socket)
+		    : receiving_(socket)
 		{
 		}
 
@@ -167,7 +168,8 @@ namespace
 		void send(Si::iterator_range<char const *> data)
 		{
 			assert(receiving_.get_socket());
-			boost::asio::write(*receiving_.get_socket(), boost::asio::buffer(data.begin(), static_cast<std::size_t>(data.size())));
+			boost::asio::write(*receiving_.get_socket(),
+			                   boost::asio::buffer(data.begin(), static_cast<std::size_t>(data.size())));
 		}
 
 		void shutdown()
@@ -178,7 +180,6 @@ namespace
 		}
 
 	private:
-
 		thread_socket_source receiving_;
 	};
 
@@ -188,37 +189,39 @@ namespace
 	struct coroutine_web_server
 	{
 		explicit coroutine_web_server(boost::asio::io_service &io, boost::uint16_t port)
-			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
-			, clients(&acceptor)
-			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine_generator<events>([this](Si::push_context<events> &yield) -> void
-			{
-				boost::uintmax_t visitor_count = 0;
-				for (;;)
-				{
-					auto result = yield.get_one(clients);
-					if (!result)
-					{
-						break;
-					}
-					++visitor_count;
-					std::shared_ptr<boost::asio::ip::tcp::socket> client = result->get();
-					auto context =
-						[visitor_count, client]() -> events
-					{
-						auto visitor_number_ = visitor_count;
-						auto client_handler = Si::erase_shared(Si::make_coroutine_generator<Si::nothing>([client, visitor_number_](Si::push_context<Si::nothing> &yield) -> void
-						{
-							coroutine_socket coro_socket(*client, yield);
-							return serve_client(coro_socket, visitor_number_);
-						}));
-						return client_handler;
-					}();
-					if (!context.empty())
-					{
-						yield(std::move(context));
-					}
-				}
-			})))))
+		    : acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
+		    , clients(&acceptor)
+		    , all_work(Si::make_total_consumer(
+		          Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine_generator<events>(
+		              [this](Si::push_context<events> &yield) -> void
+		              {
+			              boost::uintmax_t visitor_count = 0;
+			              for (;;)
+			              {
+				              auto result = yield.get_one(clients);
+				              if (!result)
+				              {
+					              break;
+				              }
+				              ++visitor_count;
+				              std::shared_ptr<boost::asio::ip::tcp::socket> client = result->get();
+				              auto context = [visitor_count, client]() -> events
+				              {
+					              auto visitor_number_ = visitor_count;
+					              auto client_handler = Si::erase_shared(Si::make_coroutine_generator<Si::nothing>(
+					                  [client, visitor_number_](Si::push_context<Si::nothing> &yield) -> void
+					                  {
+						                  coroutine_socket coro_socket(*client, yield);
+						                  return serve_client(coro_socket, visitor_number_);
+						              }));
+					              return client_handler;
+					          }();
+				              if (!context.empty())
+				              {
+					              yield(std::move(context));
+				              }
+			              }
+			          })))))
 		{
 		}
 
@@ -228,7 +231,6 @@ namespace
 		}
 
 	private:
-
 		boost::asio::ip::tcp::acceptor acceptor;
 		Si::asio::tcp_acceptor<boost::asio::ip::tcp::acceptor *> clients;
 		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
@@ -237,27 +239,31 @@ namespace
 	struct thread_web_server
 	{
 		explicit thread_web_server(boost::asio::io_service &io, boost::uint16_t port)
-			: acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
-			, clients(&acceptor)
-			, all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(Si::make_coroutine_generator<events>([this](Si::push_context<events> &yield) -> void
-			{
-				boost::uintmax_t visitor_count = 0;
-				for (;;)
-				{
-					auto result = yield.get_one(clients);
-					if (!result)
-					{
-						break;
-					}
-					++visitor_count;
-					std::shared_ptr<boost::asio::ip::tcp::socket> client = result->get();
-					std::thread([client, visitor_count]
-					{
-						thread_socket threaded_socket(*client);
-						serve_client(threaded_socket, visitor_count);
-					}).detach();
-				}
-			})))))
+		    : acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), port))
+		    , clients(&acceptor)
+		    , all_work(Si::make_total_consumer(Si::erase_unique(Si::flatten<boost::mutex>(
+		          Si::make_coroutine_generator<events>([this](Si::push_context<events> &yield) -> void
+		                                               {
+			                                               boost::uintmax_t visitor_count = 0;
+			                                               for (;;)
+			                                               {
+				                                               auto result = yield.get_one(clients);
+				                                               if (!result)
+				                                               {
+					                                               break;
+				                                               }
+				                                               ++visitor_count;
+				                                               std::shared_ptr<boost::asio::ip::tcp::socket> client =
+				                                                   result->get();
+				                                               std::thread([client, visitor_count]
+				                                                           {
+					                                                           thread_socket threaded_socket(*client);
+					                                                           serve_client(threaded_socket,
+					                                                                        visitor_count);
+					                                                       })
+				                                                   .detach();
+			                                               }
+			                                           })))))
 		{
 		}
 
@@ -267,7 +273,6 @@ namespace
 		}
 
 	private:
-
 		boost::asio::ip::tcp::acceptor acceptor;
 		Si::asio::tcp_acceptor<boost::asio::ip::tcp::acceptor *> clients;
 		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
@@ -291,16 +296,16 @@ int main()
 
 	std::vector<boost::unique_future<void>> workers;
 	std::generate_n(std::back_inserter(workers), thread_count - 1, [&io]
-	{
-		return boost::async(boost::launch::async, [&io]
-		{
-			io.run();
-		});
-	});
+	                {
+		                return boost::async(boost::launch::async, [&io]
+		                                    {
+			                                    io.run();
+			                                });
+		            });
 	std::for_each(workers.begin(), workers.end(), [](boost::unique_future<void> &worker)
-	{
-		worker.get();
-	});
+	              {
+		              worker.get();
+		          });
 #else
 	std::cerr << "This example requires coroutine support\n";
 #endif

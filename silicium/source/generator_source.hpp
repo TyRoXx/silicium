@@ -9,7 +9,9 @@
 
 namespace Si
 {
-	template <class Generator, class Element = typename detail::element_from_optional_like<typename std::result_of<Generator ()>::type>::type>
+	template <class Generator,
+	          class Element =
+	              typename detail::element_from_optional_like<typename std::result_of<Generator()>::type>::type>
 	struct generator_source
 	{
 		typedef Element element_type;
@@ -19,7 +21,7 @@ namespace Si
 		}
 
 		explicit generator_source(Generator generate_next)
-			: m_generate_next(std::move(generate_next))
+		    : m_generate_next(std::move(generate_next))
 		{
 		}
 
@@ -68,14 +70,13 @@ namespace Si
 		}
 
 	private:
-
 		typedef
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-			typename detail::proper_value_function<Generator, Si::optional<Element>>::type
+		    typename detail::proper_value_function<Generator, Si::optional<Element>>::type
 #else
-			Generator
+		    Generator
 #endif
-			proper_generator;
+		        proper_generator;
 
 		proper_generator m_generate_next;
 	};
@@ -83,7 +84,7 @@ namespace Si
 	template <class Generator>
 	auto make_generator_source(Generator &&generate_next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> generator_source<typename std::decay<Generator>::type>
+	    -> generator_source<typename std::decay<Generator>::type>
 #endif
 	{
 		return generator_source<typename std::decay<Generator>::type>(std::forward<Generator>(generate_next));
@@ -92,23 +93,26 @@ namespace Si
 	template <class OneShotGenerator>
 	auto make_oneshot_generator_source(OneShotGenerator &&generate_one)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> generator_source<std::function<Si::optional<decltype(generate_one())>()>>
+	    -> generator_source<std::function<Si::optional<decltype(generate_one())>()>>
 #endif
 	{
 		bool has_generated = false;
 		return make_generator_source(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			std::function<Si::optional<decltype(generate_one())>()>
+		    std::function<Si::optional<decltype(generate_one())>()>
 #endif
-			([has_generated, SILICIUM_CAPTURE_EXPRESSION(generate_one, std::forward<OneShotGenerator>(generate_one))]() mutable -> Si::optional<decltype(generate_one())>
-		{
-			if (has_generated)
-			{
-				return Si::none;
-			}
-			has_generated = true;
-			return std::forward<OneShotGenerator>(generate_one)();
-		}));
+		    ([
+			   has_generated,
+			   SILICIUM_CAPTURE_EXPRESSION(generate_one, std::forward<OneShotGenerator>(generate_one))
+			]() mutable->Si::optional<decltype(generate_one())>
+		     {
+			     if (has_generated)
+			     {
+				     return Si::none;
+			     }
+			     has_generated = true;
+			     return std::forward<OneShotGenerator>(generate_one)();
+			 }));
 	}
 }
 

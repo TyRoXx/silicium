@@ -10,14 +10,14 @@ struct silicium_receiver : Si::observer<void *>
 	void *user_data;
 
 	silicium_receiver()
-		: callback(nullptr)
-		, user_data(nullptr)
+	    : callback(nullptr)
+	    , user_data(nullptr)
 	{
 	}
 
 	silicium_receiver(silicium_observer_function callback, void *user_data)
-		: callback(callback)
-		, user_data(user_data)
+	    : callback(callback)
+	    , user_data(user_data)
 	{
 	}
 
@@ -45,13 +45,13 @@ struct silicium_coroutine : silicium_observable
 #if SILICIUM_VC2012
 	template <class Arg>
 	explicit silicium_coroutine(Arg &&arg)
-		: m_coroutine(std::forward<Arg>(arg))
+	    : m_coroutine(std::forward<Arg>(arg))
 	{
 	}
 #else
-	template <class ...Args>
-	explicit silicium_coroutine(Args &&...args)
-		: m_coroutine(std::forward<Args>(args)...)
+	template <class... Args>
+	explicit silicium_coroutine(Args &&... args)
+	    : m_coroutine(std::forward<Args>(args)...)
 	{
 	}
 #endif
@@ -62,31 +62,29 @@ struct silicium_coroutine : silicium_observable
 	}
 
 private:
-
 	Si::coroutine_observable<void *> m_coroutine;
 };
 
 struct silicium_yield_context : Si::yield_context
 {
 	explicit silicium_yield_context(Si::yield_context yield)
-		: Si::yield_context(yield)
+	    : Si::yield_context(yield)
 	{
 	}
 };
 #endif
 
-extern "C"
-silicium_observable *silicium_make_coroutine(silicium_coroutine_function action, void *user_data)
+extern "C" silicium_observable *silicium_make_coroutine(silicium_coroutine_function action, void *user_data)
 {
 	assert(action);
 #if SILICIUM_HAS_COROUTINE_OBSERVABLE
 	try
 	{
 		auto result = Si::make_unique<silicium_coroutine>([action, user_data](Si::yield_context yield) -> void *
-		{
-			silicium_yield_context wrapped_yield(yield);
-			return action(user_data, &wrapped_yield);
-		});
+		                                                  {
+			                                                  silicium_yield_context wrapped_yield(yield);
+			                                                  return action(user_data, &wrapped_yield);
+			                                              });
 		return result.release();
 	}
 	catch (std::bad_alloc const &)
@@ -100,8 +98,8 @@ silicium_observable *silicium_make_coroutine(silicium_coroutine_function action,
 #endif
 }
 
-extern "C"
-void silicium_async_get_one(silicium_observable *observable, silicium_observer_function callback, void *user_data)
+extern "C" void silicium_async_get_one(silicium_observable *observable, silicium_observer_function callback,
+                                       void *user_data)
 {
 	assert(observable);
 	assert(callback);
@@ -109,8 +107,7 @@ void silicium_async_get_one(silicium_observable *observable, silicium_observer_f
 	return observable->async_get_one(Si::observe_by_ref(static_cast<Si::observer<void *> &>(observable->receiver)));
 }
 
-extern "C"
-void silicium_free_observable(silicium_observable *observable)
+extern "C" void silicium_free_observable(silicium_observable *observable)
 {
 	std::unique_ptr<silicium_observable> destroyed(observable);
 }

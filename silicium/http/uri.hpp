@@ -19,9 +19,9 @@ namespace Si
 			typedef iterator_range<char const *> string;
 
 			//     ---              - - --   -   skipped by the parser
-			//https://localhost:8080/p/a/?a=2#hh
+			// https://localhost:8080/p/a/?a=2#hh
 			//=====   ============== = =  === ==
-			//scheme                 |_|   |  |
+			// scheme                 |_|   |  |
 			//                   path      |  |
 			//                         query  |
 			//                             fragment

@@ -12,7 +12,8 @@ namespace Si
 		struct block_thread_t
 		{
 			BOOST_CONSTEXPR block_thread_t()
-			{}
+			{
+			}
 		};
 
 		static BOOST_CONSTEXPR_OR_CONST block_thread_t block_thread;
@@ -24,11 +25,11 @@ namespace Si
 			{
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 				blocking_thread_handler(blocking_thread_handler &&other)
-					: m_promised(std::move(other.m_promised))
+				    : m_promised(std::move(other.m_promised))
 				{
 				}
 
-				blocking_thread_handler &operator = (blocking_thread_handler &&other)
+				blocking_thread_handler &operator=(blocking_thread_handler &&other)
 				{
 					m_promised = std::move(other.m_promised);
 					return *this;
@@ -50,7 +51,6 @@ namespace Si
 				}
 
 			private:
-
 				std::promise<Element> m_promised;
 			};
 		}
@@ -67,7 +67,7 @@ namespace boost
 			typedef Element type;
 
 			explicit async_result(Si::asio::detail::blocking_thread_handler<Element> &handler)
-				: m_result(handler.get_future())
+			    : m_result(handler.get_future())
 			{
 			}
 
@@ -77,7 +77,6 @@ namespace boost
 			}
 
 		private:
-
 			std::future<Element> m_result;
 		};
 

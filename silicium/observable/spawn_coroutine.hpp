@@ -3,7 +3,8 @@
 
 #include <silicium/config.hpp>
 
-#define SILICIUM_HAS_SPAWN_COROUTINE ((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && !SILICIUM_AVOID_BOOST_COROUTINE)
+#define SILICIUM_HAS_SPAWN_COROUTINE                                                                                   \
+	((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && !SILICIUM_AVOID_BOOST_COROUTINE)
 
 #if SILICIUM_HAS_SPAWN_COROUTINE
 
@@ -22,74 +23,70 @@ namespace Si
 		template <class Function>
 		auto lambda_to_value_impl(Function &&function, std::true_type)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> Function
+		    -> Function
 #endif
 		{
 			return std::forward<Function>(function);
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class Function, class Result, class Class, class ...Arguments>
-		auto lambda_to_value_impl_lambda_case(Function &&function, Result(Class::*)(Arguments...) const)
+		template <class Function, class Result, class Class, class... Arguments>
+		auto lambda_to_value_impl_lambda_case(Function &&function, Result (Class::*)(Arguments...) const)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> std::function<Result(Arguments...)>
+		    -> std::function<Result(Arguments...)>
 #endif
 		{
 			return std::function<Result(Arguments...)>(std::forward<Function>(function));
 		}
 #else
 		template <class Function, class Result, class Class>
-		auto lambda_to_value_impl_lambda_case(Function &&function, Result(Class::*)() const)
+		auto lambda_to_value_impl_lambda_case(Function &&function, Result (Class::*)() const)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> std::function<Result()>
+		    -> std::function<Result()>
 #endif
 		{
 			return std::function<Result()>(std::forward<Function>(function));
 		}
 
 		template <class Function, class Result, class Class, class A0>
-		auto lambda_to_value_impl_lambda_case(Function &&function, Result(Class::*)(A0) const)
+		auto lambda_to_value_impl_lambda_case(Function &&function, Result (Class::*)(A0) const)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> std::function<Result(A0)>
+		    -> std::function<Result(A0)>
 #endif
 		{
 			return std::function<Result(A0)>(std::forward<Function>(function));
 		}
 
-		//TODO?
+// TODO?
 #endif
 
 		template <class Function>
 		auto lambda_to_value_impl(Function &&function, std::false_type)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> decltype(lambda_to_value_impl_lambda_case(std::forward<Function>(function), &std::decay<Function>::type::operator()))
+		    -> decltype(lambda_to_value_impl_lambda_case(std::forward<Function>(function),
+		                                                 &std::decay<Function>::type::operator()))
 #endif
 		{
-			return lambda_to_value_impl_lambda_case(std::forward<Function>(function), &std::decay<Function>::type::operator());
+			return lambda_to_value_impl_lambda_case(std::forward<Function>(function),
+			                                        &std::decay<Function>::type::operator());
 		}
 
 		template <class Function>
 		auto lambda_to_value(Function &&function)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> decltype(lambda_to_value_impl(
-				std::forward<Function>(function),
-				std::integral_constant<bool,
-					Si::is_move_assignable<typename std::decay<Function>::type>::value &&
-					Si::is_move_constructible<typename std::decay<Function>::type>::value
-				>()
-			))
+		    -> decltype(lambda_to_value_impl(
+		        std::forward<Function>(function),
+		        std::integral_constant<bool,
+		                               Si::is_move_assignable<typename std::decay<Function>::type>::value &&
+		                                   Si::is_move_constructible<typename std::decay<Function>::type>::value>()))
 #endif
 		{
 			typedef typename std::decay<Function>::type clean;
-			return lambda_to_value_impl(
-				std::forward<Function>(function),
-				std::integral_constant<bool,
-					Si::is_move_assignable<clean>::value &&
-					Si::is_move_constructible<clean>::value
-				>()
-			);
+			return lambda_to_value_impl(std::forward<Function>(function), std::integral_constant < bool,
+			                            Si::is_move_assignable<clean>::value &&Si::is_move_constructible<clean>::value >
+			                                ());
 		}
-}
+	}
 
 	template <class Element, class Next, class Transformation>
 	struct observer_transforming
@@ -101,8 +98,8 @@ namespace Si
 		}
 
 		explicit observer_transforming(Next next, Transformation transform)
-			: m_next(std::move(next))
-			, m_transform(std::move(transform))
+		    : m_next(std::move(next))
+		    , m_transform(std::move(transform))
 		{
 		}
 
@@ -114,15 +111,15 @@ namespace Si
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		observer_transforming(observer_transforming &&) = default;
-		observer_transforming &operator = (observer_transforming &&) = default;
+		observer_transforming &operator=(observer_transforming &&) = default;
 #else
 		observer_transforming(observer_transforming &&other)
-			: m_next(std::move(other.m_next))
-			, m_transform(std::move(other.m_transform))
+		    : m_next(std::move(other.m_next))
+		    , m_transform(std::move(other.m_transform))
 		{
 		}
-		
-		observer_transforming &operator = (observer_transforming &&other)
+
+		observer_transforming &operator=(observer_transforming &&other)
 		{
 			m_next = std::move(other.m_next);
 			m_transform = std::move(other.m_transform);
@@ -131,7 +128,6 @@ namespace Si
 #endif
 
 	private:
-
 		Next m_next;
 		Transformation m_transform;
 	};
@@ -141,28 +137,25 @@ namespace Si
 		template <class Element, class Next, class Transformation>
 		auto transform_observer_impl(Next &&next, Transformation &&transform)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			->observer_transforming<
-			Element,
-			typename std::decay<Next>::type,
-			typename std::decay<Transformation>::type
-			>
+		    -> observer_transforming<Element, typename std::decay<Next>::type,
+		                             typename std::decay<Transformation>::type>
 #endif
 		{
-			return observer_transforming<
-				Element,
-				typename std::decay<Next>::type,
-				typename std::decay<Transformation>::type
-			>(std::forward<Next>(next), std::forward<Transformation>(transform));
+			return observer_transforming<Element, typename std::decay<Next>::type,
+			                             typename std::decay<Transformation>::type>(
+			    std::forward<Next>(next), std::forward<Transformation>(transform));
 		}
 	}
 
 	template <class Element, class Next, class Transformation>
 	auto transform_observer(Next &&next, Transformation &&transform)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(detail::transform_observer_impl<Element>(std::forward<Next>(next), detail::lambda_to_value(std::forward<Transformation>(transform))))
+	    -> decltype(detail::transform_observer_impl<Element>(
+	        std::forward<Next>(next), detail::lambda_to_value(std::forward<Transformation>(transform))))
 #endif
 	{
-		return detail::transform_observer_impl<Element>(std::forward<Next>(next), detail::lambda_to_value(std::forward<Transformation>(transform)));
+		return detail::transform_observer_impl<Element>(
+		    std::forward<Next>(next), detail::lambda_to_value(std::forward<Transformation>(transform)));
 	}
 
 	struct spawn_context
@@ -174,8 +167,8 @@ namespace Si
 		}
 
 		explicit spawn_context(wait_function wait, std::weak_ptr<void> async_state)
-			: m_wait(std::move(wait))
-			, m_async_state(std::move(async_state))
+		    : m_wait(std::move(wait))
+		    , m_async_state(std::move(async_state))
 		{
 		}
 
@@ -184,40 +177,34 @@ namespace Si
 		{
 			typedef typename std::decay<Observable>::type::element_type element_type;
 			Si::optional<element_type> result;
-			auto waiting_for = virtualize_observable<ptr_observer<observer<nothing>>>(
-				transform_observer<nothing>(
-					std::forward<Observable>(from),
-					[this, &result](ptr_observer<observer<nothing>> previous_observer)
-					{
-						std::shared_ptr<void> async_state = this->m_async_state.lock();
-						assert(async_state);
-						assert(async_state.use_count() >= 2);
-						return make_function_observer(
+			auto waiting_for = virtualize_observable<ptr_observer<observer<nothing>>>(transform_observer<nothing>(
+			    std::forward<Observable>(from), [this, &result](ptr_observer<observer<nothing>> previous_observer)
+			    {
+				    std::shared_ptr<void> async_state = this->m_async_state.lock();
+				    assert(async_state);
+				    assert(async_state.use_count() >= 2);
+				    return make_function_observer(
 #ifdef _MSC_VER
-							std::function<void(Si::optional<element_type>)>
+				        std::function<void(Si::optional<element_type>)>
 #endif
-							([previous_observer, async_state, &result](Si::optional<element_type> element)
-							{
-								if (element)
-								{
-									result = std::move(*element);
-									previous_observer.got_element(nothing());
-								}
-								else
-								{
-									previous_observer.ended();
-								}
-							})
-						);
-					}
-				)
-			);
+				        ([previous_observer, async_state, &result](Si::optional<element_type> element)
+				         {
+					         if (element)
+					         {
+						         result = std::move(*element);
+						         previous_observer.got_element(nothing());
+					         }
+					         else
+					         {
+						         previous_observer.ended();
+					         }
+					     }));
+				}));
 			m_wait(waiting_for);
 			return result;
 		}
 
 	private:
-
 		wait_function m_wait;
 		std::weak_ptr<void> m_async_state;
 	};
@@ -234,32 +221,31 @@ namespace Si
 			template <class Function>
 			void start(Function &&function)
 			{
-				m_coro = coroutine([this, function](coroutine_push_type &push)
-				{
-					spawn_context context(
-						[this, &push](Observable<nothing, ptr_observer<observer<nothing>>>::interface &waiting_for)
-						{
-							wait_for(waiting_for);
-							if (m_waiting)
-							{
-								m_suspended = true;
-								push(nothing());
-							}
-						},
-						std::weak_ptr<void>(this->shared_from_this())
-						);
-					function(context);
-				});
+				m_coro = coroutine(
+				    [this, function](coroutine_push_type &push)
+				    {
+					    spawn_context context(
+					        [this, &push](Observable<nothing, ptr_observer<observer<nothing>>>::interface &waiting_for)
+					        {
+						        wait_for(waiting_for);
+						        if (m_waiting)
+						        {
+							        m_suspended = true;
+							        push(nothing());
+						        }
+						    },
+					        std::weak_ptr<void>(this->shared_from_this()));
+					    function(context);
+					});
 			}
 
 		private:
-
 #if BOOST_VERSION >= 105500
 			typedef boost::coroutines::coroutine<nothing>::pull_type coroutine;
 			typedef boost::coroutines::coroutine<nothing>::push_type coroutine_push_type;
 #else
-			typedef boost::coroutines::coroutine<nothing ()> coroutine;
-			typedef boost::coroutines::coroutine<nothing ()>::caller_type coroutine_push_type;
+			typedef boost::coroutines::coroutine<nothing()> coroutine;
+			typedef boost::coroutines::coroutine<nothing()>::caller_type coroutine_push_type;
 #endif
 
 			coroutine m_coro;

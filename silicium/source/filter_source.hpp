@@ -17,8 +17,8 @@ namespace Si
 		}
 
 		filter_source(Input input, Predicate is_propagated)
-			: input(std::move(input))
-			, is_propagated(std::move(is_propagated))
+		    : input(std::move(input))
+		    , is_propagated(std::move(is_propagated))
 		{
 		}
 
@@ -31,7 +31,7 @@ namespace Si
 		element_type *copy_next(iterator_range<element_type *> destination)
 		{
 			element_type *copied = destination.begin();
-			for (; copied != destination.end(); )
+			for (; copied != destination.end();)
 			{
 				auto element = Si::get(input);
 				if (!element)
@@ -48,14 +48,13 @@ namespace Si
 		}
 
 	private:
-
 		typedef
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-			typename detail::proper_value_function<Predicate, bool, element_type const &>::type
+		    typename detail::proper_value_function<Predicate, bool, element_type const &>::type
 #else
-			Predicate
+		    Predicate
 #endif
-			proper_predicate;
+		        proper_predicate;
 
 		Input input;
 		proper_predicate is_propagated;
@@ -64,19 +63,11 @@ namespace Si
 	template <class Input, class Predicate>
 	auto make_filter_source(Input &&input, Predicate &&is_propagated)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> filter_source<
-			typename std::decay<Input>::type,
-			typename std::decay<Predicate>::type
-		>
+	    -> filter_source<typename std::decay<Input>::type, typename std::decay<Predicate>::type>
 #endif
 	{
-		return filter_source<
-				typename std::decay<Input>::type,
-				typename std::decay<Predicate>::type
-			>(
-				std::forward<Input>(input),
-				std::forward<Predicate>(is_propagated)
-			);
+		return filter_source<typename std::decay<Input>::type, typename std::decay<Predicate>::type>(
+		    std::forward<Input>(input), std::forward<Predicate>(is_propagated));
 	}
 }
 

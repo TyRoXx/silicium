@@ -5,9 +5,9 @@
 #include <boost/system/error_code.hpp>
 
 #ifdef _WIN32
-#	include <silicium/win32/win32.hpp>
+#include <silicium/win32/win32.hpp>
 #else
-#	include <errno.h>
+#include <errno.h>
 #endif
 
 namespace Si
@@ -17,9 +17,9 @@ namespace Si
 	{
 		auto const err =
 #ifdef _WIN32
-			::GetLastError();
+		    ::GetLastError();
 #else
-			errno;
+		    errno;
 #endif
 		return boost::system::error_code(err, boost::system::system_category());
 	}

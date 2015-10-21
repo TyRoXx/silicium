@@ -17,7 +17,7 @@ namespace Si
 		}
 
 		explicit range_source(ForwardRange range)
-			: m_range(std::move(range))
+		    : m_range(std::move(range))
 		{
 		}
 
@@ -49,7 +49,6 @@ namespace Si
 		}
 
 	private:
-
 		typedef typename boost::range_iterator<ForwardRange>::type iterator;
 
 		ForwardRange m_range;
@@ -61,7 +60,7 @@ namespace Si
 			{
 				return {};
 			}
-			element_type const * const data = &m_range.front();
+			element_type const *const data = &m_range.front();
 			return make_iterator_range(data, data + m_range.size());
 		}
 
@@ -75,7 +74,7 @@ namespace Si
 	template <class ForwardRange>
 	auto make_range_source(ForwardRange &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> range_source<typename std::decay<ForwardRange>::type>
+	    -> range_source<typename std::decay<ForwardRange>::type>
 #endif
 	{
 		return range_source<typename std::decay<ForwardRange>::type>(std::forward<ForwardRange>(range));

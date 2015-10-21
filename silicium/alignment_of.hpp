@@ -8,11 +8,11 @@ namespace Si
 	template <class T>
 	struct alignment_of : std::integral_constant<std::size_t,
 #ifdef _MSC_VER
-		__alignof(T)
+	                                             __alignof(T)
 #else
-		alignof(T)
+	                                             alignof(T)
 #endif
-	>
+	                                             >
 	{
 	};
 }

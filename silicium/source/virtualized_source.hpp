@@ -16,7 +16,7 @@ namespace Si
 		}
 
 		explicit virtualized_source(Original original)
-			: original(std::move(original))
+		    : original(std::move(original))
 		{
 		}
 
@@ -31,13 +31,11 @@ namespace Si
 		}
 
 	private:
-
 		Original original;
 	};
 
 	template <class Source>
-	virtualized_source<typename std::decay<Source>::type>
-	virtualize_source(Source &&next)
+	virtualized_source<typename std::decay<Source>::type> virtualize_source(Source &&next)
 	{
 		return virtualized_source<typename std::decay<Source>::type>(std::forward<Source>(next));
 	}

@@ -16,8 +16,8 @@ namespace Si
 		}
 
 		explicit take_observable(Input input, Counter remaining_count)
-			: input(std::move(input))
-			, remaining_count(std::move(remaining_count))
+		    : input(std::move(input))
+		    , remaining_count(std::move(remaining_count))
 		{
 		}
 
@@ -36,7 +36,6 @@ namespace Si
 		}
 
 	private:
-
 		Input input;
 		Counter remaining_count;
 	};
@@ -44,13 +43,11 @@ namespace Si
 	template <class Input, class Counter>
 	auto take(Input &&input, Counter &&count)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> take_observable<typename std::decay<Input>::type, typename std::decay<Counter>::type>
+	    -> take_observable<typename std::decay<Input>::type, typename std::decay<Counter>::type>
 #endif
 	{
 		return take_observable<typename std::decay<Input>::type, typename std::decay<Counter>::type>(
-			std::forward<Input>(input),
-			std::forward<Counter>(count)
-		);
+		    std::forward<Input>(input), std::forward<Counter>(count));
 	}
 }
 

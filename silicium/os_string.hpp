@@ -4,7 +4,7 @@
 #include <silicium/noexcept_string.hpp>
 #include <silicium/throw_last_error.hpp>
 #ifdef _WIN32
-#	include <silicium/win32/win32.hpp>
+#include <silicium/win32/win32.hpp>
 #endif
 #include <string>
 
@@ -12,11 +12,11 @@ namespace Si
 {
 	typedef
 #ifdef _WIN32
-		wchar_t
+	    wchar_t
 #else
-		char
+	    char
 #endif
-		os_char;
+	        os_char;
 
 #ifdef _WIN32
 	typedef std::basic_string<os_char> os_string;
@@ -79,21 +79,23 @@ namespace Si
 		{
 			if (length == 0)
 			{
-				//because WideCharToMultiByte fails for empty input
+				// because WideCharToMultiByte fails for empty input
 				return std::string();
 			}
 			if (length > static_cast<size_t>((std::numeric_limits<int>::max)()))
 			{
 				throw std::invalid_argument("Input string is too long for WinAPI");
 			}
-			int const destination_length = WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), nullptr, 0, 0, FALSE);
+			int const destination_length =
+			    WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), nullptr, 0, 0, FALSE);
 			if (!destination_length)
 			{
 				throw_last_error();
 			}
 			std::string result;
 			result.resize(destination_length);
-			if (!WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), &result.front(), destination_length, 0, FALSE))
+			if (!WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), &result.front(), destination_length,
+			                         0, FALSE))
 			{
 				throw_last_error();
 			}

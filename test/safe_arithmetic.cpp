@@ -31,28 +31,40 @@ namespace
 		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow + Si::safe<Unsigned>(3));
 
 		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(5), Si::safe<Unsigned>(2) + overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(Si::overflow, Si::safe((std::numeric_limits<Unsigned>::max)()) + overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) + overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  Si::safe((std::numeric_limits<Unsigned>::max)()) + overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  Si::safe<Unsigned>(3) + overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
 		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) + overflow_uint(Si::overflow));
 		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow + overflow_uint(Si::safe<Unsigned>(3)));
 
 		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(5), overflow_uint(Si::safe<Unsigned>(2)) + Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) + Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) + Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) + Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  overflow_uint(Si::safe<Unsigned>(3)) + Si::safe((std::numeric_limits<Unsigned>::max)()));
 		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) + Si::overflow);
 		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::overflow) + Si::safe<Unsigned>(3));
 
 		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(5)), Si::safe<Unsigned>(2) + Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe((std::numeric_limits<Unsigned>::max)()) + Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) + Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  Si::safe((std::numeric_limits<Unsigned>::max)()) + Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  Si::safe<Unsigned>(3) + Si::safe((std::numeric_limits<Unsigned>::max)()));
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) + Si::overflow);
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::overflow + Si::safe<Unsigned>(3));
 
-		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(5)), overflow_uint(Si::safe<Unsigned>(2)) + overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) + overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) + overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) + overflow_uint(Si::overflow));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::overflow) + overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(5)),
+		                  overflow_uint(Si::safe<Unsigned>(2)) + overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) +
+		                                                   overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) +
+		                      overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) + overflow_uint(Si::overflow));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::overflow) + overflow_uint(Si::safe<Unsigned>(3)));
 	}
 
 	template <class Unsigned>
@@ -67,28 +79,40 @@ namespace
 		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow - Si::safe<Unsigned>(3));
 
 		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(5), Si::safe<Unsigned>(8) - overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(Si::overflow, Si::safe((std::numeric_limits<Unsigned>::min)()) - overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) - overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  Si::safe((std::numeric_limits<Unsigned>::min)()) - overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  Si::safe<Unsigned>(3) - overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
 		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) - overflow_uint(Si::overflow));
 		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow - overflow_uint(Si::safe<Unsigned>(3)));
 
 		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(5), overflow_uint(Si::safe<Unsigned>(8)) - Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe((std::numeric_limits<Unsigned>::min)())) - Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) - Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  overflow_uint(Si::safe((std::numeric_limits<Unsigned>::min)())) - Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  overflow_uint(Si::safe<Unsigned>(3)) - Si::safe((std::numeric_limits<Unsigned>::max)()));
 		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) - Si::overflow);
 		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::overflow) - Si::safe<Unsigned>(3));
 
 		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(5)), Si::safe<Unsigned>(8) - Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe((std::numeric_limits<Unsigned>::min)()) - Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) - Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  Si::safe((std::numeric_limits<Unsigned>::min)()) - Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  Si::safe<Unsigned>(3) - Si::safe((std::numeric_limits<Unsigned>::max)()));
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) - Si::overflow);
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::overflow - Si::safe<Unsigned>(3));
 
-		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(5)), overflow_uint(Si::safe<Unsigned>(8)) - overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe((std::numeric_limits<Unsigned>::min)())) - overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) - overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) - overflow_uint(Si::overflow));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::overflow) - overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(5)),
+		                  overflow_uint(Si::safe<Unsigned>(8)) - overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe((std::numeric_limits<Unsigned>::min)())) -
+		                                                   overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) -
+		                      overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) - overflow_uint(Si::overflow));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::overflow) - overflow_uint(Si::safe<Unsigned>(3)));
 	}
 
 	template <class Unsigned>
@@ -103,28 +127,40 @@ namespace
 		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow * Si::safe<Unsigned>(3));
 
 		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(6), Si::safe<Unsigned>(2) * overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(Si::overflow, Si::safe((std::numeric_limits<Unsigned>::max)()) * overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) * overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  Si::safe((std::numeric_limits<Unsigned>::max)()) * overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  Si::safe<Unsigned>(3) * overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
 		BOOST_CHECK_EQUAL(Si::overflow, Si::safe<Unsigned>(3) * overflow_uint(Si::overflow));
 		BOOST_CHECK_EQUAL(Si::overflow, Si::overflow * overflow_uint(Si::safe<Unsigned>(3)));
 
 		BOOST_CHECK_EQUAL(Si::safe<Unsigned>(6), overflow_uint(Si::safe<Unsigned>(2)) * Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) * Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) * Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(Si::overflow,
+		                  overflow_uint(Si::safe<Unsigned>(3)) * Si::safe((std::numeric_limits<Unsigned>::max)()));
 		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::safe<Unsigned>(3)) * Si::overflow);
 		BOOST_CHECK_EQUAL(Si::overflow, overflow_uint(Si::overflow) * Si::safe<Unsigned>(3));
 
 		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(6)), Si::safe<Unsigned>(2) * Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe((std::numeric_limits<Unsigned>::max)()) * Si::safe<Unsigned>(3));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) * Si::safe((std::numeric_limits<Unsigned>::max)()));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  Si::safe((std::numeric_limits<Unsigned>::max)()) * Si::safe<Unsigned>(3));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  Si::safe<Unsigned>(3) * Si::safe((std::numeric_limits<Unsigned>::max)()));
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) * Si::overflow);
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::overflow * Si::safe<Unsigned>(3));
 
-		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(6)), overflow_uint(Si::safe<Unsigned>(2)) * overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) * overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) * overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) * overflow_uint(Si::overflow));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::overflow) * overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(6)),
+		                  overflow_uint(Si::safe<Unsigned>(2)) * overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())) *
+		                                                   overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) *
+		                      overflow_uint(Si::safe((std::numeric_limits<Unsigned>::max)())));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) * overflow_uint(Si::overflow));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::overflow) * overflow_uint(Si::safe<Unsigned>(3)));
 	}
 
 	template <class Unsigned>
@@ -152,10 +188,14 @@ namespace
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::safe<Unsigned>(3) / Si::overflow);
 		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), Si::overflow / Si::safe<Unsigned>(3));
 
-		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(2)), overflow_uint(Si::safe<Unsigned>(8)) / overflow_uint(Si::safe<Unsigned>(3)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) / overflow_uint(Si::safe<Unsigned>(0)));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::safe<Unsigned>(3)) / overflow_uint(Si::overflow));
-		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow), overflow_uint(Si::overflow) / overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::safe<Unsigned>(2)),
+		                  overflow_uint(Si::safe<Unsigned>(8)) / overflow_uint(Si::safe<Unsigned>(3)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) / overflow_uint(Si::safe<Unsigned>(0)));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::safe<Unsigned>(3)) / overflow_uint(Si::overflow));
+		BOOST_CHECK_EQUAL(overflow_uint(Si::overflow),
+		                  overflow_uint(Si::overflow) / overflow_uint(Si::safe<Unsigned>(3)));
 	}
 
 	template <class Unsigned>

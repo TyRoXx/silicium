@@ -9,40 +9,39 @@
 namespace Si
 {
 	template <class In, class State, class Step>
-	struct finite_state_machine
-		: private observer<typename In::element_type>
+	struct finite_state_machine : private observer<typename In::element_type>
 	{
 		typedef State element_type;
 
 		finite_state_machine()
-			: fetching(false)
-			, has_ended(false)
-			, receiver_(nullptr)
+		    : fetching(false)
+		    , has_ended(false)
+		    , receiver_(nullptr)
 		{
 		}
 
 		finite_state_machine(In in, element_type initial_state, Step step)
-			: in(std::move(in))
-			, state(std::move(initial_state))
-			, step(std::move(step))
-			, fetching(false)
-			, has_ended(false)
-			, receiver_(nullptr)
+		    : in(std::move(in))
+		    , state(std::move(initial_state))
+		    , step(std::move(step))
+		    , fetching(false)
+		    , has_ended(false)
+		    , receiver_(nullptr)
 		{
 		}
 
 #ifdef _MSC_VER
 		finite_state_machine(finite_state_machine &&other)
-			: fetching(false)
-			, has_ended(false)
-			, receiver_(nullptr)
+		    : fetching(false)
+		    , has_ended(false)
+		    , receiver_(nullptr)
 		{
 			*this = std::move(other);
 		}
 
-		finite_state_machine &operator = (finite_state_machine &&other)
+		finite_state_machine &operator=(finite_state_machine &&other)
 		{
-			//TODO: exception safety
+			// TODO: exception safety
 			in = std::move(other.in);
 			state = std::move(other.state);
 			step = std::move(other.step);
@@ -53,7 +52,7 @@ namespace Si
 		}
 #else
 		finite_state_machine(finite_state_machine &&) = default;
-		finite_state_machine &operator = (finite_state_machine &&) = default;
+		finite_state_machine &operator=(finite_state_machine &&) = default;
 #endif
 
 		void async_get_one(ptr_observer<observer<element_type>> receiver)
@@ -64,7 +63,6 @@ namespace Si
 		}
 
 	private:
-
 		In in;
 		element_type state;
 		Step step;
@@ -103,19 +101,17 @@ namespace Si
 		}
 
 		SILICIUM_DELETED_FUNCTION(finite_state_machine(finite_state_machine const &))
-		SILICIUM_DELETED_FUNCTION(finite_state_machine &operator = (finite_state_machine const &))
+		SILICIUM_DELETED_FUNCTION(finite_state_machine &operator=(finite_state_machine const &))
 	};
 
 	template <class In, class State, class Step>
-	auto make_finite_state_machine(In &&in, State &&initial_state, Step &&step) -> finite_state_machine<
-		typename std::decay<In>::type,
-		typename std::decay<State>::type,
-		typename std::decay<Step>::type>
+	auto make_finite_state_machine(In &&in, State &&initial_state, Step &&step)
+	    -> finite_state_machine<typename std::decay<In>::type, typename std::decay<State>::type,
+	                            typename std::decay<Step>::type>
 	{
-		return finite_state_machine<
-				typename std::decay<In>::type,
-				typename std::decay<State>::type,
-				typename std::decay<Step>::type>(std::forward<In>(in), std::forward<State>(initial_state), std::forward<Step>(step));
+		return finite_state_machine<typename std::decay<In>::type, typename std::decay<State>::type,
+		                            typename std::decay<Step>::type>(
+		    std::forward<In>(in), std::forward<State>(initial_state), std::forward<Step>(step));
 	}
 }
 

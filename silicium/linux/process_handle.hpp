@@ -11,13 +11,11 @@ namespace Si
 {
 	struct process_handle
 	{
-		process_handle() BOOST_NOEXCEPT
-			: m_id(-1)
+		process_handle() BOOST_NOEXCEPT : m_id(-1)
 		{
 		}
 
-		explicit process_handle(pid_t id) BOOST_NOEXCEPT
-			: m_id(id)
+		explicit process_handle(pid_t id) BOOST_NOEXCEPT : m_id(id)
 		{
 		}
 
@@ -30,13 +28,12 @@ namespace Si
 			wait_for_exit().get();
 		}
 
-		process_handle(process_handle &&other) BOOST_NOEXCEPT
-			: m_id(-1)
+		process_handle(process_handle &&other) BOOST_NOEXCEPT : m_id(-1)
 		{
 			swap(other);
 		}
 
-		process_handle &operator = (process_handle &&other) BOOST_NOEXCEPT
+		process_handle &operator=(process_handle &&other) BOOST_NOEXCEPT
 		{
 			swap(other);
 			return *this;
@@ -62,11 +59,10 @@ namespace Si
 		}
 
 	private:
-
 		pid_t m_id;
 
 		SILICIUM_DELETED_FUNCTION(process_handle(process_handle const &))
-		SILICIUM_DELETED_FUNCTION(process_handle &operator = (process_handle const &))
+		SILICIUM_DELETED_FUNCTION(process_handle &operator=(process_handle const &))
 	};
 }
 

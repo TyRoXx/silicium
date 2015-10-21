@@ -12,12 +12,12 @@ namespace Si
 		typedef success error_type;
 
 		ostream_ref_sink()
-			: m_file(nullptr)
+		    : m_file(nullptr)
 		{
 		}
 
 		explicit ostream_ref_sink(std::ostream &file)
-		   : m_file(&file)
+		    : m_file(&file)
 		{
 		}
 
@@ -29,7 +29,6 @@ namespace Si
 		}
 
 	private:
-
 		std::ostream *m_file;
 	};
 
@@ -38,9 +37,9 @@ namespace Si
 		typedef char element_type;
 		typedef boost::system::error_code error_type;
 
-		//unique_ptr to make ostreams movable
+		// unique_ptr to make ostreams movable
 		explicit ostream_sink(std::unique_ptr<std::ostream> file)
-			: m_file(std::move(file))
+		    : m_file(std::move(file))
 		{
 			m_file->exceptions(std::ios::failbit | std::ios::badbit);
 		}
@@ -52,12 +51,11 @@ namespace Si
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		ostream_sink(ostream_sink &&other) BOOST_NOEXCEPT
-			: m_file(std::move(other.m_file))
+		ostream_sink(ostream_sink &&other) BOOST_NOEXCEPT : m_file(std::move(other.m_file))
 		{
 		}
-		
-		ostream_sink &operator = (ostream_sink &&other) BOOST_NOEXCEPT
+
+		ostream_sink &operator=(ostream_sink &&other) BOOST_NOEXCEPT
 		{
 			m_file = std::move(other.m_file);
 			return *this;
@@ -65,16 +63,16 @@ namespace Si
 #endif
 
 	private:
-
 		std::unique_ptr<std::ostream> m_file;
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		SILICIUM_DELETED_FUNCTION(ostream_sink(ostream_sink const &))
-		SILICIUM_DELETED_FUNCTION(ostream_sink &operator = (ostream_sink const &))
+		SILICIUM_DELETED_FUNCTION(ostream_sink &operator=(ostream_sink const &))
 #endif
 	};
 
-	inline std::unique_ptr<Sink<char, boost::system::error_code>::interface> make_file_sink(boost::filesystem::path const &name)
+	inline std::unique_ptr<Sink<char, boost::system::error_code>::interface>
+	make_file_sink(boost::filesystem::path const &name)
 	{
 		std::unique_ptr<std::ostream> file(new std::ofstream(name.string(), std::ios::binary));
 		if (!*file)

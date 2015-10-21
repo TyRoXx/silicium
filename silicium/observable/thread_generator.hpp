@@ -23,7 +23,7 @@ namespace Si
 		struct event : private observer<nothing>
 		{
 			event()
-				: got_something(false)
+			    : got_something(false)
 			{
 			}
 
@@ -41,7 +41,6 @@ namespace Si
 			}
 
 		private:
-
 			typename ThreadingAPI::mutex got_something_mutex;
 			typename ThreadingAPI::condition_variable got_something_set;
 			bool got_something;
@@ -76,17 +75,16 @@ namespace Si
 
 		template <class Action>
 		explicit thread_generator_observable(Action &&action)
-			: state(Si::make_unique<state_type>(std::forward<Action>(action)))
+		    : state(Si::make_unique<state_type>(std::forward<Action>(action)))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		thread_generator_observable(thread_generator_observable &&other) BOOST_NOEXCEPT
-			: state(std::move(other.state))
+		thread_generator_observable(thread_generator_observable &&other) BOOST_NOEXCEPT : state(std::move(other.state))
 		{
 		}
 
-		thread_generator_observable &operator = (thread_generator_observable &&other) BOOST_NOEXCEPT
+		thread_generator_observable &operator=(thread_generator_observable &&other) BOOST_NOEXCEPT
 		{
 			state = std::move(other.state);
 			return *this;
@@ -105,30 +103,30 @@ namespace Si
 		}
 
 	private:
-
 		struct state_type : private detail::push_context_impl<Element>
 		{
 			template <class Action>
 			explicit state_type(Action &&action)
-				: has_ended(false)
+			    : has_ended(false)
 			{
 				worker = ThreadingAPI::launch_async([action, this]() mutable
-				{
-					push_context<Element> yield(*this);
-					(std::forward<Action>(action))(yield);
+				                                    {
+					                                    push_context<Element> yield(*this);
+					                                    (std::forward<Action>(action))(yield);
 
-					typename ThreadingAPI::unique_lock lock(receiver_mutex);
-					if (receiver.get())
-					{
-						auto receiver_ = Si::exchange(receiver, erased_observer<Element>());
-						lock.unlock();
-						std::move(receiver_).ended();
-					}
-					else
-					{
-						has_ended = true;
-					}
-				});
+					                                    typename ThreadingAPI::unique_lock lock(receiver_mutex);
+					                                    if (receiver.get())
+					                                    {
+						                                    auto receiver_ =
+						                                        Si::exchange(receiver, erased_observer<Element>());
+						                                    lock.unlock();
+						                                    std::move(receiver_).ended();
+					                                    }
+					                                    else
+					                                    {
+						                                    has_ended = true;
+					                                    }
+					                                });
 			}
 
 			template <class Observer>
@@ -160,7 +158,6 @@ namespace Si
 			}
 
 		private:
-
 			typename ThreadingAPI::template future<void>::type worker;
 			typename ThreadingAPI::mutex receiver_mutex;
 			erased_observer<Element> receiver;
@@ -189,7 +186,8 @@ namespace Si
 				}
 			}
 
-			virtual void get_one(Observable<nothing, ptr_observer<observer<nothing>>>::interface &target) SILICIUM_OVERRIDE
+			virtual void
+			get_one(Observable<nothing, ptr_observer<observer<nothing>>>::interface &target) SILICIUM_OVERRIDE
 			{
 				got_something.block(target);
 			}

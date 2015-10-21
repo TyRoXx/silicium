@@ -20,8 +20,8 @@ namespace Si
 		typedef typename Next::element_type element_type;
 
 		explicit buffering_source(Next &next, std::size_t capacity)
-			: m_next(&next)
-			, m_buffer(capacity)
+		    : m_next(&next)
+		    , m_buffer(capacity)
 		{
 		}
 
@@ -45,13 +45,14 @@ namespace Si
 			element_type *next = destination.begin();
 
 			std::size_t taken_from_buffer = 0;
-			for (auto b = m_buffer.begin(); (b != m_buffer.end()) && (next != destination.end()); ++next, ++b, ++taken_from_buffer)
+			for (auto b = m_buffer.begin(); (b != m_buffer.end()) && (next != destination.end());
+			     ++next, ++b, ++taken_from_buffer)
 			{
-				*next = *b; //TODO move?
+				*next = *b; // TODO move?
 			}
 
 			assert(m_next);
-			element_type * const result = m_next->copy_next(make_iterator_range(next, destination.end()));
+			element_type *const result = m_next->copy_next(make_iterator_range(next, destination.end()));
 			m_buffer.erase_begin(taken_from_buffer);
 			return result;
 		}
@@ -75,7 +76,6 @@ namespace Si
 		}
 
 	private:
-
 		Next *m_next;
 		boost::circular_buffer<element_type> m_buffer;
 
@@ -104,15 +104,15 @@ namespace Si
 	}
 
 	template <class Element>
-	struct mutable_source_iterator SILICIUM_FINAL : boost::iterator_facade<mutable_source_iterator<Element>, Element, std::input_iterator_tag>
+	struct mutable_source_iterator SILICIUM_FINAL
+	    : boost::iterator_facade<mutable_source_iterator<Element>, Element, std::input_iterator_tag>
 	{
-		mutable_source_iterator() BOOST_NOEXCEPT
-			: m_source(nullptr)
+		mutable_source_iterator() BOOST_NOEXCEPT : m_source(nullptr)
 		{
 		}
 
 		explicit mutable_source_iterator(Si::mutable_source<Element> &source)
-			: m_source(&source)
+		    : m_source(&source)
 		{
 			check_end();
 		}
@@ -143,14 +143,13 @@ namespace Si
 		}
 
 	private:
-
 		Si::mutable_source<Element> *m_source;
 
 		void check_end()
 		{
 			if (m_source->map_next_mutable(1).empty())
 			{
-				//no elements in source -> go to end
+				// no elements in source -> go to end
 				m_source = nullptr;
 			}
 		}

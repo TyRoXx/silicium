@@ -4,9 +4,9 @@
 #include <silicium/config.hpp>
 
 #ifdef _WIN32
-#	include <Winsock2.h>
+#include <Winsock2.h>
 #else
-#	include <arpa/inet.h>
+#include <arpa/inet.h>
 #endif
 
 namespace Si
@@ -59,7 +59,7 @@ namespace Si
 {
 	inline boost::uint16_t bswap16(boost::uint16_t value)
 	{
-		//provided for symmetry with Visual C++ bswap16
+		// provided for symmetry with Visual C++ bswap16
 		return static_cast<boost::uint16_t>((value >> 8) | (value << 8));
 	}
 

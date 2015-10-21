@@ -9,32 +9,32 @@
 namespace Si
 {
 	template <class Input>
-	struct cache_observable
-			: public Observable<typename Input::element_type, ptr_observer<observer<typename Input::element_type>>>::interface
-			, private observer<typename Input::element_type>
+	struct cache_observable : public Observable<typename Input::element_type,
+	                                            ptr_observer<observer<typename Input::element_type>>>::interface,
+	                          private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 
 		explicit cache_observable(Input input, boost::optional<element_type> cached)
-			: input(std::move(input))
-			, receiver_(nullptr)
-			, cached(std::move(cached))
-			, is_fetching(false)
+		    : input(std::move(input))
+		    , receiver_(nullptr)
+		    , cached(std::move(cached))
+		    , is_fetching(false)
 		{
 		}
 
 #ifdef _MSC_VER
 		cache_observable(cache_observable &&other)
-			: input(std::move(other.input))
-			, receiver_(std::move(other.receiver_))
-			, cached(std::move(other.cached))
-			, is_fetching(std::move(other.is_fetching))
+		    : input(std::move(other.input))
+		    , receiver_(std::move(other.receiver_))
+		    , cached(std::move(other.cached))
+		    , is_fetching(std::move(other.is_fetching))
 		{
 		}
 
-		cache_observable &operator = (cache_observable &&other)
+		cache_observable &operator=(cache_observable &&other)
 		{
-			//TODO: exception safety
+			// TODO: exception safety
 			input = std::move(other.input);
 			receiver_ = std::move(other.receiver_);
 			cached = std::move(other.cached);
@@ -61,7 +61,6 @@ namespace Si
 		}
 
 	private:
-
 		Input input;
 		observer<element_type> *receiver_;
 		boost::optional<element_type> cached;
@@ -96,7 +95,8 @@ namespace Si
 	template <class Input, class Cached>
 	auto cache(Input &&input, Cached &&initially) -> cache_observable<typename std::decay<Input>::type>
 	{
-		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input), std::forward<Cached>(initially));
+		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input),
+		                                                          std::forward<Cached>(initially));
 	}
 }
 

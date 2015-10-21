@@ -14,14 +14,14 @@ namespace Si
 		typedef success error_type;
 
 		container_buffer()
-			: m_destination(nullptr)
-			, m_committed(0)
+		    : m_destination(nullptr)
+		    , m_committed(0)
 		{
 		}
 
 		explicit container_buffer(ContiguousContainer &destination)
-			: m_destination(&destination)
-			, m_committed(destination.size())
+		    : m_destination(&destination)
+		    , m_committed(destination.size())
 		{
 		}
 
@@ -44,7 +44,6 @@ namespace Si
 		}
 
 	private:
-
 		ContiguousContainer *m_destination;
 		std::size_t m_committed;
 	};
@@ -52,7 +51,7 @@ namespace Si
 	template <class ContiguousContainer>
 	auto make_container_buffer(ContiguousContainer &destination)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> container_buffer<ContiguousContainer>
+	    -> container_buffer<ContiguousContainer>
 #endif
 	{
 		return container_buffer<ContiguousContainer>(destination);

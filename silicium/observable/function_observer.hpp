@@ -18,7 +18,7 @@ namespace Si
 			typename std::decay<Element>::type *value;
 
 			explicit optional_maker(typename std::decay<Element>::type *value)
-				: value(value)
+			    : value(value)
 			{
 			}
 
@@ -40,22 +40,22 @@ namespace Si
 	struct function_observer
 	{
 		typedef typename detail::element_from_optional_like<
-			typename std::decay<
-				typename detail::argument_of<Function>::type
-			>::type
-		>::type element_type;
+		    typename std::decay<typename detail::argument_of<Function>::type>::type>::type element_type;
 
 		template <class F>
-		explicit function_observer(F &&function, typename boost::enable_if_c<!std::is_same<function_observer, typename std::decay<F>::type>::value, void>::type * = nullptr)
-			: m_function(std::forward<F>(function))
+		explicit function_observer(
+		    F &&function,
+		    typename boost::enable_if_c<!std::is_same<function_observer, typename std::decay<F>::type>::value,
+		                                void>::type * = nullptr)
+		    : m_function(std::forward<F>(function))
 		{
 		}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		function_observer(function_observer &&other) = default;
 		function_observer(function_observer const &other) = default;
-		function_observer &operator = (function_observer &&other) = default;
-		function_observer &operator = (function_observer const &other) = default;
+		function_observer &operator=(function_observer &&other) = default;
+		function_observer &operator=(function_observer const &other) = default;
 #endif
 
 		template <class Element>
@@ -70,12 +70,10 @@ namespace Si
 		}
 
 	private:
-
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-		typedef typename detail::proper_value_function<
-			Function,
-			void,
-			typename detail::argument_of<Function>::type>::type function_holder;
+		typedef
+		    typename detail::proper_value_function<Function, void, typename detail::argument_of<Function>::type>::type
+		        function_holder;
 #else
 		typedef Function function_holder;
 #endif
@@ -83,12 +81,13 @@ namespace Si
 		function_holder m_function;
 	};
 
-	BOOST_STATIC_ASSERT((std::is_same<int, function_observer<void (*)(boost::optional<int> const &)>::element_type>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<int, function_observer<void (*)(boost::optional<int> const &)>::element_type>::value));
 
 	template <class Function>
 	auto make_function_observer(Function &&function)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> function_observer<typename std::decay<Function>::type>
+	    -> function_observer<typename std::decay<Function>::type>
 #endif
 	{
 		return function_observer<typename std::decay<Function>::type>(std::forward<Function>(function));

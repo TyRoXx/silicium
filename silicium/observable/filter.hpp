@@ -10,20 +10,19 @@
 namespace Si
 {
 	template <class Input, class Predicate>
-	struct filter_observable
-		: private observer<typename Input::element_type>
+	struct filter_observable : private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 
 		filter_observable()
-			: receiver_(nullptr)
+		    : receiver_(nullptr)
 		{
 		}
 
 		filter_observable(Input input, Predicate is_propagated)
-			: input(std::move(input))
-			, is_propagated(std::move(is_propagated))
-			, receiver_(nullptr)
+		    : input(std::move(input))
+		    , is_propagated(std::move(is_propagated))
+		    , receiver_(nullptr)
 		{
 		}
 
@@ -35,14 +34,13 @@ namespace Si
 		}
 
 	private:
-
 		typedef
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-			typename detail::proper_value_function<Predicate, bool, element_type const &>::type
+		    typename detail::proper_value_function<Predicate, bool, element_type const &>::type
 #else
-			Predicate
+		    Predicate
 #endif
-			proper_predicate;
+		        proper_predicate;
 
 		Input input;
 		proper_predicate is_propagated;
@@ -67,13 +65,11 @@ namespace Si
 	};
 
 	template <class Input, class Predicate>
-	auto make_filter_observable(Input &&input, Predicate &&is_propagated) -> filter_observable<
-		typename std::decay<Input>::type,
-		typename std::decay<Predicate>::type>
+	auto make_filter_observable(Input &&input, Predicate &&is_propagated)
+	    -> filter_observable<typename std::decay<Input>::type, typename std::decay<Predicate>::type>
 	{
-		return filter_observable<
-			typename std::decay<Input>::type,
-			typename std::decay<Predicate>::type>(std::forward<Input>(input), std::forward<Predicate>(is_propagated));
+		return filter_observable<typename std::decay<Input>::type, typename std::decay<Predicate>::type>(
+		    std::forward<Input>(input), std::forward<Predicate>(is_propagated));
 	}
 }
 

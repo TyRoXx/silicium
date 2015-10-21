@@ -27,12 +27,12 @@ namespace Si
 		typedef typename observer_type::element_type element_type;
 
 		any_ptr_observer()
-			: m_impl(ObserverPtr())
+		    : m_impl(ObserverPtr())
 		{
 		}
 
 		explicit any_ptr_observer(ObserverPtr impl)
-			: m_impl(std::move(impl))
+		    : m_impl(std::move(impl))
 		{
 		}
 
@@ -54,7 +54,6 @@ namespace Si
 		}
 
 	private:
-
 		ObserverPtr m_impl;
 	};
 
@@ -69,12 +68,12 @@ namespace Si
 		typedef typename observer_type::element_type element_type;
 
 		ptr_observer()
-			: any_ptr_observer<T *>(nullptr)
+		    : any_ptr_observer<T *>(nullptr)
 		{
 		}
 
 		explicit ptr_observer(T *impl)
-			: any_ptr_observer<T *>(impl)
+		    : any_ptr_observer<T *>(impl)
 		{
 		}
 	};
@@ -96,7 +95,7 @@ namespace Si
 		}
 
 		explicit virtualized_observer(Original original)
-			: m_original(std::move(original))
+		    : m_original(std::move(original))
 		{
 		}
 
@@ -111,14 +110,13 @@ namespace Si
 		}
 
 	private:
-
 		Original m_original;
 	};
 
 	template <class Observer>
 	auto virtualize_observer(Observer &&original)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> virtualized_observer<typename std::decay<Observer>::type>
+	    -> virtualized_observer<typename std::decay<Observer>::type>
 #endif
 	{
 		return virtualized_observer<typename std::decay<Observer>::type>(std::forward<Observer>(original));
@@ -127,7 +125,7 @@ namespace Si
 	template <class Observer, class OtherObserver>
 	auto extend(Observer &&, OtherObserver &&right)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> OtherObserver
+	    -> OtherObserver
 #endif
 	{
 		return std::forward<OtherObserver>(right);

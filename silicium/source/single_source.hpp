@@ -13,13 +13,13 @@ namespace Si
 		typedef Element element_type;
 
 		single_source()
-			: used(false)
+		    : used(false)
 		{
 		}
 
 		explicit single_source(Element element)
-			: element(std::move(element))
-			, used(false)
+		    : element(std::move(element))
+		    , used(false)
 		{
 		}
 
@@ -46,7 +46,6 @@ namespace Si
 		}
 
 	private:
-
 		Element element;
 		bool used;
 	};
@@ -54,7 +53,7 @@ namespace Si
 	template <class Element>
 	auto make_single_source(Element &&element)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> single_source<typename std::decay<Element>::type>
+	    -> single_source<typename std::decay<Element>::type>
 #endif
 	{
 		return single_source<typename std::decay<Element>::type>(std::forward<Element>(element));

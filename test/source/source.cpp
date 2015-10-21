@@ -13,7 +13,7 @@ namespace Si
 		auto lines = Si::detail::make_line_source(empty);
 		BOOST_CHECK(lines.map_next(1).empty());
 		std::vector<char> line;
-		auto * const result = lines.copy_next(make_iterator_range(&line, &line + 1));
+		auto *const result = lines.copy_next(make_iterator_range(&line, &line + 1));
 		BOOST_CHECK_EQUAL(&line, result);
 	}
 
@@ -24,7 +24,7 @@ namespace Si
 		auto lines = Si::detail::make_line_source(source);
 		BOOST_CHECK(lines.map_next(1).empty());
 		std::vector<char> line;
-		auto * const result = lines.copy_next(make_iterator_range(&line, &line + 1));
+		auto *const result = lines.copy_next(make_iterator_range(&line, &line + 1));
 		BOOST_CHECK_EQUAL(&line + 1, result);
 		BOOST_CHECK_EQUAL("abc", std::string(begin(line), end(line)));
 	}
@@ -77,9 +77,9 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(generator_source_empty)
 	{
 		auto source = Si::make_generator_source([]() -> Si::optional<element>
-		{
-			return Si::none;
-		});
+		                                        {
+			                                        return Si::none;
+			                                    });
 		BOOST_CHECK(!Si::get(source));
 	}
 
@@ -87,11 +87,11 @@ namespace Si
 	{
 		bool first = true;
 		auto source = Si::make_generator_source([&first]() -> Si::optional<int>
-		{
-			auto result = first ? Si::make_optional(12) : Si::none;
-			first = false;
-			return result;
-		});
+		                                        {
+			                                        auto result = first ? Si::make_optional(12) : Si::none;
+			                                        first = false;
+			                                        return result;
+			                                    });
 		BOOST_REQUIRE(12 == Si::get(source));
 		BOOST_REQUIRE(!Si::get(source));
 		BOOST_REQUIRE(!Si::get(source));
@@ -101,9 +101,9 @@ namespace Si
 	{
 		int next = 0;
 		auto source = Si::virtualize_source(Si::make_generator_source([&next]() -> Si::optional<int>
-		{
-			return next++;
-		}));
+		                                                              {
+			                                                              return next++;
+			                                                          }));
 		auto buffer = Si::make_buffer(source, 2);
 		for (int i = 0; i < 10; ++i)
 		{
@@ -113,14 +113,20 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(one_shot_generator)
 	{
-		auto s = Si::make_oneshot_generator_source([]() { return 2; });
+		auto s = Si::make_oneshot_generator_source([]()
+		                                           {
+			                                           return 2;
+			                                       });
 		BOOST_CHECK_EQUAL(2, Si::get(s));
 		BOOST_CHECK_EQUAL(Si::none, Si::get(s));
 	}
 
 	BOOST_AUTO_TEST_CASE(virtualized_source_test)
 	{
-		auto v = Si::virtualize_source(Si::make_generator_source([]() -> Si::optional<int> { return 0; }));
+		auto v = Si::virtualize_source(Si::make_generator_source([]() -> Si::optional<int>
+		                                                         {
+			                                                         return 0;
+			                                                     }));
 		BOOST_CHECK_EQUAL(0, Si::get(v));
 	}
 }

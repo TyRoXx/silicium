@@ -22,8 +22,7 @@ namespace Si
 		};
 
 		template <class CharSource>
-		SILICIUM_USE_RESULT
-		optional<request> parse_request(CharSource &&in)
+		SILICIUM_USE_RESULT optional<request> parse_request(CharSource &&in)
 		{
 			auto lines = Si::detail::make_line_source(in);
 			auto first_line = get(lines);

@@ -16,13 +16,13 @@ namespace Si
 		}
 
 		explicit constant_observable(Element value)
-			: m_value(std::move(value))
+		    : m_value(std::move(value))
 		{
 		}
 
 		template <class OtherElement>
 		constant_observable(constant_observable<OtherElement> &&other)
-			: m_value(other.constant())
+		    : m_value(other.constant())
 		{
 		}
 
@@ -38,14 +38,13 @@ namespace Si
 		}
 
 	private:
-
 		Element m_value;
 	};
 
 	template <class Element>
 	auto make_constant_observable(Element &&value)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> constant_observable<typename std::decay<Element>::type>
+	    -> constant_observable<typename std::decay<Element>::type>
 #endif
 	{
 		return constant_observable<typename std::decay<Element>::type>(std::forward<Element>(value));

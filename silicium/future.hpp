@@ -15,17 +15,18 @@ namespace Si
 {
 	namespace detail
 	{
-		struct avoid_msvc_warning_about_multiple_copy_ctors {};
+		struct avoid_msvc_warning_about_multiple_copy_ctors
+		{
+		};
 
 		struct link
 		{
-			link() BOOST_NOEXCEPT
-				: m_other_side(nullptr)
+			link() BOOST_NOEXCEPT : m_other_side(nullptr)
 			{
 			}
 
 			explicit link(link &other_side, avoid_msvc_warning_about_multiple_copy_ctors)
-				: m_other_side(&other_side)
+			    : m_other_side(&other_side)
 			{
 				assert(!other_side.m_other_side);
 				other_side.m_other_side = this;
@@ -41,10 +42,8 @@ namespace Si
 			}
 
 			SILICIUM_DISABLE_COPY(link)
-public:
-
-			link(link &&other) BOOST_NOEXCEPT
-				: m_other_side(other.m_other_side)
+		public:
+			link(link &&other) BOOST_NOEXCEPT : m_other_side(other.m_other_side)
 			{
 				other.m_other_side = nullptr;
 				if (m_other_side)
@@ -53,7 +52,7 @@ public:
 				}
 			}
 
-			link &operator = (link &&other) BOOST_NOEXCEPT
+			link &operator=(link &&other) BOOST_NOEXCEPT
 			{
 				if (m_other_side)
 				{
@@ -73,7 +72,6 @@ public:
 			}
 
 		private:
-
 			link *m_other_side;
 		};
 	}
@@ -91,13 +89,11 @@ public:
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		SILICIUM_DISABLE_COPY(future)
 	public:
-
-		future(future &&other) BOOST_NOEXCEPT
-		: m_state(std::move(other.m_state))
+		future(future &&other) BOOST_NOEXCEPT : m_state(std::move(other.m_state))
 		{
 		}
 
-		future &operator = (future &&other) BOOST_NOEXCEPT
+		future &operator=(future &&other) BOOST_NOEXCEPT
 		{
 			m_state = std::move(other.m_state);
 			return *this;
@@ -105,43 +101,41 @@ public:
 #endif
 
 		explicit future(T value)
-			: m_state(std::move(value))
+		    : m_state(std::move(value))
 		{
 		}
 
 		explicit future(detail::link &promise) BOOST_NOEXCEPT
-			: m_state(detail::link(promise, detail::avoid_msvc_warning_about_multiple_copy_ctors()))
+		    : m_state(detail::link(promise, detail::avoid_msvc_warning_about_multiple_copy_ctors()))
 		{
 		}
 
 		template <class Handler>
-		auto async_get(Handler &&handler)
-			-> typename boost::asio::async_result<typename boost::asio::handler_type<Handler, void(T)>::type>::type
+		auto async_get(Handler &&handler) ->
+		    typename boost::asio::async_result<typename boost::asio::handler_type<Handler, void(T)>::type>::type
 		{
 			typename boost::asio::handler_type<Handler, void(T)>::type real_handler(std::forward<Handler>(handler));
 			typename boost::asio::async_result<decltype(real_handler)> result(real_handler);
 			{
 				std::lock_guard<typename ThreadSafety::future_mutex> lock(m_mutex);
-				visit<void>(
-					m_state,
-					[](empty)
-					{
-						SILICIUM_UNREACHABLE();
-					},
-					[this, &real_handler](T &value)
-					{
-						real_handler(std::forward<T>(value));
-						m_state = empty();
-					},
-					[this, &real_handler](detail::link &promise)
-					{
-						m_state = getting(std::move(promise), std::move(real_handler));
-					},
-					[](getting &)
-					{
-						SILICIUM_UNREACHABLE();
-					}
-				);
+				visit<void>(m_state,
+				            [](empty)
+				            {
+					            SILICIUM_UNREACHABLE();
+					        },
+				            [this, &real_handler](T &value)
+				            {
+					            real_handler(std::forward<T>(value));
+					            m_state = empty();
+					        },
+				            [this, &real_handler](detail::link &promise)
+				            {
+					            m_state = getting(std::move(promise), std::move(real_handler));
+					        },
+				            [](getting &)
+				            {
+					            SILICIUM_UNREACHABLE();
+					        });
 			}
 			return result.get();
 		}
@@ -153,32 +147,29 @@ public:
 		}
 
 	private:
-
 		friend struct promise<T, ThreadSafety>;
 		void internal_set_value(T value)
 		{
 			std::lock_guard<typename ThreadSafety::future_mutex> lock(m_mutex);
-			visit<void>(
-				m_state,
-				[](empty)
-				{
-					SILICIUM_UNREACHABLE();
-				},
-				[](T &)
-				{
-					SILICIUM_UNREACHABLE();
-				},
-				[this, &value](detail::link &)
-				{
-					m_state = std::move(value);
-				},
-				[this, &value](getting &get)
-				{
-					auto handler = std::move(get.handler);
-					m_state = empty();
-					handler(std::move(value));
-				}
-			);
+			visit<void>(m_state,
+			            [](empty)
+			            {
+				            SILICIUM_UNREACHABLE();
+				        },
+			            [](T &)
+			            {
+				            SILICIUM_UNREACHABLE();
+				        },
+			            [this, &value](detail::link &)
+			            {
+				            m_state = std::move(value);
+				        },
+			            [this, &value](getting &get)
+			            {
+				            auto handler = std::move(get.handler);
+				            m_state = empty();
+				            handler(std::move(value));
+				        });
 		}
 
 		struct empty
@@ -187,13 +178,12 @@ public:
 
 		struct getting
 		{
-			//has to be the first member for a hack in promise<T> to work
+			// has to be the first member for a hack in promise<T> to work
 			detail::link promise;
 			function<void(T)> handler;
 
-			getting(detail::link promise, function<void(T)> handler) BOOST_NOEXCEPT
-				: promise(std::move(promise))
-				, handler(std::move(handler))
+			getting(detail::link promise, function<void(T)> handler) BOOST_NOEXCEPT : promise(std::move(promise)),
+			                                                                          handler(std::move(handler))
 			{
 			}
 
@@ -202,13 +192,12 @@ public:
 			{
 			}
 
-			getting(getting &&other) BOOST_NOEXCEPT
-				: promise(std::move(other.promise))
-				, handler(std::move(other.handler))
+			getting(getting &&other) BOOST_NOEXCEPT : promise(std::move(other.promise)),
+			                                          handler(std::move(other.handler))
 			{
 			}
 
-			getting &operator = (getting &&other) BOOST_NOEXCEPT
+			getting &operator=(getting &&other) BOOST_NOEXCEPT
 			{
 				promise = std::move(other.promise);
 				handler = std::move(other.handler);
@@ -239,13 +228,11 @@ public:
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		SILICIUM_DISABLE_COPY(promise)
 	public:
-
-		promise(promise &&other) BOOST_NOEXCEPT
-			: m_state(std::move(other.m_state))
+		promise(promise &&other) BOOST_NOEXCEPT : m_state(std::move(other.m_state))
 		{
 		}
 
-		promise &operator = (promise &&other) BOOST_NOEXCEPT
+		promise &operator=(promise &&other) BOOST_NOEXCEPT
 		{
 			m_state = std::move(other.m_state);
 			return *this;
@@ -255,52 +242,49 @@ public:
 		future<T, ThreadSafety> get_future()
 		{
 			return visit<future<T, ThreadSafety>>(
-				m_state,
-				[this](empty)
-				{
-					m_state = waiting_for_set_value();
-					return future<T, ThreadSafety>(try_get_ptr<waiting_for_set_value>(m_state)->future);
+			    m_state,
+			    [this](empty)
+			    {
+				    m_state = waiting_for_set_value();
+				    return future<T, ThreadSafety>(try_get_ptr<waiting_for_set_value>(m_state)->future);
 				},
-				[this](T &value)
-				{
-					T result = std::move(value);
-					m_state = empty();
-					return future<T, ThreadSafety>(std::move(result));
+			    [this](T &value)
+			    {
+				    T result = std::move(value);
+				    m_state = empty();
+				    return future<T, ThreadSafety>(std::move(result));
 				},
-				[](waiting_for_set_value &) -> future<T, ThreadSafety>
-				{
-					boost::throw_exception(std::logic_error("get_future can only be called once"));
-					SILICIUM_UNREACHABLE();
-				}
-			);
+			    [](waiting_for_set_value &) -> future<T, ThreadSafety>
+			    {
+				    boost::throw_exception(std::logic_error("get_future can only be called once"));
+				    SILICIUM_UNREACHABLE();
+				});
 		}
 
-		template <class ...Args>
-		void set_value(Args &&...args)
+		template <class... Args>
+		void set_value(Args &&... args)
 		{
 			T arg(std::forward<Args>(args)...);
-			visit<void>(
-				m_state,
-				[this, &arg](empty)
-				{
-					m_state = std::move(arg);
-				},
-				[&arg](T &value)
-				{
-					value = std::move(arg);
-				},
-				[this, &arg](waiting_for_set_value &waiting)
-				{
-					//A dirty hack, but it works as long as the class layouts are as expected.
-					future<T, ThreadSafety> &future_ = *reinterpret_cast<future<T, ThreadSafety> *>(waiting.future.get_other_side());
-					//TODO: change state in a safe way
-					future_.internal_set_value(std::move(arg));
-				}
-			);
+			visit<void>(m_state,
+			            [this, &arg](empty)
+			            {
+				            m_state = std::move(arg);
+				        },
+			            [&arg](T &value)
+			            {
+				            value = std::move(arg);
+				        },
+			            [this, &arg](waiting_for_set_value &waiting)
+			            {
+				            // A dirty hack, but it works as long as the class layouts are as expected.
+				            future<T, ThreadSafety> &future_ =
+				                *reinterpret_cast<future<T, ThreadSafety> *>(waiting.future.get_other_side());
+				            // TODO: change state in a safe way
+				            future_.internal_set_value(std::move(arg));
+				        });
 		}
 
 	private:
-
 		struct empty
 		{
 		};
@@ -314,12 +298,11 @@ public:
 			{
 			}
 
-			waiting_for_set_value(waiting_for_set_value &&other) BOOST_NOEXCEPT
-				: future(std::move(other.future))
+			waiting_for_set_value(waiting_for_set_value &&other) BOOST_NOEXCEPT : future(std::move(other.future))
 			{
 			}
 
-			waiting_for_set_value &operator = (waiting_for_set_value &&other) BOOST_NOEXCEPT
+			waiting_for_set_value &operator=(waiting_for_set_value &&other) BOOST_NOEXCEPT
 			{
 				future = std::move(other.future);
 				return *this;
@@ -355,7 +338,6 @@ public:
 			}
 
 		private:
-
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
 			union
 			{
@@ -380,7 +362,7 @@ public:
 			new (&m_mutex.storage()) Mutex();
 		}
 
-		mutex_move_wrapper &operator = (mutex_move_wrapper &&)
+		mutex_move_wrapper &operator=(mutex_move_wrapper &&)
 		{
 			return *this;
 		}
@@ -403,7 +385,6 @@ public:
 		SILICIUM_DISABLE_COPY(mutex_move_wrapper)
 
 	private:
-
 		detail::uninitialized<Mutex> m_mutex;
 	};
 

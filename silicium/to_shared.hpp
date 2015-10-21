@@ -9,7 +9,7 @@ namespace Si
 	template <class T>
 	auto to_shared(T &&t)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> std::shared_ptr<typename std::decay<T>::type>
+	    -> std::shared_ptr<typename std::decay<T>::type>
 #endif
 	{
 		typedef typename std::decay<T>::type decayed_T;

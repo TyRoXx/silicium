@@ -21,28 +21,26 @@ namespace Si
 			noexcept_string status_text;
 			std::unique_ptr<arguments_table> arguments;
 
-			response() BOOST_NOEXCEPT
-				: status(0)
+			response() BOOST_NOEXCEPT : status(0)
 			{
 			}
 
-			response(response &&other) BOOST_NOEXCEPT
-				: http_version(std::move(other.http_version))
-				, status(other.status)
-				, status_text(std::move(other.status_text))
-				, arguments(std::move(other.arguments))
+			response(response &&other) BOOST_NOEXCEPT : http_version(std::move(other.http_version)),
+			                                            status(other.status),
+			                                            status_text(std::move(other.status_text)),
+			                                            arguments(std::move(other.arguments))
 			{
 			}
 
 			response(response const &other)
-				: http_version(other.http_version)
-				, status(other.status)
-				, status_text(other.status_text)
-				, arguments(other.arguments ? to_unique(*other.arguments) : nullptr)
+			    : http_version(other.http_version)
+			    , status(other.status)
+			    , status_text(other.status_text)
+			    , arguments(other.arguments ? to_unique(*other.arguments) : nullptr)
 			{
 			}
 
-			response &operator = (response &&other) BOOST_NOEXCEPT
+			response &operator=(response &&other) BOOST_NOEXCEPT
 			{
 				http_version = std::move(other.http_version);
 				status = std::move(other.status);
@@ -51,7 +49,7 @@ namespace Si
 				return *this;
 			}
 
-			response &operator = (response const &other)
+			response &operator=(response const &other)
 			{
 				http_version = other.http_version;
 				status = other.status;
@@ -62,8 +60,7 @@ namespace Si
 		};
 
 		template <class CharSource>
-		SILICIUM_USE_RESULT
-		optional<response> parse_response(CharSource &&in)
+		SILICIUM_USE_RESULT optional<response> parse_response(CharSource &&in)
 		{
 			auto lines = Si::detail::make_line_source(in);
 			auto first_line = get(lines);

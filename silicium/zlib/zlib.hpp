@@ -21,17 +21,19 @@ namespace Si
 			return "zlib";
 		}
 
-        virtual std::string message(int ev) const SILICIUM_OVERRIDE
+		virtual std::string message(int ev) const SILICIUM_OVERRIDE
 		{
 			switch (ev)
 			{
-#define SILICIUM_HANDLE_ERROR_CASE(error) case error: return BOOST_STRINGIZE(error);
-			SILICIUM_HANDLE_ERROR_CASE(Z_ERRNO)
-			SILICIUM_HANDLE_ERROR_CASE(Z_STREAM_ERROR)
-			SILICIUM_HANDLE_ERROR_CASE(Z_DATA_ERROR)
-			SILICIUM_HANDLE_ERROR_CASE(Z_MEM_ERROR)
-			SILICIUM_HANDLE_ERROR_CASE(Z_BUF_ERROR)
-			SILICIUM_HANDLE_ERROR_CASE(Z_VERSION_ERROR)
+#define SILICIUM_HANDLE_ERROR_CASE(error)                                                                              \
+	case error:                                                                                                        \
+		return BOOST_STRINGIZE(error);
+				SILICIUM_HANDLE_ERROR_CASE(Z_ERRNO)
+				SILICIUM_HANDLE_ERROR_CASE(Z_STREAM_ERROR)
+				SILICIUM_HANDLE_ERROR_CASE(Z_DATA_ERROR)
+				SILICIUM_HANDLE_ERROR_CASE(Z_MEM_ERROR)
+				SILICIUM_HANDLE_ERROR_CASE(Z_BUF_ERROR)
+				SILICIUM_HANDLE_ERROR_CASE(Z_VERSION_ERROR)
 #undef SILICIUM_HANDLE_ERROR_CASE
 			default:
 				return "";

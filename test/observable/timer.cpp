@@ -13,17 +13,18 @@ BOOST_AUTO_TEST_CASE(asio_timer)
 	std::size_t elapsed_count = 0;
 	std::size_t const loop_count = 10;
 	auto coro = Si::make_total_consumer(Si::make_coroutine([&t, &elapsed_count, loop_count](Si::yield_context yield)
-	{
-		BOOST_REQUIRE_EQUAL(0U, elapsed_count);
-		for (std::size_t i = 0; i < loop_count; ++i)
-		{
-			t.expires_from_now(boost::chrono::microseconds(1));
-			boost::optional<Si::asio::timer_elapsed> e = yield.get_one(t);
-			BOOST_REQUIRE(e);
-			++elapsed_count;
-		}
-		return Si::nothing{};
-	}));
+	                                                       {
+		                                                       BOOST_REQUIRE_EQUAL(0U, elapsed_count);
+		                                                       for (std::size_t i = 0; i < loop_count; ++i)
+		                                                       {
+			                                                       t.expires_from_now(boost::chrono::microseconds(1));
+			                                                       boost::optional<Si::asio::timer_elapsed> e =
+			                                                           yield.get_one(t);
+			                                                       BOOST_REQUIRE(e);
+			                                                       ++elapsed_count;
+		                                                       }
+		                                                       return Si::nothing{};
+		                                                   }));
 	coro.start();
 	io.run();
 	BOOST_CHECK_EQUAL(loop_count, elapsed_count);
@@ -39,7 +40,7 @@ namespace
 		bool is_element;
 
 		test_observer()
-			: is_element(false)
+		    : is_element(false)
 		{
 		}
 

@@ -13,7 +13,7 @@ namespace Si
 		}
 
 		explicit destructor(Callable action)
-			: m_action(std::move(action))
+		    : m_action(std::move(action))
 		{
 		}
 
@@ -32,14 +32,13 @@ namespace Si
 #endif
 
 	private:
-
 		optional<Callable> m_action;
 	};
 
 	template <class Callable>
 	auto make_destructor(Callable &&action)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> destructor<typename std::decay<Callable>::type>
+	    -> destructor<typename std::decay<Callable>::type>
 #endif
 	{
 		return destructor<typename std::decay<Callable>::type>(std::forward<Callable>(action));

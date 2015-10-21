@@ -19,13 +19,13 @@ namespace Si
 		}
 
 		range_value(BidirectionalRange range)
-			: range(std::move(range))
+		    : range(std::move(range))
 		{
 		}
 	};
 
 	template <class BidirectionalRange1, class BidirectionalRange2>
-	bool operator == (range_value<BidirectionalRange1> const &left, range_value<BidirectionalRange2> const &right)
+	bool operator==(range_value<BidirectionalRange1> const &left, range_value<BidirectionalRange2> const &right)
 	{
 		return boost::range::equal(left.range, right.range);
 	}
@@ -33,7 +33,7 @@ namespace Si
 	template <class BidirectionalRange>
 	auto make_range_value(BidirectionalRange &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> range_value<typename std::decay<BidirectionalRange>::type>
+	    -> range_value<typename std::decay<BidirectionalRange>::type>
 #endif
 	{
 		return range_value<typename std::decay<BidirectionalRange>::type>(std::forward<BidirectionalRange>(range));

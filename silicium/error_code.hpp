@@ -8,11 +8,11 @@
 
 namespace Si
 {
-	template <class UnderlyingErrorCode = boost::system::error_code, class UnderlyingCategory = boost::system::error_category>
+	template <class UnderlyingErrorCode = boost::system::error_code,
+	          class UnderlyingCategory = boost::system::error_category>
 	struct error_code
 	{
-		error_code() BOOST_NOEXCEPT
-			: underlying(nullptr)
+		error_code() BOOST_NOEXCEPT : underlying(nullptr)
 		{
 		}
 
@@ -48,11 +48,9 @@ namespace Si
 		}
 
 	private:
-
 		UnderlyingErrorCode const *underlying;
 
-		explicit error_code(UnderlyingErrorCode const &underlying) BOOST_NOEXCEPT
-			: underlying(&underlying)
+		explicit error_code(UnderlyingErrorCode const &underlying) BOOST_NOEXCEPT : underlying(&underlying)
 		{
 		}
 	};
@@ -60,7 +58,8 @@ namespace Si
 	BOOST_STATIC_ASSERT(sizeof(error_code<>) == sizeof(void *));
 
 	template <class UnderlyingErrorCode, class UnderlyingCategory>
-	bool operator == (error_code<UnderlyingErrorCode, UnderlyingCategory> const &left, error_code<UnderlyingErrorCode, UnderlyingCategory> const &right)
+	bool operator==(error_code<UnderlyingErrorCode, UnderlyingCategory> const &left,
+	                error_code<UnderlyingErrorCode, UnderlyingCategory> const &right)
 	{
 		return left.to_underlying() == right.to_underlying();
 	}
@@ -69,10 +68,10 @@ namespace Si
 	inline SILICIUM_NORETURN void throw_error(error_code<UnderlyingErrorCode, UnderlyingCategory> error)
 	{
 #ifndef __GNUC__
-		//GCC warns about a return in a "noreturn" function
+		// GCC warns about a return in a "noreturn" function
 		return
 #endif
-			throw_error(error.to_underlying());
+		    throw_error(error.to_underlying());
 	}
 
 	template <class UnderlyingErrorCode, class UnderlyingCategory>
@@ -82,7 +81,7 @@ namespace Si
 	}
 
 	template <class UnderlyingErrorCode, class UnderlyingCategory>
-	std::ostream &operator << (std::ostream &out, error_code<UnderlyingErrorCode, UnderlyingCategory> const &value)
+	std::ostream &operator<<(std::ostream &out, error_code<UnderlyingErrorCode, UnderlyingCategory> const &value)
 	{
 		return out << value.to_underlying();
 	}

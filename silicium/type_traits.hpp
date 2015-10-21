@@ -4,15 +4,15 @@
 #include <silicium/config.hpp>
 #include <boost/static_assert.hpp>
 #if BOOST_VERSION >= 105700
-#	include <boost/type_traits/is_copy_assignable.hpp>
+#include <boost/type_traits/is_copy_assignable.hpp>
 #endif
 #if BOOST_VERSION >= 105500
-#	include <boost/type_traits/is_copy_constructible.hpp>
+#include <boost/type_traits/is_copy_constructible.hpp>
 #endif
 #include <boost/type_traits/has_trivial_constructor.hpp>
 #if BOOST_VERSION >= 104900
-#	include <boost/type_traits/is_nothrow_move_constructible.hpp>
-#	include <boost/type_traits/is_nothrow_move_assignable.hpp>
+#include <boost/type_traits/is_nothrow_move_constructible.hpp>
+#include <boost/type_traits/is_nothrow_move_assignable.hpp>
 #endif
 #include <boost/type_traits/has_nothrow_destructor.hpp>
 
@@ -48,10 +48,11 @@ namespace Si
 	using std::is_nothrow_move_constructible;
 #if SILICIUM_VC2012
 	template <class T>
-	struct is_nothrow_move_assignable : std::integral_constant<bool, std::is_pod<T>::value || std::has_nothrow_copy_assign<T>::value>
+	struct is_nothrow_move_assignable
+	    : std::integral_constant<bool, std::is_pod<T>::value || std::has_nothrow_copy_assign<T>::value>
 	{
 	};
-#else // SILICIUM_VC2012
+#else  // SILICIUM_VC2012
 	using std::is_nothrow_move_assignable;
 #endif // SILICIUM_VC2012
 
@@ -73,7 +74,9 @@ namespace Si
 	};
 #else
 	template <class T>
-	struct is_copy_assignable : std::true_type {};
+	struct is_copy_assignable : std::true_type
+	{
+	};
 #endif
 	template <class T>
 	struct is_copy_constructible : boost::is_copy_constructible<T>
@@ -89,22 +92,22 @@ namespace Si
 
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) == 407)
 	template <class T>
-	struct is_nothrow_destructible : std::true_type {};
+	struct is_nothrow_destructible : std::true_type
+	{
+	};
 #else
 	using std::is_nothrow_destructible;
 #endif
 
 #else // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
 	template <class T>
-	struct is_default_constructible : std::conditional<
-		std::is_reference<T>::value,
-		std::false_type,
+	struct is_default_constructible : std::conditional<std::is_reference<T>::value, std::false_type,
 #if !defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER
-		std::is_constructible<T>
+	                                                   std::is_constructible<T>
 #else
-		boost::has_trivial_constructor<T>
+	                                                   boost::has_trivial_constructor<T>
 #endif
-	>::type
+	                                                   >::type
 	{
 	};
 	template <class T>

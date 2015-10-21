@@ -30,12 +30,15 @@ namespace Si
 		};
 
 		template <class Unsigned, class Endianness, class InputIterator>
-		optional<std::pair<Unsigned, InputIterator>> bytes_to_integer_shortcut(InputIterator, InputIterator, Endianness, identity<Unsigned>) BOOST_NOEXCEPT
+		optional<std::pair<Unsigned, InputIterator>> bytes_to_integer_shortcut(InputIterator, InputIterator, Endianness,
+		                                                                       identity<Unsigned>) BOOST_NOEXCEPT
 		{
 			return none;
 		}
 
-		inline optional<std::pair<boost::uint32_t, byte const *>> bytes_to_integer_shortcut(byte const *begin, byte const *end, big_endian, identity<boost::uint32_t>) BOOST_NOEXCEPT
+		inline optional<std::pair<boost::uint32_t, byte const *>>
+		bytes_to_integer_shortcut(byte const *begin, byte const *end, big_endian,
+		                          identity<boost::uint32_t>) BOOST_NOEXCEPT
 		{
 			if (static_cast<size_t>(end - begin) < sizeof(boost::uint32_t))
 			{
@@ -53,7 +56,7 @@ namespace Si
 			Unsigned built;
 
 			unsigned_int_builder()
-				: built()
+			    : built()
 			{
 			}
 
@@ -67,7 +70,7 @@ namespace Si
 		struct endian_parser
 		{
 			endian_parser()
-				: m_bytes_in_buffer(0)
+			    : m_bytes_in_buffer(0)
 			{
 			}
 
@@ -76,7 +79,8 @@ namespace Si
 			{
 				if (m_bytes_in_buffer == 0)
 				{
-					optional<std::pair<Unsigned, InputIterator>> const succeeded = bytes_to_integer_shortcut(begin, end, Endianness(), identity<Unsigned>());
+					optional<std::pair<Unsigned, InputIterator>> const succeeded =
+					    bytes_to_integer_shortcut(begin, end, Endianness(), identity<Unsigned>());
 					if (succeeded)
 					{
 						m_buffer.built = succeeded->first;
@@ -86,7 +90,8 @@ namespace Si
 				}
 				while ((begin != end) && (m_bytes_in_buffer < sizeof(Unsigned)))
 				{
-					m_buffer.set_byte(Endianness::byte_index_to_significance(m_bytes_in_buffer, sizeof(Unsigned)), *begin);
+					m_buffer.set_byte(Endianness::byte_index_to_significance(m_bytes_in_buffer, sizeof(Unsigned)),
+					                  *begin);
 					++begin;
 					++m_bytes_in_buffer;
 				}
@@ -103,7 +108,6 @@ namespace Si
 			}
 
 		private:
-
 			unsigned_int_builder<Unsigned> m_buffer;
 			std::size_t m_bytes_in_buffer;
 		};

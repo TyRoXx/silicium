@@ -13,8 +13,8 @@ namespace Si
 {
 	namespace detail
 	{
-		//std::iterator_traits<T const *>::value_type seems to be T (GCC 4.8), but that
-		//is not useful at all because the const is missing.
+		// std::iterator_traits<T const *>::value_type seems to be T (GCC 4.8), but that
+		// is not useful at all because the const is missing.
 		template <class Iterator>
 		struct actual_value_type
 		{
@@ -30,28 +30,24 @@ namespace Si
 		typedef Iterator iterator;
 		typedef Iterator const_iterator;
 
-		BOOST_CONSTEXPR iterator_range() BOOST_NOEXCEPT
-			: m_begin(Iterator())
-			, m_end(Iterator())
+		BOOST_CONSTEXPR iterator_range() BOOST_NOEXCEPT : m_begin(Iterator()), m_end(Iterator())
 		{
 		}
 
 		template <class It1, class It2>
-		BOOST_CONSTEXPR iterator_range(It1 &&begin, It2 &&end) BOOST_NOEXCEPT
-			: m_begin(std::forward<It1>(begin))
-			, m_end(std::forward<It2>(end))
+		BOOST_CONSTEXPR iterator_range(It1 &&begin, It2 &&end) BOOST_NOEXCEPT : m_begin(std::forward<It1>(begin)),
+		                                                                        m_end(std::forward<It2>(end))
 		{
 		}
 
 		template <class OtherIterator>
-		iterator_range(iterator_range<OtherIterator> const &other) BOOST_NOEXCEPT
-			: m_begin(other.begin())
-			, m_end(other.end())
+		iterator_range(iterator_range<OtherIterator> const &other) BOOST_NOEXCEPT : m_begin(other.begin()),
+		                                                                            m_end(other.end())
 		{
 		}
 
 		template <class OtherIterator>
-		iterator_range &operator = (iterator_range<OtherIterator> const &other) BOOST_NOEXCEPT
+		iterator_range &operator=(iterator_range<OtherIterator> const &other) BOOST_NOEXCEPT
 		{
 			m_begin = other.begin();
 			m_end = other.end();
@@ -103,18 +99,19 @@ namespace Si
 		/// This method is only available with random access iterators so that it takes O(1) in time.
 		value_type &operator[](difference_type index) const BOOST_NOEXCEPT
 		{
-			(void)static_cast<std::random_access_iterator_tag>(typename std::iterator_traits<Iterator>::iterator_category{});
+			(void)static_cast<std::random_access_iterator_tag>(
+			    typename std::iterator_traits<Iterator>::iterator_category{});
 			assert(index < size());
 			return begin()[index];
 		}
 
 	private:
-
 		Iterator m_begin, m_end;
 	};
 
 	template <class Iterator1, class Iterator2>
-	BOOST_CONSTEXPR bool pointing_to_same_subrange(iterator_range<Iterator1> const &left, iterator_range<Iterator2> const &right)
+	BOOST_CONSTEXPR bool pointing_to_same_subrange(iterator_range<Iterator1> const &left,
+	                                               iterator_range<Iterator2> const &right)
 	{
 		return (left.begin() == right.begin()) && (left.end() == right.end());
 	}
@@ -125,7 +122,7 @@ namespace Si
 		return range.begin();
 	}
 
-	//for Boost.Range compatibility
+	// for Boost.Range compatibility
 	template <class Iterator>
 	BOOST_CONSTEXPR Iterator const &range_begin(iterator_range<Iterator> const &range)
 	{
@@ -141,7 +138,7 @@ namespace Si
 	template <class Iterator1, class Iterator2>
 	BOOST_CONSTEXPR auto make_iterator_range(Iterator1 &&begin, Iterator2 &&end)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> iterator_range<typename std::decay<Iterator1>::type>
+	    -> iterator_range<typename std::decay<Iterator1>::type>
 #endif
 	{
 		typedef typename std::decay<Iterator1>::type iterator_type;
@@ -152,7 +149,7 @@ namespace Si
 	template <class Range>
 	auto make_iterator_range(Range &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(make_iterator_range(std::begin(range), std::end(range)))
+	    -> decltype(make_iterator_range(std::begin(range), std::end(range)))
 #endif
 	{
 		using std::begin;
@@ -163,7 +160,7 @@ namespace Si
 	template <class ContiguousRange>
 	auto make_contiguous_range(ContiguousRange &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(make_iterator_range(boost::addressof(*std::begin(range)), boost::addressof(*std::end(range))))
+	    -> decltype(make_iterator_range(boost::addressof(*std::begin(range)), boost::addressof(*std::end(range))))
 #endif
 	{
 		using std::begin;
@@ -175,8 +172,8 @@ namespace Si
 			typename std::remove_reference<decltype(*begin_)>::type *data = nullptr;
 			return make_iterator_range(data, data);
 		}
-		auto * const data_begin = boost::addressof(*begin_);
-		auto * const data_end = data_begin + std::distance(begin_, end_);
+		auto *const data_begin = boost::addressof(*begin_);
+		auto *const data_end = data_begin + std::distance(begin_, end_);
 		return make_iterator_range(data_begin, data_end);
 	}
 }

@@ -20,28 +20,28 @@ namespace Si
 		}
 
 		explicit ptr_observable(Ptr content)
-			: content(std::move(content))
+		    : content(std::move(content))
 		{
 		}
 
 #ifdef _MSC_VER
 		ptr_observable(ptr_observable &&other)
-			: content(std::move(other.content))
+		    : content(std::move(other.content))
 		{
 		}
 
-		ptr_observable &operator = (ptr_observable &&other)
+		ptr_observable &operator=(ptr_observable &&other)
 		{
 			content = std::move(other.content);
 			return *this;
 		}
 
 		ptr_observable(ptr_observable const &other)
-			: content(other.content)
+		    : content(other.content)
 		{
 		}
 
-		ptr_observable &operator = (ptr_observable const &other)
+		ptr_observable &operator=(ptr_observable const &other)
 		{
 			content = other.content;
 			return *this;
@@ -61,7 +61,6 @@ namespace Si
 		}
 
 	private:
-
 		Ptr content;
 	};
 }

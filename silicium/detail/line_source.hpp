@@ -13,12 +13,12 @@ namespace Si
 		struct line_source SILICIUM_FINAL : Source<std::vector<char>>::interface
 		{
 			line_source()
-				: m_next(nullptr)
+			    : m_next(nullptr)
 			{
 			}
 
 			explicit line_source(Next &next)
-				: m_next(&next)
+			    : m_next(&next)
 			{
 			}
 
@@ -64,7 +64,6 @@ namespace Si
 			}
 
 		private:
-
 			Next *m_next;
 		};
 

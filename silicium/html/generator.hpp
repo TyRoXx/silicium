@@ -17,7 +17,7 @@ namespace Si
 	template <class CharRange>
 	auto make_range_from_string_like(CharRange &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> CharRange
+	    -> CharRange
 #endif
 	{
 		return std::forward<CharRange>(range);
@@ -26,7 +26,7 @@ namespace Si
 	template <class Char>
 	auto make_range_from_string_like(Char const *c_str)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(make_c_str_range(c_str))
+	    -> decltype(make_c_str_range(c_str))
 #endif
 	{
 		return make_c_str_range(c_str);
@@ -40,11 +40,21 @@ namespace Si
 			using Si::append;
 			switch (c)
 			{
-			case '&' : append(sink, "&amp;"); break;
-			case '<' : append(sink, "&lt;"); break;
-			case '>' : append(sink, "&gt;"); break;
-			case '\'': append(sink, "&apos;"); break;
-			case '"' : append(sink, "&quot;"); break;
+			case '&':
+				append(sink, "&amp;");
+				break;
+			case '<':
+				append(sink, "&lt;");
+				break;
+			case '>':
+				append(sink, "&gt;");
+				break;
+			case '\'':
+				append(sink, "&apos;");
+				break;
+			case '"':
+				append(sink, "&quot;");
+				break;
 			default:
 				append(sink, c);
 				break;
@@ -52,9 +62,7 @@ namespace Si
 		}
 
 		template <class CharSink, class StringLike>
-		void write_string(
-			CharSink &&sink,
-			StringLike const &text)
+		void write_string(CharSink &&sink, StringLike const &text)
 		{
 			for (auto c : make_range_from_string_like(text))
 			{
@@ -63,9 +71,7 @@ namespace Si
 		}
 
 		template <class CharSink, class StringLike>
-		void open_attributed_element(
-			CharSink &&sink,
-			StringLike const &name)
+		void open_attributed_element(CharSink &&sink, StringLike const &name)
 		{
 			append(sink, '<');
 			write_string(sink, name);
@@ -84,10 +90,7 @@ namespace Si
 		}
 
 		template <class CharSink, class KeyStringLike, class ValueStringLike>
-		void add_attribute(
-			CharSink &&sink,
-			KeyStringLike const &key,
-			ValueStringLike const &value)
+		void add_attribute(CharSink &&sink, KeyStringLike const &key, ValueStringLike const &value)
 		{
 			append(sink, " ");
 			append(sink, key);
@@ -97,18 +100,14 @@ namespace Si
 		}
 
 		template <class CharSink, class StringLike>
-		void open_element(
-			CharSink &&sink,
-			StringLike const &name)
+		void open_element(CharSink &&sink, StringLike const &name)
 		{
 			open_attributed_element(sink, name);
 			finish_attributes(sink);
 		}
 
 		template <class CharSink, class StringLike>
-		void close_element(
-			CharSink &&sink,
-			StringLike const &name)
+		void close_element(CharSink &&sink, StringLike const &name)
 		{
 			using Si::append;
 			append(sink, '<');
@@ -118,9 +117,7 @@ namespace Si
 		}
 
 		template <class CharSink, class StringLike>
-		void unpaired_element(
-			CharSink &&sink,
-			StringLike const &name)
+		void unpaired_element(CharSink &&sink, StringLike const &name)
 		{
 			using Si::append;
 			append(sink, '<');
@@ -131,7 +128,9 @@ namespace Si
 
 		struct empty_t
 		{
-			BOOST_CONSTEXPR empty_t() {}
+			BOOST_CONSTEXPR empty_t()
+			{
+			}
 		};
 
 		static BOOST_CONSTEXPR_OR_CONST empty_t empty;
@@ -141,18 +140,18 @@ namespace Si
 		{
 			typedef
 #if BOOST_VERSION >= 105300
-				boost::string_ref
+			    boost::string_ref
 #else
-				noexcept_string
+			    noexcept_string
 #endif
-				name_type;
+			        name_type;
 
 			generator()
 			{
 			}
 
 			explicit generator(CharSink out)
-				: m_out(std::move(out))
+			    : m_out(std::move(out))
 			{
 			}
 
@@ -189,9 +188,7 @@ namespace Si
 			}
 
 			template <class KeyStringLike, class ValueStringLike>
-			void attribute(
-				KeyStringLike const &key,
-				ValueStringLike const &value)
+			void attribute(KeyStringLike const &key, ValueStringLike const &value)
 			{
 				add_attribute(m_out, key, value);
 			}
@@ -202,8 +199,8 @@ namespace Si
 			}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-			template <class ...Args>
-			void operator()(Args &&...args)
+			template <class... Args>
+			void operator()(Args &&... args)
 			{
 				element(std::forward<Args>(args)...);
 			}
@@ -230,13 +227,11 @@ namespace Si
 			}
 
 		private:
-
 			CharSink m_out;
 		};
 
 		template <class CharSink>
-		auto make_generator(CharSink &&sink)
-			-> generator<typename std::decay<CharSink>::type>
+		auto make_generator(CharSink &&sink) -> generator<typename std::decay<CharSink>::type>
 		{
 			return generator<typename std::decay<CharSink>::type>(std::forward<CharSink>(sink));
 		}

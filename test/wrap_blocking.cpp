@@ -19,18 +19,18 @@ namespace Si
 		typedef decltype(std::declval<Action>()()) element_type;
 
 		explicit blocking_observable(Action act)
-			: act(std::move(act))
+		    : act(std::move(act))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		blocking_observable(blocking_observable &&other)
-			: act(std::move(other.act))
-			, done(std::move(other.done))
+		    : act(std::move(other.act))
+		    , done(std::move(other.done))
 		{
 		}
 
-		blocking_observable &operator = (blocking_observable &&other)
+		blocking_observable &operator=(blocking_observable &&other)
 		{
 			act = std::move(other.act);
 			done = std::move(other.done);
@@ -41,10 +41,10 @@ namespace Si
 		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
 			done = boost::async(boost::launch::async, [this, receiver]()
-			{
-				element_type result = act();
-				receiver.got_element(std::move(result));
-			});
+			                    {
+				                    element_type result = act();
+				                    receiver.got_element(std::move(result));
+				                });
 		}
 
 		element_type get_one()
@@ -53,7 +53,6 @@ namespace Si
 		}
 
 	private:
-
 		Action act;
 		boost::unique_future<void> done;
 	};
@@ -83,19 +82,19 @@ namespace
 BOOST_AUTO_TEST_CASE(wrap_blocking_coroutine)
 {
 	auto coro = Si::make_coroutine_generator<int>([](Si::push_context<int> &yield)
-	{
-		auto blocking = Si::wrap_blocking(blocking_stuff);
-		auto const intermediate_result = yield.get_one(blocking);
-		BOOST_REQUIRE(intermediate_result);
-		yield(*intermediate_result + 3);
-	});
+	                                              {
+		                                              auto blocking = Si::wrap_blocking(blocking_stuff);
+		                                              auto const intermediate_result = yield.get_one(blocking);
+		                                              BOOST_REQUIRE(intermediate_result);
+		                                              yield(*intermediate_result + 3);
+		                                          });
 	boost::asio::io_service io;
 	std::unique_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(io));
 	auto consumer = Si::consume<int>([&work](int element)
-	{
-		BOOST_CHECK_EQUAL(5, element);
-		work.reset();
-	});
+	                                 {
+		                                 BOOST_CHECK_EQUAL(5, element);
+		                                 work.reset();
+		                             });
 	coro.async_get_one(Si::observe_by_ref(consumer));
 	io.run();
 }

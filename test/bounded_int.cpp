@@ -27,11 +27,11 @@ BOOST_AUTO_TEST_CASE(bounded_int_format_char)
 {
 	typedef Si::bounded_int<char,
 #if SILICIUM_COMPILER_HAS_CONSTEXPR_NUMERIC_LIMITS
-		(std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)()
+	                        (std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)()
 #else
-		CHAR_MIN, CHAR_MAX
+	                        CHAR_MIN, CHAR_MAX
 #endif
-	> char_int;
+	                        > char_int;
 #if SILICIUM_COMPILER_HAS_CONSTEXPR_NUMERIC_LIMITS
 	BOOST_STATIC_ASSERT((std::numeric_limits<int>::max)() > (std::numeric_limits<char>::max)());
 #endif

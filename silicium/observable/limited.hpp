@@ -22,8 +22,8 @@ namespace Si
 		typedef typename Next::element_type element_type;
 
 		explicit limited_observable(Next next, Limit limit)
-			: m_next(std::move(next))
-			, m_remaining_limit(std::move(limit))
+		    : m_next(std::move(next))
+		    , m_remaining_limit(std::move(limit))
 		{
 		}
 
@@ -42,15 +42,15 @@ namespace Si
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		limited_observable(limited_observable &&) = default;
-		limited_observable &operator = (limited_observable &&) = default;
+		limited_observable &operator=(limited_observable &&) = default;
 #else
 		limited_observable(limited_observable &&other)
-			: m_next(std::move(other.m_next))
-			, m_remaining_limit(std::move(other.m_remaining_limit))
+		    : m_next(std::move(other.m_next))
+		    , m_remaining_limit(std::move(other.m_remaining_limit))
 		{
 		}
 
-		limited_observable &operator = (limited_observable &&other)
+		limited_observable &operator=(limited_observable &&other)
 		{
 			m_next = std::move(other.m_next);
 			m_remaining_limit = std::move(other.m_remaining_limit);
@@ -59,7 +59,6 @@ namespace Si
 #endif
 
 	private:
-
 		Next m_next;
 		Limit m_remaining_limit;
 	};
@@ -67,16 +66,11 @@ namespace Si
 	template <class Next, class Limit>
 	auto make_limited_observable(Next &&next, Limit &&limit)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> limited_observable<
-			typename std::decay<Next>::type,
-			typename std::decay<Limit>::type
-		>
+	    -> limited_observable<typename std::decay<Next>::type, typename std::decay<Limit>::type>
 #endif
 	{
-		return limited_observable<
-			typename std::decay<Next>::type,
-			typename std::decay<Limit>::type
-			>(std::forward<Next>(next), std::forward<Limit>(limit));
+		return limited_observable<typename std::decay<Next>::type, typename std::decay<Limit>::type>(
+		    std::forward<Next>(next), std::forward<Limit>(limit));
 	}
 }
 

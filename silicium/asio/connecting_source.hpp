@@ -4,7 +4,7 @@
 #include <silicium/source/source.hpp>
 
 #if BOOST_VERSION < 105300
-//for Asio
+// for Asio
 #include <algorithm>
 #endif
 
@@ -26,21 +26,22 @@ namespace Si
 		{
 			typedef connecting_source_element_type element_type;
 
-			explicit connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield, boost::asio::ip::tcp::endpoint remote_endpoint);
+			explicit connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield,
+			                           boost::asio::ip::tcp::endpoint remote_endpoint);
 			iterator_range<element_type const *> map_next(std::size_t);
 			element_type *copy_next(iterator_range<element_type *> destination);
 
 		private:
-
 			boost::asio::io_service *io;
 			boost::asio::yield_context *yield;
 			boost::asio::ip::tcp::endpoint remote_endpoint;
 		};
 
-		inline connecting_source::connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield, boost::asio::ip::tcp::endpoint remote_endpoint)
-			: io(&io)
-			, yield(&yield)
-			, remote_endpoint(remote_endpoint)
+		inline connecting_source::connecting_source(boost::asio::io_service &io, boost::asio::yield_context &yield,
+		                                            boost::asio::ip::tcp::endpoint remote_endpoint)
+		    : io(&io)
+		    , yield(&yield)
+		    , remote_endpoint(remote_endpoint)
 		{
 		}
 

@@ -8,9 +8,9 @@
 namespace Si
 {
 #ifdef _MSC_VER
-	//boost string does not work at all on VC++ 2013 Update 3, so we use std::string instead
+	// boost string does not work at all on VC++ 2013 Update 3, so we use std::string instead
 	typedef std::string noexcept_string;
-	
+
 	inline noexcept_string &&to_noexcept_string(noexcept_string &&str)
 	{
 		return std::move(str);
@@ -72,9 +72,9 @@ namespace Si
 		template <class Target, class Original>
 		auto convert_range(Original const &original) ->
 #if SILICIUM_COMPILER_HAS_DECLTYPE_AUTO
-			decltype(auto)
+		    decltype(auto)
 #else
-			decltype(convert_range_impl<Target>(original, typename std::is_same<Target, Original>::type()))
+		    decltype(convert_range_impl<Target>(original, typename std::is_same<Target, Original>::type()))
 #endif
 		{
 			return convert_range_impl<Target>(original, typename std::is_same<Target, Original>::type());

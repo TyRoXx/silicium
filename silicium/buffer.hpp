@@ -10,37 +10,36 @@
 namespace Si
 {
 	template <class Element, class Original>
-	struct buffer_observable
-		: private observer<Element>
+	struct buffer_observable : private observer<Element>
 	{
 		typedef Element element_type;
 
 		buffer_observable()
-			: receiver_(nullptr)
-			, fetching(false)
+		    : receiver_(nullptr)
+		    , fetching(false)
 		{
 		}
 
 		explicit buffer_observable(Original from, std::size_t size)
-			: from(std::move(from))
-			, elements(size)
-			, receiver_(nullptr)
-			, fetching(false)
+		    : from(std::move(from))
+		    , elements(size)
+		    , receiver_(nullptr)
+		    , fetching(false)
 		{
 		}
 
 #if defined(_MSC_VER) || (BOOST_VERSION <= 105400)
 		buffer_observable(buffer_observable &&other)
-			: from(std::move(other.from))
-			, elements(std::move(other.elements))
-			, receiver_(nullptr)
-			, fetching(false)
+		    : from(std::move(other.from))
+		    , elements(std::move(other.elements))
+		    , receiver_(nullptr)
+		    , fetching(false)
 		{
 		}
 
-		buffer_observable &operator = (buffer_observable &&other)
+		buffer_observable &operator=(buffer_observable &&other)
 		{
-			//TODO: exception safety
+			// TODO: exception safety
 			from = std::move(other.from);
 			elements = std::move(other.elements);
 			receiver_ = std::move(other.receiver);
@@ -49,7 +48,7 @@ namespace Si
 		}
 #else
 		buffer_observable(buffer_observable &&) = default;
-		buffer_observable &operator = (buffer_observable &&) = default;
+		buffer_observable &operator=(buffer_observable &&) = default;
 #endif
 
 		void async_get_one(ptr_observer<observer<element_type>> receiver)
@@ -72,7 +71,6 @@ namespace Si
 		}
 
 	private:
-
 		Original from;
 		boost::circular_buffer<Element> elements;
 		observer<element_type> *receiver_;
@@ -83,8 +81,7 @@ namespace Si
 			assert(!elements.full());
 			assert(fetching);
 			fetching = false;
-			if (elements.empty() &&
-				receiver_)
+			if (elements.empty() && receiver_)
 			{
 				exchange(receiver_, nullptr)->got_element(std::move(value));
 				return check_fetch();
@@ -127,11 +124,12 @@ namespace Si
 		}
 
 		SILICIUM_DELETED_FUNCTION(buffer_observable(buffer_observable const &))
-		SILICIUM_DELETED_FUNCTION(buffer_observable &operator = (buffer_observable const &))
+		SILICIUM_DELETED_FUNCTION(buffer_observable &operator=(buffer_observable const &))
 	};
 
 	template <class Original>
-	auto make_buffer_observable(Original &&from, std::size_t size) -> buffer_observable<typename std::decay<Original>::type::element_type, typename std::decay<Original>::type>
+	auto make_buffer_observable(Original &&from, std::size_t size)
+	    -> buffer_observable<typename std::decay<Original>::type::element_type, typename std::decay<Original>::type>
 	{
 		typedef typename std::decay<Original>::type clean_original;
 		typedef typename clean_original::element_type element;

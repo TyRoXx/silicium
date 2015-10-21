@@ -10,7 +10,7 @@ namespace Si
 	struct success
 	{
 		SILICIUM_USE_RESULT
-		bool operator !() const BOOST_NOEXCEPT
+		bool operator!() const BOOST_NOEXCEPT
 		{
 			return true;
 		}

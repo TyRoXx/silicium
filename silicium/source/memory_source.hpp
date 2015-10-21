@@ -19,7 +19,7 @@ namespace Si
 		}
 
 		explicit memory_source(iterator_range<Element const *> elements)
-			: m_elements(std::move(elements))
+		    : m_elements(std::move(elements))
 		{
 		}
 
@@ -41,7 +41,6 @@ namespace Si
 		}
 
 	private:
-
 		iterator_range<Element const *> m_elements;
 	};
 
@@ -55,7 +54,7 @@ namespace Si
 		}
 
 		explicit mutable_memory_source(iterator_range<Element *> elements)
-			: m_elements(std::move(elements))
+		    : m_elements(std::move(elements))
 		{
 		}
 
@@ -77,14 +76,14 @@ namespace Si
 		}
 
 	private:
-
 		iterator_range<Element *> m_elements;
 	};
 
 	template <class Element>
 	memory_source<Element> make_container_source(std::vector<Element> const &container)
 	{
-		return memory_source<Element>(iterator_range<Element const *>(container.data(), container.data() + container.size()));
+		return memory_source<Element>(
+		    iterator_range<Element const *>(container.data(), container.data() + container.size()));
 	}
 
 	template <class Element, std::size_t N>
@@ -96,7 +95,8 @@ namespace Si
 	template <class Element, std::size_t N>
 	mutable_memory_source<Element> make_container_source(std::array<Element, N> &&container)
 	{
-		return mutable_memory_source<Element>(make_iterator_range(container.data(), container.data() + container.size()));
+		return mutable_memory_source<Element>(
+		    make_iterator_range(container.data(), container.data() + container.size()));
 	}
 
 	template <class Element>

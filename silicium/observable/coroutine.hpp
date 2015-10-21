@@ -4,7 +4,9 @@
 #include <silicium/config.hpp>
 #include <silicium/observable/yield_context.hpp>
 
-#define SILICIUM_HAS_COROUTINE_OBSERVABLE ((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT && !SILICIUM_AVOID_BOOST_COROUTINE)
+#define SILICIUM_HAS_COROUTINE_OBSERVABLE                                                                              \
+	((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT &&                             \
+	 !SILICIUM_AVOID_BOOST_COROUTINE)
 
 #if SILICIUM_HAS_COROUTINE_OBSERVABLE
 
@@ -28,7 +30,7 @@ namespace Si
 #endif
 
 			explicit coroutine_yield_context(consumer_type &consumer)
-				: consumer(&consumer)
+			    : consumer(&consumer)
 			{
 			}
 
@@ -38,7 +40,6 @@ namespace Si
 			}
 
 		private:
-
 			consumer_type *consumer;
 		};
 	}
@@ -49,26 +50,26 @@ namespace Si
 		typedef Element element_type;
 
 		coroutine_observable()
-			: receiver_(nullptr)
+		    : receiver_(nullptr)
 		{
 		}
 
 		coroutine_observable(coroutine_observable &&other)
-			: state(std::move(other.state))
-			, action(std::move(other.action))
-			, receiver_(nullptr)
+		    : state(std::move(other.state))
+		    , action(std::move(other.action))
+		    , receiver_(nullptr)
 		{
 		}
 
 		template <class Action>
 		explicit coroutine_observable(Action &&action)
-			: state()
-			, action(std::forward<Action>(action))
-			, receiver_(nullptr)
+		    : state()
+		    , action(std::forward<Action>(action))
+		    , receiver_(nullptr)
 		{
 		}
 
-		coroutine_observable &operator = (coroutine_observable &&other)
+		coroutine_observable &operator=(coroutine_observable &&other)
 		{
 			state = std::move(other.state);
 			action = std::move(other.action);
@@ -83,15 +84,14 @@ namespace Si
 		}
 
 	private:
-
 		typedef Observable<nothing, ptr_observer<observer<nothing>>>::interface *command_type;
 		typedef
 #if BOOST_VERSION >= 105500
-			typename boost::coroutines::coroutine<command_type>::pull_type
+		    typename boost::coroutines::coroutine<command_type>::pull_type
 #else
-			boost::coroutines::coroutine<command_type ()>
+		    boost::coroutines::coroutine<command_type()>
 #endif
-		coroutine_type;
+		        coroutine_type;
 		typedef std::shared_ptr<coroutine_type> coroutine_holder;
 
 		struct async_state
@@ -100,15 +100,15 @@ namespace Si
 			bool has_finished;
 
 			async_state()
-				: has_finished(false)
+			    : has_finished(false)
 			{
 			}
 		};
 
 		std::shared_ptr<async_state> state;
-		std::function<Element (yield_context)> action;
+		std::function<Element(yield_context)> action;
 		Si::observer<Element> *receiver_;
-		
+
 		virtual void got_element(nothing) SILICIUM_OVERRIDE
 		{
 			next();
@@ -132,23 +132,22 @@ namespace Si
 				auto new_state = std::make_shared<async_state>();
 				state = new_state;
 				keep_coro_alive = new_state;
-				new_state->coro_ =
-					std::make_shared<coroutine_type>
-						([bound_action, this](
+				new_state->coro_ = std::make_shared<coroutine_type>(
+				    [bound_action, this](
 #if BOOST_VERSION >= 105500
-							typename boost::coroutines::coroutine<command_type>::push_type
+				        typename boost::coroutines::coroutine<command_type>::push_type
 #else
-							typename coroutine_type::caller_type
+				        typename coroutine_type::caller_type
 #endif
-							&push)
-						{
-							detail::coroutine_yield_context yield_impl(push);
-							yield_context yield(yield_impl); //TODO: save this indirection
-							auto result = bound_action(yield);
-							assert(!state->has_finished);
-							state->has_finished = true;
-							Si::exchange(receiver_, nullptr)->got_element(std::move(result));
-						});
+				            &push)
+				    {
+					    detail::coroutine_yield_context yield_impl(push);
+					    yield_context yield(yield_impl); // TODO: save this indirection
+					    auto result = bound_action(yield);
+					    assert(!state->has_finished);
+					    state->has_finished = true;
+					    Si::exchange(receiver_, nullptr)->got_element(std::move(result));
+					});
 			}
 			else if (*state->coro_)
 			{
@@ -174,16 +173,17 @@ namespace Si
 		}
 
 		SILICIUM_DELETED_FUNCTION(coroutine_observable(coroutine_observable const &))
-		SILICIUM_DELETED_FUNCTION(coroutine_observable &operator = (coroutine_observable const &))
+		SILICIUM_DELETED_FUNCTION(coroutine_observable &operator=(coroutine_observable const &))
 	};
 
 	template <class Action>
 	auto make_coroutine(Action &&action)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>
+	    -> coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>
 #endif
 	{
-		return coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>(std::forward<Action>(action));
+		return coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>(
+		    std::forward<Action>(action));
 	}
 }
 

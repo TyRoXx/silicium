@@ -8,7 +8,8 @@ BOOST_AUTO_TEST_CASE(checked_add_size_t)
 
 BOOST_AUTO_TEST_CASE(operator_plus_size_t)
 {
-	BOOST_CHECK_EQUAL(Si::overflow_or<std::size_t>(7), (Si::overflow_or<std::size_t>(2) + Si::overflow_or<std::size_t>(5)));
+	BOOST_CHECK_EQUAL(Si::overflow_or<std::size_t>(7),
+	                  (Si::overflow_or<std::size_t>(2) + Si::overflow_or<std::size_t>(5)));
 }
 
 BOOST_AUTO_TEST_CASE(operator_plus_assign_size_t)

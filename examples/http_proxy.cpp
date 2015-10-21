@@ -22,8 +22,8 @@ namespace
 		auto maybe_request = Si::http::receive_request(client, yield);
 		if (maybe_request.is_error())
 		{
-			//The header was incomplete, maybe the connecting was closed.
-			//If we want to know the reason, the error_extracting_source remembered it:
+			// The header was incomplete, maybe the connecting was closed.
+			// If we want to know the reason, the error_extracting_source remembered it:
 			boost::system::error_code error = maybe_request.error();
 			boost::ignore_unused_variable_warning(error);
 			return;
@@ -31,7 +31,7 @@ namespace
 
 		if (!maybe_request.get())
 		{
-			//syntax error in the request
+			// syntax error in the request
 			return;
 		}
 
@@ -47,17 +47,18 @@ namespace
 				auto response_writer = Si::make_container_sink(response);
 				Si::http::generate_status_line(response_writer, "HTTP/1.0", "200", "OK");
 				boost::string_ref const content = "Hello, visitor!";
-				Si::http::generate_header(response_writer, "Content-Length", boost::lexical_cast<Si::noexcept_string>(content.size()));
+				Si::http::generate_header(response_writer, "Content-Length",
+				                          boost::lexical_cast<Si::noexcept_string>(content.size()));
 				Si::http::finish_headers(response_writer);
 				Si::append(response_writer, content);
 			}
 
-			//you can handle the error if you want
+			// you can handle the error if you want
 			boost::system::error_code error = Si::asio::write(client, Si::make_memory_range(response), yield);
 			boost::ignore_unused_variable_warning(error);
 		}
 
-		//ignore shutdown failures, they do not matter here
+		// ignore shutdown failures, they do not matter here
 		boost::system::error_code error;
 		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 	}
@@ -66,7 +67,7 @@ namespace
 	{
 		boost::system::error_code ec;
 
-		//use a unique_ptr to support older versions of Boost where acceptor was not movable
+		// use a unique_ptr to support older versions of Boost where acceptor was not movable
 		auto acceptor = Si::make_unique<boost::asio::ip::tcp::acceptor>(io);
 
 		acceptor->open(boost::asio::ip::tcp::v4(), ec);
@@ -87,19 +88,15 @@ namespace
 			return ec;
 		}
 
-		Si::spawn_observable(
-			Si::transform(
-				Si::asio::make_tcp_acceptor(std::move(acceptor)),
-				[](Si::asio::tcp_acceptor_result maybe_client)
-				{
-					auto client = maybe_client.get();
-					Si::spawn_coroutine([client](Si::spawn_context yield)
-					{
-						serve_client(*client, yield);
-					});
-				}
-			)
-		);
+		Si::spawn_observable(Si::transform(Si::asio::make_tcp_acceptor(std::move(acceptor)),
+		                                   [](Si::asio::tcp_acceptor_result maybe_client)
+		                                   {
+			                                   auto client = maybe_client.get();
+			                                   Si::spawn_coroutine([client](Si::spawn_context yield)
+			                                                       {
+				                                                       serve_client(*client, yield);
+				                                                   });
+			                               }));
 
 		return {};
 	}

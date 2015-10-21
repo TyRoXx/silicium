@@ -28,7 +28,7 @@
 #include <boost/assign/list_of.hpp>
 #include <unordered_map>
 #if SILICIUM_HAS_EXCEPTIONS
-#	include <future>
+#include <future>
 #endif
 
 namespace Si
@@ -45,7 +45,10 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(transform_value_semantics)
 	{
 		int dummy;
-		test_value_semantics(Si::transform(Si::empty<int>(), [&dummy](int) { return 0; }));
+		test_value_semantics(Si::transform(Si::empty<int>(), [&dummy](int)
+		                                   {
+			                                   return 0;
+			                               }));
 	}
 #endif
 
@@ -53,18 +56,22 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_bridge)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::observable<int, Si::ptr_observer<Si::observer<int>>>>> first(bridge);
-		auto ones  = Si::make_generator_observable([]{ return 1; });
+		Si::ptr_observable<int, std::shared_ptr<Si::observable<int, Si::ptr_observer<Si::observer<int>>>>> first(
+		    bridge);
+		auto ones = Si::make_generator_observable([]
+		                                          {
+			                                          return 1;
+			                                      });
 		auto both = Si::make_tuple(first, ones);
 		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
-		{
-			return std::get<0>(element) + std::get<1>(element);
-		});
+		                           {
+			                           return std::get<0>(element) + std::get<1>(element);
+			                       });
 		std::vector<int> generated;
 		auto consumer = Si::consume<int>([&generated](int element)
-		{
-			generated.emplace_back(element);
-		});
+		                                 {
+			                                 generated.emplace_back(element);
+			                             });
 		BOOST_CHECK(generated.empty());
 
 		added.async_get_one(Si::observe_by_ref(consumer));
@@ -79,15 +86,16 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::Observable<int, Si::ptr_observer<Si::observer<int>>>::interface>> first(bridge);
+		Si::ptr_observable<int, std::shared_ptr<Si::Observable<int, Si::ptr_observer<Si::observer<int>>>::interface>>
+		    first(bridge);
 		auto buf = Si::make_buffer_observable(first, 2);
 		buf.prefetch();
 
 		std::vector<int> generated;
 		auto consumer = Si::consume<int>([&generated](int element)
-		{
-			generated.emplace_back(element);
-		});
+		                                 {
+			                                 generated.emplace_back(element);
+			                             });
 		BOOST_CHECK(generated.empty());
 
 		for (size_t i = 0; i < 2; ++i)
@@ -115,21 +123,21 @@ namespace Si
 	{
 		Si::bridge<int> first;
 		using string =
-#ifdef _MSC_VER //does not compile with boost::container::string in VC++ 2013
-			std::string
+#ifdef _MSC_VER // does not compile with boost::container::string in VC++ 2013
+		    std::string
 #else
-			boost::container::string
+		    boost::container::string
 #endif
-			;
+		    ;
 		Si::bridge<string> second;
 		auto variants = make_variant(Si::ref(first), Si::ref(second));
 
 		typedef Si::variant<int, string> variant;
 		std::vector<variant> produced;
 		auto consumer = Si::consume<variant>([&produced](variant element)
-		{
-			produced.emplace_back(std::move(element));
-		});
+		                                     {
+			                                     produced.emplace_back(std::move(element));
+			                                 });
 
 		variants.async_get_one(Si::observe_by_ref(consumer));
 		BOOST_CHECK(produced.empty());
@@ -139,11 +147,7 @@ namespace Si
 		BOOST_CHECK_EQUAL(1U, produced.size());
 		second.got_element("Hi");
 
-		std::vector<variant> const expected
-		{
-			4,
-			string("Hi")
-		};
+		std::vector<variant> const expected{4, string("Hi")};
 
 		BOOST_CHECK(expected == produced);
 	}
@@ -158,10 +162,10 @@ namespace Si
 		typename Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface *from;
 
 		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
-			: dispatcher(&dispatcher)
-			, blocker(boost::in_place(boost::ref(dispatcher)))
-			, action(std::move(action))
-			, from(nullptr)
+		    : dispatcher(&dispatcher)
+		    , blocker(boost::in_place(boost::ref(dispatcher)))
+		    , action(std::move(action))
+		    , from(nullptr)
 		{
 		}
 
@@ -190,10 +194,13 @@ namespace Si
 	};
 
 	template <class Element, class Action>
-	auto blocking_then(boost::asio::io_service &io, typename Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface &from, Action &&action)
-		-> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
+	auto blocking_then(boost::asio::io_service &io,
+	                   typename Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface &from,
+	                   Action &&action)
+	    -> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
 	{
-		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(io, std::forward<Action>(action));
+		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(
+		    io, std::forward<Action>(action));
 		from.async_get_one(*state);
 		state->from = &from;
 		return state;
@@ -207,11 +214,11 @@ namespace Si
 	{
 		typedef
 #ifdef _MSC_VER
-			std::unordered_map
+		    std::unordered_map
 #else
-			boost::container::flat_map
+		    boost::container::flat_map
 #endif
-			<observer<Element> *, bool> type;
+		    <observer<Element> *, bool> type;
 	};
 
 	template <class Element>
@@ -220,26 +227,26 @@ namespace Si
 		typedef Element element_type;
 
 		connection()
-			: connections(nullptr)
-			, receiver_(nullptr)
+		    : connections(nullptr)
+		    , receiver_(nullptr)
 		{
 		}
 
 		explicit connection(typename signal_observer_map<Element>::type &connections)
-			: connections(&connections)
-			, receiver_(nullptr)
+		    : connections(&connections)
+		    , receiver_(nullptr)
 		{
 		}
 
 		connection(connection &&other)
-			: connections(other.connections)
-			, receiver_(other.receiver_)
+		    : connections(other.connections)
+		    , receiver_(other.receiver_)
 		{
 			other.connections = nullptr;
 			other.receiver_ = nullptr;
 		}
 
-		connection &operator = (connection &&other)
+		connection &operator=(connection &&other)
 		{
 			boost::swap(connections, other.connections);
 			boost::swap(receiver_, other.receiver_);
@@ -257,7 +264,7 @@ namespace Si
 
 		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
-			auto * const old_receiver = receiver_;
+			auto *const old_receiver = receiver_;
 			connections->insert(std::make_pair(receiver.get(), true)).first->second = true;
 			if (old_receiver && (old_receiver != receiver.get()))
 			{
@@ -269,12 +276,11 @@ namespace Si
 		}
 
 	private:
-
 		typename signal_observer_map<Element>::type *connections;
 		observer<Element> *receiver_;
 
 		SILICIUM_DELETED_FUNCTION(connection(connection const &))
-		SILICIUM_DELETED_FUNCTION(connection &operator = (connection const &))
+		SILICIUM_DELETED_FUNCTION(connection &operator=(connection const &))
 	};
 
 	template <class Element>
@@ -300,7 +306,6 @@ namespace Si
 		}
 
 	private:
-
 		typename signal_observer_map<Element>::type observers;
 	};
 }
@@ -314,10 +319,10 @@ namespace
 		auto con2 = s.connect();
 		std::vector<int> generated;
 		auto consumer = Si::consume<int>([&generated](boost::optional<int> value)
-		{
-			BOOST_REQUIRE(value);
-			generated.emplace_back(*value);
-		});
+		                                 {
+			                                 BOOST_REQUIRE(value);
+			                                 generated.emplace_back(*value);
+			                             });
 		con1.async_get_one(Si::observe_by_ref(consumer));
 		s.emit_one(2);
 		con2 = std::move(con1);

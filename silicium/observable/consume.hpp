@@ -14,7 +14,7 @@ namespace Si
 		typedef Element element_type;
 
 		explicit consumer(Consume consume)
-			: consume(std::move(consume))
+		    : consume(std::move(consume))
 		{
 		}
 
@@ -28,7 +28,6 @@ namespace Si
 		}
 
 	private:
-
 		Consume consume;
 	};
 

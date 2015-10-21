@@ -2,16 +2,14 @@
 #define SILICIUM_C_BINDING_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 typedef struct silicium_memory_range
 {
 	char const *begin;
 	char const *end;
-}
-silicium_memory_range;
+} silicium_memory_range;
 
 typedef struct silicium_yield_context silicium_yield_context;
 

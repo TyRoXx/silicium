@@ -13,7 +13,6 @@ namespace Si
 		{
 		}
 	};
-
 }
 
 #endif

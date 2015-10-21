@@ -9,20 +9,15 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem/path.hpp>
 #if BOOST_VERSION >= 105500
-#	include <boost/utility/explicit_operator_bool.hpp>
+#include <boost/utility/explicit_operator_bool.hpp>
 #endif
 #include <boost/container/string.hpp>
 
 namespace Si
 {
 	template <class Element, class Error = success>
-	SILICIUM_TRAIT_WITH_TYPEDEFS(
-		Sink,
-		typedef Element element_type;
-		typedef Error error_type;
-		,
-		((append, (1, (iterator_range<element_type const *>)), error_type))
-	)
+	SILICIUM_TRAIT_WITH_TYPEDEFS(Sink, typedef Element element_type; typedef Error error_type;
+	                             , ((append, (1, (iterator_range<element_type const *>)), error_type)))
 
 #if SILICIUM_COMPILER_HAS_USING
 	template <class Element, class Error = boost::system::error_code>

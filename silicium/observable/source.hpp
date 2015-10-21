@@ -18,7 +18,7 @@ namespace Si
 		}
 
 		explicit source_observable(Source source)
-			: source(std::move(source))
+		    : source(std::move(source))
 		{
 		}
 
@@ -37,14 +37,13 @@ namespace Si
 		}
 
 	private:
-
 		Source source;
 	};
 
 	template <class Element, class Source>
 	auto make_source_observable(Source &&source)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> source_observable<Element, typename std::decay<Source>::type>
+	    -> source_observable<Element, typename std::decay<Source>::type>
 #endif
 	{
 		return source_observable<Element, typename std::decay<Source>::type>(std::forward<Source>(source));

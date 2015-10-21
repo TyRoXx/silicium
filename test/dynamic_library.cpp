@@ -7,13 +7,13 @@ namespace
 	{
 		return Si::dynamic_library(Si::native_path_string(
 #ifdef _WIN32
-			L"msvcr110.dll" //assuming VC++ 2013
+		    L"msvcr110.dll" // assuming VC++ 2013
 #elif defined(__APPLE__)
-			"libm.dylib"
+		    "libm.dylib"
 #else
-			"libm.so"
+		    "libm.so"
 #endif
-			));
+		    ));
 	}
 
 	Si::dynamic_library load_some_library()

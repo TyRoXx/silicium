@@ -21,16 +21,15 @@ namespace Si
 
 		template <class Iterator>
 		vector(Iterator begin, Iterator end)
-			: m_impl(begin, end)
+		    : m_impl(begin, end)
 		{
 		}
 
-		vector(vector &&other) BOOST_NOEXCEPT
-			: m_impl(std::move(other.m_impl))
+		vector(vector &&other) BOOST_NOEXCEPT : m_impl(std::move(other.m_impl))
 		{
 		}
 
-		vector &operator = (vector &&other) BOOST_NOEXCEPT
+		vector &operator=(vector &&other) BOOST_NOEXCEPT
 		{
 			m_impl = std::move(other.m_impl);
 			return *this;
@@ -38,15 +37,14 @@ namespace Si
 
 #if !SILICIUM_VC2012
 		vector(std::initializer_list<Element> elements)
-			//Boost 1.56 is missing the initializer_list ctor
-			: m_impl(elements.begin(), elements.end())
+		    // Boost 1.56 is missing the initializer_list ctor
+		    : m_impl(elements.begin(), elements.end())
 		{
 		}
 #endif
 
 		SILICIUM_DISABLE_COPY(vector)
 	public:
-
 		vector copy() const
 		{
 			return vector(m_impl);
@@ -93,8 +91,8 @@ namespace Si
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class ...Args>
-		void emplace_back(Args &&...args)
+		template <class... Args>
+		void emplace_back(Args &&... args)
 		{
 			m_impl.emplace_back(std::forward<Args>(args)...);
 		}
@@ -107,17 +105,16 @@ namespace Si
 #endif
 
 	private:
-
 		boost::container::vector<Element, Allocator> m_impl;
 
 		explicit vector(boost::container::vector<Element, Allocator> impl)
-			: m_impl(std::move(impl))
+		    : m_impl(std::move(impl))
 		{
 		}
 	};
 
 	template <class Element, class Allocator>
-	bool operator == (vector<Element, Allocator> const &left, vector<Element, Allocator> const &right)
+	bool operator==(vector<Element, Allocator> const &left, vector<Element, Allocator> const &right)
 	{
 		return boost::range::equal(left, right);
 	}

@@ -21,12 +21,12 @@ namespace Si
 			typedef boost::system::error_code element_type;
 
 			writing_observable()
-				: stream(nullptr)
+			    : stream(nullptr)
 			{
 			}
 
 			explicit writing_observable(AsyncStream &stream)
-				: stream(&stream)
+			    : stream(&stream)
 			{
 			}
 
@@ -40,18 +40,16 @@ namespace Si
 			{
 				assert(stream);
 				boost::asio::async_write(
-					*stream,
-					boost::asio::buffer(m_buffer.begin(), static_cast<std::size_t>(m_buffer.size())),
-					[SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))]
-						(boost::system::error_code ec, std::size_t bytes_sent) mutable
-				{
-					(void)bytes_sent;
-					std::forward<Observer>(receiver).got_element(ec);
-				});
+				    *stream, boost::asio::buffer(m_buffer.begin(), static_cast<std::size_t>(m_buffer.size())),
+				    [SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](
+				        boost::system::error_code ec, std::size_t bytes_sent) mutable
+				    {
+					    (void)bytes_sent;
+					    std::forward<Observer>(receiver).got_element(ec);
+					});
 			}
 
 		private:
-
 			AsyncStream *stream;
 			memory_range m_buffer;
 		};
@@ -59,7 +57,7 @@ namespace Si
 		template <class AsyncStream>
 		auto make_writing_observable(AsyncStream &stream)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> writing_observable<AsyncStream>
+		    -> writing_observable<AsyncStream>
 #endif
 		{
 			return writing_observable<AsyncStream>(stream);

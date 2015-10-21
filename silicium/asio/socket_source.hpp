@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <boost/asio/ip/tcp.hpp>
 
-#define SILICIUM_HAS_ASIO_SOCKET_SOURCE (!SILICIUM_AVOID_BOOST_COROUTINE && (BOOST_VERSION >= 105400) && SILICIUM_HAS_EXCEPTIONS)
+#define SILICIUM_HAS_ASIO_SOCKET_SOURCE                                                                                \
+	(!SILICIUM_AVOID_BOOST_COROUTINE && (BOOST_VERSION >= 105400) && SILICIUM_HAS_EXCEPTIONS)
 
 #if SILICIUM_HAS_ASIO_SOCKET_SOURCE
 #include <boost/asio/spawn.hpp>
@@ -24,15 +25,15 @@ namespace Si
 			char *copy_next(iterator_range<char *> destination);
 
 		private:
-
 			boost::asio::ip::tcp::socket *m_socket;
 			YieldContext *m_yield;
 		};
 
 		template <class YieldContext>
-		basic_socket_source<YieldContext>::basic_socket_source(boost::asio::ip::tcp::socket &socket, YieldContext &yield)
-			: m_socket(&socket)
-			, m_yield(&yield)
+		basic_socket_source<YieldContext>::basic_socket_source(boost::asio::ip::tcp::socket &socket,
+		                                                       YieldContext &yield)
+		    : m_socket(&socket)
+		    , m_yield(&yield)
 		{
 		}
 
@@ -47,7 +48,8 @@ namespace Si
 		{
 			assert(m_socket);
 			assert(m_yield);
-			size_t const read = m_socket->async_read_some(boost::asio::buffer(destination.begin(), static_cast<std::size_t>(destination.size())), *m_yield);
+			size_t const read = m_socket->async_read_some(
+			    boost::asio::buffer(destination.begin(), static_cast<std::size_t>(destination.size())), *m_yield);
 			return destination.begin() + read;
 		}
 

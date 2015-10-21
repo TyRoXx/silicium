@@ -10,7 +10,9 @@ BOOST_AUTO_TEST_CASE(to_unique)
 
 struct base
 {
-	virtual ~base() {}
+	virtual ~base()
+	{
+	}
 };
 
 struct derived : base

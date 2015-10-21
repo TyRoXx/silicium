@@ -32,7 +32,7 @@ namespace Si
 	struct yield_context
 	{
 		explicit yield_context(detail::basic_yield_context &impl)
-			: impl(&impl)
+		    : impl(&impl)
 		{
 		}
 
@@ -40,12 +40,13 @@ namespace Si
 		boost::optional<typename std::decay<Observable>::type::element_type> get_one(Observable &&from) const
 		{
 			boost::optional<typename std::decay<Observable>::type::element_type> result;
-			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result](typename std::decay<Observable>::type::element_type element)
-			{
-				assert(!result);
-				result = std::move(element);
-				return nothing{};
-			}));
+			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(
+			    Si::transform(Si::ref(from), [&result](typename std::decay<Observable>::type::element_type element)
+			                  {
+				                  assert(!result);
+				                  result = std::move(element);
+				                  return nothing{};
+				              }));
 			impl->get_one(tf);
 			return result;
 		}
@@ -54,18 +55,18 @@ namespace Si
 		bool get_one(Observable &&from, typename std::decay<Observable>::type::element_type &result) const
 		{
 			bool got_result = false;
-			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(Si::ref(from), [&result, &got_result](typename std::decay<Observable>::type::element_type element)
-			{
-				result = std::move(element);
-				got_result = true;
-				return nothing{};
-			}));
+			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(
+			    Si::ref(from), [&result, &got_result](typename std::decay<Observable>::type::element_type element)
+			    {
+				    result = std::move(element);
+				    got_result = true;
+				    return nothing{};
+				}));
 			impl->get_one(tf);
 			return got_result;
 		}
 
 	protected:
-
 		detail::basic_yield_context *impl;
 	};
 
@@ -73,7 +74,7 @@ namespace Si
 	struct push_context : yield_context
 	{
 		explicit push_context(detail::push_context_impl<Element> &impl)
-			: yield_context(impl)
+		    : yield_context(impl)
 		{
 		}
 

@@ -4,10 +4,7 @@
 
 typedef long element;
 
-SILICIUM_TRAIT(
-	Producer,
-	((get, (0, ()), element))
-)
+SILICIUM_TRAIT(Producer, ((get, (0, ()), element)))
 
 struct test_producer
 {
@@ -25,14 +22,9 @@ BOOST_AUTO_TEST_CASE(trivial_trait)
 }
 
 template <class T>
-SILICIUM_TRAIT(
-	Container,
-	((emplace_back, (1, (T)), void))
-	((resize, (1, (size_t)), void))
-	((resize, (2, (size_t, T const &)), void))
-	((empty, (0, ()), bool, const))
-	((size, (0, ()), size_t, const BOOST_NOEXCEPT))
-)
+SILICIUM_TRAIT(Container, ((emplace_back, (1, (T)), void))((resize, (1, (size_t)),
+                                                            void))((resize, (2, (size_t, T const &)), void))(
+                              (empty, (0, ()), bool, const))((size, (0, ()), size_t, const BOOST_NOEXCEPT)))
 
 BOOST_AUTO_TEST_CASE(templatized_trait)
 {
@@ -77,14 +69,14 @@ BOOST_AUTO_TEST_CASE(trait_noexcept_method)
 
 BOOST_AUTO_TEST_CASE(trait_box)
 {
-	//default constructor is available:
+	// default constructor is available:
 	Container<int>::box container;
 
 	{
-		//move construction is available:
+		// move construction is available:
 		Container<int>::box container2 = Container<int>::make_box(std::vector<int>());
 
-		//move assignment is available:
+		// move assignment is available:
 		container = std::move(container2);
 
 		BOOST_REQUIRE(container.original);
@@ -98,11 +90,11 @@ BOOST_AUTO_TEST_CASE(trait_box)
 
 BOOST_AUTO_TEST_CASE(trait_eraser)
 {
-	//default constructor is available:
+	// default constructor is available:
 	Container<int>::eraser<std::vector<int>> container;
 
 	{
-		//move construction is available:
+		// move construction is available:
 		std::vector<int> content = boost::assign::list_of(1)(2)(3);
 		Container<int>::eraser<std::vector<int>> container2 = Container<int>::erase(std::move(content));
 		BOOST_CHECK(content.empty());
@@ -110,7 +102,7 @@ BOOST_AUTO_TEST_CASE(trait_eraser)
 		BOOST_CHECK_EQUAL(0u, container.original.size());
 		BOOST_CHECK_EQUAL(3u, container2.original.size());
 
-		//move assignment is available:
+		// move assignment is available:
 		container = std::move(container2);
 
 		BOOST_CHECK_EQUAL(3u, container.original.size());
@@ -126,25 +118,18 @@ template <class Signature>
 struct Callable;
 
 template <class Result, class A0>
-SILICIUM_SPECIALIZED_TRAIT(
-	Callable,
-	<Result(A0)>,
-	,
-	((operator(), (1, (A0)), Result))
-)
+SILICIUM_SPECIALIZED_TRAIT(Callable, <Result(A0)>, , ((operator(), (1, (A0)), Result)))
 
 BOOST_AUTO_TEST_CASE(trait_specialization)
 {
-	auto add_two = Callable<int(int)>::make_box([](int a) { return a + 2; });
+	auto add_two = Callable<int(int)>::make_box([](int a)
+	                                            {
+		                                            return a + 2;
+		                                        });
 	BOOST_CHECK_EQUAL(3, add_two(1));
 }
 
-SILICIUM_TRAIT_WITH_TYPEDEFS(
-	WithTypedefs,
-	typedef float element_type;
-	,
-	((get, (0, ()), element_type))
-)
+SILICIUM_TRAIT_WITH_TYPEDEFS(WithTypedefs, typedef float element_type;, ((get, (0, ()), element_type)))
 
 struct impl_with_typedefs
 {

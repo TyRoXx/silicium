@@ -18,47 +18,47 @@ namespace Si
 		typedef ExceptionPtr exception_ptr;
 
 		expected()
-			: m_state(has_value)
+		    : m_state(has_value)
 		{
 			new (&value_address()) value_type();
 		}
 
 		expected(T &&value)
-			: m_state(has_value)
+		    : m_state(has_value)
 		{
 			new (&value_address()) value_type(std::move(value));
 		}
 
 		expected(T const &value)
-			: m_state(has_value)
+		    : m_state(has_value)
 		{
 			new (&value_address()) value_type(value);
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class A0, class ...Args>
-		explicit expected(A0 &&a0, Args &&...args)
-			: m_state(has_value)
+		template <class A0, class... Args>
+		explicit expected(A0 &&a0, Args &&... args)
+		    : m_state(has_value)
 		{
 			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<Args>(args)...);
 		}
 #else
 		template <class A0, class A1>
 		expected(A0 &&a0, A1 &&a1)
-			: m_state(has_value)
+		    : m_state(has_value)
 		{
 			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<A1>(a1));
 		}
 #endif
 
 		expected(exception_ptr exception)
-			: m_state(has_exception)
+		    : m_state(has_exception)
 		{
 			new (&exception_address()) exception_ptr(std::move(exception));
 		}
 
 		expected(expected &&other)
-			: m_state(other.m_state)
+		    : m_state(other.m_state)
 		{
 			switch (m_state)
 			{
@@ -73,7 +73,7 @@ namespace Si
 		}
 
 		expected(expected const &other)
-			: m_state(other.m_state)
+		    : m_state(other.m_state)
 		{
 			switch (m_state)
 			{
@@ -87,7 +87,7 @@ namespace Si
 			}
 		}
 
-		expected &operator = (T &&value)
+		expected &operator=(T &&value)
 		{
 			switch (m_state)
 			{
@@ -104,7 +104,7 @@ namespace Si
 			return *this;
 		}
 
-		expected &operator = (T const &value)
+		expected &operator=(T const &value)
 		{
 			switch (m_state)
 			{
@@ -113,18 +113,18 @@ namespace Si
 				break;
 
 			case has_exception:
-				{
-					value_type copy(value);
-					exception_address().~exception_ptr();
-					new (&value_address()) value_type(std::move(copy));
-					m_value = has_value;
-					break;
-				}
+			{
+				value_type copy(value);
+				exception_address().~exception_ptr();
+				new (&value_address()) value_type(std::move(copy));
+				m_value = has_value;
+				break;
+			}
 			}
 			return *this;
 		}
 
-		expected &operator = (expected &&other)
+		expected &operator=(expected &&other)
 		{
 			switch (m_state)
 			{
@@ -160,7 +160,7 @@ namespace Si
 			return *this;
 		}
 
-		expected &operator = (expected const &other)
+		expected &operator=(expected const &other)
 		{
 			switch (m_state)
 			{
@@ -212,7 +212,7 @@ namespace Si
 
 		T &value()
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-			&
+		    &
 #endif
 		{
 			switch (m_state)
@@ -228,7 +228,7 @@ namespace Si
 
 		T const &value() const
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-			&
+		    &
 #endif
 		{
 			switch (m_state)
@@ -258,8 +258,8 @@ namespace Si
 #endif
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class ...Args>
-		void emplace(Args &&...args)
+		template <class... Args>
+		void emplace(Args &&... args)
 		{
 			switch (m_state)
 			{
@@ -326,14 +326,15 @@ namespace Si
 		{
 			switch (m_state)
 			{
-			case has_value: return true;
-			case has_exception: return false;
+			case has_value:
+				return true;
+			case has_exception:
+				return false;
 			}
 			SILICIUM_UNREACHABLE();
 		}
-		
-	private:
 
+	private:
 		enum state
 		{
 			has_value,
@@ -343,7 +344,8 @@ namespace Si
 		union
 		{
 			typename std::aligned_storage<sizeof(T), boost::alignment_of<T>::value>::type m_value;
-			typename std::aligned_storage<sizeof(exception_ptr), boost::alignment_of<exception_ptr>::value>::type m_exception;
+			typename std::aligned_storage<sizeof(exception_ptr), boost::alignment_of<exception_ptr>::value>::type
+			    m_exception;
 		};
 		state m_state;
 

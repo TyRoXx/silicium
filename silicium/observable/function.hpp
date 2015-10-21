@@ -18,7 +18,7 @@ namespace Si
 		}
 
 		explicit function_observable(AsyncGetOne get)
-			: get(std::move(get))
+		    : get(std::move(get))
 		{
 		}
 
@@ -28,14 +28,13 @@ namespace Si
 		}
 
 	private:
-
 		typedef
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-			typename detail::proper_value_function<AsyncGetOne, void, ptr_observer<observer<element_type>>>::type
+		    typename detail::proper_value_function<AsyncGetOne, void, ptr_observer<observer<element_type>>>::type
 #else
-			AsyncGetOne
+		    AsyncGetOne
 #endif
-			proper_get;
+		        proper_get;
 
 		proper_get get;
 	};
@@ -43,7 +42,7 @@ namespace Si
 	template <class Element, class AsyncGetOne>
 	auto make_function_observable(AsyncGetOne &&get)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> function_observable<Element, typename std::decay<AsyncGetOne>::type>
+	    -> function_observable<Element, typename std::decay<AsyncGetOne>::type>
 #endif
 	{
 		return function_observable<Element, typename std::decay<AsyncGetOne>::type>(std::forward<AsyncGetOne>(get));
@@ -52,31 +51,31 @@ namespace Si
 	template <class GenerateElement>
 	auto make_function_observable2(GenerateElement &&generate)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> function_observable<
-			typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type,
-			std::function<void(ptr_observer<observer<typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type>>)>
-		>
+	    -> function_observable<
+	        typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type,
+	        std::function<void(ptr_observer<observer<typename detail::element_from_optional_like<
+	                               typename std::decay<decltype(generate())>::type>::type>>)>>
 #endif
 	{
-		typedef typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type element_type;
+		typedef typename detail::element_from_optional_like<typename std::decay<decltype(generate())>::type>::type
+		    element_type;
 		return make_function_observable<element_type>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			std::function<void(ptr_observer<observer<element_type>>)>
+		    std::function<void(ptr_observer<observer<element_type>>)>
 #endif
-			([SILICIUM_CAPTURE_EXPRESSION(generate, std::forward<GenerateElement>(generate))]
-				(ptr_observer<observer<element_type>> observer_) mutable
-			{
-				Si::optional<element_type> element = std::forward<GenerateElement>(generate)();
-				if (element)
-				{
-					observer_.got_element(std::move(*element));
-				}
-				else
-				{
-					observer_.ended();
-				}
-			})
-		);
+		    ([SILICIUM_CAPTURE_EXPRESSION(generate, std::forward<GenerateElement>(generate))](
+		        ptr_observer<observer<element_type>> observer_) mutable
+		     {
+			     Si::optional<element_type> element = std::forward<GenerateElement>(generate)();
+			     if (element)
+			     {
+				     observer_.got_element(std::move(*element));
+			     }
+			     else
+			     {
+				     observer_.ended();
+			     }
+			 }));
 	}
 }
 

@@ -25,20 +25,19 @@ namespace Si
 			typedef typename timer_impl::duration duration;
 
 			explicit timer(boost::asio::io_service &io)
-				: impl(make_unique<timer_impl>(io))
+			    : impl(make_unique<timer_impl>(io))
 			{
 			}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 			timer(timer &&other) BOOST_NOEXCEPT = default;
-			timer &operator = (timer &&other) BOOST_NOEXCEPT = default;
+			timer &operator=(timer &&other) BOOST_NOEXCEPT = default;
 #else
-			timer(timer &&other) BOOST_NOEXCEPT
-				: impl(std::move(other.impl))
+			timer(timer &&other) BOOST_NOEXCEPT : impl(std::move(other.impl))
 			{
 			}
 
-			timer &operator = (timer &&other) BOOST_NOEXCEPT
+			timer &operator=(timer &&other) BOOST_NOEXCEPT
 			{
 				impl = std::move(other.impl);
 				return *this;
@@ -56,29 +55,29 @@ namespace Si
 			void async_get_one(Observer &&receiver)
 			{
 				assert(impl);
-				impl->async_wait([this, receiver](boost::system::error_code error) mutable
-				{
-					if (!!error)
-					{
-						assert(error == boost::asio::error::operation_aborted); //TODO: remove this assumption
-						return;
-					}
-					std::forward<Observer>(receiver).got_element(timer_elapsed());
-				});
+				impl->async_wait(
+				    [this, receiver](boost::system::error_code error) mutable
+				    {
+					    if (!!error)
+					    {
+						    assert(error == boost::asio::error::operation_aborted); // TODO: remove this assumption
+						    return;
+					    }
+					    std::forward<Observer>(receiver).got_element(timer_elapsed());
+					});
 			}
 
 		private:
-
 			std::unique_ptr<timer_impl> impl;
 
 			SILICIUM_DELETED_FUNCTION(timer(timer const &))
-			SILICIUM_DELETED_FUNCTION(timer &operator = (timer const &))
+			SILICIUM_DELETED_FUNCTION(timer &operator=(timer const &))
 		};
 
 		template <class AsioTimer>
 		auto make_timer(boost::asio::io_service &io)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> timer<AsioTimer>
+		    -> timer<AsioTimer>
 #endif
 		{
 			return timer<AsioTimer>(io);
@@ -86,7 +85,7 @@ namespace Si
 
 		inline auto make_timer(boost::asio::io_service &io)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			-> timer<boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>
+		    -> timer<boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>
 #endif
 		{
 			return timer<boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>(io);

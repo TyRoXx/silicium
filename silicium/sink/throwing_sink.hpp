@@ -17,7 +17,7 @@ namespace Si
 		}
 
 		explicit throwing_sink(Next next)
-			: next(next)
+		    : next(next)
 		{
 		}
 
@@ -32,14 +32,13 @@ namespace Si
 		}
 
 	private:
-
 		Next next;
 	};
 
 	template <class Next>
 	auto make_throwing_sink(Next &&next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> throwing_sink<typename std::decay<Next>::type>
+	    -> throwing_sink<typename std::decay<Next>::type>
 #endif
 	{
 		return throwing_sink<typename std::decay<Next>::type>(std::forward<Next>(next));

@@ -21,46 +21,47 @@ int main()
 		acceptor.accept(*client);
 		auto visitor_id = ++visitor_count;
 		std::thread([client, visitor_id]
-		{
-			{
-				std::array<char, 1024> receive_buffer;
-				boost::system::error_code ec;
-				client->read_some(boost::asio::buffer(receive_buffer), ec);
-				if (!!ec)
-				{
-					return;
-				}
-			}
+		            {
+			            {
+				            std::array<char, 1024> receive_buffer;
+				            boost::system::error_code ec;
+				            client->read_some(boost::asio::buffer(receive_buffer), ec);
+				            if (!!ec)
+				            {
+					            return;
+				            }
+			            }
 
-			{
-				const auto response = boost::str(boost::format(
-										"HTTP/1.0 200 OK\r\n"
-										"Content-Length: 9\r\n"
-										"Connection: close\r\n"
-										"\r\n"
-										"%1%") % visitor_id);
-				boost::system::error_code ec;
-				auto sent = client->send(boost::asio::buffer(response), 0, ec);
-				if (ec || (sent != response.size()))
-				{
-					std::cerr << "Could not send\n";
-					return;
-				}
-			}
+			            {
+				            const auto response = boost::str(boost::format("HTTP/1.0 200 OK\r\n"
+				                                                           "Content-Length: 9\r\n"
+				                                                           "Connection: close\r\n"
+				                                                           "\r\n"
+				                                                           "%1%") %
+				                                             visitor_id);
+				            boost::system::error_code ec;
+				            auto sent = client->send(boost::asio::buffer(response), 0, ec);
+				            if (ec || (sent != response.size()))
+				            {
+					            std::cerr << "Could not send\n";
+					            return;
+				            }
+			            }
 
-			client->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+			            client->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 
-			for (;;)
-			{
-				std::array<char, 1024> receive_buffer;
-				boost::system::error_code ec;
-				client->receive(boost::asio::buffer(receive_buffer), 0, ec);
-				if (!!ec)
-				{
-					break;
-				}
-			}
-		}).detach();
+			            for (;;)
+			            {
+				            std::array<char, 1024> receive_buffer;
+				            boost::system::error_code ec;
+				            client->receive(boost::asio::buffer(receive_buffer), 0, ec);
+				            if (!!ec)
+				            {
+					            break;
+				            }
+			            }
+			        })
+		    .detach();
 	}
 }
 #else

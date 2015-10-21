@@ -19,9 +19,11 @@ namespace Si
 {
 	struct none_t
 	{
-		BOOST_CONSTEXPR none_t() {}
+		BOOST_CONSTEXPR none_t()
+		{
+		}
 
-		BOOST_CONSTEXPR bool operator !() const BOOST_NOEXCEPT
+		BOOST_CONSTEXPR bool operator!() const BOOST_NOEXCEPT
 		{
 			return true;
 		}
@@ -31,7 +33,7 @@ namespace Si
 
 	static none_t BOOST_CONSTEXPR_OR_CONST none;
 
-	inline bool operator == (none_t, none_t)
+	inline bool operator==(none_t, none_t)
 	{
 		return true;
 	}
@@ -48,63 +50,59 @@ namespace Si
 	template <class T>
 	struct optional
 	{
-		optional() BOOST_NOEXCEPT
-			: m_is_set(false)
+		optional() BOOST_NOEXCEPT : m_is_set(false)
 		{
 		}
 
-		optional(none_t) BOOST_NOEXCEPT
-			: m_is_set(false)
+		optional(none_t) BOOST_NOEXCEPT : m_is_set(false)
 		{
 		}
 
-		optional(optional &&other) BOOST_NOEXCEPT
-			: m_is_set(other.m_is_set)
+		optional(optional &&other) BOOST_NOEXCEPT : m_is_set(other.m_is_set)
 		{
 			if (m_is_set)
 			{
-				new (data())T(std::move(*other));
+				new (data()) T(std::move(*other));
 			}
 		}
 
 		optional(optional const &other)
-			: m_is_set(other.m_is_set)
+		    : m_is_set(other.m_is_set)
 		{
 			if (m_is_set)
 			{
-				new (data())T(*other);
+				new (data()) T(*other);
 			}
 		}
 
-		optional(T &&value) BOOST_NOEXCEPT
-			: m_is_set(true)
+		optional(T &&value) BOOST_NOEXCEPT : m_is_set(true)
 		{
 			new (data()) T(std::move(value));
 		}
 
 		optional(T const &value)
-			: m_is_set(true)
+		    : m_is_set(true)
 		{
 			new (data()) T(value);
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class ...Args>
-		explicit optional(some_t, Args &&...args)
-			: m_is_set(true)
+		template <class... Args>
+		explicit optional(some_t, Args &&... args)
+		    : m_is_set(true)
 		{
 			new (data()) T(std::forward<Args>(args)...);
 		}
 #else
 		explicit optional(some_t)
-			: m_is_set(true)
+		    : m_is_set(true)
 		{
 			new (data()) T();
 		}
 
 		template <class A0>
 		explicit optional(some_t, A0 &&a0)
-			: m_is_set(true)
+		    : m_is_set(true)
 		{
 			new (data()) T(std::forward<A0>(a0));
 		}
@@ -119,7 +117,7 @@ namespace Si
 			data()->~T();
 		}
 
-		optional &operator = (optional &&other) BOOST_NOEXCEPT
+		optional &operator=(optional &&other) BOOST_NOEXCEPT
 		{
 			if (m_is_set)
 			{
@@ -142,13 +140,13 @@ namespace Si
 				}
 				else
 				{
-					//both are already empty
+					// both are already empty
 				}
 			}
 			return *this;
 		}
 
-		optional &operator = (optional const &other)
+		optional &operator=(optional const &other)
 		{
 			if (m_is_set)
 			{
@@ -171,13 +169,13 @@ namespace Si
 				}
 				else
 				{
-					//both are already empty
+					// both are already empty
 				}
 			}
 			return *this;
 		}
 
-		optional &operator = (T const &value)
+		optional &operator=(T const &value)
 		{
 			if (m_is_set)
 			{
@@ -191,7 +189,7 @@ namespace Si
 			return *this;
 		}
 
-		optional &operator = (T &&value) BOOST_NOEXCEPT
+		optional &operator=(T &&value) BOOST_NOEXCEPT
 		{
 			if (m_is_set)
 			{
@@ -205,7 +203,7 @@ namespace Si
 			return *this;
 		}
 
-		optional &operator = (none_t const &) BOOST_NOEXCEPT
+		optional &operator=(none_t const &) BOOST_NOEXCEPT
 		{
 			if (m_is_set)
 			{
@@ -218,63 +216,63 @@ namespace Si
 		SILICIUM_EXPLICIT_OPERATOR_BOOL()
 
 		SILICIUM_USE_RESULT
-		bool operator !() const BOOST_NOEXCEPT
+		bool operator!() const BOOST_NOEXCEPT
 		{
 			return !m_is_set;
 		}
 
 #if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
 		SILICIUM_USE_RESULT
-		T &operator * () BOOST_NOEXCEPT
+		T &operator*() BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *data();
 		}
 
 		SILICIUM_USE_RESULT
-		T const &operator * () const BOOST_NOEXCEPT
+		T const &operator*() const BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *data();
 		}
 #else
 		SILICIUM_USE_RESULT
-		T &operator * () & BOOST_NOEXCEPT
+		T &operator*() & BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *data();
 		}
 
 		SILICIUM_USE_RESULT
-		T &&operator * () && BOOST_NOEXCEPT
+		T &&operator*() && BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return std::move(*data());
 		}
 
 		SILICIUM_USE_RESULT
-		T const &operator * () const & BOOST_NOEXCEPT
+		T const &operator*() const &BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *data();
 		}
 #endif
 
-		T *operator -> () BOOST_NOEXCEPT
+		T *operator->() BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return data();
 		}
 
-		T const *operator -> () const BOOST_NOEXCEPT
+		T const *operator->() const BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return data();
 		}
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class ...Args>
-		void emplace(Args &&...args)
+		template <class... Args>
+		void emplace(Args &&... args)
 		{
 			*this = none;
 			new (data()) T{std::forward<Args>(args)...};
@@ -289,14 +287,14 @@ namespace Si
 			m_is_set = true;
 		}
 
-#define BOOST_PP_LOCAL_MACRO(N) \
-		template <BOOST_PP_ENUM_PARAMS(N, class A)> \
-		void emplace(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
-		{ \
-			*this = none; \
-			new (data()) T(BOOST_PP_ENUM_PARAMS(N, a)); \
-			m_is_set = true; \
-		}
+#define BOOST_PP_LOCAL_MACRO(N)                                                                                        \
+	template <BOOST_PP_ENUM_PARAMS(N, class A)>                                                                        \
+	void emplace(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                                                                 \
+	{                                                                                                                  \
+		*this = none;                                                                                                  \
+		new (data()) T(BOOST_PP_ENUM_PARAMS(N, a));                                                                    \
+		m_is_set = true;                                                                                               \
+	}
 #define BOOST_PP_LOCAL_LIMITS (1, 10)
 #include BOOST_PP_LOCAL_ITERATE()
 #undef BOOST_PP_LOCAL_MACRO
@@ -344,7 +342,7 @@ namespace Si
 				}
 				else
 				{
-					//both empty -> nothing to be done here
+					// both empty -> nothing to be done here
 				}
 			}
 		}
@@ -361,7 +359,6 @@ namespace Si
 		}
 
 	private:
-
 		enum
 		{
 			alignment = alignment_of<T>::value
@@ -384,23 +381,19 @@ namespace Si
 	template <class T>
 	struct optional<T &>
 	{
-		optional() BOOST_NOEXCEPT
-			: m_data(nullptr)
+		optional() BOOST_NOEXCEPT : m_data(nullptr)
 		{
 		}
 
-		optional(T &data) BOOST_NOEXCEPT
-			: m_data(&data)
+		optional(T &data) BOOST_NOEXCEPT : m_data(&data)
 		{
 		}
 
-		optional(some_t, T &data) BOOST_NOEXCEPT
-			: m_data(&data)
+		optional(some_t, T &data) BOOST_NOEXCEPT : m_data(&data)
 		{
 		}
 
-		optional(none_t) BOOST_NOEXCEPT
-			: m_data(nullptr)
+		optional(none_t) BOOST_NOEXCEPT : m_data(nullptr)
 		{
 		}
 
@@ -410,7 +403,7 @@ namespace Si
 		}
 
 		SILICIUM_USE_RESULT
-		bool operator !() const BOOST_NOEXCEPT
+		bool operator!() const BOOST_NOEXCEPT
 		{
 			return m_data == nullptr;
 		}
@@ -418,33 +411,32 @@ namespace Si
 		SILICIUM_EXPLICIT_OPERATOR_BOOL()
 
 		SILICIUM_USE_RESULT
-		T &operator * () BOOST_NOEXCEPT
+		T &operator*() BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *m_data;
 		}
 
 		SILICIUM_USE_RESULT
-		T const &operator * () const BOOST_NOEXCEPT
+		T const &operator*() const BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return *m_data;
 		}
 
-		T *operator -> () BOOST_NOEXCEPT
+		T *operator->() BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return m_data;
 		}
 
-		T const *operator -> () const BOOST_NOEXCEPT
+		T const *operator->() const BOOST_NOEXCEPT
 		{
 			assert(*this);
 			return m_data;
 		}
 
 	private:
-
 		T *m_data;
 	};
 
@@ -459,8 +451,7 @@ namespace Si
 #endif
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	bool operator == (optional<T> const &left, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator==(optional<T> const &left, optional<T> const &right)
 	{
 		if (left && right)
 		{
@@ -470,8 +461,7 @@ namespace Si
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	bool operator == (optional<T> const &left, T const &right)
+	SILICIUM_USE_RESULT bool operator==(optional<T> const &left, T const &right)
 	{
 		if (left)
 		{
@@ -481,36 +471,31 @@ namespace Si
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	bool operator == (T const &left, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator==(T const &left, optional<T> const &right)
 	{
 		return (right == left);
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	bool operator == (none_t const &, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator==(none_t const &, optional<T> const &right)
 	{
 		return !right;
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	bool operator == (optional<T> const &left, none_t const &)
+	SILICIUM_USE_RESULT bool operator==(optional<T> const &left, none_t const &)
 	{
 		return !left;
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	bool operator != (optional<T> const &left, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator!=(optional<T> const &left, optional<T> const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	bool operator < (optional<T> const &left, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator<(optional<T> const &left, optional<T> const &right)
 	{
 		if (left)
 		{
@@ -537,20 +522,19 @@ namespace Si
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	Si::optional<typename std::decay<T>::type> make_optional(T &&value)
+	SILICIUM_USE_RESULT Si::optional<typename std::decay<T>::type> make_optional(T &&value)
 	{
 		return Si::optional<typename std::decay<T>::type>(std::forward<T>(value));
 	}
 
-	inline std::ostream &operator << (std::ostream &out, none_t const &)
+	inline std::ostream &operator<<(std::ostream &out, none_t const &)
 	{
 		out << "none";
 		return out;
 	}
 
 	template <class T>
-	std::ostream &operator << (std::ostream &out, optional<T> const &value)
+	std::ostream &operator<<(std::ostream &out, optional<T> const &value)
 	{
 		if (value)
 		{
@@ -564,8 +548,7 @@ namespace Si
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT
-	std::size_t hash_value(optional<T> const &value)
+	SILICIUM_USE_RESULT std::size_t hash_value(optional<T> const &value)
 	{
 		if (value)
 		{
@@ -583,7 +566,7 @@ namespace Si
 
 	template <class T, class Transformation>
 	auto fmap(optional<T> const &value, Transformation &&transform)
-		-> optional<decltype(std::forward<Transformation>(transform)(*value))>
+	    -> optional<decltype(std::forward<Transformation>(transform)(*value))>
 	{
 		if (value)
 		{
@@ -602,8 +585,8 @@ namespace Si
 			return true;
 		}
 
-		template <class Head, class ...Tail>
-		bool all_of(Head const &head, Tail const &...tail)
+		template <class Head, class... Tail>
+		bool all_of(Head const &head, Tail const &... tail)
 		{
 			if (!head)
 			{
@@ -613,9 +596,9 @@ namespace Si
 		}
 	}
 
-	template <class Transformation, class ...Optionals>
-	auto variadic_fmap(Transformation &&transform, Optionals const &...values)
-		-> optional<decltype(std::forward<Transformation>(transform)((*values)...))>
+	template <class Transformation, class... Optionals>
+	auto variadic_fmap(Transformation &&transform, Optionals const &... values)
+	    -> optional<decltype(std::forward<Transformation>(transform)((*values)...))>
 	{
 		if (detail::all_of(values...))
 		{

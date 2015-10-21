@@ -15,7 +15,7 @@ namespace Si
 			SILICIUM_USE_RESULT
 			static void *open(c_string file)
 			{
-				void * const handle = dlopen(file.c_str(), RTLD_LAZY);
+				void *const handle = dlopen(file.c_str(), RTLD_LAZY);
 				if (!handle)
 				{
 					boost::throw_exception(std::runtime_error(dlerror()));

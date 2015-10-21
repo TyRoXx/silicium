@@ -18,7 +18,7 @@ namespace Si
 	struct future_runtime_checked
 	{
 		future_runtime_checked()
-			: got(false)
+		    : got(false)
 		{
 		}
 
@@ -30,7 +30,6 @@ namespace Si
 		}
 
 	private:
-
 		bool got;
 	};
 
@@ -45,11 +44,11 @@ namespace Si
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		ready_future(ready_future &&other)
-			: value(std::move(other.value))
+		    : value(std::move(other.value))
 		{
 		}
 
-		ready_future &operator = (ready_future &&other)
+		ready_future &operator=(ready_future &&other)
 		{
 			value = std::move(other.value);
 			return *this;
@@ -57,7 +56,7 @@ namespace Si
 #endif
 
 		explicit ready_future(Element value)
-			: value(std::move(value))
+		    : value(std::move(value))
 		{
 		}
 
@@ -69,14 +68,13 @@ namespace Si
 		}
 
 	private:
-
 		Element value;
 	};
 
 	template <class Element>
 	auto make_ready_future_observable(Element &&value)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> ready_future<typename std::decay<Element>::type>
+	    -> ready_future<typename std::decay<Element>::type>
 #endif
 	{
 		return ready_future<typename std::decay<Element>::type>(std::forward<Element>(value));

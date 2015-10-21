@@ -14,7 +14,7 @@ namespace
 		bool has_ended;
 
 		end_observer()
-			: has_ended(false)
+		    : has_ended(false)
 		{
 		}
 
@@ -48,11 +48,11 @@ BOOST_AUTO_TEST_CASE(source_observable_non_empty)
 	{
 		bool got_element = false;
 		auto observer = Si::consume<char>([&got_element](char c)
-		{
-			BOOST_CHECK_EQUAL('A', c);
-			BOOST_REQUIRE(!got_element);
-			got_element = true;
-		});
+		                                  {
+			                                  BOOST_CHECK_EQUAL('A', c);
+			                                  BOOST_REQUIRE(!got_element);
+			                                  got_element = true;
+			                              });
 		observable.async_get_one(observer);
 		BOOST_REQUIRE(got_element);
 	}

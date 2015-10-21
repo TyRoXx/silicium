@@ -41,33 +41,36 @@ namespace Si
 		}
 
 	private:
-
 		Int m_value;
 
 		explicit bounded_int(Int value)
-			: m_value(value)
+		    : m_value(value)
 		{
 		}
 	};
 
 	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
-	bool operator == (bounded_int<Int, MinimumLeft, MaximumLeft> const &left, bounded_int<Int, MinimumRight, MaximumRight> const &right)
+	bool operator==(bounded_int<Int, MinimumLeft, MaximumLeft> const &left,
+	                bounded_int<Int, MinimumRight, MaximumRight> const &right)
 	{
-		BOOST_STATIC_ASSERT(((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) || ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
+		BOOST_STATIC_ASSERT(((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) ||
+		                    ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
 		return left.value() == right.value();
 	}
 
 	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
-	bool operator < (bounded_int<Int, MinimumLeft, MaximumLeft> const &left, bounded_int<Int, MinimumRight, MaximumRight> const &right)
+	bool operator<(bounded_int<Int, MinimumLeft, MaximumLeft> const &left,
+	               bounded_int<Int, MinimumRight, MaximumRight> const &right)
 	{
-		BOOST_STATIC_ASSERT(((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) || ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
+		BOOST_STATIC_ASSERT(((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) ||
+		                    ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
 		return left.value() < right.value();
 	}
 
 	template <class Int, Int Minimum, Int Maximum>
-	std::ostream &operator << (std::ostream &out, bounded_int<Int, Minimum, Maximum> const &value)
+	std::ostream &operator<<(std::ostream &out, bounded_int<Int, Minimum, Maximum> const &value)
 	{
-		//Propagate char types to int by adding zero so that ostream will properly format them as numbers.
+		// Propagate char types to int by adding zero so that ostream will properly format them as numbers.
 		auto printable = (0 + value.value());
 		return out << printable;
 	}

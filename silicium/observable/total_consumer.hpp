@@ -17,17 +17,17 @@ namespace Si
 		}
 
 		explicit total_consumer(Input input)
-			: input(std::move(input))
+		    : input(std::move(input))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		total_consumer(total_consumer &&other)
-			: input(std::move(other.input))
+		    : input(std::move(other.input))
 		{
 		}
 
-		total_consumer &operator = (total_consumer &&other)
+		total_consumer &operator=(total_consumer &&other)
 		{
 			input = std::move(other.input);
 			return *this;
@@ -45,12 +45,11 @@ namespace Si
 		}
 
 	private:
-
 		Input input;
 
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{
-			(void)value; //ignore result
+			(void)value; // ignore result
 			return start();
 		}
 

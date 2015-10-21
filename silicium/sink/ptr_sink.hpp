@@ -12,12 +12,12 @@ namespace Si
 		typedef typename Pointee::error_type error_type;
 
 		ptr_sink()
-			: next(nullptr)
+		    : next(nullptr)
 		{
 		}
 
 		explicit ptr_sink(Pointer next)
-			: next(std::move(next))
+		    : next(std::move(next))
 		{
 		}
 
@@ -27,14 +27,13 @@ namespace Si
 		}
 
 	private:
-
 		Pointer next;
 	};
 
 	template <class Pointee>
 	auto ref_sink(Pointee &next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> ptr_sink<Pointee, Pointee *>
+	    -> ptr_sink<Pointee, Pointee *>
 #endif
 	{
 		return ptr_sink<Pointee, Pointee *>(&next);

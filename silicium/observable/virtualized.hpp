@@ -17,17 +17,17 @@ namespace Si
 		}
 
 		explicit virtualized_observable(Observable next)
-			: next(std::move(next))
+		    : next(std::move(next))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		virtualized_observable(virtualized_observable &&other)
-			: next(std::move(other.next))
+		    : next(std::move(other.next))
 		{
 		}
 
-		virtualized_observable &operator = (virtualized_observable &&other)
+		virtualized_observable &operator=(virtualized_observable &&other)
 		{
 			next = std::move(other.next);
 			return *this;
@@ -40,13 +40,11 @@ namespace Si
 		}
 
 	private:
-
 		Observable next;
 	};
 
 	template <class Observer, class Observable>
-	virtualized_observable<typename std::decay<Observable>::type, Observer>
-	virtualize_observable(Observable &&next)
+	virtualized_observable<typename std::decay<Observable>::type, Observer> virtualize_observable(Observable &&next)
 	{
 		return virtualized_observable<typename std::decay<Observable>::type, Observer>(std::forward<Observable>(next));
 	}

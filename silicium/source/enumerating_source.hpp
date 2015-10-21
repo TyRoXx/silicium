@@ -21,17 +21,17 @@ namespace Si
 		}
 
 		explicit enumerating_source(RangeSource input)
-			: m_input(std::move(input))
+		    : m_input(std::move(input))
 		{
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		enumerating_source(enumerating_source &&other)
-			: m_input(std::move(other.m_input))
+		    : m_input(std::move(other.m_input))
 		{
 		}
 
-		enumerating_source &operator = (enumerating_source &&other)
+		enumerating_source &operator=(enumerating_source &&other)
 		{
 			m_input = std::move(other.m_input);
 			return *this;
@@ -87,7 +87,6 @@ namespace Si
 		}
 
 	private:
-
 		RangeSource m_input;
 		range_type m_rest;
 	};
@@ -95,7 +94,7 @@ namespace Si
 	template <class RangeSource>
 	auto make_enumerating_source(RangeSource &&input)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> enumerating_source<typename std::decay<RangeSource>::type>
+	    -> enumerating_source<typename std::decay<RangeSource>::type>
 #endif
 	{
 		return enumerating_source<typename std::decay<RangeSource>::type>(std::forward<RangeSource>(input));

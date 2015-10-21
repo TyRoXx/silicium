@@ -3,7 +3,7 @@
 
 #include <silicium/config.hpp>
 #if SILICIUM_HAS_EXCEPTIONS
-#	include <future>
+#include <future>
 #endif
 #include <mutex>
 #include <condition_variable>
@@ -26,15 +26,16 @@ namespace Si
 		template <class Result>
 		struct packaged_task
 		{
-			typedef std::packaged_task<Result ()> type;
+			typedef std::packaged_task<Result()> type;
 		};
 #endif
 		typedef std::mutex mutex;
 		typedef std::condition_variable condition_variable;
 		typedef std::unique_lock<std::mutex> unique_lock;
 #if SILICIUM_HAS_EXCEPTIONS && SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class Action, class ...Args>
-		static auto launch_async(Action &&action, Args &&...args) -> std::future<decltype(action(std::forward<Args>(args)...))>
+		template <class Action, class... Args>
+		static auto launch_async(Action &&action, Args &&... args)
+		    -> std::future<decltype(action(std::forward<Args>(args)...))>
 		{
 			return std::async(std::launch::async, std::forward<Action>(action), std::forward<Args>(args)...);
 		}

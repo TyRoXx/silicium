@@ -17,9 +17,7 @@
 #if SILICIUM_EXAMPLE_AVAILABLE
 namespace
 {
-	void serve_client(
-		std::shared_ptr<boost::asio::ip::tcp::socket> client,
-		boost::asio::yield_context yield)
+	void serve_client(std::shared_ptr<boost::asio::ip::tcp::socket> client, boost::asio::yield_context yield)
 	{
 		try
 		{
@@ -40,7 +38,8 @@ namespace
 			}
 
 			auto const client_endpoint = client->remote_endpoint();
-			auto const client_name = boost::str(boost::format("%1%:%2%") % client_endpoint.address() % client_endpoint.port());
+			auto const client_name =
+			    boost::str(boost::format("%1%:%2%") % client_endpoint.address() % client_endpoint.port());
 			std::string const content = "Hello, " + client_name + "!";
 
 			Si::http::response response;
@@ -57,7 +56,7 @@ namespace
 		}
 		catch (boost::system::system_error const &)
 		{
-			//ignore disconnect
+			// ignore disconnect
 		}
 	}
 }
@@ -69,13 +68,14 @@ int main()
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
 #if SILICIUM_EXAMPLE_AVAILABLE
 	boost::asio::spawn(io, [&acceptor](boost::asio::yield_context yield)
-	{
-		auto clients = Si::virtualize_source(Si::asio::accepting_source(acceptor, yield));
-		for (auto client : Si::make_buffer(clients, 1))
-		{
-			boost::asio::spawn(acceptor.get_io_service(), std::bind(serve_client, client, std::placeholders::_1));
-		}
-	});
+	                   {
+		                   auto clients = Si::virtualize_source(Si::asio::accepting_source(acceptor, yield));
+		                   for (auto client : Si::make_buffer(clients, 1))
+		                   {
+			                   boost::asio::spawn(acceptor.get_io_service(),
+			                                      std::bind(serve_client, client, std::placeholders::_1));
+		                   }
+		               });
 #else
 	std::cerr << "This example requires boost::asio::spawn\n";
 #endif

@@ -14,8 +14,8 @@ namespace Si
 		}
 
 		on_first_observable(Input input, Handler handler)
-			: m_input(std::move(input))
-			, m_handler(std::move(handler))
+		    : m_input(std::move(input))
+		    , m_handler(std::move(handler))
 		{
 		}
 
@@ -25,7 +25,6 @@ namespace Si
 		}
 
 	private:
-
 		Input m_input;
 		Handler m_handler;
 
@@ -43,12 +42,11 @@ namespace Si
 	template <class Input, class Handler>
 	auto on_first(Input &&input, Handler &&handle_element)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>
+	    -> on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>
 #endif
 	{
 		return on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>(
-			std::forward<Input>(input),
-			std::forward<Handler>(handle_element));
+		    std::forward<Input>(input), std::forward<Handler>(handle_element));
 	}
 }
 

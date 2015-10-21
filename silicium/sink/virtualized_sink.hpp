@@ -17,7 +17,7 @@ namespace Si
 		}
 
 		explicit virtualized_sink(Next next)
-			: m_next(std::move(next))
+		    : m_next(std::move(next))
 		{
 		}
 
@@ -28,11 +28,11 @@ namespace Si
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		virtualized_sink(virtualized_sink &&other)
-			: m_next(std::move(other.m_next))
+		    : m_next(std::move(other.m_next))
 		{
 		}
 
-		virtualized_sink &operator = (virtualized_sink &&other)
+		virtualized_sink &operator=(virtualized_sink &&other)
 		{
 			m_next = std::move(other.m_next);
 			return *this;
@@ -40,14 +40,13 @@ namespace Si
 #endif
 
 	private:
-
 		Next m_next;
 	};
 
 	template <class Next>
 	auto virtualize_sink(Next &&next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> virtualized_sink<typename std::decay<Next>::type>
+	    -> virtualized_sink<typename std::decay<Next>::type>
 #endif
 	{
 		return virtualized_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
@@ -56,7 +55,7 @@ namespace Si
 	template <class Next>
 	auto erase_sink(Next &&next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> ptr_sink<typename std::decay<Next>::type, std::unique_ptr<typename std::decay<Next>::type>>
+	    -> ptr_sink<typename std::decay<Next>::type, std::unique_ptr<typename std::decay<Next>::type>>
 #endif
 	{
 		typedef typename std::decay<Next>::type clean;

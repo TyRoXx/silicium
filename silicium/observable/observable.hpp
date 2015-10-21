@@ -7,12 +7,7 @@
 namespace Si
 {
 	template <class Element, class Observer>
-	SILICIUM_TRAIT_WITH_TYPEDEFS(
-		Observable,
-		typedef Element element_type;
-		,
-		((async_get_one, (1, (Observer)), void))
-	)
+	SILICIUM_TRAIT_WITH_TYPEDEFS(Observable, typedef Element element_type;, ((async_get_one, (1, (Observer)), void)))
 
 #if SILICIUM_COMPILER_HAS_USING
 	template <class Element, class Observer>
