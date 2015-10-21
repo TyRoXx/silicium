@@ -5,7 +5,7 @@
 #include <boost/array.hpp>
 #include <algorithm>
 #include <boost/asio/posix/stream_descriptor.hpp>
-#include <silicium/posix/pipe.hpp>
+#include <silicium/pipe.hpp>
 
 #ifndef _WIN32
 BOOST_AUTO_TEST_CASE(asio_reading_observable)

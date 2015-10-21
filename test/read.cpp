@@ -1,6 +1,6 @@
 #include <silicium/read_file.hpp>
 #include <silicium/write.hpp>
-#include <silicium/posix/pipe.hpp>
+#include <silicium/pipe.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(read_invalid)
