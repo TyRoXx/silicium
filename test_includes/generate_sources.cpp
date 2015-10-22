@@ -91,10 +91,10 @@ int main()
 #endif
 	    ;
 	std::unordered_set<std::string> blacklist;
-	blacklist.emplace(windows_system_name);
-	blacklist.emplace(linux_system_name);
+	blacklist.insert(windows_system_name);
+	blacklist.insert(linux_system_name);
 #ifdef _WIN32
-	blacklist.emplace("posix");
+	blacklist.insert("posix");
 #endif
 	blacklist.erase(current_system_name);
 	auto const is_relevant_directory = [&blacklist](boost::filesystem::path const &dir)
