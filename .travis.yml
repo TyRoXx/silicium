@@ -51,7 +51,7 @@ script:
  - git clone https://github.com/TyRoXx/ventura.git || exit 1
  - mkdir build-ventura
  - pushd build-ventura
- - CXX=$CPP cmake .. -DSILICIUM_INCLUDE_DIR=. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DVENTURA_TESTS_RUNNING_ON_TRAVIS_CI=ON || exit 1
+ - CXX=$CPP cmake ../ventura -DSILICIUM_INCLUDE_DIR=. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DVENTURA_TESTS_RUNNING_ON_TRAVIS_CI=ON || exit 1
  - cmake --build . -- -j2 || exit 1
  - pushd test
  - if [ $NO_RTTI != "ON" ]; then
