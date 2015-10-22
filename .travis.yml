@@ -38,11 +38,22 @@ before_install:
  - git submodule update --init --recursive
 
 script:
- - mkdir build
- - cd build
+ - mkdir build-silicium
+ - pushd build-silicium
  - CXX=$CPP cmake .. -DSILICIUM_USE_WEBSOCKETPP=$WEBSOCKETPP -DSILICIUM_TEST_INCLUDES=$TEST_INCLUDES -DSILICIUM_PEDANTIC=$PEDANTIC -DSILICIUM_NO_EXCEPTIONS=$NO_EXCEPTIONS -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSILICIUM_TESTS_RUNNING_ON_TRAVIS_CI=ON -DSILICIUM_NO_RTTI=$NO_RTTI || exit 1
  - cmake --build . -- -j2 || exit 1
- - cd test
+ - pushd test
+ - if [ $NO_RTTI != "ON" ]; then
+     ./unit_test || exit 1;
+   fi
+ - popd
+ - popd
+ - git clone https://github.com/TyRoXx/ventura.git || exit 1
+ - mkdir build-ventura
+ - pushd build-ventura
+ - CXX=$CPP cmake .. -DSILICIUM_INCLUDE_DIR=. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DVENTURA_TESTS_RUNNING_ON_TRAVIS_CI=ON || exit 1
+ - cmake --build . -- -j2 || exit 1
+ - pushd test
  - if [ $NO_RTTI != "ON" ]; then
      ./unit_test || exit 1;
    fi
