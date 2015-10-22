@@ -3,6 +3,8 @@
 
 #include <silicium/sink/sink.hpp>
 #include <silicium/config.hpp>
+#include <boost/throw_exception.hpp>
+#include <boost/system/system_error.hpp>
 
 namespace Si
 {
@@ -26,7 +28,7 @@ namespace Si
 			auto error = next.append(data);
 			if (error)
 			{
-				throw boost::system::system_error(error);
+				boost::throw_exception(boost::system::system_error(error));
 			}
 			return {};
 		}

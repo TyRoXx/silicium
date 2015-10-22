@@ -2,8 +2,7 @@
 #define SILICIUM_ITERATOR_SINK_HPP
 
 #include <silicium/sink/sink.hpp>
-#include <silicium/config.hpp>
-#include <silicium/success.hpp>
+#include <boost/range/algorithm/copy.hpp>
 
 namespace Si
 {

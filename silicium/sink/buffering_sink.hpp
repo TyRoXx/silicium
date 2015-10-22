@@ -4,6 +4,7 @@
 #include <silicium/sink/sink.hpp>
 #include <silicium/then.hpp>
 #include <array>
+#include <boost/range/algorithm/copy.hpp>
 
 #define SILICIUM_HAS_BUFFERING_SINK SILICIUM_HAS_THEN
 

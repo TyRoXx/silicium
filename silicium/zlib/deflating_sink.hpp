@@ -67,7 +67,7 @@ namespace Si
 			assert(rc != Z_STREAM_ERROR);
 			assert(rc != Z_BUF_ERROR);
 			assert(rc == Z_OK);
-			boost::ignore_unused_variable_warning(rc);
+			ignore_unused_variable_warning(rc);
 			return std::make_pair(m_stream->avail_in, m_stream->avail_out);
 		}
 

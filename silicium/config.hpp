@@ -310,6 +310,11 @@ namespace Si
 #else
 	typedef boost::uintptr_t uintptr_t;
 #endif
+
+	template <class T>
+	void ignore_unused_variable_warning(T &&)
+	{
+	}
 }
 
 #endif

@@ -3,15 +3,8 @@
 
 #include <silicium/trait.hpp>
 #include <silicium/iterator_range.hpp>
-#include <silicium/memory_range.hpp>
-#include <silicium/utility.hpp>
 #include <silicium/success.hpp>
-#include <boost/range/algorithm/copy.hpp>
-#include <boost/filesystem/path.hpp>
-#if BOOST_VERSION >= 105500
-#include <boost/utility/explicit_operator_bool.hpp>
-#endif
-#include <boost/container/string.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace Si
 {
@@ -32,7 +25,7 @@ namespace Si
 
 		error_type append(iterator_range<element_type const *> data)
 		{
-			boost::ignore_unused_variable_warning(data);
+			ignore_unused_variable_warning(data);
 			return error_type();
 		}
 	};

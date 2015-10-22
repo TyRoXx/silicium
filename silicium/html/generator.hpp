@@ -3,12 +3,8 @@
 
 #include <silicium/source/source.hpp>
 #include <silicium/sink/append.hpp>
-#include <silicium/sink/sink.hpp>
-#include <silicium/config.hpp>
-
-#if BOOST_VERSION >= 105300
-#include <boost/utility/string_ref.hpp>
-#else
+#include <silicium/memory_range.hpp>
+#if BOOST_VERSION < 105300
 #include <silicium/noexcept_string.hpp>
 #endif
 

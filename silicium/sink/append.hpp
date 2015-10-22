@@ -1,11 +1,12 @@
 #ifndef SILICIUM_SINK_APPEND_HPP
 #define SILICIUM_SINK_APPEND_HPP
 
-#include <silicium/config.hpp>
 #include <silicium/sink/sink.hpp>
+#include <silicium/memory_range.hpp>
 #if BOOST_VERSION >= 105300
 #include <boost/utility/string_ref.hpp>
 #endif
+#include <boost/container/string.hpp>
 
 namespace Si
 {
