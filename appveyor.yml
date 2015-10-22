@@ -26,7 +26,7 @@ before_build:
 build_script:
   - cd build-silicium
   - cmake --build . --config Release
-  - cd build-ventura
+  - cd ..\build-ventura
   - cmake --build . --config Release
   - cd ..
 
