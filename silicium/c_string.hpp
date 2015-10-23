@@ -68,10 +68,13 @@ namespace Si
 	typedef os_c_string native_path_string;
 
 #ifdef _WIN32
-#define SILICIUM_SYSTEM_LITERAL(x) L##x
+#define SILICIUM_OS_STR(x) L##x
 #else
-#define SILICIUM_SYSTEM_LITERAL(x) x
+#define SILICIUM_OS_STR(x) x
 #endif
+
+///this macro is deprecated, use SILICIUM_OS_STR directly instead
+#define SILICIUM_SYSTEM_LITERAL SILICIUM_OS_STR
 }
 
 #endif
