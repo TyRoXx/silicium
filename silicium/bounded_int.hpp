@@ -58,6 +58,12 @@ namespace Si
 			return *result;
 		}
 
+		template <Int NewMinimum, Int NewMaximum>
+		optional<bounded_int<Int, NewMinimum, NewMaximum>> narrow() const
+		{
+			return bounded_int<Int, NewMinimum, NewMaximum>::create(m_value);
+		}
+
 	private:
 		Int m_value;
 

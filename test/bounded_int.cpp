@@ -85,3 +85,17 @@ BOOST_AUTO_TEST_CASE(bounded_int_clamp_value_unchanged)
 	Si::bounded_int<int, 1, 2> out = in.clamp<1, 2>();
 	BOOST_CHECK_EQUAL(1, out.value());
 }
+
+BOOST_AUTO_TEST_CASE(bounded_int_narrow_success)
+{
+	Si::bounded_int<int, 0, 2> in = Si::bounded_int<int, 0, 2>::literal<1>();
+	Si::optional<Si::bounded_int<int, 1, 2>> out = in.narrow<1, 2>();
+	BOOST_CHECK_EQUAL((Si::bounded_int<int, 1, 2>::literal<1>()), out);
+}
+
+BOOST_AUTO_TEST_CASE(bounded_int_narrow_failure)
+{
+	Si::bounded_int<int, 0, 2> in = Si::bounded_int<int, 0, 2>::literal<0>();
+	Si::optional<Si::bounded_int<int, 1, 2>> out = in.narrow<1, 2>();
+	BOOST_CHECK_EQUAL(Si::none, out);
+}
