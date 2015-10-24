@@ -101,7 +101,34 @@ namespace Si
 	}
 
 	template <class Unsigned>
+	overflow_or<Unsigned> &operator+=(overflow_or<Unsigned> &left, Unsigned const &right)
+	{
+		if (left.is_overflow())
+		{
+			return left;
+		}
+		left = checked_add(*left.value(), right);
+		return left;
+	}
+
+	template <class Unsigned>
 	overflow_or<Unsigned> operator+(overflow_or<Unsigned> const &left, overflow_or<Unsigned> const &right)
+	{
+		overflow_or<Unsigned> result = left;
+		result += right;
+		return result;
+	}
+
+	template <class Unsigned>
+	overflow_or<Unsigned> operator+(Unsigned const &left, overflow_or<Unsigned> const &right)
+	{
+		overflow_or<Unsigned> result = right;
+		result += left;
+		return result;
+	}
+
+	template <class Unsigned>
+	overflow_or<Unsigned> operator+(overflow_or<Unsigned> const &left, Unsigned const &right)
 	{
 		overflow_or<Unsigned> result = left;
 		result += right;
