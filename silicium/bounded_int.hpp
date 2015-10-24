@@ -12,6 +12,14 @@ namespace Si
 
 		BOOST_STATIC_ASSERT(Minimum <= Maximum);
 
+		template <Int OtherMinimum, Int OtherMaximum>
+		bounded_int(bounded_int<Int, OtherMinimum, OtherMaximum> const &other)
+			: m_value(other.value())
+		{
+			BOOST_STATIC_ASSERT(OtherMinimum >= Minimum);
+			BOOST_STATIC_ASSERT(OtherMaximum <= Maximum);
+		}
+
 		static optional<bounded_int> create(Int possible_value)
 		{
 			int minimum = Minimum;

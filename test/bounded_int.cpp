@@ -48,3 +48,11 @@ BOOST_AUTO_TEST_CASE(bounded_int_format_short)
 	Si::bounded_int<short, 0, 133> zero = Si::bounded_int<short, 0, 133>::literal<133>();
 	BOOST_CHECK_EQUAL("133", boost::lexical_cast<std::string>(zero));
 }
+
+BOOST_AUTO_TEST_CASE(bounded_int_construct_from_smaller)
+{
+	Si::bounded_int<int, 0, 1> smaller = Si::bounded_int<int, 0, 1>::literal<1>();
+	Si::bounded_int<int, -1, 2> larger = smaller;
+	BOOST_CHECK_EQUAL(larger, smaller);
+	BOOST_CHECK_EQUAL(1, larger.value());
+}
