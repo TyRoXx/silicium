@@ -73,7 +73,7 @@ namespace Si
 #define SILICIUM_OS_STR(x) x
 #endif
 
-///this macro is deprecated, use SILICIUM_OS_STR directly instead
+/// this macro is deprecated, use SILICIUM_OS_STR directly instead
 #define SILICIUM_SYSTEM_LITERAL SILICIUM_OS_STR
 }
 

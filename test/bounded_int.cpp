@@ -56,3 +56,32 @@ BOOST_AUTO_TEST_CASE(bounded_int_construct_from_smaller)
 	BOOST_CHECK_EQUAL(larger, smaller);
 	BOOST_CHECK_EQUAL(1, larger.value());
 }
+
+BOOST_AUTO_TEST_CASE(bounded_int_add)
+{
+	Si::bounded_int<int, 0, 1> first = Si::bounded_int<int, 0, 1>::literal<1>();
+	Si::bounded_int<int, -1, 2> second = Si::bounded_int<int, -1, 2>::literal<2>();
+	Si::bounded_int<int, -1, 3> result = first + second;
+	BOOST_CHECK_EQUAL(3, result.value());
+}
+
+BOOST_AUTO_TEST_CASE(bounded_int_clamp_smaller_max)
+{
+	Si::bounded_int<int, 0, 1> in = Si::bounded_int<int, 0, 1>::literal<1>();
+	Si::bounded_int<int, 0, 0> out = in.clamp<0, 0>();
+	BOOST_CHECK_EQUAL(0, out.value());
+}
+
+BOOST_AUTO_TEST_CASE(bounded_int_clamp_greater_min)
+{
+	Si::bounded_int<int, 0, 1> in = Si::bounded_int<int, 0, 1>::literal<0>();
+	Si::bounded_int<int, 1, 1> out = in.clamp<1, 1>();
+	BOOST_CHECK_EQUAL(1, out.value());
+}
+
+BOOST_AUTO_TEST_CASE(bounded_int_clamp_value_unchanged)
+{
+	Si::bounded_int<int, 0, 2> in = Si::bounded_int<int, 0, 2>::literal<1>();
+	Si::bounded_int<int, 1, 2> out = in.clamp<1, 2>();
+	BOOST_CHECK_EQUAL(1, out.value());
+}

@@ -14,7 +14,7 @@ namespace Si
 
 		template <Int OtherMinimum, Int OtherMaximum>
 		bounded_int(bounded_int<Int, OtherMinimum, OtherMaximum> const &other)
-			: m_value(other.value())
+		    : m_value(other.value())
 		{
 			BOOST_STATIC_ASSERT(OtherMinimum >= Minimum);
 			BOOST_STATIC_ASSERT(OtherMaximum <= Maximum);
@@ -46,6 +46,16 @@ namespace Si
 		Int value() const
 		{
 			return m_value;
+		}
+
+		template <Int NewMinimum, Int NewMaximum>
+		bounded_int<Int, NewMinimum, NewMaximum> clamp() const
+		{
+			using std::min;
+			using std::max;
+			auto result = bounded_int<Int, NewMinimum, NewMaximum>::create(max(NewMinimum, min(NewMaximum, m_value)));
+			assert(result);
+			return *result;
 		}
 
 	private:
@@ -81,6 +91,17 @@ namespace Si
 		// Propagate char types to int by adding zero so that ostream will properly format them as numbers.
 		auto printable = (0 + value.value());
 		return out << printable;
+	}
+
+	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
+	bounded_int<Int, MinimumLeft + MinimumRight, MaximumLeft + MaximumRight>
+	operator+(bounded_int<Int, MinimumLeft, MaximumLeft> const &left,
+	          bounded_int<Int, MinimumRight, MaximumRight> const &right)
+	{
+		auto result = bounded_int<Int, MinimumLeft + MinimumRight, MaximumLeft + MaximumRight>::create(left.value() +
+		                                                                                               right.value());
+		assert(result);
+		return *result;
 	}
 }
 
