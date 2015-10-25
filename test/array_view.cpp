@@ -166,24 +166,3 @@ BOOST_AUTO_TEST_CASE(array_view_begin_end)
 	}
 	BOOST_CHECK_EQUAL(6, sum);
 }
-
-namespace
-{
-	static std::array<int, 3> arr = {{}};
-
-	struct arr_data_accessor
-	{
-		int *value() const
-		{
-			return arr.data();
-		}
-	};
-}
-
-BOOST_AUTO_TEST_CASE(array_view_static_data)
-{
-	Si::array_view<int, Si::bounded_int<std::size_t, 0, 3>, arr_data_accessor> view;
-	BOOST_STATIC_ASSERT(sizeof(std::size_t) == sizeof(view));
-	BOOST_CHECK_EQUAL(arr.data(), view.data());
-	BOOST_CHECK(view.empty());
-}

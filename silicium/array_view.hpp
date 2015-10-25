@@ -16,39 +16,8 @@ namespace Si
 #endif
 	                        > bounded_size_t;
 
-	namespace detail
-	{
-		template <class T>
-		struct value_wrapper
-		{
-			value_wrapper()
-			    : m_value()
-			{
-			}
-
-			explicit value_wrapper(T value)
-			    : m_value(value)
-			{
-			}
-
-			template <T Value>
-			static value_wrapper create()
-			{
-				return value_wrapper(Value);
-			}
-
-			T value() const
-			{
-				return m_value;
-			}
-
-		private:
-			T m_value;
-		};
-	}
-
-	template <class T, class Length = bounded_size_t, class Data = detail::value_wrapper<T *>>
-	struct array_view : private Length, private Data
+	template <class T, class Length = bounded_size_t>
+	struct array_view : private Length
 	{
 		typedef T value_type;
 		typedef typename std::remove_const<T>::type mutable_value_type;
@@ -58,48 +27,48 @@ namespace Si
 
 		array_view()
 		    : Length(Length::template literal<0>())
-		    , Data()
+		    , m_data()
 		{
 		}
 
 		array_view(value_type &begin, Length length)
 		    : Length(length)
-		    , Data(&begin)
+		    , m_data(&begin)
 		{
 		}
 
 		template <std::size_t N>
 		array_view(std::array<mutable_value_type, N> &array)
 		    : Length(Length::template literal<N>())
-		    , Data(array.data())
+		    , m_data(array.data())
 		{
 		}
 
 		template <std::size_t N>
 		array_view(std::array<mutable_value_type, N> const &array)
 		    : Length(Length::template literal<N>())
-		    , Data(array.data())
+		    , m_data(array.data())
 		{
 		}
 
 		template <std::size_t N>
 		array_view(boost::array<mutable_value_type, N> &array)
 		    : Length(Length::template literal<N>())
-		    , Data(array.data())
+		    , m_data(array.data())
 		{
 		}
 
 		template <std::size_t N>
 		array_view(boost::array<mutable_value_type, N> const &array)
 		    : Length(Length::template literal<N>())
-		    , Data(array.data())
+		    , m_data(array.data())
 		{
 		}
 
 		template <class Allocator>
 		array_view(std::vector<mutable_value_type, Allocator> &vector)
 		    : Length(*Length::create(vector.size()))
-		    , Data(vector.data())
+		    , m_data(vector.data())
 		{
 			BOOST_STATIC_ASSERT(std::is_same<bounded_size_t, Length>::value);
 		}
@@ -107,7 +76,7 @@ namespace Si
 		template <class Allocator>
 		array_view(std::vector<mutable_value_type, Allocator> const &vector)
 		    : Length(*Length::create(vector.size()))
-		    , Data(vector.data())
+		    , m_data(vector.data())
 		{
 			BOOST_STATIC_ASSERT(std::is_same<bounded_size_t, Length>::value);
 		}
@@ -129,7 +98,7 @@ namespace Si
 
 		value_type *data() const
 		{
-			return Data::value();
+			return m_data;
 		}
 
 		iterator begin() const
@@ -141,6 +110,9 @@ namespace Si
 		{
 			return data() + length().value();
 		}
+
+	private:
+		value_type *m_data;
 	};
 }
 
