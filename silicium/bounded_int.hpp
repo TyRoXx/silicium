@@ -5,8 +5,44 @@
 
 namespace Si
 {
+	namespace detail
+	{
+		template <class Int, Int Minimum, Int Maximum>
+		struct compact_int
+		{
+			explicit compact_int(Int value)
+			    : m_value(value)
+			{
+			}
+
+			Int value() const
+			{
+				return m_value;
+			}
+
+		private:
+			Int m_value;
+		};
+
+		// no need to store the value if there is only one possibility
+		template <class Int, Int Value>
+		struct compact_int<Int, Value, Value>
+		{
+			explicit compact_int(Int value)
+			{
+				assert(Value == value);
+				ignore_unused_variable_warning(value);
+			}
+
+			static Int value()
+			{
+				return Value;
+			}
+		};
+	}
+
 	template <class Int, Int Minimum, Int Maximum>
-	struct bounded_int
+	struct bounded_int : private detail::compact_int<Int, Minimum, Maximum>
 	{
 		typedef Int value_type;
 
@@ -14,7 +50,7 @@ namespace Si
 
 		template <Int OtherMinimum, Int OtherMaximum>
 		bounded_int(bounded_int<Int, OtherMinimum, OtherMaximum> const &other)
-		    : m_value(other.value())
+		    : value_base(other.value())
 		{
 			BOOST_STATIC_ASSERT(OtherMinimum >= Minimum);
 			BOOST_STATIC_ASSERT(OtherMaximum <= Maximum);
@@ -22,12 +58,12 @@ namespace Si
 
 		static optional<bounded_int> create(Int possible_value)
 		{
-			int minimum = Minimum;
+			value_type minimum = Minimum;
 			if (possible_value < minimum)
 			{
 				return none;
 			}
-			int maximum = Maximum;
+			value_type maximum = Maximum;
 			if (possible_value > maximum)
 			{
 				return none;
@@ -45,7 +81,7 @@ namespace Si
 
 		Int value() const
 		{
-			return m_value;
+			return value_base::value();
 		}
 
 		template <Int NewMinimum, Int NewMaximum>
@@ -53,7 +89,7 @@ namespace Si
 		{
 			using std::min;
 			using std::max;
-			auto result = bounded_int<Int, NewMinimum, NewMaximum>::create(max(NewMinimum, min(NewMaximum, m_value)));
+			auto result = bounded_int<Int, NewMinimum, NewMaximum>::create(max(NewMinimum, min(NewMaximum, value())));
 			assert(result);
 			return *result;
 		}
@@ -61,14 +97,14 @@ namespace Si
 		template <Int NewMinimum, Int NewMaximum>
 		optional<bounded_int<Int, NewMinimum, NewMaximum>> narrow() const
 		{
-			return bounded_int<Int, NewMinimum, NewMaximum>::create(m_value);
+			return bounded_int<Int, NewMinimum, NewMaximum>::create(value());
 		}
 
 	private:
-		Int m_value;
+		typedef detail::compact_int<Int, Minimum, Maximum> value_base;
 
 		explicit bounded_int(Int value)
-		    : m_value(value)
+		    : value_base(value)
 		{
 		}
 	};
