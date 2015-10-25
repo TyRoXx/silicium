@@ -112,6 +112,7 @@ namespace Si
 
 		template <class Input, class Transformation>
 		auto transform(Input &&input, Transformation &&transform)
+		    -> transformation<typename std::decay<Input>::type, typename std::decay<Transformation>::type>
 		{
 			return transformation<typename std::decay<Input>::type, typename std::decay<Transformation>::type>(
 			    std::forward<Input>(input), std::forward<Transformation>(transform));
