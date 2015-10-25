@@ -6,6 +6,22 @@ BOOST_STATIC_ASSERT(sizeof(int *) == sizeof(Si::array_view<int, Si::bounded_int<
 
 BOOST_STATIC_ASSERT((2 * sizeof(int *)) == sizeof(Si::array_view<int, Si::bounded_int<std::size_t, 1, 2>>));
 
+BOOST_AUTO_TEST_CASE(array_view_default_constructor)
+{
+	{
+		Si::array_view<int> arr;
+		BOOST_CHECK(arr.empty());
+		BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), arr.data());
+		BOOST_CHECK_EQUAL(0, arr.length().value());
+	}
+	{
+		Si::array_view<int, Si::bounded_int<std::size_t, 0, 100>> arr;
+		BOOST_CHECK(arr.empty());
+		BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), arr.data());
+		BOOST_CHECK_EQUAL(0, arr.length().value());
+	}
+}
+
 BOOST_AUTO_TEST_CASE(array_view_from_std_array)
 {
 	std::array<int, 1> a1;
@@ -149,4 +165,25 @@ BOOST_AUTO_TEST_CASE(array_view_begin_end)
 		sum += e;
 	}
 	BOOST_CHECK_EQUAL(6, sum);
+}
+
+namespace
+{
+	static std::array<int, 3> arr = {{}};
+
+	struct arr_data_accessor
+	{
+		int *value() const
+		{
+			return arr.data();
+		}
+	};
+}
+
+BOOST_AUTO_TEST_CASE(array_view_static_data)
+{
+	Si::array_view<int, Si::bounded_int<std::size_t, 0, 3>, arr_data_accessor> view;
+	BOOST_STATIC_ASSERT(sizeof(std::size_t) == sizeof(view));
+	BOOST_CHECK_EQUAL(arr.data(), view.data());
+	BOOST_CHECK(view.empty());
 }

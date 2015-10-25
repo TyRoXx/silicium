@@ -58,7 +58,7 @@ namespace Si
 
 		array_view()
 		    : Length(Length::template literal<0>())
-		    , Data(nullptr)
+		    , Data()
 		{
 		}
 
