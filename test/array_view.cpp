@@ -137,3 +137,16 @@ BOOST_AUTO_TEST_CASE(array_view_default_length_type_const)
 		BOOST_CHECK_EQUAL(5, v.length().value());
 	}
 }
+
+BOOST_AUTO_TEST_CASE(array_view_begin_end)
+{
+	std::array<int, 3> const arr = {{1, 2, 3}};
+	Si::array_view<int const> view = arr;
+	BOOST_CHECK_EQUAL_COLLECTIONS(arr.begin(), arr.end(), view.begin(), view.end());
+	int sum = 0;
+	for (int e : view)
+	{
+		sum += e;
+	}
+	BOOST_CHECK_EQUAL(6, sum);
+}
