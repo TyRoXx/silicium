@@ -52,6 +52,9 @@ namespace Si
 	{
 		typedef T value_type;
 		typedef typename std::remove_const<T>::type mutable_value_type;
+		typedef T *iterator;
+		typedef T *const_iterator;
+		typedef typename Length::value_type size_type;
 
 		array_view()
 		    : Length(Length::template literal<0>())
@@ -59,7 +62,7 @@ namespace Si
 		{
 		}
 
-		array_view(T &begin, Length length)
+		array_view(value_type &begin, Length length)
 		    : Length(length)
 		    , Data(&begin)
 		{
@@ -119,22 +122,22 @@ namespace Si
 			return length().value() == 0;
 		}
 
-		iterator_range<T *> to_range() const
+		iterator_range<value_type *> to_range() const
 		{
 			return make_iterator_range(begin(), end());
 		}
 
-		T *data() const
+		value_type *data() const
 		{
 			return Data::value();
 		}
 
-		T *begin() const
+		iterator begin() const
 		{
 			return data();
 		}
 
-		T *end() const
+		iterator end() const
 		{
 			return data() + length().value();
 		}
