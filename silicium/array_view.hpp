@@ -111,6 +111,13 @@ namespace Si
 			return data() + length().value();
 		}
 
+		template <std::size_t MinIndex, std::size_t MaxIndex>
+		value_type &operator[](bounded_int<std::size_t, MinIndex, MaxIndex> index) const
+		{
+			BOOST_STATIC_ASSERT((is_always_less<decltype(index), Length>::value));
+			return data()[index.value()];
+		}
+
 	private:
 		value_type *m_data;
 	};

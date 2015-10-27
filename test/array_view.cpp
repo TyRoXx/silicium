@@ -166,3 +166,14 @@ BOOST_AUTO_TEST_CASE(array_view_begin_end)
 	}
 	BOOST_CHECK_EQUAL(6, sum);
 }
+
+BOOST_AUTO_TEST_CASE(array_view_index_operator)
+{
+	std::array<int, 3> const arr = {{1, 2, -3}};
+	typedef Si::bounded_int<std::size_t, 3, 3> length;
+	typedef Si::bounded_int<std::size_t, 0, 2> index;
+	Si::array_view<int const, length> const view = arr;
+	BOOST_CHECK_EQUAL(1, view[index::literal<0>()]);
+	BOOST_CHECK_EQUAL(2, view[index::literal<1>()]);
+	BOOST_CHECK_EQUAL(-3, view[index::literal<2>()]);
+}
