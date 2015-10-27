@@ -20,6 +20,7 @@ namespace Si
 	struct array_view : private Length
 	{
 		typedef T value_type;
+		typedef Length length_type;
 		typedef typename std::remove_const<T>::type mutable_value_type;
 		typedef T *iterator;
 		typedef T *const_iterator;
@@ -121,6 +122,42 @@ namespace Si
 	private:
 		value_type *m_data;
 	};
+
+	template <class T, std::size_t N>
+	array_view<T, bounded_int<std::size_t, N, N>> make_array_view(std::array<T, N> &array)
+	{
+		return array_view<T, bounded_int<std::size_t, N, N>>(array);
+	}
+
+	template <class T, std::size_t N>
+	array_view<T const, bounded_int<std::size_t, N, N>> make_array_view(std::array<T, N> const &array)
+	{
+		return array_view<T const, bounded_int<std::size_t, N, N>>(array);
+	}
+
+	template <class T, std::size_t N>
+	array_view<T, bounded_int<std::size_t, N, N>> make_array_view(boost::array<T, N> &array)
+	{
+		return array_view<T, bounded_int<std::size_t, N, N>>(array);
+	}
+
+	template <class T, std::size_t N>
+	array_view<T const, bounded_int<std::size_t, N, N>> make_array_view(boost::array<T, N> const &array)
+	{
+		return array_view<T const, bounded_int<std::size_t, N, N>>(array);
+	}
+
+	template <class T, class Allocator>
+	array_view<T, bounded_size_t> make_array_view(std::vector<T, Allocator> &vector)
+	{
+		return array_view<T, bounded_size_t>(vector);
+	}
+
+	template <class T, class Allocator>
+	array_view<T const, bounded_size_t> make_array_view(std::vector<T, Allocator> const &vector)
+	{
+		return array_view<T const, bounded_size_t>(vector);
+	}
 }
 
 #endif

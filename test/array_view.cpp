@@ -177,3 +177,31 @@ BOOST_AUTO_TEST_CASE(array_view_index_operator)
 	BOOST_CHECK_EQUAL(2, view[index::literal<1>()]);
 	BOOST_CHECK_EQUAL(-3, view[index::literal<2>()]);
 }
+
+BOOST_AUTO_TEST_CASE(make_array_view)
+{
+	{
+		std::array<int, 3> std_arr = {{1, 2, -3}};
+		Si::array_view<int, Si::bounded_int<std::size_t, 3, 3>> view = Si::make_array_view(std_arr);
+
+		boost::array<int, 3> boost_arr = {{1, 2, -3}};
+		view = Si::make_array_view(boost_arr);
+	}
+	std::vector<int> vector(7);
+	Si::array_view<int, Si::bounded_size_t> view = Si::make_array_view(vector);
+	BOOST_CHECK_EQUAL(vector.size(), view.length().value());
+}
+
+BOOST_AUTO_TEST_CASE(make_array_view_const)
+{
+	{
+		std::array<int, 3> const std_arr = {{1, 2, -3}};
+		Si::array_view<int const, Si::bounded_int<std::size_t, 3, 3>> view = Si::make_array_view(std_arr);
+
+		boost::array<int, 3> const boost_arr = {{1, 2, -3}};
+		view = Si::make_array_view(boost_arr);
+	}
+	std::vector<int> const vector(7);
+	Si::array_view<int const, Si::bounded_size_t> view = Si::make_array_view(vector);
+	BOOST_CHECK_EQUAL(vector.size(), view.length().value());
+}
