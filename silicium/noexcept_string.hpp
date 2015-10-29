@@ -49,7 +49,7 @@ namespace Si
 #endif
 
 	template <class String = noexcept_string>
-	inline String to_utf8_string(char const *utf8)
+	String to_utf8_string(char const *utf8)
 	{
 		return utf8;
 	}
@@ -83,7 +83,7 @@ namespace Si
 	}
 
 	template <class String = noexcept_string>
-	inline String to_utf8_string(std::string const &utf8)
+	String to_utf8_string(std::string const &utf8)
 	{
 #ifdef _WIN32
 		return utf8;
@@ -93,7 +93,7 @@ namespace Si
 	}
 
 	template <class String = noexcept_string>
-	inline String to_utf8_string(boost::container::string const &utf8)
+	String to_utf8_string(boost::container::string const &utf8)
 	{
 		return detail::convert_range<String>(utf8);
 	}
