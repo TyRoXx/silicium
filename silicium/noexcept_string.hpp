@@ -48,7 +48,8 @@ namespace Si
 	}
 #endif
 
-	inline noexcept_string to_utf8_string(char const *utf8)
+	template <class String = noexcept_string>
+	inline String to_utf8_string(char const *utf8)
 	{
 		return utf8;
 	}
@@ -81,18 +82,20 @@ namespace Si
 		}
 	}
 
-	inline noexcept_string to_utf8_string(std::string const &utf8)
+	template <class String = noexcept_string>
+	inline String to_utf8_string(std::string const &utf8)
 	{
 #ifdef _WIN32
 		return utf8;
 #else
-		return detail::convert_range<noexcept_string>(utf8);
+		return detail::convert_range<String>(utf8);
 #endif
 	}
 
-	inline noexcept_string to_utf8_string(boost::container::string const &utf8)
+	template <class String = noexcept_string>
+	inline String to_utf8_string(boost::container::string const &utf8)
 	{
-		return detail::convert_range<noexcept_string>(utf8);
+		return detail::convert_range<String>(utf8);
 	}
 }
 
