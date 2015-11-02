@@ -150,7 +150,8 @@ namespace Si
 	struct is_always_less;
 
 	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
-	struct is_always_less<bounded_int<Int, MinimumLeft, MaximumLeft>, bounded_int<Int, MinimumRight, MaximumRight>> : std::integral_constant<bool, (MaximumLeft < MinimumRight)>
+	struct is_always_less<bounded_int<Int, MinimumLeft, MaximumLeft>, bounded_int<Int, MinimumRight, MaximumRight>>
+	    : std::integral_constant<bool, (MaximumLeft < MinimumRight)>
 	{
 		BOOST_STATIC_ASSERT(MinimumLeft <= MaximumLeft);
 		BOOST_STATIC_ASSERT(MinimumRight <= MaximumRight);
