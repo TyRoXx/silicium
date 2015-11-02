@@ -7,7 +7,10 @@
 namespace Si
 {
 	template <class Source, class Sink>
-	void copy(Source &&from, Sink &&to)
+	typename std::enable_if<std::is_convertible<typename std::decay<Source>::type::element_type,
+	                                            typename std::decay<Sink>::type::element_type>::value,
+	                        void>::type
+	copy(Source &&from, Sink &&to)
 	{
 		for (;;)
 		{
