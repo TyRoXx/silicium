@@ -11,10 +11,9 @@
 namespace Si
 {
 	template <class Sink, class Element>
-	auto append(Sink &&out, std::basic_string<Element> const &str)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> typename error_type<Sink>::type
-#endif
+	typename boost::disable_if<std::is_same<typename std::decay<Sink>::type::element_type, std::basic_string<Element>>,
+	                           typename error_type<Sink>::type>::type
+	append(Sink &&out, std::basic_string<Element> const &str)
 	{
 		return out.append(make_iterator_range(str.data(), str.data() + str.size()));
 	}
@@ -40,16 +39,15 @@ namespace Si
 #endif
 
 	template <class Sink, class Element>
-	auto append(Sink &&out, Element const *c_str)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> typename error_type<Sink>::type
-#endif
+	typename std::enable_if<std::is_same<Element, typename std::decay<Sink>::type::element_type>::value,
+	                        typename error_type<Sink>::type>::type
+	append(Sink &&out, Element const *c_str)
 	{
 		return out.append(make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
 	}
 
-	template <class Sink, class Element>
-	auto append(Sink &&out, Element const &single)
+	template <class Sink>
+	auto append(Sink &&out, typename std::decay<Sink>::type::element_type const &single)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	    -> typename error_type<Sink>::type
 #endif
