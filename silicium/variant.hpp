@@ -881,7 +881,7 @@ namespace Si
 			}
 
 		private:
-			Head *m_head;
+			typename std::remove_reference<Head>::type *m_head;
 		};
 
 		template <class Result, class Head, class... Tail>
@@ -904,7 +904,7 @@ namespace Si
 			}
 
 		private:
-			Head *m_head;
+			typename std::remove_reference<Head>::type *m_head;
 		};
 	}
 

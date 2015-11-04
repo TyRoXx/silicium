@@ -47,6 +47,12 @@ namespace Si
 			typedef Argument type;
 		};
 
+		template <class Result, class Argument>
+		struct argument_of<Result (&)(Argument)>
+		{
+			typedef Argument type;
+		};
+
 		struct test_class
 		{
 			void operator()(int);
