@@ -20,7 +20,7 @@ before_build:
   - cd ..
   - mkdir build-ventura
   - cd build-ventura
-  - cmake -G "Visual Studio 12" -DBOOST_ROOT=c:\Libraries\boost -DSILICIUM_INCLUDE_DIR=.. ../ventura
+  - cmake -G "Visual Studio 14" -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DBOOST_LIBRARYDIR=C:\Libraries\boost_1_59_0\lib32-msvc-14.0 -DSILICIUM_INCLUDE_DIR=.. ../ventura
   - cd ..
 
 build_script:
