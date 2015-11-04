@@ -16,7 +16,7 @@ before_build:
   - git clone https://github.com/TyRoXx/ventura.git
   - mkdir build-silicium
   - cd build-silicium
-  - cmake -G "Visual Studio 12" -DBOOST_ROOT=c:\Libraries\boost ..
+  - cmake -G "Visual Studio 14" -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DBOOST_LIBRARYDIR=C:\Libraries\boost_1_59_0\lib32-msvc-14.0 ..
   - cd ..
   - mkdir build-ventura
   - cd build-ventura
