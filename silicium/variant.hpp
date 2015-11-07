@@ -145,6 +145,16 @@ namespace Si
 				m_which = value;
 			}
 
+			void set_invalid() BOOST_NOEXCEPT
+			{
+				m_which = invalid_which;
+			}
+
+			bool is_valid() const BOOST_NOEXCEPT
+			{
+				return m_which != invalid_which;
+			}
+
 			char &storage() BOOST_NOEXCEPT
 			{
 				return reinterpret_cast<char &>(m_storage);
@@ -156,14 +166,61 @@ namespace Si
 			}
 
 		private:
+			enum
+			{
+				invalid_which = 255
+			};
 			union_<T...> m_storage;
 			which_type m_which;
 		};
 
+		template <class T>
+		struct can_ever_be_invalid : std::integral_constant<bool, !std::is_pod<T>::value>
+		{
+		};
+
+		struct never_invalid
+		{
+			void set_invalid()
+			{
+				SILICIUM_UNREACHABLE();
+			}
+
+			bool is_valid() const
+			{
+				return true;
+			}
+		};
+
+		struct sometimes_invalid
+		{
+			sometimes_invalid()
+				: m_is_valid(true)
+			{
+			}
+
+			void set_invalid() BOOST_NOEXCEPT
+			{
+				m_is_valid = false;
+			}
+
+			bool is_valid() const BOOST_NOEXCEPT
+			{
+				return m_is_valid;
+			}
+
+		private:
+			bool m_is_valid;
+		};
+
 		template <class Single>
-		struct combined_storage<Single>
+		struct combined_storage<Single> : public std::conditional<can_ever_be_invalid<Single>::value, sometimes_invalid, never_invalid>::type
 		{
 			typedef unsigned char which_type;
+
+			combined_storage()
+			{
+			}
 
 			which_type which() const BOOST_NOEXCEPT
 			{
@@ -201,7 +258,7 @@ namespace Si
 		}
 
 		template <class T>
-		void move_construct_storage(void *destination, void *source) BOOST_NOEXCEPT
+		void move_construct_storage(void *destination, void *source)
 		{
 			auto &dest = *static_cast<T *>(destination);
 			auto &src = *static_cast<T *>(source);
@@ -367,6 +424,10 @@ namespace Si
 
 			~variant_base() BOOST_NOEXCEPT
 			{
+				if (!this->is_valid())
+				{
+					return;
+				}
 				destroy_storage(this->which(), this->storage());
 			}
 
@@ -392,6 +453,28 @@ namespace Si
 			}
 
 			template <class U, class CleanU = typename std::decay<U>::type,
+					  std::size_t Index = index_of<CleanU, T...>::value,
+					  class NoFastVariant = typename std::enable_if<
+						  boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
+										   boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
+						  void>::type>
+			variant_base &operator=(U &&value)
+			{
+				destroy_storage(this->which(), this->storage());
+				try
+				{
+					this->move_or_copy_construct_storage(this->storage(), std::forward<U>(value), std::is_const<typename std::remove_reference<U>::type>());
+				}
+				catch (...)
+				{
+					this->set_invalid();
+					throw;
+				}
+				this->set_which(Index);
+				return *this;
+			}
+
+			template <class U, class CleanU = typename std::decay<U>::type,
 			          std::size_t Index = index_of<CleanU, T...>::value,
 			          class NoFastVariant = typename std::enable_if<
 			              boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
@@ -412,7 +495,13 @@ namespace Si
 
 			which_type which() const BOOST_NOEXCEPT
 			{
+				assert(is_valid());
 				return m_storage.which();
+			}
+
+			bool is_valid() const BOOST_NOEXCEPT
+			{
+				return m_storage.is_valid();
 			}
 
 			template <class Visitor>
@@ -483,11 +572,28 @@ namespace Si
 				m_storage.which(static_cast<unsigned char>(w));
 			}
 
-			static void move_construct_storage(which_type which, char &destination, char &source) BOOST_NOEXCEPT
+			void set_invalid()
+			{
+				m_storage.set_invalid();
+			}
+
+			static void move_construct_storage(which_type which, char &destination, char &source)
 			{
 				static std::array<void (*)(void *, void *), sizeof...(T)> const f = {
 				    {&detail::move_construct_storage<T>...}};
 				f[which](&destination, &source);
+			}
+
+			template <class From>
+			static void move_or_copy_construct_storage(char &destination, From &&from, std::false_type)
+			{
+				detail::move_construct_storage<typename std::decay<From>::type>(&destination, &from);
+			}
+
+			template <class From>
+			static void move_or_copy_construct_storage(char &destination, From const &from, std::true_type)
+			{
+				detail::copy_construct_storage<From>(&destination, &from);
 			}
 
 			static void destroy_storage(which_type which, char &destroyed) BOOST_NOEXCEPT
@@ -550,6 +656,18 @@ namespace Si
 				base::operator=(std::move(other));
 				return *this;
 			}
+
+					  template <class U, class CleanU = typename std::decay<U>::type,
+								std::size_t Index = index_of<CleanU, T...>::value,
+								class NoFastVariant = typename std::enable_if<
+									boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
+													 boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
+									void>::type>
+			  variant_base &operator=(U &&value)
+			  {
+				  base::operator=(std::forward<U>(value));
+				  return *this;
+			  }
 
 			variant_base &operator=(variant_base const &other)
 			{

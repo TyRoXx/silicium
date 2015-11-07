@@ -612,7 +612,7 @@ BOOST_AUTO_TEST_CASE(variant_const_try_get_ptr)
 
 BOOST_AUTO_TEST_CASE(variant_sizeof)
 {
-	BOOST_CHECK_EQUAL(sizeof(std::string), sizeof(Si::variant<std::string>));
+	BOOST_CHECK_EQUAL((sizeof(std::string) + sizeof(std::ptrdiff_t)), sizeof(Si::variant<std::string>));
 	BOOST_CHECK_EQUAL(sizeof(boost::uint8_t), sizeof(Si::variant<boost::uint8_t>));
 	BOOST_CHECK_EQUAL(sizeof(boost::uint16_t), sizeof(Si::variant<boost::uint16_t>));
 	BOOST_CHECK_EQUAL(sizeof(boost::uint32_t), sizeof(Si::variant<boost::uint32_t>));
@@ -639,5 +639,40 @@ BOOST_AUTO_TEST_CASE(variant_recursive)
 	tree::base t;
 	t = leaf();
 	t = std::vector<tree>();
+}
+
+struct throws_on_move_exception : std::runtime_error
+{
+	throws_on_move_exception()
+		: std::runtime_error("throws_on_move_exception")
+	{
+	}
+};
+
+struct throws_on_move
+{
+	throws_on_move()
+	{
+	}
+
+	throws_on_move(throws_on_move &&)
+	{
+		throw throws_on_move_exception();
+	}
+
+	SILICIUM_DELETED_FUNCTION(throws_on_move &operator = (throws_on_move &&))
+};
+
+BOOST_AUTO_TEST_CASE(variant_move_throws)
+{
+	std::shared_ptr<int> content = std::make_shared<int>(123);
+	std::weak_ptr<int> weak_content = content;
+	Si::variant<std::shared_ptr<int>, throws_on_move> v = content;
+	BOOST_CHECK_EQUAL(2, weak_content.use_count());
+	content.reset();
+	BOOST_CHECK_EQUAL(1, weak_content.use_count());
+	BOOST_CHECK_EXCEPTION(v = throws_on_move(), throws_on_move_exception, [](throws_on_move_exception const &) { return true; });
+	BOOST_CHECK_EQUAL(0, weak_content.use_count());
+	BOOST_CHECK(!v.is_valid());
 }
 #endif
