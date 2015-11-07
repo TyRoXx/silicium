@@ -14,6 +14,7 @@
 #include <boost/mpl/contains.hpp>
 #include <boost/optional.hpp>
 #include <boost/type_traits.hpp>
+#include <boost/throw_exception.hpp>
 
 #define SILICIUM_HAS_VARIANT SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 
