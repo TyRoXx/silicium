@@ -649,6 +649,7 @@ struct throws_on_move_exception : std::runtime_error
 	}
 };
 
+#if SILICIUM_HAS_EXCEPTIONS
 struct throws_on_move
 {
 	throws_on_move()
@@ -691,4 +692,6 @@ BOOST_AUTO_TEST_CASE(variant_move_throws)
 		                      return true;
 		                  });
 }
+#endif
+
 #endif

@@ -471,16 +471,20 @@ namespace Si
 			variant_base &operator=(U &&value)
 			{
 				destroy_storage(this->which(), this->storage());
+#if SILICIUM_HAS_EXCEPTIONS
 				try
+#endif
 				{
 					this->move_or_copy_construct_storage(this->storage(), std::forward<U>(value),
 					                                     std::is_const<typename std::remove_reference<U>::type>());
 				}
+#if SILICIUM_HAS_EXCEPTIONS
 				catch (...)
 				{
 					this->set_invalid();
 					throw;
 				}
+#endif
 				this->set_which(Index);
 				return *this;
 			}
