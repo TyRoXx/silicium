@@ -31,6 +31,14 @@ namespace Si
 	{
 	};
 
+	struct invalid_variant_exception : std::logic_error
+	{
+		invalid_variant_exception()
+		    : std::logic_error("invalid_variant_exception")
+		{
+		}
+	};
+
 	namespace detail
 	{
 		template <class... T>
@@ -509,6 +517,7 @@ namespace Si
 			template <class Visitor>
 			auto apply_visitor(Visitor &&visitor) -> typename std::decay<Visitor>::type::result_type
 			{
+				throw_if_invalid();
 				typedef typename std::decay<Visitor>::type::result_type result;
 				static std::array<result (*)(Visitor &&, void *), sizeof...(T)> const f{
 				    {&apply_visitor_impl<Visitor, T, result>...}};
@@ -518,6 +527,7 @@ namespace Si
 			template <class Visitor>
 			auto apply_visitor(Visitor &&visitor) const -> typename std::decay<Visitor>::type::result_type
 			{
+				throw_if_invalid();
 				typedef typename std::decay<Visitor>::type::result_type result;
 				static std::array<result (*)(Visitor &&, void const *), sizeof...(T)> const f{
 				    {&apply_visitor_const_impl<Visitor, T, result>...}};
@@ -559,24 +569,33 @@ namespace Si
 
 			storage_type m_storage;
 
-			char &storage()
+			char &storage() BOOST_NOEXCEPT
 			{
 				return m_storage.storage();
 			}
 
-			char const &storage() const
+			char const &storage() const BOOST_NOEXCEPT
 			{
 				return m_storage.storage();
 			}
 
-			void set_which(which_type w)
+			void set_which(which_type w) BOOST_NOEXCEPT
 			{
 				m_storage.which(static_cast<unsigned char>(w));
 			}
 
-			void set_invalid()
+			void set_invalid() BOOST_NOEXCEPT
 			{
 				m_storage.set_invalid();
+			}
+
+			void throw_if_invalid() const
+			{
+				if (is_valid())
+				{
+					return;
+				}
+				boost::throw_exception(invalid_variant_exception());
 			}
 
 			static void move_construct_storage(which_type which, char &destination, char &source)

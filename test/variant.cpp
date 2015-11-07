@@ -663,6 +663,14 @@ struct throws_on_move
 	SILICIUM_DELETED_FUNCTION(throws_on_move &operator=(throws_on_move &&))
 };
 
+struct null_visitor : boost::static_visitor<void>
+{
+	template <class T>
+	void operator()(T &&) const
+	{
+	}
+};
+
 BOOST_AUTO_TEST_CASE(variant_move_throws)
 {
 	std::shared_ptr<int> content = std::make_shared<int>(123);
@@ -677,5 +685,10 @@ BOOST_AUTO_TEST_CASE(variant_move_throws)
 		                  });
 	BOOST_CHECK_EQUAL(0, weak_content.use_count());
 	BOOST_CHECK(!v.is_valid());
+	BOOST_CHECK_EXCEPTION(Si::apply_visitor(null_visitor(), v), Si::invalid_variant_exception,
+	                      [](Si::invalid_variant_exception const &)
+	                      {
+		                      return true;
+		                  });
 }
 #endif
