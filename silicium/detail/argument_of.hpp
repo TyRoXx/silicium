@@ -48,7 +48,7 @@ namespace Si
 		};
 
 		template <class Result, class Argument>
-		struct argument_of<Result (&)(Argument)>
+		struct argument_of<Result(&)(Argument)>
 		{
 			typedef Argument type;
 		};

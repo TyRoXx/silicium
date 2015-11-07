@@ -644,7 +644,7 @@ BOOST_AUTO_TEST_CASE(variant_recursive)
 struct throws_on_move_exception : std::runtime_error
 {
 	throws_on_move_exception()
-		: std::runtime_error("throws_on_move_exception")
+	    : std::runtime_error("throws_on_move_exception")
 	{
 	}
 };
@@ -660,7 +660,7 @@ struct throws_on_move
 		throw throws_on_move_exception();
 	}
 
-	SILICIUM_DELETED_FUNCTION(throws_on_move &operator = (throws_on_move &&))
+	SILICIUM_DELETED_FUNCTION(throws_on_move &operator=(throws_on_move &&))
 };
 
 BOOST_AUTO_TEST_CASE(variant_move_throws)
@@ -671,7 +671,10 @@ BOOST_AUTO_TEST_CASE(variant_move_throws)
 	BOOST_CHECK_EQUAL(2, weak_content.use_count());
 	content.reset();
 	BOOST_CHECK_EQUAL(1, weak_content.use_count());
-	BOOST_CHECK_EXCEPTION(v = throws_on_move(), throws_on_move_exception, [](throws_on_move_exception const &) { return true; });
+	BOOST_CHECK_EXCEPTION(v = throws_on_move(), throws_on_move_exception, [](throws_on_move_exception const &)
+	                      {
+		                      return true;
+		                  });
 	BOOST_CHECK_EQUAL(0, weak_content.use_count());
 	BOOST_CHECK(!v.is_valid());
 }

@@ -195,7 +195,7 @@ namespace Si
 		struct sometimes_invalid
 		{
 			sometimes_invalid()
-				: m_is_valid(true)
+			    : m_is_valid(true)
 			{
 			}
 
@@ -214,7 +214,8 @@ namespace Si
 		};
 
 		template <class Single>
-		struct combined_storage<Single> : public std::conditional<can_ever_be_invalid<Single>::value, sometimes_invalid, never_invalid>::type
+		struct combined_storage<Single>
+		    : public std::conditional<can_ever_be_invalid<Single>::value, sometimes_invalid, never_invalid>::type
 		{
 			typedef unsigned char which_type;
 
@@ -453,17 +454,18 @@ namespace Si
 			}
 
 			template <class U, class CleanU = typename std::decay<U>::type,
-					  std::size_t Index = index_of<CleanU, T...>::value,
-					  class NoFastVariant = typename std::enable_if<
-						  boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
-										   boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
-						  void>::type>
+			          std::size_t Index = index_of<CleanU, T...>::value,
+			          class NoFastVariant = typename std::enable_if<
+			              boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
+			                               boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
+			              void>::type>
 			variant_base &operator=(U &&value)
 			{
 				destroy_storage(this->which(), this->storage());
 				try
 				{
-					this->move_or_copy_construct_storage(this->storage(), std::forward<U>(value), std::is_const<typename std::remove_reference<U>::type>());
+					this->move_or_copy_construct_storage(this->storage(), std::forward<U>(value),
+					                                     std::is_const<typename std::remove_reference<U>::type>());
 				}
 				catch (...)
 				{
@@ -657,17 +659,17 @@ namespace Si
 				return *this;
 			}
 
-					  template <class U, class CleanU = typename std::decay<U>::type,
-								std::size_t Index = index_of<CleanU, T...>::value,
-								class NoFastVariant = typename std::enable_if<
-									boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
-													 boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
-									void>::type>
-			  variant_base &operator=(U &&value)
-			  {
-				  base::operator=(std::forward<U>(value));
-				  return *this;
-			  }
+			template <class U, class CleanU = typename std::decay<U>::type,
+			          std::size_t Index = index_of<CleanU, T...>::value,
+			          class NoFastVariant = typename std::enable_if<
+			              boost::mpl::and_<boost::mpl::not_<std::is_base_of<variant_base, CleanU>>,
+			                               boost::mpl::bool_<(index_of<CleanU, T...>::value < sizeof...(T))>>::value,
+			              void>::type>
+			variant_base &operator=(U &&value)
+			{
+				base::operator=(std::forward<U>(value));
+				return *this;
+			}
 
 			variant_base &operator=(variant_base const &other)
 			{
