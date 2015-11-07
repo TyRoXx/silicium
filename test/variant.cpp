@@ -1,6 +1,7 @@
 #include <silicium/variant.hpp>
 #include <silicium/config.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/noexcept_string.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <boost/container/string.hpp>
 #include <boost/variant/static_visitor.hpp>
@@ -11,17 +12,6 @@
 #if SILICIUM_HAS_VARIANT
 namespace Si
 {
-#ifdef _MSC_VER
-	// boost::container::string is broken in Boost 1.55 with Visual C++ 2013.
-	// std::string is not nothrow_default_constructible, but that does not matter because VC++ 2013 cannot detect that
-	// anyway.
-	typedef std::string noexcept_string;
-#elif BOOST_VERSION >= 105300
-	typedef boost::container::string noexcept_string;
-#else
-	typedef char const *noexcept_string;
-#endif
-
 	BOOST_AUTO_TEST_CASE(variant_single)
 	{
 		variant<int> v;
