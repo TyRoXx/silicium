@@ -61,10 +61,9 @@ namespace Si
 			}
 			int const output_size = MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), nullptr, 0);
 			assert(output_size >= 0);
-			if (output_size == 0)
+			if ((length > 0) && (output_size == 0))
 			{
-				assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
-				throw std::invalid_argument("Input string is not UTF-8");
+				throw_last_error();
 			}
 			winapi_string result;
 			result.resize(static_cast<size_t>(output_size));
