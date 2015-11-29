@@ -1054,7 +1054,7 @@ namespace Si
 
 #if SILICIUM_GCC46
 	template <class Result, class Variant, class... Visitors>
-	Result visit(Variant &variant, Visitors &&... visitors)
+	Result visit(Variant &&variant, Visitors &&... visitors)
 	{
 		detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
