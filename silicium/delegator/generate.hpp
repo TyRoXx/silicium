@@ -8,14 +8,14 @@
 	struct name                                                                                                        \
 	{
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
-#define DELEGATOR_METHOD(name, result, ...)
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)
 
 #include DELEGATOR_INCLUDE
 
 #undef DELEGATOR_TEMPLATE
 #undef DELEGATOR_NAME
 #undef DELEGATOR_TYPEDEF
-#undef DELEGATOR_METHOD
+#undef DELEGATOR_BASIC_METHOD
 
 // abstract base class:
 
@@ -27,7 +27,7 @@
 		{                                                                                                              \
 		}
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
-#define DELEGATOR_METHOD(name, result, ...) virtual auto name(__VA_ARGS__)->result = 0;
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) virtual auto name(__VA_ARGS__)->result constness = 0;
 
 #include DELEGATOR_INCLUDE
 }
@@ -36,7 +36,7 @@
 #undef DELEGATOR_TEMPLATE
 #undef DELEGATOR_NAME
 #undef DELEGATOR_TYPEDEF
-#undef DELEGATOR_METHOD
+#undef DELEGATOR_BASIC_METHOD
 
 // eraser:
 
@@ -55,15 +55,15 @@
                                                                                                                        \
 	public:
 #define DELEGATOR_TYPEDEF(...)
-#define DELEGATOR_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
-#define DELEGATOR_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
-#define DELEGATOR_METHOD(name, result, ...)                                                                            \
+#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
+#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
 	virtual auto name(                                                                                                 \
-	    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_METHOD_DETAIL_PARAMETER, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)))        \
-	    ->result SILICIUM_OVERRIDE                                                                                              \
+	    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)))  \
+	    ->result constness SILICIUM_OVERRIDE                                                                           \
 	{                                                                                                                  \
-		return m_impl.name(                                                                                            \
-		    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_METHOD_DETAIL_FORWARD, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));     \
+		return m_impl.name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _,                          \
+		                                            BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));                          \
 	}
 
 #include DELEGATOR_INCLUDE
@@ -79,9 +79,9 @@ static eraser<typename std::decay<Impl>::type> erase(Impl &&impl)
 #undef DELEGATOR_TEMPLATE
 #undef DELEGATOR_NAME
 #undef DELEGATOR_TYPEDEF
-#undef DELEGATOR_METHOD_DETAIL_PARAMETER
-#undef DELEGATOR_METHOD_DETAIL_FORWARD
-#undef DELEGATOR_METHOD
+#undef DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER
+#undef DELEGATOR_BASIC_METHOD_DETAIL_FORWARD
+#undef DELEGATOR_BASIC_METHOD
 
 struct fat_ref
 {
@@ -94,24 +94,24 @@ struct fat_ref
 #define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
 #define DELEGATOR_TYPEDEF(...)
-#define DELEGATOR_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
-#define DELEGATOR_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
-#define DELEGATOR_METHOD(name, result, ...)                                                                            \
-	[](void *impl, BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_METHOD_DETAIL_PARAMETER, _,                                      \
-	                                        BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) -> result                         \
+#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
+#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
+	[](void constness *impl, BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                      \
+	                                                  BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) -> result               \
 	{                                                                                                                  \
-		return static_cast<Impl *>(impl)->name(                                                                        \
-		    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_METHOD_DETAIL_FORWARD, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));     \
-	}
+		return static_cast<Impl constness *>(impl)->name(BOOST_PP_LIST_FOR_EACH_I(                                     \
+		    DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));                        \
+	},
 
 #include DELEGATOR_INCLUDE
 
 #undef DELEGATOR_TEMPLATE
 #undef DELEGATOR_NAME
 #undef DELEGATOR_TYPEDEF
-#undef DELEGATOR_METHOD_DETAIL_PARAMETER
-#undef DELEGATOR_METHOD_DETAIL_FORWARD
-#undef DELEGATOR_METHOD
+#undef DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER
+#undef DELEGATOR_BASIC_METHOD_DETAIL_FORWARD
+#undef DELEGATOR_BASIC_METHOD
 		};
 		m_virtuals = &instance;
 	}
@@ -121,13 +121,13 @@ struct fat_ref
 #define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
-#define DELEGATOR_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
-#define DELEGATOR_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
-#define DELEGATOR_METHOD(name, result, ...)                                                                            \
-	result name(                                                                                                       \
-	    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_METHOD_DETAIL_PARAMETER, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)))        \
+#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
+#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
+	auto name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                                     \
+	                                   BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) constness->result                      \
 	{                                                                                                                  \
-		return m_virtuals->name(m_impl, BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_METHOD_DETAIL_FORWARD, _,                   \
+		return m_virtuals->name(m_impl, BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _,             \
 		                                                         BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));             \
 	}
 
@@ -136,9 +136,9 @@ struct fat_ref
 #undef DELEGATOR_TEMPLATE
 #undef DELEGATOR_NAME
 #undef DELEGATOR_TYPEDEF
-#undef DELEGATOR_METHOD_DETAIL_PARAMETER
-#undef DELEGATOR_METHOD_DETAIL_FORWARD
-#undef DELEGATOR_METHOD
+#undef DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER
+#undef DELEGATOR_BASIC_METHOD_DETAIL_FORWARD
+#undef DELEGATOR_BASIC_METHOD
 
 private:
 	void *m_impl;
@@ -148,14 +148,14 @@ private:
 #define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
 #define DELEGATOR_TYPEDEF(...)
-#define DELEGATOR_METHOD(name, result, ...) result (*name)(void *, __VA_ARGS__);
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) result (*name)(void constness *, __VA_ARGS__);
 
 #include DELEGATOR_INCLUDE
 
 #undef DELEGATOR_TEMPLATE
 #undef DELEGATOR_NAME
 #undef DELEGATOR_TYPEDEF
-#undef DELEGATOR_METHOD
+#undef DELEGATOR_BASIC_METHOD
 	};
 	vtable const *m_virtuals;
 };

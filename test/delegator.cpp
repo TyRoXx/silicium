@@ -1,3 +1,6 @@
+//TODO: move into public header
+#define DELEGATOR_METHOD(name, ...) DELEGATOR_BASIC_METHOD(name, , __VA_ARGS__)
+
 #define DELEGATOR_INCLUDE "delegator_sink.hpp"
 #include <silicium/array_view.hpp>
 #include <boost/preprocessor/list/for_each_i.hpp>
@@ -22,6 +25,12 @@ namespace tests
 		explicit function_sink(Function function)
 		    : m_function(std::move(function))
 		{
+		}
+
+		// TODO: empty parameter list
+		Si::optional<boost::uint64_t> max_size(Si::nothing) const
+		{
+			return Si::none;
 		}
 
 		error_type append(Si::array_view<element_type> elements)
@@ -74,5 +83,17 @@ namespace tests
 		append_example_value(Sink<std::unique_ptr<int>, Si::success>::fat_ref(function_sink_));
 		BOOST_REQUIRE_EQUAL(1u, results.size());
 		BOOST_CHECK_EQUAL(23, *results.front());
+	}
+
+	BOOST_AUTO_TEST_CASE(delegator_const_method)
+	{
+		std::vector<std::unique_ptr<int>> results;
+		auto function_sink_ = make_function_sink<std::unique_ptr<int>, Si::success>(
+		    [](Si::array_view<std::unique_ptr<int>>) -> Si::success
+		    {
+			    return Si::success();
+			});
+		Sink<std::unique_ptr<int>, Si::success>::fat_ref const ref((function_sink_));
+		BOOST_CHECK_EQUAL(Si::optional<boost::uint64_t>(), ref.max_size(Si::nothing()));
 	}
 }
