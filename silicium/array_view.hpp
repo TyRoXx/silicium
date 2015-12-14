@@ -38,6 +38,13 @@ namespace Si
 		{
 		}
 
+		template <class OtherLength>
+		array_view(array_view<value_type, OtherLength> other)
+		    : Length(other.length())
+		    , m_data(other.data())
+		{
+		}
+
 		template <std::size_t N>
 		array_view(std::array<mutable_value_type, N> &array)
 		    : Length(Length::template literal<N>())
@@ -119,6 +126,11 @@ namespace Si
 			return data()[index.value()];
 		}
 
+		value_type &front() const
+		{
+			return (*this)[bounded_int<std::size_t, 0, 0>::literal<0>()];
+		}
+
 	private:
 		value_type *m_data;
 	};
@@ -157,6 +169,12 @@ namespace Si
 	array_view<T const, bounded_size_t> make_array_view(std::vector<T, Allocator> const &vector)
 	{
 		return array_view<T const, bounded_size_t>(vector);
+	}
+
+	template <class T>
+	array_view<T, bounded_int<std::size_t, 1, 1>> make_single_element_view(T &element)
+	{
+		return array_view<T, bounded_int<std::size_t, 1, 1>>(element, bounded_int<std::size_t, 1, 1>::literal<1>());
 	}
 }
 

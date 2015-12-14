@@ -205,3 +205,19 @@ BOOST_AUTO_TEST_CASE(make_array_view_const)
 	Si::array_view<int const, Si::bounded_size_t> view = Si::make_array_view(vector);
 	BOOST_CHECK_EQUAL(vector.size(), view.length().value());
 }
+
+BOOST_AUTO_TEST_CASE(make_array_view_implicit_widening)
+{
+	std::array<int, 3> const std_arr = {{1, 2, -3}};
+	Si::array_view<int const, Si::bounded_int<std::size_t, 3, 3>> view = Si::make_array_view(std_arr);
+	Si::array_view<int const, Si::bounded_int<std::size_t, 3, 4>> widened_view = view;
+	BOOST_CHECK_EQUAL_COLLECTIONS(view.begin(), view.end(), widened_view.begin(), widened_view.end());
+}
+
+BOOST_AUTO_TEST_CASE(make_single_element_view_test)
+{
+	int x = 45;
+	Si::array_view<int, Si::bounded_int<std::size_t, 1, 1>> view = Si::make_single_element_view(x);
+	BOOST_REQUIRE_EQUAL(1u, view.length().value());
+	BOOST_CHECK_EQUAL(45, view.front());
+}
