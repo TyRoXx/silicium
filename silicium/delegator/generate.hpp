@@ -27,7 +27,7 @@
 		{                                                                                                              \
 		}
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
-#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) virtual auto name(__VA_ARGS__)->result constness = 0;
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) virtual auto name(__VA_ARGS__) constness->result = 0;
 
 #include DELEGATOR_INCLUDE
 }
@@ -60,7 +60,7 @@
 #define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
 	virtual auto name(                                                                                                 \
 	    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)))  \
-	    ->result constness SILICIUM_OVERRIDE                                                                           \
+	    constness->result SILICIUM_OVERRIDE                                                                            \
 	{                                                                                                                  \
 		return m_impl.name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _,                          \
 		                                            BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));                          \

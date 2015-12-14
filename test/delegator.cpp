@@ -1,4 +1,4 @@
-//TODO: move into public header
+// TODO: move into public header
 #define DELEGATOR_METHOD(name, ...) DELEGATOR_BASIC_METHOD(name, , __VA_ARGS__)
 
 #define DELEGATOR_INCLUDE "delegator_sink.hpp"
