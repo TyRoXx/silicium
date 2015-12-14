@@ -3,11 +3,11 @@
 
 // enclosing namespace struct:
 
-#define DELEGATOR_TEMPLATE(first, ...) template <first, __VA_ARGS__>
+#define DELEGATOR_TEMPLATE(...) template <__VA_ARGS__>
 #define DELEGATOR_NAME(name)                                                                                           \
 	struct name                                                                                                        \
 	{
-#define DELEGATOR_TYPEDEF(something, ...) something __VA_ARGS__
+#define DELEGATOR_TYPEDEF(...) __VA_ARGS__
 #define DELEGATOR_METHOD(name, result, ...)
 
 #include DELEGATOR_INCLUDE
@@ -19,14 +19,14 @@
 
 // abstract base class:
 
-#define DELEGATOR_TEMPLATE(first, ...)
+#define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)                                                                                           \
 	struct abstract_base                                                                                               \
 	{                                                                                                                  \
 		virtual ~abstract_base()                                                                                       \
 		{                                                                                                              \
 		}
-#define DELEGATOR_TYPEDEF(something, ...) something __VA_ARGS__
+#define DELEGATOR_TYPEDEF(...) __VA_ARGS__
 #define DELEGATOR_METHOD(name, result, ...) virtual auto name(__VA_ARGS__)->result = 0;
 
 #include DELEGATOR_INCLUDE
@@ -40,7 +40,7 @@
 
 // eraser:
 
-#define DELEGATOR_TEMPLATE(first, ...)
+#define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)                                                                                           \
 	template <class Impl>                                                                                              \
 	struct eraser : abstract_base                                                                                      \
@@ -54,7 +54,7 @@
 		Impl m_impl;                                                                                                   \
                                                                                                                        \
 	public:
-#define DELEGATOR_TYPEDEF(something, ...)
+#define DELEGATOR_TYPEDEF(...)
 #define DELEGATOR_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
 #define DELEGATOR_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
 #define DELEGATOR_METHOD(name, result, ...)                                                                            \
@@ -91,9 +91,9 @@ struct fat_ref
 	{
 		// initialize the vtable
 		static vtable const instance = {
-#define DELEGATOR_TEMPLATE(first, ...)
+#define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
-#define DELEGATOR_TYPEDEF(something, ...)
+#define DELEGATOR_TYPEDEF(...)
 #define DELEGATOR_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
 #define DELEGATOR_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
 #define DELEGATOR_METHOD(name, result, ...)                                                                            \
@@ -118,9 +118,9 @@ struct fat_ref
 
 // methods:
 
-#define DELEGATOR_TEMPLATE(first, ...)
+#define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
-#define DELEGATOR_TYPEDEF(something, ...) something __VA_ARGS__
+#define DELEGATOR_TYPEDEF(...) __VA_ARGS__
 #define DELEGATOR_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
 #define DELEGATOR_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
 #define DELEGATOR_METHOD(name, result, ...)                                                                            \
@@ -145,9 +145,9 @@ private:
 
 	struct vtable
 	{
-#define DELEGATOR_TEMPLATE(first, ...)
+#define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
-#define DELEGATOR_TYPEDEF(something, ...)
+#define DELEGATOR_TYPEDEF(...)
 #define DELEGATOR_METHOD(name, result, ...) result (*name)(void *, __VA_ARGS__);
 
 #include DELEGATOR_INCLUDE
