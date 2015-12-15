@@ -27,7 +27,7 @@
 		{                                                                                                              \
 		}
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
-#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) virtual auto name(__VA_ARGS__) constness->result = 0;
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) virtual result name(__VA_ARGS__) constness = 0;
 
 #include DELEGATOR_INCLUDE
 }
@@ -123,8 +123,8 @@ struct fat_ref
 #define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem) elem BOOST_PP_CAT(arg, i)
 #define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem) std::forward<elem>(BOOST_PP_CAT(arg, i))
 #define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
-	auto name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                                     \
-	                                   BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) constness->result                      \
+	result name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                                   \
+	                                     BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) constness                            \
 	{                                                                                                                  \
 		return m_virtuals->name(m_impl, BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _,             \
 		                                                         BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));             \

@@ -80,15 +80,16 @@
 		BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_ERASER_METHOD, _, methods)                                          \
 	};
 
-#define SILICIUM_DETAIL_MAKE_BOX(name, typedefs, methods)                                                              \
+#define SILICIUM_DETAIL_MAKE_BOX(typedefs, methods)                                                                    \
 	struct box                                                                                                         \
 	{                                                                                                                  \
 		typedefs std::unique_ptr<interface> original;                                                                  \
-		SILICIUM_MOVABLE_MEMBER(name, original)                                                                        \
-		explicit name(std::unique_ptr<interface> original) BOOST_NOEXCEPT : original(std::move(original))              \
+		SILICIUM_MOVABLE_MEMBER(box, original)                                                                         \
+		explicit box(std::unique_ptr<interface> original) BOOST_NOEXCEPT : original(std::move(original))               \
 		{                                                                                                              \
 		}                                                                                                              \
 		BOOST_PP_SEQ_FOR_EACH(SILICIUM_DETAIL_MAKE_BOX_METHOD, _, methods)                                             \
+		SILICIUM_DISABLE_COPY(box)                                                                                     \
 	};
 
 #define SILICIUM_SPECIALIZED_TRAIT(name, specialization, typedefs, methods)                                            \
@@ -96,7 +97,7 @@
 	{                                                                                                                  \
 		SILICIUM_DETAIL_MAKE_INTERFACE(interface, typedefs, methods)                                                   \
 		SILICIUM_DETAIL_MAKE_ERASER(eraser, typedefs, methods)                                                         \
-		SILICIUM_DETAIL_MAKE_BOX(box, typedefs, methods)                                                               \
+		SILICIUM_DETAIL_MAKE_BOX(typedefs, methods)                                                                    \
 		template <class Original>                                                                                      \
 		static eraser<typename std::decay<Original>::type> erase(Original &&original)                                  \
 		{                                                                                                              \

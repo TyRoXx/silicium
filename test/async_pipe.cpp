@@ -6,6 +6,8 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/io_service.hpp>
 
+// do not want to port this to VC++ 2013
+#if SILICIUM_COMPILER_GENERATES_MOVES
 namespace Si
 {
 	template <class Message>
@@ -204,3 +206,4 @@ BOOST_AUTO_TEST_CASE(async_pipe_test)
 
 		                            });
 }
+#endif

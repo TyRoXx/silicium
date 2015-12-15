@@ -12,13 +12,13 @@ BOOST_AUTO_TEST_CASE(array_view_default_constructor)
 		Si::array_view<int> arr;
 		BOOST_CHECK(arr.empty());
 		BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), arr.data());
-		BOOST_CHECK_EQUAL(0, arr.length().value());
+		BOOST_CHECK_EQUAL(0u, arr.length().value());
 	}
 	{
 		Si::array_view<int, Si::bounded_int<std::size_t, 0, 100>> arr;
 		BOOST_CHECK(arr.empty());
 		BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), arr.data());
-		BOOST_CHECK_EQUAL(0, arr.length().value());
+		BOOST_CHECK_EQUAL(0u, arr.length().value());
 	}
 }
 
@@ -32,17 +32,17 @@ BOOST_AUTO_TEST_CASE(array_view_from_std_array)
 
 	view = a1;
 	BOOST_CHECK(!view.empty());
-	BOOST_CHECK_EQUAL(1, view.length().value());
+	BOOST_CHECK_EQUAL(1u, view.length().value());
 	BOOST_CHECK_EQUAL(a1.data(), view.to_range().begin());
 
 	view = a2;
 	BOOST_CHECK(!view.empty());
-	BOOST_CHECK_EQUAL(2, view.length().value());
+	BOOST_CHECK_EQUAL(2u, view.length().value());
 	BOOST_CHECK_EQUAL(a2.data(), view.to_range().begin());
 
 	view = a3;
 	BOOST_CHECK(!view.empty());
-	BOOST_CHECK_EQUAL(3, view.length().value());
+	BOOST_CHECK_EQUAL(3u, view.length().value());
 	BOOST_CHECK_EQUAL(a3.data(), view.to_range().begin());
 }
 

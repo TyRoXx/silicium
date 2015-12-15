@@ -1,6 +1,3 @@
-// TODO: move into public header
-#define DELEGATOR_METHOD(name, ...) DELEGATOR_BASIC_METHOD(name, , __VA_ARGS__)
-
 #define DELEGATOR_INCLUDE "delegator_sink.hpp"
 #include <silicium/array_view.hpp>
 #include <boost/preprocessor/list/for_each_i.hpp>
