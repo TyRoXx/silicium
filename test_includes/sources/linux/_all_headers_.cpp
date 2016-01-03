@@ -115,7 +115,6 @@
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
 #include <silicium/read_file.hpp>
-#include <silicium/safe_arithmetic.hpp>
 #include <silicium/serialization.hpp>
 #include <silicium/sink/append.hpp>
 #include <silicium/sink/buffer.hpp>

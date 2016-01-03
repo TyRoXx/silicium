@@ -12,10 +12,6 @@ add_executable(trivialhttp "trivialhttp.cpp")
 target_link_libraries(trivialhttp ${Boost_LIBRARIES})
 set_target_properties(trivialhttp PROPERTIES FOLDER examples)
 
-add_executable(safe_unsigned "safe_unsigned.cpp")
-target_link_libraries(safe_unsigned ${Boost_LIBRARIES})
-set_target_properties(safe_unsigned PROPERTIES FOLDER examples)
-
 if(NOT (Boost_VERSION LESS 105300)) #Boost.Coroutine required
 	add_executable(sleep "sleep.cpp")
 	target_link_libraries(sleep ${Boost_LIBRARIES})
