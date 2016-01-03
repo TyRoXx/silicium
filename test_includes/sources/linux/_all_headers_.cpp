@@ -1,4 +1,5 @@
 #include <silicium/alignment_of.hpp>
+#include <silicium/array_view.hpp>
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
@@ -107,6 +108,7 @@
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/while.hpp>
 #include <silicium/observable/yield_context.hpp>
+#include <silicium/observable2.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/os_string.hpp>
 #include <silicium/pipe.hpp>
@@ -120,6 +122,7 @@
 #include <silicium/sink/buffer.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
+#include <silicium/sink/copy.hpp>
 #include <silicium/sink/function_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/multi_sink.hpp>

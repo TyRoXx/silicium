@@ -97,6 +97,7 @@ int main()
 	blacklist.insert("posix");
 #endif
 	blacklist.erase(current_system_name);
+	blacklist.insert("delegator");
 	auto const is_relevant_directory = [&blacklist](boost::filesystem::path const &dir)
 	{
 		return blacklist.count(dir.leaf().string()) == 0;
