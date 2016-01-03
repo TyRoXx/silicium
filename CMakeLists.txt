@@ -150,6 +150,8 @@ endif()
 
 include_directories(SYSTEM ${SQLITE3_INCLUDE_DIR})
 
+find_package(Threads)
+
 option(SILICIUM_USE_WEBSOCKETPP "use websocketpp if the submodule has been checked out" ON)
 if(SILICIUM_USE_WEBSOCKETPP AND (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/websocketpp/.git"))
 	set(SILICIUM_HAS_WEBSOCKETPP ON)
