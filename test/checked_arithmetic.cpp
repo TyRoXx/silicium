@@ -1,4 +1,4 @@
-#include <silicium/checked_arithmetic.hpp>
+#include <silicium/arithmetic/add.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(checked_add_size_t)

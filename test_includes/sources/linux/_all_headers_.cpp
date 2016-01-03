@@ -1,4 +1,6 @@
 #include <silicium/alignment_of.hpp>
+#include <silicium/arithmetic/add.hpp>
+#include <silicium/arithmetic/overflow_or.hpp>
 #include <silicium/array_view.hpp>
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/connecting_observable.hpp>
@@ -20,7 +22,6 @@
 #include <silicium/byte.hpp>
 #include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
-#include <silicium/checked_arithmetic.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
