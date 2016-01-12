@@ -7,6 +7,7 @@
 #include <silicium/optional.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/memory_range.hpp>
+#include <cstring>
 
 #define SILICIUM_HAS_DEFLATING_SINK (SILICIUM_HAS_VARIANT && !SILICIUM_AVOID_ZLIB)
 
@@ -97,7 +98,7 @@ namespace Si
 		}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
-		zlib_deflating_sink(zlib_deflating_sink &&other) = default;
+		zlib_deflating_sink(zlib_deflating_sink &&) = default;
 #else
 		zlib_deflating_sink(zlib_deflating_sink &&other)
 		    : m_next(std::move(other.m_next))

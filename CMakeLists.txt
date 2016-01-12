@@ -10,13 +10,13 @@ message("C++ compiler: " ${CMAKE_CXX_COMPILER})
 
 if(UNIX)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		add_definitions("-std=c++1y")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 	else()
 		execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 		if(GCC_VERSION VERSION_GREATER 4.7)
-			add_definitions(-std=c++1y)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 		else()
-			add_definitions(-std=c++0x)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 		endif()
 	endif()
 
@@ -25,7 +25,7 @@ if(UNIX)
 	#warn when using undefined macros
 	add_definitions("-Wundef")
 
-	add_definitions("-Werror")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 
 	option(SILICIUM_PEDANTIC "pass -pedantic to the compiler (may generate useless warnings)" OFF)
 	if(SILICIUM_PEDANTIC)

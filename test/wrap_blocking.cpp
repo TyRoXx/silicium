@@ -40,11 +40,18 @@ namespace Si
 
 		void async_get_one(ptr_observer<observer<element_type>> receiver)
 		{
-			done = boost::async(boost::launch::async, [this, receiver]()
-			                    {
-				                    element_type result = act();
-				                    receiver.got_element(std::move(result));
-				                });
+#if BOOST_VERSION >= 105200
+			using boost::async;
+			using boost::launch;
+#else
+			using std::async;
+			using std::launch;
+#endif
+			done = async(launch::async, [this, receiver]()
+			             {
+				             element_type result = act();
+				             receiver.got_element(std::move(result));
+				         });
 		}
 
 		element_type get_one()
@@ -54,7 +61,12 @@ namespace Si
 
 	private:
 		Action act;
-		boost::unique_future<void> done;
+#if BOOST_VERSION >= 105200
+		boost::unique_future<void>
+#else
+		std::future<void>
+#endif
+		    done;
 	};
 
 	template <class Action>

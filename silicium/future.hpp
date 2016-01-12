@@ -2,8 +2,10 @@
 #define SILICIUM_FUTURE_HPP
 
 #include <silicium/variant.hpp>
+#include <boost/version.hpp>
 
-#define SILICIUM_HAS_FUTURE SILICIUM_HAS_VARIANT
+#define SILICIUM_DETAIL_ASIO_ASYNC_RESULT (BOOST_VERSION >= 105400)
+#define SILICIUM_HAS_FUTURE (SILICIUM_HAS_VARIANT && SILICIUM_DETAIL_ASIO_ASYNC_RESULT)
 
 #if SILICIUM_HAS_FUTURE
 #include <boost/asio/async_result.hpp>

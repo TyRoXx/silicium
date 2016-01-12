@@ -36,14 +36,15 @@ namespace Si
 
 		struct error_category : boost::system::error_category
 		{
-			virtual const char *name() const BOOST_SYSTEM_NOEXCEPT SILICIUM_OVERRIDE
+			virtual const char *name() const BOOST_NOEXCEPT SILICIUM_OVERRIDE
 			{
 				return "sqlite3";
 			}
 
 			virtual std::string message(int ev) const SILICIUM_OVERRIDE
 			{
-#if SQLITE_VERSION_NUMBER > 3007009
+#if SQLITE_VERSION_NUMBER >= 3007015
+				// http://www.sqlite.org/changes.html
 				return sqlite3_errstr(ev);
 #else
 				(void)ev;

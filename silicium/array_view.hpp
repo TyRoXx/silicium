@@ -78,7 +78,7 @@ namespace Si
 		    : Length(*Length::create(vector.size()))
 		    , m_data(vector.data())
 		{
-			BOOST_STATIC_ASSERT(std::is_same<bounded_size_t, Length>::value);
+			BOOST_STATIC_ASSERT((std::is_same<bounded_size_t, Length>::value));
 		}
 
 		template <class Allocator>
@@ -86,7 +86,7 @@ namespace Si
 		    : Length(*Length::create(vector.size()))
 		    , m_data(vector.data())
 		{
-			BOOST_STATIC_ASSERT(std::is_same<bounded_size_t, Length>::value);
+			BOOST_STATIC_ASSERT((std::is_same<bounded_size_t, Length>::value));
 		}
 
 		Length length() const

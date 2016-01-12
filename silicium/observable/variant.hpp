@@ -28,8 +28,8 @@ namespace Si
 		}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
-		variant_observable(variant_observable &&other) = default;
-		variant_observable &operator=(variant_observable &&other) = default;
+		variant_observable(variant_observable &&) = default;
+		variant_observable &operator=(variant_observable &&) = default;
 #else
 		variant_observable(variant_observable &&other)
 		    : parts(std::move(other.parts))

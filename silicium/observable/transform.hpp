@@ -54,8 +54,8 @@ namespace Si
 			return *this;
 		}
 #else
-		transformation(transformation &&other) = default;
-		transformation &operator=(transformation &&other) = default;
+		transformation(transformation &&) = default;
+		transformation &operator=(transformation &&) = default;
 #endif
 
 		template <class Observer>

@@ -5,6 +5,7 @@
 #include <silicium/zlib/zlib.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/optional.hpp>
+#include <cstring>
 
 #if !SILICIUM_AVOID_ZLIB
 namespace Si

@@ -33,7 +33,13 @@ BOOST_AUTO_TEST_CASE(append_char_to_vector)
 	Si::append(sink, static_cast<char const *>("c"));
 	Si::append(sink, std::string("d"));
 	Si::append(sink, boost::container::string("e"));
-	Si::append(sink, boost::string_ref("f"));
+	Si::append(sink,
+#if BOOST_VERSION >= 105300
+	           boost::string_ref
+#else
+	           Si::make_c_str_range
+#endif
+	           ("f"));
 	std::string const expected = "abcdef";
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
 }
@@ -47,7 +53,13 @@ BOOST_AUTO_TEST_CASE(append_char_to_std_string)
 	Si::append(sink, static_cast<char const *>("c"));
 	Si::append(sink, std::string("d"));
 	Si::append(sink, boost::container::string("e"));
-	Si::append(sink, boost::string_ref("f"));
+	Si::append(sink,
+#if BOOST_VERSION >= 105300
+	           boost::string_ref
+#else
+	           Si::make_c_str_range
+#endif
+	           ("f"));
 	std::string const expected = "abcdef";
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
 }
@@ -61,7 +73,13 @@ BOOST_AUTO_TEST_CASE(append_char_to_boost_string)
 	Si::append(sink, static_cast<char const *>("c"));
 	Si::append(sink, std::string("d"));
 	Si::append(sink, boost::container::string("e"));
-	Si::append(sink, boost::string_ref("f"));
+	Si::append(sink,
+#if BOOST_VERSION >= 105300
+	           boost::string_ref
+#else
+	           Si::make_c_str_range
+#endif
+	           ("f"));
 	std::string const expected = "abcdef";
 	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
 }

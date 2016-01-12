@@ -87,7 +87,7 @@ namespace Si
 		struct transformation
 		{
 			typedef typename Input::value_type input_value_type;
-			typedef decltype(boost::declval<Transformation>()(boost::declval<input_value_type>())) value_type;
+			typedef decltype(std::declval<Transformation>()(std::declval<input_value_type>())) value_type;
 
 			transformation(Input input, Transformation transform)
 			    : m_input(std::move(input))

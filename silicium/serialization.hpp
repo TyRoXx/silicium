@@ -6,6 +6,7 @@
 #include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/identity.hpp>
 #include <boost/concept_check.hpp>
+#include <cstring>
 
 namespace Si
 {

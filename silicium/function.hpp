@@ -73,7 +73,7 @@ namespace Si
 		template <class F>
 		struct holder : holder_base
 		{
-			BOOST_STATIC_ASSERT(!std::is_same<std::nullptr_t, F>::value);
+			BOOST_STATIC_ASSERT((!std::is_same<std::nullptr_t, F>::value));
 
 			template <class G>
 			explicit holder(G &&function)

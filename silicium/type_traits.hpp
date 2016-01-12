@@ -10,7 +10,7 @@
 #include <boost/type_traits/is_copy_constructible.hpp>
 #endif
 #include <boost/type_traits/has_trivial_constructor.hpp>
-#if BOOST_VERSION >= 104900
+#if BOOST_VERSION >= 105400
 #include <boost/type_traits/is_nothrow_move_constructible.hpp>
 #include <boost/type_traits/is_nothrow_move_assignable.hpp>
 #endif
@@ -38,7 +38,6 @@ namespace Si
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || SILICIUM_VC2012_OR_LATER
 }
 #include <type_traits>
-#include <boost/type_traits/is_nothrow_move_assignable.hpp>
 namespace Si
 {
 	using std::is_default_constructible;

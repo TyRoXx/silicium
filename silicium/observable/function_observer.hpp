@@ -52,10 +52,10 @@ namespace Si
 		}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
-		function_observer(function_observer &&other) = default;
-		function_observer(function_observer const &other) = default;
-		function_observer &operator=(function_observer &&other) = default;
-		function_observer &operator=(function_observer const &other) = default;
+		function_observer(function_observer &&) = default;
+		function_observer(function_observer const &) = default;
+		function_observer &operator=(function_observer &&) = default;
+		function_observer &operator=(function_observer const &) = default;
 #endif
 
 		template <class Element>

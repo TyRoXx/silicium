@@ -2,8 +2,12 @@
 #define SILICIUM_BLOCK_THREAD_HPP
 
 #include <silicium/config.hpp>
-#include <future>
+
+#define SILICIUM_HAS_BLOCK_THREAD (BOOST_VERSION >= 105400)
+
+#if SILICIUM_HAS_BLOCK_THREAD
 #include <boost/asio/async_result.hpp>
+#include <future>
 
 namespace Si
 {
@@ -87,4 +91,6 @@ namespace boost
 		};
 	}
 }
+#endif
+
 #endif
