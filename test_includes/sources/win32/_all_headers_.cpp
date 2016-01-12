@@ -19,7 +19,6 @@
 #include <silicium/byte.hpp>
 #include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
-#include <silicium/checked_arithmetic.hpp>
 #include <silicium/config.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <silicium/detail/basic_dynamic_library.hpp>
