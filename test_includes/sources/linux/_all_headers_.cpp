@@ -3,6 +3,7 @@
 #include <silicium/arithmetic/overflow_or.hpp>
 #include <silicium/array_view.hpp>
 #include <silicium/asio/accepting_source.hpp>
+#include <silicium/asio/async.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
 #include <silicium/asio/post_forwarder.hpp>
