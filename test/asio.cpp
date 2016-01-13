@@ -47,7 +47,9 @@ namespace Si
 {
 	template <class ForegroundDispatcher, class BackgroundDispatcher, class NullaryFunction, class ResultHandler>
 	auto async(ForegroundDispatcher &foreground, BackgroundDispatcher &background, NullaryFunction &&work,
-	           ResultHandler &&handle_result)
+	           ResultHandler &&handle_result) ->
+	    typename boost::asio::async_result<
+	        typename boost::asio::handler_type<ResultHandler, void(decltype(work()))>::type>::type
 	{
 		typedef decltype(work()) result_type;
 		typename boost::asio::handler_type<ResultHandler, void(result_type)>::type real_handler(
