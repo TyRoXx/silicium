@@ -73,6 +73,7 @@ BOOST_AUTO_TEST_CASE(asio_async)
 	BOOST_CHECK(ok);
 }
 
+#if SILICIUM_HAS_ASIO_ASYNC_SOURCE
 BOOST_AUTO_TEST_CASE(asio_async_source)
 {
 	boost::asio::io_service background;
@@ -108,3 +109,4 @@ BOOST_AUTO_TEST_CASE(asio_async_source)
 	foreground.run();
 	BOOST_CHECK(ok);
 }
+#endif

@@ -5,10 +5,13 @@
 #include <silicium/variant.hpp>
 #include <silicium/iterator_range.hpp>
 
+#define SILICIUM_HAS_ASIO_ASYNC_SOURCE SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+
 namespace Si
 {
 	namespace asio
 	{
+#if SILICIUM_HAS_ASIO_ASYNC_SOURCE
 		template <class BackgroundDispatcher, class Source>
 		struct async_source
 		{
@@ -50,6 +53,7 @@ namespace Si
 			BackgroundDispatcher m_background;
 			Source m_source;
 		};
+#endif
 	}
 }
 
