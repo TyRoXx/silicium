@@ -125,6 +125,7 @@
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/copy.hpp>
+#include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/function_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/multi_sink.hpp>
