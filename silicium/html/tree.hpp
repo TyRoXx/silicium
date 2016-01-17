@@ -203,6 +203,23 @@ namespace Si
 				 }));
 		}
 
+		template <std::size_t KeyLength, std::size_t ResultLength = detail::space + (KeyLength - 1) + detail::assign +
+		                                                            detail::quote + detail::quote>
+		auto attribute(char const(&key)[KeyLength], std::string const &value)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		    -> detail::element<std::function<void(Sink<char, success>::interface &)>, min_length<ResultLength>>
+#endif
+		{
+			return detail::make_element<min_length<ResultLength>>(
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			    std::function<void(Sink<char, success>::interface &)>
+#endif
+			    ([&key, &value](Sink<char, success>::interface &destination)
+			     {
+				     add_attribute(destination, key, value);
+				 }));
+		}
+
 		template <std::size_t Length>
 		auto text(char const(&content)[Length])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE

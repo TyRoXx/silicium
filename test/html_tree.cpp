@@ -187,6 +187,15 @@ BOOST_AUTO_TEST_CASE(html_tree_trait)
 	BOOST_CHECK_EQUAL("<test>Hello</test>", generated);
 }
 
+BOOST_AUTO_TEST_CASE(html_tree_dynamic_attribute_value)
+{
+	using namespace Si::html;
+	std::string value = "value";
+	auto document = tag("i", attribute("key", value), empty);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<i key=\"value\"/>", generated);
+}
+
 BOOST_AUTO_TEST_CASE(html_tree_produces_same_output_as_generator)
 {
 	bool const build_triggered = true;

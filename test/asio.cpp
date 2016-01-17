@@ -97,10 +97,10 @@ BOOST_AUTO_TEST_CASE(asio_async_source)
 		                                [&ok, &buffer](int *end_of_results)
 		                                {
 			                                BOOST_REQUIRE_EQUAL(buffer.data() + 3, end_of_results);
-											BOOST_REQUIRE_EQUAL(42, buffer[0]);
-											BOOST_REQUIRE_EQUAL(42, buffer[1]);
-											BOOST_REQUIRE_EQUAL(42, buffer[2]);
-											ok = true;
+			                                BOOST_REQUIRE_EQUAL(42, buffer[0]);
+			                                BOOST_REQUIRE_EQUAL(42, buffer[1]);
+			                                BOOST_REQUIRE_EQUAL(42, buffer[2]);
+			                                ok = true;
 			                            });
 		            });
 	BOOST_REQUIRE(!ok);
