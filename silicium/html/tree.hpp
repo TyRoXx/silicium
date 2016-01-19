@@ -237,6 +237,22 @@ namespace Si
 				 }));
 		}
 
+		inline auto text(std::string content)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		    -> detail::element<std::function<void(Sink<char, success>::interface &)>, min_length<0>>
+#endif
+		{
+			return detail::make_element<min_length<0>>(
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+			    std::function<void(Sink<char, success>::interface &)>
+#endif
+			    ([SILICIUM_CAPTURE_EXPRESSION(content, std::move(content))](Sink<char, success>::interface &
+			                                                                destination)
+			     {
+				     html::write_string(destination, content);
+				 }));
+		}
+
 		namespace detail
 		{
 			inline void no_content(Sink<char, success>::interface &)
