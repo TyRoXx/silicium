@@ -95,6 +95,13 @@ namespace Si
 			append(sink, '"');
 		}
 
+		template <class CharSink, class KeyStringLike>
+		void add_attribute(CharSink &&sink, KeyStringLike const &key)
+		{
+			append(sink, " ");
+			append(sink, key);
+		}
+
 		template <class CharSink, class StringLike>
 		void open_element(CharSink &&sink, StringLike const &name)
 		{

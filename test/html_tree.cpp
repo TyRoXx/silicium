@@ -177,6 +177,15 @@ BOOST_AUTO_TEST_CASE(html_tree_two_attributes)
 	BOOST_CHECK_EQUAL("<i key=\"value\" key2=\"value2\"/>", generated);
 }
 
+BOOST_AUTO_TEST_CASE(html_tree_attribute_without_value)
+{
+	using namespace Si::html;
+	auto document = tag("i", attribute("key"), empty);
+	BOOST_CHECK_EQUAL(8u, decltype(document)::length_type::value);
+	std::string generated = generate<std::string>(document);
+	BOOST_CHECK_EQUAL("<i key/>", generated);
+}
+
 BOOST_AUTO_TEST_CASE(html_tree_trait)
 {
 	Si::html::Element<>::box const erased =
