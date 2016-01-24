@@ -64,10 +64,21 @@ namespace Si
 			return boost::system::error_code(code, sqlite_category());
 		}
 
-		inline error_or<database_handle> open(c_string path)
+		inline error_or<database_handle> open_existing(c_string path)
 		{
 			sqlite3 *database;
 			int rc = sqlite3_open_v2(path.c_str(), &database, SQLITE_OPEN_READWRITE, nullptr);
+			if (rc != SQLITE_OK)
+			{
+				return make_error_code(rc);
+			}
+			return database_handle(database);
+		}
+
+		inline error_or<database_handle> open_or_create(c_string path)
+		{
+			sqlite3 *database;
+			int rc = sqlite3_open_v2(path.c_str(), &database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
 			if (rc != SQLITE_OK)
 			{
 				return make_error_code(rc);
