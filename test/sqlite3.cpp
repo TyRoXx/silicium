@@ -1,6 +1,32 @@
 #include <silicium/sqlite3.hpp>
 #include <boost/test/unit_test.hpp>
+
+#if SILICIUM_HAS_EXCEPTIONS
 #include <boost/filesystem/operations.hpp>
+
+BOOST_AUTO_TEST_CASE(sqlite_open_or_create_file)
+{
+	boost::filesystem::path const test_file = boost::filesystem::current_path() / "test_sqlite_open_file.sqlite3";
+	boost::filesystem::remove(test_file);
+	{
+		Si::error_or<Si::SQLite3::database_handle> database =
+			Si::SQLite3::open_or_create(Si::c_string(test_file.c_str()));
+		BOOST_REQUIRE(!database.is_error());
+		BOOST_CHECK(database.get());
+		Si::SQLite3::database_handle moved = database.move_value();
+		BOOST_CHECK(moved);
+	}
+	// reopen an existing file:
+	{
+		Si::error_or<Si::SQLite3::database_handle> database =
+			Si::SQLite3::open_or_create(Si::c_string(test_file.c_str()));
+		BOOST_REQUIRE(!database.is_error());
+		BOOST_CHECK(database.get());
+		Si::SQLite3::database_handle moved = database.move_value();
+		BOOST_CHECK(moved);
+	}
+}
+#endif
 
 BOOST_AUTO_TEST_CASE(sqlite_open_existing_memory)
 {
@@ -18,29 +44,6 @@ BOOST_AUTO_TEST_CASE(sqlite_open_or_create_memory)
 	BOOST_CHECK(database.get());
 	Si::SQLite3::database_handle moved = database.move_value();
 	BOOST_CHECK(moved);
-}
-
-BOOST_AUTO_TEST_CASE(sqlite_open_or_create_file)
-{
-	boost::filesystem::path const test_file = boost::filesystem::current_path() / "test_sqlite_open_file.sqlite3";
-	boost::filesystem::remove(test_file);
-	{
-		Si::error_or<Si::SQLite3::database_handle> database =
-		    Si::SQLite3::open_or_create(Si::c_string(test_file.c_str()));
-		BOOST_REQUIRE(!database.is_error());
-		BOOST_CHECK(database.get());
-		Si::SQLite3::database_handle moved = database.move_value();
-		BOOST_CHECK(moved);
-	}
-	// reopen an existing file:
-	{
-		Si::error_or<Si::SQLite3::database_handle> database =
-		    Si::SQLite3::open_or_create(Si::c_string(test_file.c_str()));
-		BOOST_REQUIRE(!database.is_error());
-		BOOST_CHECK(database.get());
-		Si::SQLite3::database_handle moved = database.move_value();
-		BOOST_CHECK(moved);
-	}
 }
 
 BOOST_AUTO_TEST_CASE(sqlite_open_error)
