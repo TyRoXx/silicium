@@ -8,6 +8,8 @@ endif()
 message("C compiler:   " ${CMAKE_C_COMPILER})
 message("C++ compiler: " ${CMAKE_CXX_COMPILER})
 
+option(SILICIUM_WARNING_IS_ERROR "turn all warnings into errors (-Werror)" OFF)
+
 if(UNIX)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
@@ -25,7 +27,9 @@ if(UNIX)
 	#warn when using undefined macros
 	add_definitions("-Wundef")
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+	if(SILICIUM_WARNING_IS_ERROR)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+	endif()
 
 	option(SILICIUM_PEDANTIC "pass -pedantic to the compiler (may generate useless warnings)" OFF)
 	if(SILICIUM_PEDANTIC)
