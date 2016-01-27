@@ -41,9 +41,9 @@ before_test:
 
 test_script:
   - cd build-silicium\test
-  - %BUILD_TYPE%\unit_test.exe
+  - .\%BUILD_TYPE%\unit_test.exe
   - cd ..\..\build-ventura\test
-  - %BUILD_TYPE%\unit_test.exe
+  - .\%BUILD_TYPE%\unit_test.exe
 
 after_test:
 
