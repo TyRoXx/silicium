@@ -11,6 +11,11 @@ clone_depth: 1
 
 os: Windows Server 2012 R2
 
+environment:
+  matrix:
+  - BUILD_TYPE: Debug
+  - BUILD_TYPE: Release
+
 before_build:
   - git submodule update --init
   - git clone https://github.com/TyRoXx/ventura.git
@@ -25,9 +30,9 @@ before_build:
 
 build_script:
   - cd build-silicium
-  - cmake --build . --config Release
+  - cmake --build . --config %BUILD_TYPE%
   - cd ..\build-ventura
-  - cmake --build . --config Release
+  - cmake --build . --config %BUILD_TYPE%
   - cd ..
 
 after_build:
@@ -36,9 +41,9 @@ before_test:
 
 test_script:
   - cd build-silicium\test
-  - Release\unit_test.exe
+  - %BUILD_TYPE%\unit_test.exe
   - cd ..\..\build-ventura\test
-  - Release\unit_test.exe
+  - %BUILD_TYPE%\unit_test.exe
 
 after_test:
 
