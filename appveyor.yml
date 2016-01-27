@@ -14,14 +14,18 @@ os: Windows Server 2012 R2
 environment:
   matrix:
   - BUILD_TYPE: Debug
+    NO_EXCEPTIONS: ON
+  - BUILD_TYPE: Debug
+    NO_EXCEPTIONS: OFF
   - BUILD_TYPE: Release
+    NO_EXCEPTIONS: OFF
 
 before_build:
   - git submodule update --init
   - git clone https://github.com/TyRoXx/ventura.git
   - mkdir build-silicium
   - cd build-silicium
-  - cmake -G "Visual Studio 14" -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DBOOST_LIBRARYDIR=C:\Libraries\boost_1_59_0\lib32-msvc-14.0 -DSILICIUM_TEST_INCLUDES=ON ..
+  - cmake -G "Visual Studio 14" -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DBOOST_LIBRARYDIR=C:\Libraries\boost_1_59_0\lib32-msvc-14.0 -DSILICIUM_TEST_INCLUDES=ON -DSILICIUM_NO_EXCEPTIONS=%NO_EXCEPTIONS% ..
   - cd ..
   - mkdir build-ventura
   - cd build-ventura
