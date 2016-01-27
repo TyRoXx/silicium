@@ -1,4 +1,4 @@
-option(SILICIUM_TEST_INCLUDES "" OFF)
+option(SILICIUM_TEST_INCLUDES "verify that you can #include all public headers without issues" OFF)
 if(SILICIUM_TEST_INCLUDES)
 	file(GLOB sources "dummy.cpp" "sources/*.cpp" "sources/detail/*.cpp" "sources/observable/*.cpp" "sources/sink/*.cpp" "sources/source/*.cpp" "sources/zlib/*.cpp")
 	file(GLOB_RECURSE sources_asio "sources/asio/*.cpp")
