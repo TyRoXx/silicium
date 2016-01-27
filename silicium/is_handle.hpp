@@ -6,7 +6,7 @@
 
 namespace Si
 {
-#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
+#if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT && !defined(BOOST_NO_CXX11_NOEXCEPT)
 #define SILICIUM_HAS_IS_HANDLE 1
 	template <class T>
 	struct is_handle

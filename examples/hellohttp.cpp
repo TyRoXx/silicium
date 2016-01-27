@@ -64,9 +64,9 @@ namespace
 
 int main()
 {
+#if SILICIUM_EXAMPLE_AVAILABLE
 	boost::asio::io_service io;
 	boost::asio::ip::tcp::acceptor acceptor(io, boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080));
-#if SILICIUM_EXAMPLE_AVAILABLE
 	boost::asio::spawn(io, [&acceptor](boost::asio::yield_context yield)
 	                   {
 		                   auto clients = Si::virtualize_source(Si::asio::accepting_source(acceptor, yield));
@@ -76,8 +76,8 @@ int main()
 			                                      std::bind(serve_client, client, std::placeholders::_1));
 		                   }
 		               });
+	io.run();
 #else
 	std::cerr << "This example requires boost::asio::spawn\n";
 #endif
-	io.run();
 }
