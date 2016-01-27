@@ -1,6 +1,14 @@
 silicium
 ========
 
+A modern C++ library by Kevin Wichmann (TyRoXx). It contains generic
+components he needs in other personal projects and experiments that will
+be moved to their own libraries or removed eventually.
+
+Nothing in here is well tested or ready for production yet. Any API can
+change at any time before version ``1.0`` (see ``<silicium/version.hpp>``
+for the current version).
+
 compilers
 =========
 
