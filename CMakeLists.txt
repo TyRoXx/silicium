@@ -36,6 +36,9 @@ if(UNIX)
 		add_definitions("-pedantic")
 		add_definitions("-DSILICIUM_PEDANTIC")
 	endif()
+
+	#reduce size of binaries in the order of ~10%
+	add_definitions("-fvisibility=hidden -fvisibility-inlines-hidden")
 endif()
 
 if(MSVC)
