@@ -17,4 +17,4 @@ endif()
 
 set(formatted ${formatted} ${CMAKE_CURRENT_SOURCE_DIR}/generate_sources.cpp PARENT_SCOPE)
 add_executable(test_includes_generate "generate_sources.cpp")
-target_link_libraries(test_includes_generate ${Boost_LIBRARIES})
+target_link_libraries(test_includes_generate ${Boost_LIBRARIES} ${CONAN_LIBS})
