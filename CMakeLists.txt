@@ -210,6 +210,8 @@ add_subdirectory("examples")
 
 if(WIN32)
 	set(SILICIUM_CLANG_FORMAT "C:/Program Files/LLVM/bin/clang-format.exe" CACHE TYPE PATH)
+elseif(APPLE)
+	set(SILICIUM_CLANG_FORMAT "clang-format" CACHE TYPE PATH)
 else()
 	set(SILICIUM_CLANG_FORMAT "clang-format-3.7" CACHE TYPE PATH)
 endif()
