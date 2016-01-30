@@ -105,7 +105,8 @@ namespace Si
 
 			error_type append(iterator_range<element_type const *> elements)
 			{
-				std::ptrdiff_t const free = m_shared->buffer.capacity() - m_shared->buffer.size();
+				std::ptrdiff_t const free =
+				    static_cast<std::ptrdiff_t>(m_shared->buffer.capacity() - m_shared->buffer.size());
 				std::ptrdiff_t const copied = (std::min)(elements.size(), free);
 				// TODO: this Sink breaks its promise to handle all elements because we use a limited buffer. At the
 				// same time we do not really want to enlarge the buffer of the pipe indefinitely. This shows that the
