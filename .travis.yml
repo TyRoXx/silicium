@@ -37,7 +37,7 @@ env:
 matrix:
   include:
     - os: osx
-    - env: CPP=clang++ WEBSOCKETPP=OFF PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF TEST_INCLUDES=OFF BUILD_TYPE=Debug
+      env: CPP=clang++ WEBSOCKETPP=OFF PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF TEST_INCLUDES=OFF BUILD_TYPE=Debug
 
 before_install:
  - git submodule update --init --recursive
