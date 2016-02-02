@@ -150,7 +150,6 @@
 #include <silicium/source/throwing_source.hpp>
 #include <silicium/source/transforming_source.hpp>
 #include <silicium/source/virtualized_source.hpp>
-#include <silicium/sqlite3.hpp>
 #include <silicium/std_threading.hpp>
 #include <silicium/steady_clock.hpp>
 #include <silicium/success.hpp>

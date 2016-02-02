@@ -131,16 +131,6 @@ else()
 	endif()
 	include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 	link_directories(${Boost_LIBRARY_DIR})
-
-	find_package(SQLite3)
-	if(NOT SQLITE3_FOUND)
-		set(SQLITE3_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sqlite-amalgamation-3081002")
-		add_library(sqlite3 "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/sqlite-amalgamation-3081002/sqlite3.c")
-		set_target_properties(sqlite3 PROPERTIES FOLDER dependencies)
-		set(SQLITE3_LIBRARIES sqlite3)
-	endif()
-
-	include_directories(SYSTEM ${SQLITE3_INCLUDE_DIR})
 endif()
 
 if(WIN32)
