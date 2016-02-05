@@ -3,8 +3,11 @@
 
 #include <silicium/optional.hpp>
 #include <boost/align/is_aligned.hpp>
-#include <boost/align/assume_aligned.hpp>
 #include <algorithm>
+
+#if BOOST_VERSION >= 105900
+#include <boost/align/assume_aligned.hpp>
+#endif
 
 namespace Si
 {
@@ -40,9 +43,12 @@ namespace Si
 		// raw pointers to make it as easy as possible for the optimizer to understand what is being done.
 		void const *from_ptr = &from.ref();
 		void *to_ptr = &to.ref();
+#if BOOST_VERSION >= 105900
 		BOOST_ALIGN_ASSUME_ALIGNED(from_ptr, Alignment);
 		BOOST_ALIGN_ASSUME_ALIGNED(to_ptr, Alignment);
-		std::copy(static_cast<From const *>(from_ptr), static_cast<From const *>(from_ptr) + count, static_cast<To *>(to_ptr));
+#endif
+		std::copy(static_cast<From const *>(from_ptr), static_cast<From const *>(from_ptr) + count,
+		          static_cast<To *>(to_ptr));
 	}
 }
 
