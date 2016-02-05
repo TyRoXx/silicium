@@ -1,6 +1,7 @@
 #include <silicium/aligned_ref.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_HAS_ALIGNED_REF
 BOOST_AUTO_TEST_CASE(aligned_ref_ok)
 {
 	std::uint32_t buffer;
@@ -45,3 +46,4 @@ BOOST_AUTO_TEST_CASE(aligned_ref_copy)
 	         *Si::aligned_ref<char, sizeof(to)>::create(reinterpret_cast<char &>(to)), sizeof(from));
 	BOOST_CHECK_EQUAL(from, to);
 }
+#endif

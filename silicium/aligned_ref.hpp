@@ -1,8 +1,13 @@
 #ifndef SILICIUM_ALIGNED_REF_HPP
 #define SILICIUM_ALIGNED_REF_HPP
 
-#include <silicium/optional.hpp>
+#include <boost/version.hpp>
+
+#define SILICIUM_HAS_ALIGNED_REF (BOOST_VERSION >= 105600)
+
+#if SILICIUM_HAS_ALIGNED_REF
 #include <boost/align/is_aligned.hpp>
+#include <silicium/optional.hpp>
 #include <algorithm>
 
 #if BOOST_VERSION >= 105900
@@ -51,5 +56,5 @@ namespace Si
 		          static_cast<To *>(to_ptr));
 	}
 }
-
+#endif
 #endif
