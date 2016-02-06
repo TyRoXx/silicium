@@ -398,6 +398,7 @@ BOOST_AUTO_TEST_CASE(error_or_move_value)
 	BOOST_CHECK_EQUAL(42, *moved);
 }
 
+#if SILICIUM_HAS_EXCEPTIONS
 BOOST_AUTO_TEST_CASE(throw_error_std)
 {
 	std::error_code const error(123, std::generic_category());
@@ -416,3 +417,4 @@ BOOST_AUTO_TEST_CASE(throw_error_boost)
 		                      return (error == ex.code());
 		                  });
 }
+#endif
