@@ -397,3 +397,22 @@ BOOST_AUTO_TEST_CASE(error_or_move_value)
 	BOOST_REQUIRE(moved);
 	BOOST_CHECK_EQUAL(42, *moved);
 }
+
+BOOST_AUTO_TEST_CASE(throw_error_std)
+{
+	std::error_code const error(123, std::generic_category());
+	BOOST_CHECK_EXCEPTION(Si::throw_error(error), std::system_error, [error](std::system_error const &ex)
+	                      {
+		                      return (error == ex.code());
+		                  });
+}
+
+BOOST_AUTO_TEST_CASE(throw_error_boost)
+{
+	boost::system::error_code const error(123, boost::system::generic_category());
+	BOOST_CHECK_EXCEPTION(Si::throw_error(error), boost::system::system_error,
+	                      [error](boost::system::system_error const &ex)
+	                      {
+		                      return (error == ex.code());
+		                  });
+}

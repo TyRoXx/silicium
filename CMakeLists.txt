@@ -55,9 +55,6 @@ if(MSVC)
 
 	#SILICIUM_TRAIT triggers warnings about missing arguments for the macro BOOST_PP_EXPAND_I (maybe a VC++ 2013 bug?)
 	add_definitions("/wd4003")
-
-	#Boost future has unreachable code for no reason
-	add_definitions("/wd4702")
 	
 	#Boost in_place triggers /W4 warning about an assignment operator that could not be generated
 	add_definitions("/wd4512")
