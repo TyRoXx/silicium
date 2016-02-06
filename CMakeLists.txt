@@ -139,6 +139,13 @@ else()
 	else()
 		set(SILICIUM_HAS_WEBSOCKETPP OFF)
 	endif()
+
+	find_package(ZLIB)
+	if(ZLIB_FOUND)
+		include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
+	else()
+		add_definitions("-DSILICIUM_AVOID_ZLIB=1")
+	endif()
 endif()
 
 if(WIN32)
@@ -146,13 +153,6 @@ if(WIN32)
 	add_definitions("-D_WIN32_WINDOWS")
 
 	add_definitions("-DBOOST_ASIO_HAS_IOCP")
-endif()
-
-find_package(ZLIB)
-if(ZLIB_FOUND)
-	include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
-else()
-	add_definitions("-DSILICIUM_AVOID_ZLIB=1")
 endif()
 
 find_package(UriParser)
