@@ -12,3 +12,7 @@ class SiliciumConan(ConanFile):
 
     def package(self):
         self.copy(pattern="*.hpp", dst="include/silicium", src="silicium", keep_path=True)
+
+    def imports(self):
+        self.copy("*.dll", dst="bin", src="bin")
+        self.copy("*.dylib*", dst="bin", src="lib")
