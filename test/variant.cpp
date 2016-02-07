@@ -507,7 +507,7 @@ namespace Si
 
 	std::ostream &operator<<(std::ostream &out, Si::unit)
 	{
-		return out << "nothing";
+		return out << "unit";
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_construct_inplace)

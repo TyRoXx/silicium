@@ -70,14 +70,14 @@ namespace Si
 BOOST_AUTO_TEST_CASE(coroutine_generator_self_destruct)
 {
 	std::size_t steps_done = 0;
-	auto coro = Si::to_unique(Si::make_coroutine_generator<Si::nothing>([&steps_done](Si::push_context<Si::nothing> push)
+	auto coro = Si::to_unique(Si::make_coroutine_generator<Si::unit>([&steps_done](Si::push_context<Si::unit> push)
 	{
 		BOOST_REQUIRE_EQUAL(1u, steps_done);
 		++steps_done;
 		push({});
 	}));
 	BOOST_REQUIRE_EQUAL(0u, steps_done);
-	auto handler = Si::on_first(Si::ref(*coro), [&coro, &steps_done](boost::optional<Si::nothing> value)
+	auto handler = Si::on_first(Si::ref(*coro), [&coro, &steps_done](boost::optional<Si::unit> value)
 	{
 		BOOST_CHECK(value);
 		//this function is called in the coroutine

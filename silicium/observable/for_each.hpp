@@ -15,7 +15,7 @@ namespace Si
 	template <class Input, class Handler>
 	auto for_each(Input &&input, Handler &&handle_element)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> total_consumer<unique_observable<nothing>>
+	    -> total_consumer<unique_observable<unit>>
 #endif
 	{
 		typedef typename std::decay<Input>::type::element_type element;
