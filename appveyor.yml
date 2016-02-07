@@ -22,20 +22,13 @@ environment:
 
 before_build:
   - git submodule update --init
-  - git clone https://github.com/TyRoXx/ventura.git
   - mkdir build-silicium
   - cd build-silicium
   - cmake -G "Visual Studio 14" -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DBOOST_LIBRARYDIR=C:\Libraries\boost_1_59_0\lib32-msvc-14.0 -DSILICIUM_TEST_INCLUDES=ON -DSILICIUM_NO_EXCEPTIONS=%NO_EXCEPTIONS% ..
   - cd ..
-  - mkdir build-ventura
-  - cd build-ventura
-  - cmake -G "Visual Studio 14" -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DBOOST_LIBRARYDIR=C:\Libraries\boost_1_59_0\lib32-msvc-14.0 -DSILICIUM_INCLUDE_DIR=.. ../ventura
-  - cd ..
 
 build_script:
   - cd build-silicium
-  - cmake --build . --config %BUILD_TYPE%
-  - cd ..\build-ventura
   - cmake --build . --config %BUILD_TYPE%
   - cd ..
 
@@ -45,8 +38,6 @@ before_test:
 
 test_script:
   - cd build-silicium\test
-  - .\%BUILD_TYPE%\unit_test.exe
-  - cd ..\..\build-ventura\test
   - .\%BUILD_TYPE%\unit_test.exe
 
 after_test:
