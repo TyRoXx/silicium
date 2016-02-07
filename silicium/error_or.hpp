@@ -14,11 +14,19 @@ namespace Si
 	inline SILICIUM_NORETURN void throw_error(boost::system::error_code error)
 	{
 		boost::throw_exception(boost::system::system_error(error));
+#ifdef BOOST_GCC
+		// silence a warning about noreturn
+		SILICIUM_UNREACHABLE();
+#endif
 	}
 
 	inline SILICIUM_NORETURN void throw_error(std::error_code error)
 	{
 		boost::throw_exception(std::system_error(error));
+#ifdef BOOST_GCC
+		// silence a warning about noreturn
+		SILICIUM_UNREACHABLE();
+#endif
 	}
 
 	inline void throw_if_error(boost::system::error_code error)
