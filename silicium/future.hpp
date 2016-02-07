@@ -259,7 +259,8 @@ namespace Si
 			    [](waiting_for_set_value &) -> future<T, ThreadSafety>
 			    {
 				    boost::throw_exception(std::logic_error("get_future can only be called once"));
-#ifdef BOOST_GCC
+#if defined(BOOST_GCC) || (!SILICIUM_HAS_EXCEPTIONS && defined(BOOST_MSVC))
+					// avoid warnings because boost::throw_exception is not always "noreturn"
 				    SILICIUM_UNREACHABLE();
 #endif
 				});

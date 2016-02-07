@@ -7,7 +7,6 @@
 namespace boost
 {
 #ifdef BOOST_NO_EXCEPTIONS
-	SILICIUM_NORETURN
 	void throw_exception(std::exception const &e)
 	{
 		Si::ignore_unused_variable_warning(e);
