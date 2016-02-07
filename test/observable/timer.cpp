@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(asio_timer)
 			                                                       BOOST_REQUIRE(e);
 			                                                       ++elapsed_count;
 		                                                       }
-		                                                       return Si::nothing{};
+		                                                       return Si::unit{};
 		                                                   }));
 	coro.start();
 	io.run();

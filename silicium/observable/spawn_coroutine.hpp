@@ -160,7 +160,7 @@ namespace Si
 
 	struct spawn_context
 	{
-		typedef std::function<void(Observable<nothing, ptr_observer<observer<nothing>>>::interface &)> wait_function;
+		typedef std::function<void(Observable<unit, ptr_observer<observer<unit>>>::interface &)> wait_function;
 
 		spawn_context()
 		{
@@ -177,8 +177,8 @@ namespace Si
 		{
 			typedef typename std::decay<Observable>::type::element_type element_type;
 			Si::optional<element_type> result;
-			auto waiting_for = virtualize_observable<ptr_observer<observer<nothing>>>(transform_observer<nothing>(
-			    std::forward<Observable>(from), [this, &result](ptr_observer<observer<nothing>> previous_observer)
+			auto waiting_for = virtualize_observable<ptr_observer<observer<unit>>>(transform_observer<unit>(
+			    std::forward<Observable>(from), [this, &result](ptr_observer<observer<unit>> previous_observer)
 			    {
 				    std::shared_ptr<void> async_state = this->m_async_state.lock();
 				    assert(async_state);
@@ -192,7 +192,7 @@ namespace Si
 					         if (element)
 					         {
 						         result = std::move(*element);
-						         previous_observer.got_element(nothing());
+						         previous_observer.got_element(unit());
 					         }
 					         else
 					         {
@@ -211,7 +211,7 @@ namespace Si
 
 	namespace detail
 	{
-		struct spawned : std::enable_shared_from_this<spawned>, private observer<nothing>
+		struct spawned : std::enable_shared_from_this<spawned>, private observer<unit>
 		{
 			spawned()
 			    : m_suspended(false)
@@ -225,13 +225,13 @@ namespace Si
 				    [this, function](coroutine_push_type &push)
 				    {
 					    spawn_context context(
-					        [this, &push](Observable<nothing, ptr_observer<observer<nothing>>>::interface &waiting_for)
+					        [this, &push](Observable<unit, ptr_observer<observer<unit>>>::interface &waiting_for)
 					        {
 						        wait_for(waiting_for);
 						        if (m_waiting)
 						        {
 							        m_suspended = true;
-							        push(nothing());
+							        push(unit());
 						        }
 						    },
 					        std::weak_ptr<void>(this->shared_from_this()));
@@ -241,24 +241,24 @@ namespace Si
 
 		private:
 #if BOOST_VERSION >= 105500
-			typedef boost::coroutines::coroutine<nothing>::pull_type coroutine;
-			typedef boost::coroutines::coroutine<nothing>::push_type coroutine_push_type;
+			typedef boost::coroutines::coroutine<unit>::pull_type coroutine;
+			typedef boost::coroutines::coroutine<unit>::push_type coroutine_push_type;
 #else
-			typedef boost::coroutines::coroutine<nothing()> coroutine;
-			typedef boost::coroutines::coroutine<nothing()>::caller_type coroutine_push_type;
+			typedef boost::coroutines::coroutine<unit()> coroutine;
+			typedef boost::coroutines::coroutine<unit()>::caller_type coroutine_push_type;
 #endif
 
 			coroutine m_coro;
 			bool m_waiting;
 			bool m_suspended;
 
-			void wait_for(Observable<nothing, ptr_observer<observer<nothing>>>::interface &waiting_for)
+			void wait_for(Observable<unit, ptr_observer<observer<unit>>>::interface &waiting_for)
 			{
 				m_waiting = true;
-				waiting_for.async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
+				waiting_for.async_get_one(observe_by_ref(static_cast<observer<unit> &>(*this)));
 			}
 
-			void got_element(nothing) SILICIUM_OVERRIDE
+			void got_element(unit) SILICIUM_OVERRIDE
 			{
 				ended();
 			}

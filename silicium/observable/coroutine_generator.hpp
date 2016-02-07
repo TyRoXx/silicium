@@ -64,7 +64,7 @@ namespace Si
 
 		struct yield
 		{
-			Observable<nothing, ptr_observer<observer<nothing>>>::interface *target;
+			Observable<unit, ptr_observer<observer<unit>>>::interface *target;
 		};
 
 		template <class Element>
@@ -94,8 +94,7 @@ namespace Si
 				(*consumer)(detail::result<Element *>(&result));
 			}
 
-			virtual void
-			get_one(Observable<nothing, ptr_observer<observer<nothing>>>::interface &target) SILICIUM_OVERRIDE
+			virtual void get_one(Observable<unit, ptr_observer<observer<unit>>>::interface &target) SILICIUM_OVERRIDE
 			{
 				(*consumer)(detail::yield{&target});
 			}
@@ -106,7 +105,7 @@ namespace Si
 	}
 
 	template <class Element>
-	struct coroutine_generator_observable : private observer<nothing>
+	struct coroutine_generator_observable : private observer<unit>
 	{
 		typedef Element element_type;
 
@@ -172,7 +171,7 @@ namespace Si
 			    coro_;
 		}
 
-		virtual void got_element(nothing) SILICIUM_OVERRIDE
+		virtual void got_element(unit) SILICIUM_OVERRIDE
 		{
 			next();
 		}
@@ -222,7 +221,7 @@ namespace Si
 					},
 				    [this](detail::yield command)
 				    {
-					    command.target->async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
+					    command.target->async_get_one(observe_by_ref(static_cast<observer<unit> &>(*this)));
 					});
 			}
 			else

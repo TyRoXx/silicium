@@ -98,7 +98,7 @@ int main()
 		                                      {
 			                                      serve_client(*client, yield);
 			                                  });
-		                  return Si::nothing();
+		                  return Si::unit();
 		              }));
 #else
 	std::cerr << "This example requires coroutine support\n";

@@ -63,11 +63,11 @@ namespace
 
 	struct coroutine_socket
 	{
-		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, Si::push_context<Si::nothing> &yield)
+		explicit coroutine_socket(boost::asio::ip::tcp::socket &socket, Si::push_context<Si::unit> &yield)
 		    : socket(&socket)
 		    , yield(&yield)
 		    , received(4096)
-		    , receiving_(Si::observable_source<socket_observable, Si::push_context<Si::nothing>>(
+		    , receiving_(Si::observable_source<socket_observable, Si::push_context<Si::unit>>(
 		          socket_observable(socket,
 		                            Si::make_iterator_range(received.data(), received.data() + received.size())),
 		          yield))
@@ -101,9 +101,9 @@ namespace
 
 	private:
 		boost::asio::ip::tcp::socket *socket;
-		Si::push_context<Si::nothing> *yield;
+		Si::push_context<Si::unit> *yield;
 		std::vector<char> received;
-		Si::virtualized_source<Si::observable_source<socket_observable, Si::push_context<Si::nothing>>> receiving_;
+		Si::virtualized_source<Si::observable_source<socket_observable, Si::push_context<Si::unit>>> receiving_;
 	};
 
 	struct thread_socket_source : Si::Source<Si::error_or<Si::memory_range>>::interface
@@ -183,7 +183,7 @@ namespace
 		thread_socket_source receiving_;
 	};
 
-	typedef Si::shared_observable<Si::nothing> events;
+	typedef Si::shared_observable<Si::unit> events;
 
 #if SILICIUM_EXAMPLE_AVAILABLE
 	struct coroutine_web_server
@@ -208,8 +208,8 @@ namespace
 				              auto context = [visitor_count, client]() -> events
 				              {
 					              auto visitor_number_ = visitor_count;
-					              auto client_handler = Si::erase_shared(Si::make_coroutine_generator<Si::nothing>(
-					                  [client, visitor_number_](Si::push_context<Si::nothing> &yield) -> void
+					              auto client_handler = Si::erase_shared(Si::make_coroutine_generator<Si::unit>(
+					                  [client, visitor_number_](Si::push_context<Si::unit> &yield) -> void
 					                  {
 						                  coroutine_socket coro_socket(*client, yield);
 						                  return serve_client(coro_socket, visitor_number_);
@@ -233,7 +233,7 @@ namespace
 	private:
 		boost::asio::ip::tcp::acceptor acceptor;
 		Si::asio::tcp_acceptor<boost::asio::ip::tcp::acceptor *> clients;
-		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
+		Si::total_consumer<Si::unique_observable<Si::unit>> all_work;
 	};
 
 	struct thread_web_server
@@ -275,7 +275,7 @@ namespace
 	private:
 		boost::asio::ip::tcp::acceptor acceptor;
 		Si::asio::tcp_acceptor<boost::asio::ip::tcp::acceptor *> clients;
-		Si::total_consumer<Si::unique_observable<Si::nothing>> all_work;
+		Si::total_consumer<Si::unique_observable<Si::unit>> all_work;
 	};
 #endif
 }

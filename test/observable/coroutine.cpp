@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(coroutine_total_consumer)
 	auto consumer = Si::make_total_consumer(Si::make_coroutine([&executed](Si::yield_context)
 	                                                           {
 		                                                           executed = true;
-		                                                           return Si::nothing();
+		                                                           return Si::unit();
 		                                                       }));
 	BOOST_CHECK(!executed);
 	consumer.start();
@@ -69,14 +69,14 @@ BOOST_AUTO_TEST_CASE(coroutine_total_consumer)
 BOOST_AUTO_TEST_CASE(coroutine_self_destruct)
 {
 	std::size_t steps_done = 0;
-	auto coro = Si::to_unique(Si::make_coroutine([&steps_done](Si::yield_context) -> Si::nothing
+	auto coro = Si::to_unique(Si::make_coroutine([&steps_done](Si::yield_context) -> Si::unit
 	                                             {
 		                                             BOOST_REQUIRE_EQUAL(1u, steps_done);
 		                                             ++steps_done;
 		                                             return {};
 		                                         }));
 	BOOST_REQUIRE_EQUAL(0u, steps_done);
-	auto handler = Si::on_first(Si::ref(*coro), [&coro, &steps_done](Si::optional<Si::nothing> value)
+	auto handler = Si::on_first(Si::ref(*coro), [&coro, &steps_done](Si::optional<Si::unit> value)
 	                            {
 		                            BOOST_CHECK(value);
 		                            // this function is called in the coroutine
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(spawn_observable)
 	                                   {
 		                                   BOOST_REQUIRE(!elapsed);
 		                                   elapsed = true;
-		                                   return Si::nothing();
+		                                   return Si::unit();
 		                               }));
 	BOOST_CHECK(!elapsed);
 	io.run();

@@ -20,7 +20,7 @@ namespace Si
 	namespace detail
 	{
 		template <class ThreadingAPI>
-		struct event : private observer<nothing>
+		struct event : private observer<unit>
 		{
 			event()
 			    : got_something(false)
@@ -31,7 +31,7 @@ namespace Si
 			void block(NothingObservable &&blocked_on)
 			{
 				assert(!got_something);
-				blocked_on.async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
+				blocked_on.async_get_one(observe_by_ref(static_cast<observer<unit> &>(*this)));
 				typename ThreadingAPI::unique_lock lock(got_something_mutex);
 				while (!got_something)
 				{
@@ -45,7 +45,7 @@ namespace Si
 			typename ThreadingAPI::condition_variable got_something_set;
 			bool got_something;
 
-			virtual void got_element(nothing) SILICIUM_OVERRIDE
+			virtual void got_element(unit) SILICIUM_OVERRIDE
 			{
 				wake_get_one();
 			}
@@ -186,8 +186,7 @@ namespace Si
 				}
 			}
 
-			virtual void
-			get_one(Observable<nothing, ptr_observer<observer<nothing>>>::interface &target) SILICIUM_OVERRIDE
+			virtual void get_one(Observable<unit, ptr_observer<observer<unit>>>::interface &target) SILICIUM_OVERRIDE
 			{
 				got_something.block(target);
 			}

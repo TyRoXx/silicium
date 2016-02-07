@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(asio_posting_observable)
 	                                                                                                      {
 		                                                                                                      return 7;
 		                                                                                                  })),
-	                  [&got_result](Si::optional<std::future<int>> e) -> Si::nothing
+	                  [&got_result](Si::optional<std::future<int>> e) -> Si::unit
 	                  {
 		                  BOOST_REQUIRE(e);
 		                  int result = e->get();

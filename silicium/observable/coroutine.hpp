@@ -45,7 +45,7 @@ namespace Si
 	}
 
 	template <class Element>
-	struct coroutine_observable : private observer<nothing>
+	struct coroutine_observable : private observer<unit>
 	{
 		typedef Element element_type;
 
@@ -84,7 +84,7 @@ namespace Si
 		}
 
 	private:
-		typedef Observable<nothing, ptr_observer<observer<nothing>>>::interface *command_type;
+		typedef Observable<unit, ptr_observer<observer<unit>>>::interface *command_type;
 		typedef
 #if BOOST_VERSION >= 105500
 		    typename boost::coroutines::coroutine<command_type>::pull_type
@@ -109,7 +109,7 @@ namespace Si
 		std::function<Element(yield_context)> action;
 		Si::observer<Element> *receiver_;
 
-		virtual void got_element(nothing) SILICIUM_OVERRIDE
+		virtual void got_element(unit) SILICIUM_OVERRIDE
 		{
 			next();
 		}
@@ -164,7 +164,7 @@ namespace Si
 			if (*state->coro_)
 			{
 				command_type command = state->coro_->get();
-				command->async_get_one(observe_by_ref(static_cast<observer<nothing> &>(*this)));
+				command->async_get_one(observe_by_ref(static_cast<observer<unit> &>(*this)));
 			}
 			else
 			{
