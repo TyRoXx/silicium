@@ -427,9 +427,9 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(variant_overloaded_visit_unordered_with_const_visitors)
 	{
-		variant<int, nothing, std::unique_ptr<long>> v(3);
+		variant<int, unit, std::unique_ptr<long>> v(3);
 		int result = visit<int>(v,
-		                        [](nothing) -> int
+		                        [](unit) -> int
 		                        {
 			                        BOOST_FAIL("unexpected type");
 			                        return 0;
@@ -448,9 +448,9 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(variant_visit_unordered_with_mutable_visitors)
 	{
-		variant<int, nothing, std::unique_ptr<long>> v(3);
+		variant<int, unit, std::unique_ptr<long>> v(3);
 		int result = visit<int>(v,
-		                        [](nothing) mutable -> int
+		                        [](unit) mutable -> int
 		                        {
 			                        BOOST_FAIL("unexpected type");
 			                        return 0;
@@ -469,10 +469,10 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(variant_visit_return_void)
 	{
-		variant<int, nothing> v(3);
+		variant<int, unit> v(3);
 		bool got_result = false;
 		visit<void>(v,
-		            [](nothing)
+		            [](unit)
 		            {
 			            BOOST_FAIL("unexpected type");
 			        },
@@ -505,14 +505,14 @@ namespace Si
 		return out << value.v;
 	}
 
-	std::ostream &operator<<(std::ostream &out, Si::nothing)
+	std::ostream &operator<<(std::ostream &out, Si::unit)
 	{
 		return out << "nothing";
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_construct_inplace)
 	{
-		typedef variant<int, float, nothing, std::string, needs_inplace_construction> var;
+		typedef variant<int, float, unit, std::string, needs_inplace_construction> var;
 		{
 			var a(Si::inplace<int>(), 12);
 			var b(12);
@@ -524,8 +524,8 @@ namespace Si
 			BOOST_CHECK_EQUAL(b, a);
 		}
 		{
-			var a((Si::inplace<nothing>()), Si::nothing());
-			var b((Si::nothing()));
+			var a((Si::inplace<unit>()), Si::unit());
+			var b((Si::unit()));
 			BOOST_CHECK_EQUAL(b, a);
 		}
 		{
@@ -547,7 +547,7 @@ namespace Si
 				                                                BOOST_FAIL("unexpected type");
 				                                                return none;
 				                                            },
-			                                                [](nothing)
+			                                                [](unit)
 			                                                {
 				                                                BOOST_FAIL("unexpected type");
 				                                                return none;
@@ -572,14 +572,14 @@ namespace Si
 
 BOOST_AUTO_TEST_CASE(variant_try_get_ptr)
 {
-	Si::variant<Si::nothing, int, std::unique_ptr<long>> u, v(123), w(Si::make_unique<long>(456));
-	BOOST_STATIC_ASSERT((std::is_same<Si::nothing *, decltype(Si::try_get_ptr<Si::nothing>(u))>::value));
+	Si::variant<Si::unit, int, std::unique_ptr<long>> u, v(123), w(Si::make_unique<long>(456));
+	BOOST_STATIC_ASSERT((std::is_same<Si::unit *, decltype(Si::try_get_ptr<Si::unit>(u))>::value));
 	BOOST_STATIC_ASSERT((std::is_same<int *, decltype(Si::try_get_ptr<int>(u))>::value));
 	BOOST_STATIC_ASSERT(
 	    (std::is_same<std::unique_ptr<long> *, decltype(Si::try_get_ptr<std::unique_ptr<long>>(u))>::value));
-	BOOST_CHECK_NE(static_cast<Si::nothing *>(nullptr), Si::try_get_ptr<Si::nothing>(u));
-	BOOST_CHECK_EQUAL(static_cast<Si::nothing *>(nullptr), Si::try_get_ptr<Si::nothing>(v));
-	BOOST_CHECK_EQUAL(static_cast<Si::nothing *>(nullptr), Si::try_get_ptr<Si::nothing>(w));
+	BOOST_CHECK_NE(static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(u));
+	BOOST_CHECK_EQUAL(static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(v));
+	BOOST_CHECK_EQUAL(static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(w));
 	BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), Si::try_get_ptr<int>(u));
 	BOOST_REQUIRE_NE(static_cast<int *>(nullptr), Si::try_get_ptr<int>(v));
 	BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), Si::try_get_ptr<int>(w));
@@ -592,14 +592,14 @@ BOOST_AUTO_TEST_CASE(variant_try_get_ptr)
 
 BOOST_AUTO_TEST_CASE(variant_const_try_get_ptr)
 {
-	Si::variant<Si::nothing, int, std::unique_ptr<long>> const u, v(123), w(Si::make_unique<long>(456));
-	BOOST_STATIC_ASSERT((std::is_same<Si::nothing const *, decltype(Si::try_get_ptr<Si::nothing>(u))>::value));
+	Si::variant<Si::unit, int, std::unique_ptr<long>> const u, v(123), w(Si::make_unique<long>(456));
+	BOOST_STATIC_ASSERT((std::is_same<Si::unit const *, decltype(Si::try_get_ptr<Si::unit>(u))>::value));
 	BOOST_STATIC_ASSERT((std::is_same<int const *, decltype(Si::try_get_ptr<int>(u))>::value));
 	BOOST_STATIC_ASSERT(
 	    (std::is_same<std::unique_ptr<long> const *, decltype(Si::try_get_ptr<std::unique_ptr<long>>(u))>::value));
-	BOOST_CHECK_NE(static_cast<Si::nothing const *>(nullptr), Si::try_get_ptr<Si::nothing>(u));
-	BOOST_CHECK_EQUAL(static_cast<Si::nothing const *>(nullptr), Si::try_get_ptr<Si::nothing>(v));
-	BOOST_CHECK_EQUAL(static_cast<Si::nothing const *>(nullptr), Si::try_get_ptr<Si::nothing>(w));
+	BOOST_CHECK_NE(static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(u));
+	BOOST_CHECK_EQUAL(static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(v));
+	BOOST_CHECK_EQUAL(static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(w));
 	BOOST_CHECK_EQUAL(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(u));
 	BOOST_REQUIRE_NE(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(v));
 	BOOST_CHECK_EQUAL(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(w));
@@ -619,10 +619,10 @@ BOOST_AUTO_TEST_CASE(variant_sizeof)
 	BOOST_CHECK_EQUAL(sizeof(boost::uint64_t), sizeof(Si::variant<boost::uint64_t>));
 	BOOST_CHECK_EQUAL(sizeof(int *), sizeof(Si::variant<int *>));
 	BOOST_CHECK_EQUAL(sizeof(std::hash<Si::variant<int>>), sizeof(Si::variant<std::hash<Si::variant<int>>>));
-	BOOST_CHECK_EQUAL((Si::alignment_of<int *>::value + sizeof(int *)), sizeof(Si::variant<int *, int, Si::nothing>));
+	BOOST_CHECK_EQUAL((Si::alignment_of<int *>::value + sizeof(int *)), sizeof(Si::variant<int *, int, Si::unit>));
 	BOOST_CHECK_EQUAL((Si::alignment_of<std::string>::value + sizeof(std::string)),
-	                  sizeof(Si::variant<std::string, Si::nothing>));
-	BOOST_CHECK_EQUAL((sizeof(unsigned char) + sizeof(Si::nothing)), sizeof(Si::variant<Si::nothing, Si::none_t>));
+	                  sizeof(Si::variant<std::string, Si::unit>));
+	BOOST_CHECK_EQUAL((sizeof(unsigned char) + sizeof(Si::unit)), sizeof(Si::variant<Si::unit, Si::none_t>));
 }
 
 struct leaf

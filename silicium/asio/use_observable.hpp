@@ -38,7 +38,7 @@ namespace Si
 				void async_get_one(Observer &&receiver)
 				{
 					Si::visit<void>(m_waiting_or_storing,
-					                [this, &receiver](nothing)
+					                [this, &receiver](unit)
 					                {
 						                m_waiting_or_storing =
 						                    erased_observer<Element>(std::forward<Observer>(receiver));
@@ -56,14 +56,14 @@ namespace Si
 				void fulfill(Element element)
 				{
 					Si::visit<void>(m_waiting_or_storing,
-					                [this, &element](nothing)
+					                [this, &element](unit)
 					                {
 						                m_waiting_or_storing = std::move(element);
 						            },
 					                [this, &element](erased_observer<Element> &receiver)
 					                {
 						                auto moved_receiver = std::move(receiver);
-						                m_waiting_or_storing = nothing();
+						                m_waiting_or_storing = unit();
 						                std::move(moved_receiver).got_element(std::move(element));
 						            },
 					                [](element_type &)
@@ -73,7 +73,7 @@ namespace Si
 				}
 
 			private:
-				variant<nothing, erased_observer<Element>, Element> m_waiting_or_storing;
+				variant<unit, erased_observer<Element>, Element> m_waiting_or_storing;
 			};
 
 			template <class Element>

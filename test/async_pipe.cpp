@@ -18,14 +18,14 @@ namespace Si
 	struct async_pipe_reader
 	{
 		typename Source<Element>::box buffer;
-		typename Awaitable<nothing>::box readable;
+		typename Awaitable<unit>::box readable;
 	};
 
 	template <class Element>
 	struct async_pipe_writer
 	{
 		typename Sink<Element, success>::box buffer;
-		typename Awaitable<nothing>::box writable;
+		typename Awaitable<unit>::box writable;
 	};
 
 	template <class Element>
@@ -42,8 +42,8 @@ namespace Si
 		{
 			boost::circular_buffer<Element> buffer;
 			Dispatcher &dispatcher;
-			function<void(nothing)> readable_callback;
-			function<void(nothing)> writeable_callback;
+			function<void(unit)> readable_callback;
+			function<void(unit)> writeable_callback;
 
 			shared_state(std::size_t buffered_elements, Dispatcher &dispatcher)
 			    : dispatcher(dispatcher)
@@ -55,7 +55,7 @@ namespace Si
 		template <class Element, class Dispatcher>
 		struct awaitable_read
 		{
-			typedef nothing message_type;
+			typedef unit message_type;
 
 			explicit awaitable_read(std::shared_ptr<shared_state<Element, Dispatcher>> shared)
 			    : m_shared(std::move(shared))
@@ -75,7 +75,7 @@ namespace Si
 		template <class Element, class Dispatcher>
 		struct awaitable_write
 		{
-			typedef nothing message_type;
+			typedef unit message_type;
 
 			explicit awaitable_write(std::shared_ptr<shared_state<Element, Dispatcher>> shared)
 			    : m_shared(std::move(shared))
@@ -114,15 +114,15 @@ namespace Si
 				// is an unsuitable abstraction for the writer's side. We have to use something else, maybe
 				// async_write-like.
 				m_shared->buffer.insert(m_shared->buffer.end(), elements.begin(), elements.begin() + copied);
-				function<void(nothing)> readable_callback =
-				    Si::exchange(m_shared->readable_callback, function<void(nothing)>());
+				function<void(unit)> readable_callback =
+				    Si::exchange(m_shared->readable_callback, function<void(unit)>());
 				if (!readable_callback)
 				{
 					return error_type();
 				}
 				m_shared->dispatcher.post([SILICIUM_CAPTURE_EXPRESSION(readable_callback, std::move(readable_callback))]
 				                          {
-					                          readable_callback(nothing());
+					                          readable_callback(unit());
 					                      });
 				return error_type();
 			}
@@ -160,14 +160,14 @@ namespace Si
 				if (until != destination.begin())
 				{
 					// removed something from the buffer. Writing is possible again.
-					function<void(nothing)> writeable_callback =
-					    Si::exchange(m_shared->writeable_callback, function<void(nothing)>());
+					function<void(unit)> writeable_callback =
+					    Si::exchange(m_shared->writeable_callback, function<void(unit)>());
 					if (writeable_callback)
 					{
 						m_shared->dispatcher.post(
 						    [SILICIUM_CAPTURE_EXPRESSION(writeable_callback, std::move(writeable_callback))]
 						    {
-							    writeable_callback(nothing());
+							    writeable_callback(unit());
 							});
 					}
 				}
@@ -186,10 +186,10 @@ namespace Si
 		return async_pipe<Element>{
 		    async_pipe_reader<Element>{
 		        Source<Element>::make_box(detail::async_pipe_source<Element, Dispatcher>(shared)),
-		        Awaitable<nothing>::make_box(detail::awaitable_read<Element, Dispatcher>(shared))},
+		        Awaitable<unit>::make_box(detail::awaitable_read<Element, Dispatcher>(shared))},
 		    async_pipe_writer<Element>{
 		        Sink<Element, success>::make_box(detail::async_pipe_sink<Element, Dispatcher>(shared)),
-		        Awaitable<nothing>::make_box(detail::awaitable_write<Element, Dispatcher>(shared))}};
+		        Awaitable<unit>::make_box(detail::awaitable_write<Element, Dispatcher>(shared))}};
 	}
 }
 
@@ -198,11 +198,11 @@ BOOST_AUTO_TEST_CASE(async_pipe_test)
 	typedef int message;
 	boost::asio::io_service dispatcher;
 	Si::async_pipe<message> pipe = Si::make_async_pipe<message>(2u, dispatcher);
-	pipe.reader.readable.async_wait([](Si::nothing)
+	pipe.reader.readable.async_wait([](Si::unit)
 	                                {
 
 		                            });
-	pipe.writer.writable.async_wait([](Si::nothing)
+	pipe.writer.writable.async_wait([](Si::unit)
 	                                {
 
 		                            });

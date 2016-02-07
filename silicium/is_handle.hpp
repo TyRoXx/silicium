@@ -36,7 +36,7 @@ namespace Si
 	BOOST_STATIC_ASSERT(is_handle<int>::value);
 	BOOST_STATIC_ASSERT(!is_handle<int &>::value);
 	BOOST_STATIC_ASSERT(!is_handle<int const>::value);
-	BOOST_STATIC_ASSERT(is_handle<nothing>::value);
+	BOOST_STATIC_ASSERT(is_handle<unit>::value);
 	BOOST_STATIC_ASSERT(is_handle<std::unique_ptr<int>>::value);
 
 	namespace detail

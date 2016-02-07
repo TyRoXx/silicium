@@ -236,14 +236,14 @@ private:                                                                        
 
 namespace Si
 {
-	struct nothing
+	struct unit
 	{
-		BOOST_CONSTEXPR nothing() BOOST_NOEXCEPT
+		BOOST_CONSTEXPR unit() BOOST_NOEXCEPT
 		{
 		}
 	};
 
-	inline bool operator==(nothing const &, nothing const &)
+	inline bool operator==(unit const &, unit const &)
 	{
 		return true;
 	}

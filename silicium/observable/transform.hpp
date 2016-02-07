@@ -122,7 +122,7 @@ namespace Si
 #endif
 
 			template <class... Args>
-			nothing operator()(Args &&... args) const
+			unit operator()(Args &&... args) const
 			{
 				original(std::forward<Args>(args)...);
 				return {};

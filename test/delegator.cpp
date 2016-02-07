@@ -26,7 +26,7 @@ namespace tests
 		}
 
 		// TODO: empty parameter list
-		Si::optional<boost::uint64_t> max_size(Si::nothing) const
+		Si::optional<boost::uint64_t> max_size(Si::unit) const
 		{
 			return Si::none;
 		}
@@ -107,7 +107,7 @@ namespace tests
 			    return Si::success();
 			});
 		Sink<std::unique_ptr<int>, Si::success>::fat_ref const ref((function_sink_));
-		BOOST_CHECK_EQUAL(Si::optional<boost::uint64_t>(), ref.max_size(Si::nothing()));
+		BOOST_CHECK_EQUAL(Si::optional<boost::uint64_t>(), ref.max_size(Si::unit()));
 	}
 
 	BOOST_AUTO_TEST_CASE(delegator_two_arguments)

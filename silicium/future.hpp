@@ -260,7 +260,7 @@ namespace Si
 			    {
 				    boost::throw_exception(std::logic_error("get_future can only be called once"));
 #if defined(BOOST_GCC) || (!SILICIUM_HAS_EXCEPTIONS && defined(BOOST_MSVC))
-					// avoid warnings because boost::throw_exception is not always "noreturn"
+				    // avoid warnings because boost::throw_exception is not always "noreturn"
 				    SILICIUM_UNREACHABLE();
 #endif
 				});

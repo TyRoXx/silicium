@@ -923,7 +923,7 @@ namespace Si
 
 #if SILICIUM_HAS_IS_HANDLE
 	BOOST_STATIC_ASSERT(is_handle<variant<int>>::value);
-	BOOST_STATIC_ASSERT((is_handle<variant<int, nothing>>::value));
+	BOOST_STATIC_ASSERT((is_handle<variant<int, unit>>::value));
 #endif
 
 	template <class... T>

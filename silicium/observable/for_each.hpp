@@ -30,10 +30,10 @@ namespace Si
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		    erase_unique
 #endif
-		    (transform(std::forward<Input>(input), [handle_element_capture](element value) -> nothing
+		    (transform(std::forward<Input>(input), [handle_element_capture](element value) -> unit
 		               {
 			               handle_element_capture(std::move(value));
-			               return nothing();
+			               return unit();
 			           })));
 	}
 #endif

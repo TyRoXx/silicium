@@ -445,7 +445,7 @@ namespace Si
 	BOOST_STATIC_ASSERT(is_handle<optional<int *>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int const *>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int volatile>>::value);
-	BOOST_STATIC_ASSERT(is_handle<optional<nothing>>::value);
+	BOOST_STATIC_ASSERT(is_handle<optional<unit>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int &>>::value);
 	BOOST_STATIC_ASSERT(is_handle<optional<int const &>>::value);
 #endif

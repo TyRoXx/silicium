@@ -49,12 +49,12 @@ namespace
 			                                 called_tranformation = true;
 			                             });
 		bool called_consumer = false;
-		auto consumer = Si::consume<Si::nothing>([&called_tranformation, &called_consumer](Si::nothing)
-		                                         {
-			                                         BOOST_REQUIRE(called_tranformation);
-			                                         BOOST_REQUIRE(!called_consumer);
-			                                         called_consumer = true;
-			                                     });
+		auto consumer = Si::consume<Si::unit>([&called_tranformation, &called_consumer](Si::unit)
+		                                      {
+			                                      BOOST_REQUIRE(called_tranformation);
+			                                      BOOST_REQUIRE(!called_consumer);
+			                                      called_consumer = true;
+			                                  });
 		BOOST_CHECK(!called_tranformation);
 		BOOST_CHECK(!called_consumer);
 		transformed.async_get_one(Si::observe_by_ref(consumer));

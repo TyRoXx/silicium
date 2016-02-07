@@ -15,7 +15,7 @@ namespace Si
 	{
 		struct basic_yield_context
 		{
-			typedef Observable<nothing, ptr_observer<observer<nothing>>>::interface observable_type;
+			typedef Observable<unit, ptr_observer<observer<unit>>>::interface observable_type;
 			virtual ~basic_yield_context()
 			{
 			}
@@ -40,12 +40,12 @@ namespace Si
 		boost::optional<typename std::decay<Observable>::type::element_type> get_one(Observable &&from) const
 		{
 			boost::optional<typename std::decay<Observable>::type::element_type> result;
-			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(
+			auto tf = Si::virtualize_observable<ptr_observer<observer<unit>>>(
 			    Si::transform(Si::ref(from), [&result](typename std::decay<Observable>::type::element_type element)
 			                  {
 				                  assert(!result);
 				                  result = std::move(element);
-				                  return nothing{};
+				                  return unit{};
 				              }));
 			impl->get_one(tf);
 			return result;
@@ -55,12 +55,12 @@ namespace Si
 		bool get_one(Observable &&from, typename std::decay<Observable>::type::element_type &result) const
 		{
 			bool got_result = false;
-			auto tf = Si::virtualize_observable<ptr_observer<observer<nothing>>>(Si::transform(
+			auto tf = Si::virtualize_observable<ptr_observer<observer<unit>>>(Si::transform(
 			    Si::ref(from), [&result, &got_result](typename std::decay<Observable>::type::element_type element)
 			    {
 				    result = std::move(element);
 				    got_result = true;
-				    return nothing{};
+				    return unit{};
 				}));
 			impl->get_one(tf);
 			return got_result;
@@ -70,7 +70,7 @@ namespace Si
 		detail::basic_yield_context *impl;
 	};
 
-	template <class Element = nothing>
+	template <class Element = unit>
 	struct push_context : yield_context
 	{
 		explicit push_context(detail::push_context_impl<Element> &impl)
