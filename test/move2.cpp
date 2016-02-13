@@ -4,6 +4,7 @@
 #include <silicium/arithmetic/add.hpp>
 #include <boost/test/unit_test.hpp>
 
+#if SILICIUM_COMPILER_HAS_USING
 namespace Si
 {
 	namespace m2
@@ -270,3 +271,4 @@ BOOST_AUTO_TEST_CASE(move2_vector_move_assign)
 	BOOST_REQUIRE_EQUAL(0u, v.length().value());
 	BOOST_REQUIRE_EQUAL(1u, w.length().value());
 }
+#endif
