@@ -119,11 +119,16 @@ namespace Si
 			                                                          m_begin(other.m_begin),
 			                                                          m_length(other.m_length)
 			{
+				other.m_begin = piece_of_memory();
+				other.m_length = length_type::template literal<0>();
 			}
 
 			dynamic_storage &operator=(dynamic_storage &&other) BOOST_NOEXCEPT
 			{
-				std::memcpy(this, &other, sizeof(other));
+				using std::swap;
+				swap(static_cast<Allocator &>(*this), static_cast<Allocator &>(other));
+				swap(m_begin, other.m_begin);
+				swap(m_length, other.m_length);
 				return *this;
 			}
 
@@ -195,13 +200,18 @@ namespace Si
 				return emplace_back_result::success;
 			}
 
-			basic_vector(basic_vector &&other) BOOST_NOEXCEPT : m_storage(other.m_storage), m_used(other.m_used)
+			basic_vector(basic_vector &&other) BOOST_NOEXCEPT : m_storage(move(other.m_storage)), m_used(other.m_used)
 			{
+				// TODO: solve more generically
+				other.m_used = length_type::template literal<0>();
 			}
 
 			basic_vector &operator=(basic_vector &&other) BOOST_NOEXCEPT
 			{
-				std::memcpy(this, &other, sizeof(other));
+				m_storage = move(other.m_storage);
+				m_used = other.m_used;
+				// TODO: solve more generically
+				other.m_used = length_type::template literal<0>();
 				return *this;
 			}
 
@@ -231,4 +241,32 @@ BOOST_AUTO_TEST_CASE(move2_vector_emplace_back)
 	BOOST_REQUIRE(Si::m2::emplace_back_result::success == v.emplace_back(13u));
 	BOOST_REQUIRE_EQUAL(2u, v.length().value());
 	BOOST_REQUIRE_EQUAL(2u, v.capacity().value());
+}
+
+BOOST_AUTO_TEST_CASE(move2_vector_move_construct)
+{
+	Si::m2::vector<std::uint64_t, Si::bounded_int<std::size_t, 0, 10>> v{
+	    Si::m2::empty,
+	    Si::m2::dynamic_storage<std::uint64_t, Si::bounded_int<std::size_t, 0, 10>, Si::m2::standard_allocator>{
+	        Si::m2::empty}};
+	BOOST_REQUIRE(Si::m2::emplace_back_result::success == v.emplace_back(12u));
+	Si::m2::vector<std::uint64_t, Si::bounded_int<std::size_t, 0, 10>> w{std::move(v)};
+	BOOST_REQUIRE_EQUAL(0u, v.length().value());
+	BOOST_REQUIRE_EQUAL(1u, w.length().value());
+}
+
+BOOST_AUTO_TEST_CASE(move2_vector_move_assign)
+{
+	Si::m2::vector<std::uint64_t, Si::bounded_int<std::size_t, 0, 10>> v{
+	    Si::m2::empty,
+	    Si::m2::dynamic_storage<std::uint64_t, Si::bounded_int<std::size_t, 0, 10>, Si::m2::standard_allocator>{
+	        Si::m2::empty}};
+	BOOST_REQUIRE(Si::m2::emplace_back_result::success == v.emplace_back(12u));
+	Si::m2::vector<std::uint64_t, Si::bounded_int<std::size_t, 0, 10>> w{
+	    Si::m2::empty,
+	    Si::m2::dynamic_storage<std::uint64_t, Si::bounded_int<std::size_t, 0, 10>, Si::m2::standard_allocator>{
+	        Si::m2::empty}};
+	w = std::move(v);
+	BOOST_REQUIRE_EQUAL(0u, v.length().value());
+	BOOST_REQUIRE_EQUAL(1u, w.length().value());
 }
