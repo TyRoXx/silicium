@@ -142,6 +142,7 @@ namespace Si
 		enum class emplace_back_result
 		{
 			success,
+			out_of_memory,
 			full
 		};
 
@@ -180,8 +181,14 @@ namespace Si
 				if (m_storage.length() < new_size)
 				{
 					// TODO: exponential growth
-					// TODO: handle out-of-memory situation
-					m_storage.resize(new_size);
+					switch (m_storage.resize(new_size))
+					{
+					case resize_result::success:
+						break;
+
+					case resize_result::out_of_memory:
+						return emplace_back_result::out_of_memory;
+					}
 				}
 				new (&m_storage.data()) element_type{std::forward<Args>(args)...};
 				m_used = new_size;
