@@ -164,12 +164,20 @@ namespace Si
 			{
 			}
 
-			length_type capacity() const
+			~basic_vector() BOOST_NOEXCEPT
+			{
+				for (typename length_type::value_type i = 0; i < length().value(); ++i)
+				{
+					(&m_storage.data())[length().value() - 1 - i].~element_type();
+				}
+			}
+
+			length_type capacity() const BOOST_NOEXCEPT
 			{
 				return m_storage.length();
 			}
 
-			length_type length() const
+			length_type length() const BOOST_NOEXCEPT
 			{
 				return m_used;
 			}
