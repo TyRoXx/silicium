@@ -156,6 +156,18 @@ namespace Si
 		BOOST_STATIC_ASSERT(MinimumLeft <= MaximumLeft);
 		BOOST_STATIC_ASSERT(MinimumRight <= MaximumRight);
 	};
+
+	BOOST_STATIC_ASSERT(is_always_less<bounded_int<int, 0, 0>, bounded_int<int, 1, 2>>::value);
+	BOOST_STATIC_ASSERT(is_always_less<bounded_int<unsigned, 0, 0>, bounded_int<unsigned, 1, 2>>::value);
+
+	BOOST_STATIC_ASSERT(!is_always_less<bounded_int<int, 0, 0>, bounded_int<int, 0, 2>>::value);
+	BOOST_STATIC_ASSERT(!is_always_less<bounded_int<unsigned, 0, 0>, bounded_int<unsigned, 0, 2>>::value);
+
+	template <class Int, Int Value>
+	bounded_int<Int, Value, Value> literal()
+	{
+		return bounded_int<Int, Value, Value>::template literal<Value>();
+	}
 }
 
 #endif
