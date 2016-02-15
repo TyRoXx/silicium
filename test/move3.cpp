@@ -89,7 +89,7 @@ namespace Si
 
 		private:
 			bool m_is_set;
-			std::aligned_storage<sizeof(T), alignof(T)> m_storage;
+			typename std::aligned_storage<sizeof(T), alignof(T)>::type m_storage;
 
 			T &get()
 			{
