@@ -104,7 +104,7 @@ namespace Si
 			{
 			}
 
-			unique_ref(val<unique_ref> &&other) BOOST_NOEXCEPT : unique_ref(absorb(), other.require())
+			unique_ref(val<unique_ref> &&other) BOOST_NOEXCEPT : Deleter(other.require()), m_ref(other.require().m_ref)
 			{
 				other.release();
 			}
