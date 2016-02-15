@@ -82,7 +82,7 @@ namespace Si
 			{
 				if (!m_is_set)
 				{
-					throw std::logic_error("expected non-empty val");
+					boost::throw_exception(std::logic_error("expected non-empty val"));
 				}
 				return get();
 			}
@@ -93,7 +93,7 @@ namespace Si
 
 			T &get()
 			{
-				return reinterpret_cast<T &>(m_storage);
+				return reinterpret_cast<T &>(reinterpret_cast<char &>(m_storage));
 			}
 		};
 
@@ -167,7 +167,7 @@ namespace Si
 			void *const storage = std::calloc(length, sizeof(T));
 			if (!storage)
 			{
-				throw std::bad_alloc();
+				boost::throw_exception(std::bad_alloc());
 			}
 			return val<unique_ref<T, malloc_deleter>>(*static_cast<T *>(storage), malloc_deleter());
 		}
