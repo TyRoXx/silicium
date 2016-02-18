@@ -216,7 +216,7 @@ namespace Si
 	}
 }
 
-BOOST_AUTO_TEST_CASE(move3_unique_ref)
+BOOST_AUTO_TEST_CASE(move3_val)
 {
 	Si::m3::val<Si::m3::unique_ref<int, Si::m3::new_deleter>> r = Si::m3::make_unique<int>(23);
 	BOOST_CHECK_EQUAL(23, r.require().ref());
@@ -225,6 +225,8 @@ BOOST_AUTO_TEST_CASE(move3_unique_ref)
 	s.require().ref() = 24;
 	r = std::move(s);
 	BOOST_CHECK_EQUAL(24, r.require().ref());
+	Si::m3::unique_ref<int, Si::m3::new_deleter> t(std::move(r));
+	BOOST_CHECK_EQUAL(24, t.ref());
 }
 
 BOOST_AUTO_TEST_CASE(move3_vector_ref_emplace_back)
