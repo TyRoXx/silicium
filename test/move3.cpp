@@ -173,22 +173,29 @@ namespace Si
 		}
 
 		template <class T, class Length>
-		struct dynamic_array
+		struct dynamic_array : private Length
 		{
 			template <class ElementGenerator>
 			dynamic_array(Length length, ElementGenerator &&generate_elements) BOOST_NOEXCEPT
-			    : m_elements(allocate_array_storage<T>(length.value())),
-			      m_length(length)
+			    : Length(length), m_elements(allocate_array_storage<T>(length.value()))
 			{
-				for (typename Length::value_type i = 0, c = m_length.value(); i < c; ++i)
+				for (typename Length::value_type i = 0, c = this->length().value(); i < c; ++i)
 				{
 					new (static_cast<void *>((&m_elements.ref()) + i)) T(generate_elements());
 				}
 			}
 
+			~dynamic_array() BOOST_NOEXCEPT
+			{
+				for (typename Length::value_type i = 0, c = length().value(); i < c; ++i)
+				{
+					(&m_elements.ref())[c - i - 1].~T();
+				}
+			}
+
 			Length length() const BOOST_NOEXCEPT
 			{
-				return m_length;
+				return *this;
 			}
 
 			array_view<T, Length> as_view() const BOOST_NOEXCEPT
@@ -196,9 +203,10 @@ namespace Si
 				return array_view<T, Length>(m_elements.ref(), length());
 			}
 
+			SILICIUM_DISABLE_COPY(dynamic_array)
+
 		private:
 			unique_ref<T, malloc_deleter> m_elements;
-			Length m_length;
 		};
 	}
 }
