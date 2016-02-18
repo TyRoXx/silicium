@@ -9,9 +9,11 @@ namespace Si
 {
 	namespace m3
 	{
-		struct absorb
+		template <class T>
+		void trivial_copy(T &destination, T const &source)
 		{
-		};
+			std::memcpy(&destination, &source, sizeof(source));
+		}
 
 		template <class T>
 		struct val
@@ -36,7 +38,7 @@ namespace Si
 			{
 				if (m_is_set)
 				{
-					new (static_cast<void *>(&get())) T(absorb(), other.get());
+					trivial_copy(get(), other.get());
 					other.m_is_set = false;
 				}
 			}
@@ -48,7 +50,7 @@ namespace Si
 					if (other.m_is_set)
 					{
 						get().~T();
-						new (static_cast<void *>(&get())) T(absorb(), other.get());
+						trivial_copy(get(), other.get());
 						other.m_is_set = false;
 					}
 					else
@@ -61,7 +63,7 @@ namespace Si
 				{
 					if (other.m_is_set)
 					{
-						new (static_cast<void *>(&get())) T(absorb(), other.get());
+						trivial_copy(get(), other.get());
 						other.m_is_set = false;
 						m_is_set = true;
 					}
@@ -87,6 +89,12 @@ namespace Si
 				return get();
 			}
 
+			void transfer(T &destination) BOOST_NOEXCEPT
+			{
+				trivial_copy(destination, require());
+				release();
+			}
+
 		private:
 			bool m_is_set;
 			typename std::aligned_storage<sizeof(T), alignof(T)>::type m_storage;
@@ -104,13 +112,9 @@ namespace Si
 			{
 			}
 
-			unique_ref(val<unique_ref> &&other) BOOST_NOEXCEPT : Deleter(other.require()), m_ptr(other.require().m_ptr)
+			explicit unique_ref(val<unique_ref> other) BOOST_NOEXCEPT
 			{
-				other.release();
-			}
-
-			unique_ref(absorb, unique_ref const &other) BOOST_NOEXCEPT : Deleter(other), m_ptr(other.m_ptr)
-			{
+				other.transfer(*this);
 			}
 
 			~unique_ref() BOOST_NOEXCEPT
@@ -177,11 +181,12 @@ namespace Si
 		{
 			template <class ElementGenerator>
 			dynamic_array(Length length, ElementGenerator &&generate_elements) BOOST_NOEXCEPT
-			    : Length(length), m_elements(allocate_array_storage<T>(length.value()))
+			    : Length(length),
+			      m_elements(allocate_array_storage<T>(length.value()))
 			{
 				for (typename Length::value_type i = 0, c = this->length().value(); i < c; ++i)
 				{
-					new (static_cast<void *>((&m_elements.ref()) + i)) T(generate_elements());
+					generate_elements().transfer((&m_elements.ref())[i]);
 				}
 			}
 
@@ -209,6 +214,17 @@ namespace Si
 			unique_ref<T, malloc_deleter> m_elements;
 		};
 	}
+}
+
+BOOST_AUTO_TEST_CASE(move3_unique_ref)
+{
+	Si::m3::val<Si::m3::unique_ref<int, Si::m3::new_deleter>> r = Si::m3::make_unique<int>(23);
+	BOOST_CHECK_EQUAL(23, r.require().ref());
+	Si::m3::val<Si::m3::unique_ref<int, Si::m3::new_deleter>> s = std::move(r);
+	BOOST_CHECK_EQUAL(23, s.require().ref());
+	s.require().ref() = 24;
+	r = std::move(s);
+	BOOST_CHECK_EQUAL(24, r.require().ref());
 }
 
 BOOST_AUTO_TEST_CASE(move3_vector_ref_emplace_back)
