@@ -100,33 +100,33 @@ namespace Si
 		template <class T, class Deleter>
 		struct unique_ref : private Deleter
 		{
-			explicit unique_ref(T &ref, Deleter deleter) BOOST_NOEXCEPT : Deleter(deleter), m_ref(ref)
+			explicit unique_ref(T &ref, Deleter deleter) BOOST_NOEXCEPT : Deleter(deleter), m_ptr(&ref)
 			{
 			}
 
-			unique_ref(val<unique_ref> &&other) BOOST_NOEXCEPT : Deleter(other.require()), m_ref(other.require().m_ref)
+			unique_ref(val<unique_ref> &&other) BOOST_NOEXCEPT : Deleter(other.require()), m_ptr(other.require().m_ptr)
 			{
 				other.release();
 			}
 
-			unique_ref(absorb, unique_ref const &other) BOOST_NOEXCEPT : Deleter(other), m_ref(other.m_ref)
+			unique_ref(absorb, unique_ref const &other) BOOST_NOEXCEPT : Deleter(other), m_ptr(other.m_ptr)
 			{
 			}
 
 			~unique_ref() BOOST_NOEXCEPT
 			{
-				Deleter::operator()(m_ref);
+				Deleter::operator()(*m_ptr);
 			}
 
 			SILICIUM_DISABLE_COPY(unique_ref)
 
 			T &ref() const BOOST_NOEXCEPT
 			{
-				return m_ref;
+				return *m_ptr;
 			}
 
 		private:
-			T &m_ref;
+			T *m_ptr;
 		};
 
 		struct new_deleter
