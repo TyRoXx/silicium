@@ -18,6 +18,10 @@ namespace Si
 		template <class T>
 		struct val
 		{
+			val() BOOST_NOEXCEPT : m_is_set(false)
+			{
+			}
+
 			template <class... Args>
 			explicit val(Args &&... args)
 			    : m_is_set(true)
@@ -95,6 +99,14 @@ namespace Si
 				release();
 			}
 
+			static val steal(T &from)
+			{
+				val result;
+				trivial_copy(result.get(), from);
+				result.m_is_set = true;
+				return result;
+			}
+
 		private:
 			bool m_is_set;
 			typename std::aligned_storage<sizeof(T), alignof(T)>::type m_storage;
@@ -104,6 +116,12 @@ namespace Si
 				return reinterpret_cast<T &>(reinterpret_cast<char &>(m_storage));
 			}
 		};
+
+		template <class T>
+		val<T> steal(T &stolen)
+		{
+			return val<T>::steal(stolen);
+		}
 
 		template <class T, class Deleter>
 		struct unique_ref : private Deleter
@@ -190,6 +208,13 @@ namespace Si
 				}
 			}
 
+			explicit dynamic_array(val<dynamic_array> other) BOOST_NOEXCEPT
+			    : Length(other.require()),
+			      m_elements(steal(other.require().m_elements))
+			{
+				other.release();
+			}
+
 			~dynamic_array() BOOST_NOEXCEPT
 			{
 				for (typename Length::value_type i = 0, c = length().value(); i < c; ++i)
@@ -237,6 +262,26 @@ BOOST_AUTO_TEST_CASE(move3_vector_ref_emplace_back)
 	    {
 		    return Si::m3::make_unique<int>(23);
 		});
+	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), v.length());
+	Si::array_view<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type> const range = v.as_view();
+	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), range.length());
+	Si::m3::unique_ref<int, Si::m3::new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
+	BOOST_CHECK_EQUAL(element.ref(), 23);
+}
+
+BOOST_AUTO_TEST_CASE(move3_val_of_vector)
+{
+	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
+	auto create_array = []()
+	{
+		return Si::m3::val<Si::m3::dynamic_array<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type>>(
+		    length_type::literal<1>(), []()
+		    {
+			    return Si::m3::make_unique<int>(23);
+			});
+	};
+	Si::m3::val<Si::m3::dynamic_array<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type>> a = create_array();
+	Si::m3::dynamic_array<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type> const v(std::move(a));
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), v.length());
 	Si::array_view<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type> const range = v.as_view();
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), range.length());
