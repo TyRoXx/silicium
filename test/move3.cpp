@@ -99,7 +99,7 @@ namespace Si
 				release();
 			}
 
-			static val steal(T &from)
+			static val steal(T const &from)
 			{
 				val result;
 				trivial_copy(result.get(), from);
@@ -118,7 +118,7 @@ namespace Si
 		};
 
 		template <class T>
-		val<T> steal(T &stolen)
+		val<T> steal(T const &stolen)
 		{
 			return val<T>::steal(stolen);
 		}
@@ -238,6 +238,78 @@ namespace Si
 		private:
 			unique_ref<T, malloc_deleter> m_elements;
 		};
+
+		template <class... T>
+		struct tuple_impl;
+
+		template <>
+		struct tuple_impl<>
+		{
+			tuple_impl() BOOST_NOEXCEPT
+			{
+			}
+
+			explicit tuple_impl(tuple_impl const &) BOOST_NOEXCEPT
+			{
+			}
+		};
+
+		template <class Head, class... Tail>
+		struct tuple_impl<Head, Tail...> : private tuple_impl<Tail...>
+		{
+			template <class First, class... Rest>
+			explicit tuple_impl(First &&first, Rest &&... rest) BOOST_NOEXCEPT : base(std::forward<Rest>(rest)...),
+			                                                                     m_head(std::forward<First>(first))
+			{
+			}
+
+			explicit tuple_impl(tuple_impl<Head, Tail...> const &stolen) BOOST_NOEXCEPT
+			    : base(static_cast<base const &>(stolen)),
+			      m_head(steal(stolen.m_head))
+			{
+			}
+
+		private:
+			typedef tuple_impl<Tail...> base;
+
+			Head m_head;
+		};
+
+		template <class... T>
+		struct tuple : private tuple_impl<T...>
+		{
+			template <class... Elements>
+			explicit tuple(Elements &&... elements) BOOST_NOEXCEPT : base(std::forward<Elements>(elements)...)
+			{
+			}
+
+			explicit tuple(val<tuple> other) BOOST_NOEXCEPT : base(static_cast<base const &>(other.require()))
+			{
+				other.release();
+			}
+
+		private:
+			typedef tuple_impl<T...> base;
+		};
+
+		template <class T>
+		struct make_tuple_decay
+		{
+			typedef T type;
+		};
+
+		template <class T>
+		struct make_tuple_decay<val<T>>
+		{
+			typedef T type;
+		};
+
+		template <class... T>
+		auto make_tuple(T &&... elements)
+		{
+			return val<tuple<typename make_tuple_decay<typename std::decay<T>::type>::type>...>(
+			    std::forward<T>(elements)...);
+		}
 	}
 }
 
@@ -287,4 +359,12 @@ BOOST_AUTO_TEST_CASE(move3_val_of_vector)
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), range.length());
 	Si::m3::unique_ref<int, Si::m3::new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
 	BOOST_CHECK_EQUAL(element.ref(), 23);
+}
+
+BOOST_AUTO_TEST_CASE(move3_make_tuple)
+{
+	using namespace Si::m3;
+	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
+	val<tuple<unique_ref<int, new_deleter>>> t = make_tuple(make_unique<int>(23));
+	tuple<unique_ref<int, new_deleter>> u(std::move(t));
 }
