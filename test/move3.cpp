@@ -239,6 +239,9 @@ namespace Si
 			unique_ref<T, malloc_deleter> m_elements;
 		};
 
+#define SILICIUM_M3_HAS_TUPLE SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION
+
+#if SILICIUM_M3_HAS_TUPLE
 		template <std::size_t I, class... T>
 		struct type_at;
 
@@ -349,6 +352,7 @@ namespace Si
 			return val<tuple<typename make_tuple_decay<typename std::decay<T>::type>::type>...>(
 			    std::forward<T>(elements)...);
 		}
+#endif
 	}
 }
 
@@ -400,6 +404,7 @@ BOOST_AUTO_TEST_CASE(move3_val_of_vector)
 	BOOST_CHECK_EQUAL(element.ref(), 23);
 }
 
+#if SILICIUM_M3_HAS_TUPLE
 BOOST_AUTO_TEST_CASE(move3_make_tuple)
 {
 	val<tuple<unique_ref<int, new_deleter>>> t = make_tuple(make_unique<int>(23));
@@ -407,3 +412,4 @@ BOOST_AUTO_TEST_CASE(move3_make_tuple)
 	unique_ref<int, new_deleter> &element = get<0>(u);
 	BOOST_CHECK_EQUAL(23, element.ref());
 }
+#endif
