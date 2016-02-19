@@ -402,7 +402,6 @@ BOOST_AUTO_TEST_CASE(move3_val_of_vector)
 BOOST_AUTO_TEST_CASE(move3_make_tuple)
 {
 	using namespace Si::m3;
-	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
 	val<tuple<unique_ref<int, new_deleter>>> t = make_tuple(make_unique<int>(23));
 	tuple<unique_ref<int, new_deleter>> u(std::move(t));
 	unique_ref<int, new_deleter> &element = get<0>(u);
