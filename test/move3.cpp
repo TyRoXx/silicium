@@ -351,31 +351,32 @@ namespace Si
 	}
 }
 
+using namespace Si::m3;
+
 BOOST_AUTO_TEST_CASE(move3_val)
 {
-	Si::m3::val<Si::m3::unique_ref<int, Si::m3::new_deleter>> r = Si::m3::make_unique<int>(23);
+	val<unique_ref<int, new_deleter>> r = make_unique<int>(23);
 	BOOST_CHECK_EQUAL(23, r.require().ref());
-	Si::m3::val<Si::m3::unique_ref<int, Si::m3::new_deleter>> s = std::move(r);
+	val<unique_ref<int, new_deleter>> s = std::move(r);
 	BOOST_CHECK_EQUAL(23, s.require().ref());
 	s.require().ref() = 24;
 	r = std::move(s);
 	BOOST_CHECK_EQUAL(24, r.require().ref());
-	Si::m3::unique_ref<int, Si::m3::new_deleter> t(std::move(r));
+	unique_ref<int, new_deleter> t(std::move(r));
 	BOOST_CHECK_EQUAL(24, t.ref());
 }
 
 BOOST_AUTO_TEST_CASE(move3_vector_ref_emplace_back)
 {
 	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
-	Si::m3::dynamic_array<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type> const v(
-	    length_type::literal<1>(), []()
-	    {
-		    return Si::m3::make_unique<int>(23);
-		});
+	dynamic_array<unique_ref<int, new_deleter>, length_type> const v(length_type::literal<1>(), []()
+	                                                                 {
+		                                                                 return make_unique<int>(23);
+		                                                             });
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), v.length());
-	Si::array_view<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type> const range = v.as_view();
+	Si::array_view<unique_ref<int, new_deleter>, length_type> const range = v.as_view();
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), range.length());
-	Si::m3::unique_ref<int, Si::m3::new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
+	unique_ref<int, new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
 	BOOST_CHECK_EQUAL(element.ref(), 23);
 }
 
@@ -384,24 +385,22 @@ BOOST_AUTO_TEST_CASE(move3_val_of_vector)
 	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
 	auto create_array = []()
 	{
-		return Si::m3::val<Si::m3::dynamic_array<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type>>(
-		    length_type::literal<1>(), []()
-		    {
-			    return Si::m3::make_unique<int>(23);
-			});
+		return val<dynamic_array<unique_ref<int, new_deleter>, length_type>>(length_type::literal<1>(), []()
+		                                                                     {
+			                                                                     return make_unique<int>(23);
+			                                                                 });
 	};
-	Si::m3::val<Si::m3::dynamic_array<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type>> a = create_array();
-	Si::m3::dynamic_array<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type> const v(std::move(a));
+	val<dynamic_array<unique_ref<int, new_deleter>, length_type>> a = create_array();
+	dynamic_array<unique_ref<int, new_deleter>, length_type> const v(std::move(a));
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), v.length());
-	Si::array_view<Si::m3::unique_ref<int, Si::m3::new_deleter>, length_type> const range = v.as_view();
+	Si::array_view<unique_ref<int, new_deleter>, length_type> const range = v.as_view();
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), range.length());
-	Si::m3::unique_ref<int, Si::m3::new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
+	unique_ref<int, new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
 	BOOST_CHECK_EQUAL(element.ref(), 23);
 }
 
 BOOST_AUTO_TEST_CASE(move3_make_tuple)
 {
-	using namespace Si::m3;
 	val<tuple<unique_ref<int, new_deleter>>> t = make_tuple(make_unique<int>(23));
 	tuple<unique_ref<int, new_deleter>> u(std::move(t));
 	unique_ref<int, new_deleter> &element = get<0>(u);
