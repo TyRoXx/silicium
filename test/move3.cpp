@@ -344,6 +344,7 @@ namespace Si
 
 		template <class... T>
 		auto make_tuple(T &&... elements)
+		    -> val<tuple<typename make_tuple_decay<typename std::decay<T>::type>::type>...>
 		{
 			return val<tuple<typename make_tuple_decay<typename std::decay<T>::type>::type>...>(
 			    std::forward<T>(elements)...);
