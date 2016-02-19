@@ -239,6 +239,21 @@ namespace Si
 			unique_ref<T, malloc_deleter> m_elements;
 		};
 
+		template <std::size_t I, class... T>
+		struct type_at;
+
+		template <class Head, class... Tail>
+		struct type_at<0, Head, Tail...>
+		{
+			typedef Head type;
+		};
+
+		template <std::size_t I, class Head, class... Tail>
+		struct type_at<I, Head, Tail...>
+		{
+			typedef typename type_at<I - 1, Tail...>::type type;
+		};
+
 		template <class... T>
 		struct tuple_impl;
 
@@ -269,6 +284,17 @@ namespace Si
 			{
 			}
 
+			Head &get(std::integral_constant<std::size_t, 0>)
+			{
+				return m_head;
+			}
+
+			template <std::size_t I>
+			typename type_at<I - 1, Tail...>::type &get(std::integral_constant<std::size_t, I>)
+			{
+				return base::template get(std::integral_constant<std::size_t, I - 1>());
+			}
+
 		private:
 			typedef tuple_impl<Tail...> base;
 
@@ -288,9 +314,21 @@ namespace Si
 				other.release();
 			}
 
+			template <std::size_t I>
+			typename type_at<I, T...>::type &get()
+			{
+				return base::template get(std::integral_constant<std::size_t, I>());
+			}
+
 		private:
 			typedef tuple_impl<T...> base;
 		};
+
+		template <std::size_t I, class... T>
+		typename type_at<I, T...>::type &get(tuple<T...> &from)
+		{
+			return from.template get<I>();
+		}
 
 		template <class T>
 		struct make_tuple_decay
@@ -367,4 +405,6 @@ BOOST_AUTO_TEST_CASE(move3_make_tuple)
 	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
 	val<tuple<unique_ref<int, new_deleter>>> t = make_tuple(make_unique<int>(23));
 	tuple<unique_ref<int, new_deleter>> u(std::move(t));
+	unique_ref<int, new_deleter> &element = get<0>(u);
+	BOOST_CHECK_EQUAL(23, element.ref());
 }
