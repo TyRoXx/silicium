@@ -694,4 +694,60 @@ BOOST_AUTO_TEST_CASE(variant_move_throws)
 }
 #endif
 
+namespace
+{
+	struct add;
+	struct reference;
+	struct literal;
+
+	// important: the elements are undefined types here
+	typedef Si::variant<add, reference, literal> expression;
+
+	struct add
+	{
+		std::unique_ptr<expression> left;
+		std::unique_ptr<expression> right;
+	};
+
+	struct reference
+	{
+		std::string name;
+	};
+
+	struct literal
+	{
+		std::uint64_t value;
+	};
+
+	void print(std::ostream &out, expression const &root)
+	{
+		Si::visit<void>(root,
+		                [&out](add const &add_)
+		                {
+			                out << '(';
+			                print(out, *add_.left);
+			                out << " + ";
+			                print(out, *add_.right);
+			                out << ')';
+			            },
+		                [&out](reference const &reference_)
+		                {
+			                out << reference_.name;
+			            },
+		                [&out](literal const &literal_)
+		                {
+			                out << literal_.value;
+			            });
+	}
+}
+
+BOOST_AUTO_TEST_CASE(variant_of_incomplete_types)
+{
+	std::unique_ptr<expression> right = Si::make_unique<expression>(
+	    add{Si::make_unique<expression>(reference{"b"}), Si::make_unique<expression>(literal{1})});
+	expression root = add{Si::make_unique<expression>(reference{"a"}), std::move(right)};
+	std::ostringstream buffer;
+	print(buffer, root);
+	BOOST_CHECK_EQUAL("(a + (b + 1))", buffer.str());
+}
 #endif

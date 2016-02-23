@@ -736,47 +736,14 @@ namespace Si
 			}
 		};
 
-#if SILICIUM_HAS_COPY_TRAITS
-		template <class... T>
-		struct are_copyable;
-
-		template <class First, class... T>
-		struct are_copyable<First, T...>
-		    : boost::mpl::and_<boost::mpl::and_<Si::is_copy_constructible<First>, Si::is_copy_assignable<First>>,
-		                       are_copyable<T...>>::type
-		{
-		};
-
-		template <>
-		struct are_copyable<> : std::true_type
-		{
-		};
-#else
-		template <class... T>
-		struct are_copyable : std::true_type
-		{
-		};
-#endif
-
-		BOOST_STATIC_ASSERT(are_copyable<>::value);
-		BOOST_STATIC_ASSERT(are_copyable<int>::value);
-		BOOST_STATIC_ASSERT((are_copyable<int, float>::value));
-
-// In VC++ 2013 Update 3 the type traits is_copy_constructible and is_copy_assignable still return true for unique_ptr,
-// so this assert would fail.
-#if SILICIUM_HAS_COPY_TRAITS
-		// GCC 4.6 with Boost < 1.55 is also a problem
-		BOOST_STATIC_ASSERT((!are_copyable<int, std::unique_ptr<int>>::value));
-#endif
-
 #if SILICIUM_COMPILER_HAS_USING
 		template <class... T>
-		using select_variant_base = variant_base<are_copyable<T...>::value, T...>;
+		using select_variant_base = variant_base<true, T...>;
 #else
 		template <class... T>
 		struct select_variant_base
 		{
-			typedef variant_base<are_copyable<T...>::value, T...> type;
+			typedef variant_base<true, T...> type;
 		};
 #endif
 
