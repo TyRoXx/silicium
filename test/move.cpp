@@ -47,7 +47,8 @@ struct non_noexcept_movable
 		return *this;
 	}
 
-	non_noexcept_movable &operator=(non_noexcept_movable &&other) BOOST_NOEXCEPT_IF(false)
+	non_noexcept_movable &operator=(non_noexcept_movable &&other)
+	    BOOST_NOEXCEPT_IF(false)
 	{
 		state = other.state;
 		other.state = 0;

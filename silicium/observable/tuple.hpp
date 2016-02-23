@@ -5,7 +5,7 @@
 #include <silicium/config.hpp>
 #include <bitset>
 
-#if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING ||                                         \
+#if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING || \
     SILICIUM_GCC47 /*GCC 4.7 crashes when using tuple*/
 #define SILICIUM_RX_TUPLE_AVAILABLE 0
 #else
@@ -107,11 +107,13 @@ namespace Si
 		template <std::size_t... I>
 		struct make_observers<ranges::v3::integer_sequence<I...>>
 		{
-			typedef std::tuple<tuple_observer<typename Parts::element_type, I>...> type;
+			typedef std::tuple<
+			    tuple_observer<typename Parts::element_type, I>...> type;
 		};
 
-		typedef typename make_observers<typename ranges::v3::make_integer_sequence<sizeof...(Parts)>::type>::type
-		    observers_type;
+		typedef
+		    typename make_observers<typename ranges::v3::make_integer_sequence<
+		        sizeof...(Parts)>::type>::type observers_type;
 
 		parts_tuple parts;
 		observer<buffer_tuple> *receiver = nullptr;
@@ -153,7 +155,8 @@ namespace Si
 	    -> tuple_observable<typename std::decay<Parts>::type...>
 #endif
 	{
-		return tuple_observable<typename std::decay<Parts>::type...>(std::make_tuple(std::forward<Parts>(parts)...));
+		return tuple_observable<typename std::decay<Parts>::type...>(
+		    std::make_tuple(std::forward<Parts>(parts)...));
 	}
 #endif
 }

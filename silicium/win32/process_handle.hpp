@@ -27,7 +27,8 @@ namespace Si
 			wait_for_exit();
 		}
 
-		process_handle(process_handle &&other) BOOST_NOEXCEPT : m_id(INVALID_HANDLE_VALUE)
+		process_handle(process_handle &&other) BOOST_NOEXCEPT
+		    : m_id(INVALID_HANDLE_VALUE)
 		{
 			swap(other);
 		}
@@ -61,7 +62,8 @@ namespace Si
 		HANDLE m_id;
 
 		SILICIUM_DELETED_FUNCTION(process_handle(process_handle const &))
-		SILICIUM_DELETED_FUNCTION(process_handle &operator=(process_handle const &))
+		SILICIUM_DELETED_FUNCTION(
+		    process_handle &operator=(process_handle const &))
 	};
 }
 

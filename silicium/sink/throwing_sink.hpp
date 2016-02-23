@@ -43,7 +43,8 @@ namespace Si
 	    -> throwing_sink<typename std::decay<Next>::type>
 #endif
 	{
-		return throwing_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
+		return throwing_sink<typename std::decay<Next>::type>(
+		    std::forward<Next>(next));
 	}
 }
 

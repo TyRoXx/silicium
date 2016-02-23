@@ -25,8 +25,8 @@ namespace Si
 		{
 			switch (ev)
 			{
-#define SILICIUM_HANDLE_ERROR_CASE(error)                                                                              \
-	case error:                                                                                                        \
+#define SILICIUM_HANDLE_ERROR_CASE(error)                                      \
+	case error:                                                                \
 		return BOOST_STRINGIZE(error);
 				SILICIUM_HANDLE_ERROR_CASE(Z_ERRNO)
 				SILICIUM_HANDLE_ERROR_CASE(Z_STREAM_ERROR)
@@ -53,7 +53,8 @@ namespace Si
 		{
 			return;
 		}
-		boost::throw_exception(boost::system::system_error(status, zlib_category()));
+		boost::throw_exception(
+		    boost::system::system_error(status, zlib_category()));
 	}
 }
 #endif

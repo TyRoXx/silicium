@@ -80,35 +80,42 @@ namespace Si
 	};
 
 	template <class Element>
-	memory_source<Element> make_container_source(std::vector<Element> const &container)
+	memory_source<Element>
+	make_container_source(std::vector<Element> const &container)
 	{
-		return memory_source<Element>(
-		    iterator_range<Element const *>(container.data(), container.data() + container.size()));
+		return memory_source<Element>(iterator_range<Element const *>(
+		    container.data(), container.data() + container.size()));
 	}
 
 	template <class Element, std::size_t N>
-	memory_source<Element> make_container_source(std::array<Element, N> const &container)
+	memory_source<Element>
+	make_container_source(std::array<Element, N> const &container)
 	{
-		return memory_source<Element>(make_iterator_range(container.data(), container.data() + container.size()));
+		return memory_source<Element>(make_iterator_range(
+		    container.data(), container.data() + container.size()));
 	}
 
 	template <class Element, std::size_t N>
-	mutable_memory_source<Element> make_container_source(std::array<Element, N> &&container)
+	mutable_memory_source<Element>
+	make_container_source(std::array<Element, N> &&container)
 	{
-		return mutable_memory_source<Element>(
-		    make_iterator_range(container.data(), container.data() + container.size()));
+		return mutable_memory_source<Element>(make_iterator_range(
+		    container.data(), container.data() + container.size()));
 	}
 
 	template <class Element>
-	memory_source<Element> make_container_source(std::basic_string<Element> const &container)
+	memory_source<Element>
+	make_container_source(std::basic_string<Element> const &container)
 	{
-		return memory_source<Element>(make_iterator_range(container.data(), container.data() + container.size()));
+		return memory_source<Element>(make_iterator_range(
+		    container.data(), container.data() + container.size()));
 	}
 
 	template <class Element>
 	memory_source<Element> make_c_str_source(Element const *c_str)
 	{
-		return memory_source<Element>(make_iterator_range(c_str, c_str + std::char_traits<Element>::length(c_str)));
+		return memory_source<Element>(make_iterator_range(
+		    c_str, c_str + std::char_traits<Element>::length(c_str)));
 	}
 }
 

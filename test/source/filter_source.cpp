@@ -6,15 +6,16 @@
 
 BOOST_AUTO_TEST_CASE(filter_source_true)
 {
-	auto f = Si::make_filter_source(Si::make_generator_source([]() -> Si::optional<int>
-	                                                          {
-		                                                          return 2;
-		                                                      }),
-	                                [](int element)
-	                                {
-		                                BOOST_REQUIRE_EQUAL(2, element);
-		                                return true;
-		                            });
+	auto f = Si::make_filter_source(
+	    Si::make_generator_source([]() -> Si::optional<int>
+	                              {
+		                              return 2;
+		                          }),
+	    [](int element)
+	    {
+		    BOOST_REQUIRE_EQUAL(2, element);
+		    return true;
+		});
 	Si::optional<int> element = Si::get(f);
 	BOOST_CHECK_EQUAL(2, element);
 }
@@ -22,7 +23,8 @@ BOOST_AUTO_TEST_CASE(filter_source_true)
 BOOST_AUTO_TEST_CASE(filter_source_false)
 {
 	std::vector<int> const elements = boost::assign::list_of(1)(2)(3);
-	auto f = Si::make_filter_source(Si::make_container_source(elements), [](int element)
+	auto f = Si::make_filter_source(Si::make_container_source(elements),
+	                                [](int element)
 	                                {
 		                                return element >= 3;
 		                            });

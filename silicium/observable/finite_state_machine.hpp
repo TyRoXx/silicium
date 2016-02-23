@@ -59,7 +59,8 @@ namespace Si
 		{
 			assert(!receiver_);
 			receiver_ = receiver.get();
-			in.async_get_one(Si::observe_by_ref(static_cast<observer<typename In::element_type> &>(*this)));
+			in.async_get_one(Si::observe_by_ref(
+			    static_cast<observer<typename In::element_type> &>(*this)));
 		}
 
 	private:
@@ -70,10 +71,12 @@ namespace Si
 		bool has_ended;
 		observer<element_type> *receiver_;
 
-		virtual void got_element(typename In::element_type value) SILICIUM_OVERRIDE
+		virtual void
+		got_element(typename In::element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
-			boost::optional<element_type> next = step(std::move(state), std::move(value));
+			boost::optional<element_type> next =
+			    step(std::move(state), std::move(value));
 			if (next)
 			{
 				state = std::move(*next);
@@ -100,18 +103,23 @@ namespace Si
 			}
 		}
 
-		SILICIUM_DELETED_FUNCTION(finite_state_machine(finite_state_machine const &))
-		SILICIUM_DELETED_FUNCTION(finite_state_machine &operator=(finite_state_machine const &))
+		SILICIUM_DELETED_FUNCTION(
+		    finite_state_machine(finite_state_machine const &))
+		SILICIUM_DELETED_FUNCTION(
+		    finite_state_machine &operator=(finite_state_machine const &))
 	};
 
 	template <class In, class State, class Step>
 	auto make_finite_state_machine(In &&in, State &&initial_state, Step &&step)
-	    -> finite_state_machine<typename std::decay<In>::type, typename std::decay<State>::type,
+	    -> finite_state_machine<typename std::decay<In>::type,
+	                            typename std::decay<State>::type,
 	                            typename std::decay<Step>::type>
 	{
-		return finite_state_machine<typename std::decay<In>::type, typename std::decay<State>::type,
+		return finite_state_machine<typename std::decay<In>::type,
+		                            typename std::decay<State>::type,
 		                            typename std::decay<Step>::type>(
-		    std::forward<In>(in), std::forward<State>(initial_state), std::forward<Step>(step));
+		    std::forward<In>(in), std::forward<State>(initial_state),
+		    std::forward<Step>(step));
 	}
 }
 

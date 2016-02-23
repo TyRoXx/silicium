@@ -11,7 +11,8 @@ namespace Si
 	    -> ptr_observable<typename Observable::element_type, Observable *>
 #endif
 	{
-		return ptr_observable<typename Observable::element_type, Observable *>(&identity);
+		return ptr_observable<typename Observable::element_type, Observable *>(
+		    &identity);
 	}
 }
 

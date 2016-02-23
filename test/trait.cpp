@@ -16,15 +16,18 @@ struct test_producer
 
 BOOST_AUTO_TEST_CASE(trivial_trait)
 {
-	std::unique_ptr<Producer::interface> p = Si::to_unique(Producer::erase(test_producer()));
+	std::unique_ptr<Producer::interface> p =
+	    Si::to_unique(Producer::erase(test_producer()));
 	BOOST_REQUIRE(p);
 	BOOST_CHECK_EQUAL(42, p->get());
 }
 
 template <class T>
-SILICIUM_TRAIT(Container, ((emplace_back, (1, (T)), void))((resize, (1, (size_t)),
-                                                            void))((resize, (2, (size_t, T const &)), void))(
-                              (empty, (0, ()), bool, const))((size, (0, ()), size_t, const BOOST_NOEXCEPT)))
+SILICIUM_TRAIT(Container,
+               ((emplace_back, (1, (T)), void))((resize, (1, (size_t)), void))(
+                   (resize, (2, (size_t, T const &)), void))(
+                   (empty, (0, ()), bool, const))((size, (0, ()), size_t,
+                                                   const BOOST_NOEXCEPT)))
 
 BOOST_AUTO_TEST_CASE(templatized_trait)
 {
@@ -74,7 +77,8 @@ BOOST_AUTO_TEST_CASE(trait_box)
 
 	{
 		// move construction is available:
-		Container<int>::box container2 = Container<int>::make_box(std::vector<int>());
+		Container<int>::box container2 =
+		    Container<int>::make_box(std::vector<int>());
 
 		// move assignment is available:
 		container = std::move(container2);
@@ -96,7 +100,8 @@ BOOST_AUTO_TEST_CASE(trait_eraser)
 	{
 		// move construction is available:
 		std::vector<int> content = boost::assign::list_of(1)(2)(3);
-		Container<int>::eraser<std::vector<int>> container2 = Container<int>::erase(std::move(content));
+		Container<int>::eraser<std::vector<int>> container2 =
+		    Container<int>::erase(std::move(content));
 		BOOST_CHECK(content.empty());
 
 		BOOST_CHECK_EQUAL(0u, container.original.size());
@@ -118,7 +123,8 @@ template <class Signature>
 struct Callable;
 
 template <class Result, class A0>
-SILICIUM_SPECIALIZED_TRAIT(Callable, <Result(A0)>, , ((operator(), (1, (A0)), Result)))
+SILICIUM_SPECIALIZED_TRAIT(Callable, <Result(A0)>, ,
+                           ((operator(), (1, (A0)), Result)))
 
 BOOST_AUTO_TEST_CASE(trait_specialization)
 {
@@ -129,7 +135,8 @@ BOOST_AUTO_TEST_CASE(trait_specialization)
 	BOOST_CHECK_EQUAL(3, add_two(1));
 }
 
-SILICIUM_TRAIT_WITH_TYPEDEFS(WithTypedefs, typedef float element_type;, ((get, (0, ()), element_type)))
+SILICIUM_TRAIT_WITH_TYPEDEFS(WithTypedefs, typedef float element_type;
+                             , ((get, (0, ()), element_type)))
 
 struct impl_with_typedefs
 {
@@ -142,8 +149,12 @@ struct impl_with_typedefs
 BOOST_AUTO_TEST_CASE(trait_with_typedefs)
 {
 	WithTypedefs::box b = WithTypedefs::make_box(impl_with_typedefs());
-	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::eraser<impl_with_typedefs>::element_type>::value));
-	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::interface::element_type>::value));
-	BOOST_STATIC_ASSERT((std::is_same<float, WithTypedefs::box::element_type>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<float, WithTypedefs::eraser<
+	                             impl_with_typedefs>::element_type>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<float, WithTypedefs::interface::element_type>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<float, WithTypedefs::box::element_type>::value));
 	BOOST_CHECK_EQUAL(12.0f, b.get());
 }

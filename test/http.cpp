@@ -21,7 +21,8 @@ namespace Si
 		                             "Key: Value\r\n"
 		                             "\r\n";
 		auto source = Si::make_container_source(incoming);
-		Si::optional<Si::http::request> const parsed = Si::http::parse_request(source);
+		Si::optional<Si::http::request> const parsed =
+		    Si::http::parse_request(source);
 		BOOST_REQUIRE(parsed);
 		BOOST_CHECK_EQUAL("GET", parsed->method);
 		BOOST_CHECK_EQUAL("/", parsed->path);
@@ -75,7 +76,8 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(http_request_parser_sink)
 	{
 		std::vector<Si::http::request> results;
-		auto parser = Si::http::make_request_parser_sink(Si::make_container_sink(results));
+		auto parser = Si::http::make_request_parser_sink(
+		    Si::make_container_sink(results));
 		Si::append(parser, "GET / HTTP/1.1\r\n");
 		BOOST_CHECK(results.empty());
 		Si::append(parser, "Host: host\r\n");
@@ -88,7 +90,8 @@ namespace Si
 		BOOST_CHECK_EQUAL("HTTP/1.1", result.http_version);
 		BOOST_CHECK_EQUAL(1u, result.arguments.size());
 		{
-			std::map<Si::noexcept_string, Si::noexcept_string> expected_arguments;
+			std::map<Si::noexcept_string, Si::noexcept_string>
+			    expected_arguments;
 			expected_arguments.insert(std::make_pair("Host", "host"));
 			BOOST_CHECK(expected_arguments == result.arguments);
 		}
@@ -100,12 +103,14 @@ namespace Si
 	namespace http
 	{
 		template <class ErrorOrMemoryRangeObservable>
-		struct request_parser_observable : private Sink<request, success>::interface,
-		                                   private observer<error_or<memory_range>>
+		struct request_parser_observable
+		    : private Sink<request, success>::interface,
+		      private observer<error_or<memory_range>>
 		{
 			typedef error_or<request> element_type;
 
-			explicit request_parser_observable(ErrorOrMemoryRangeObservable input)
+			explicit request_parser_observable(
+			    ErrorOrMemoryRangeObservable input)
 			    : m_input(std::move(input))
 			    , m_observer(nullptr)
 			    , m_got_result(false)
@@ -123,25 +128,31 @@ namespace Si
 		private:
 			ErrorOrMemoryRangeObservable m_input;
 			boost::optional<request_parser_sink<
-			    ptr_sink<Sink<request, success>::interface, Sink<request, success>::interface *>>> m_state;
+			    ptr_sink<Sink<request, success>::interface,
+			             Sink<request, success>::interface *>>> m_state;
 			observer<element_type> *m_observer;
 			bool m_got_result;
 
 			void fetch()
 			{
-				m_input.async_get_one(Si::observe_by_ref(static_cast<observer<error_or<memory_range>> &>(*this)));
+				m_input.async_get_one(Si::observe_by_ref(
+				    static_cast<observer<error_or<memory_range>> &>(*this)));
 			}
 
-			virtual void got_element(error_or<memory_range> piece) SILICIUM_OVERRIDE
+			virtual void
+			got_element(error_or<memory_range> piece) SILICIUM_OVERRIDE
 			{
 				if (piece.is_error())
 				{
-					Si::exchange(m_observer, nullptr)->got_element(piece.error());
+					Si::exchange(m_observer, nullptr)
+					    ->got_element(piece.error());
 					return;
 				}
 				if (!m_state)
 				{
-					m_state = boost::in_place(ref_sink(static_cast<Sink<request, success>::interface &>(*this)));
+					m_state = boost::in_place(ref_sink(
+					    static_cast<Sink<request, success>::interface &>(
+					        *this)));
 				}
 				m_state->append(piece.get());
 				if (m_got_result)
@@ -157,7 +168,8 @@ namespace Si
 				SILICIUM_UNREACHABLE();
 			}
 
-			virtual success append(iterator_range<request const *> data) SILICIUM_OVERRIDE
+			virtual success
+			append(iterator_range<request const *> data) SILICIUM_OVERRIDE
 			{
 				assert(data.size() == 1);
 				assert(!m_got_result);
@@ -168,12 +180,15 @@ namespace Si
 		};
 
 		template <class ErrorOrMemoryRangeObservable>
-		auto make_request_parser_observable(ErrorOrMemoryRangeObservable &&input)
+		auto make_request_parser_observable(
+		    ErrorOrMemoryRangeObservable &&input)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> request_parser_observable<typename std::decay<ErrorOrMemoryRangeObservable>::type>
+		    -> request_parser_observable<
+		        typename std::decay<ErrorOrMemoryRangeObservable>::type>
 #endif
 		{
-			return request_parser_observable<typename std::decay<ErrorOrMemoryRangeObservable>::type>(
+			return request_parser_observable<
+			    typename std::decay<ErrorOrMemoryRangeObservable>::type>(
 			    std::forward<ErrorOrMemoryRangeObservable>(input));
 		}
 	}
@@ -185,18 +200,18 @@ BOOST_AUTO_TEST_CASE(http_parser_observable)
 	auto parser = Si::http::make_request_parser_observable(Si::ref(input));
 	bool got_result = false;
 	std::function<void()> get;
-	auto consumer =
-	    Si::consume<Si::error_or<Si::http::request>>([&](Si::error_or<Si::http::request> const &result)
-	                                                 {
-		                                                 BOOST_REQUIRE(!got_result);
-		                                                 BOOST_REQUIRE(!result.is_error());
-		                                                 BOOST_CHECK_EQUAL("GET", result.get().method);
-		                                                 BOOST_CHECK_EQUAL("/", result.get().path);
-		                                                 BOOST_CHECK_EQUAL("HTTP/1.0", result.get().http_version);
-		                                                 BOOST_CHECK(result.get().arguments.empty());
-		                                                 got_result = true;
-		                                                 get();
-		                                             });
+	auto consumer = Si::consume<Si::error_or<Si::http::request>>(
+	    [&](Si::error_or<Si::http::request> const &result)
+	    {
+		    BOOST_REQUIRE(!got_result);
+		    BOOST_REQUIRE(!result.is_error());
+		    BOOST_CHECK_EQUAL("GET", result.get().method);
+		    BOOST_CHECK_EQUAL("/", result.get().path);
+		    BOOST_CHECK_EQUAL("HTTP/1.0", result.get().http_version);
+		    BOOST_CHECK(result.get().arguments.empty());
+		    got_result = true;
+		    get();
+		});
 	BOOST_REQUIRE(!got_result);
 	get = [&]()
 	{

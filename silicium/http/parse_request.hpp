@@ -32,7 +32,8 @@ namespace Si
 			}
 			request header;
 			{
-				auto const method_end = std::find(first_line->begin(), first_line->end(), ' ');
+				auto const method_end =
+				    std::find(first_line->begin(), first_line->end(), ' ');
 				if (method_end == first_line->end())
 				{
 					return none;
@@ -40,7 +41,8 @@ namespace Si
 				header.method.assign(first_line->begin(), method_end);
 
 				auto const path_begin = method_end + 1;
-				auto const path_end = std::find(path_begin, first_line->end(), ' ');
+				auto const path_end =
+				    std::find(path_begin, first_line->end(), ' ');
 				if (path_end == first_line->end())
 				{
 					return none;

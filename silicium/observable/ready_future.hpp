@@ -64,7 +64,8 @@ namespace Si
 		void async_get_one(ElementObserver &&receiver)
 		{
 			CheckPolicy::begin_get(value);
-			std::forward<ElementObserver>(receiver).got_element(std::move(value));
+			std::forward<ElementObserver>(receiver)
+			    .got_element(std::move(value));
 		}
 
 	private:
@@ -77,7 +78,8 @@ namespace Si
 	    -> ready_future<typename std::decay<Element>::type>
 #endif
 	{
-		return ready_future<typename std::decay<Element>::type>(std::forward<Element>(value));
+		return ready_future<typename std::decay<Element>::type>(
+		    std::forward<Element>(value));
 	}
 }
 

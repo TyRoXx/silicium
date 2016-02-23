@@ -4,7 +4,8 @@
 #include <boost/version.hpp>
 #include <silicium/variant.hpp>
 
-#define SILICIUM_HAS_USE_OBSERVABLE (SILICIUM_HAS_VARIANT && (BOOST_VERSION >= 105400))
+#define SILICIUM_HAS_USE_OBSERVABLE                                            \
+	(SILICIUM_HAS_VARIANT && (BOOST_VERSION >= 105400))
 
 #if SILICIUM_HAS_USE_OBSERVABLE
 #include <silicium/observable/ptr.hpp>
@@ -37,50 +38,56 @@ namespace Si
 				template <class Observer>
 				void async_get_one(Observer &&receiver)
 				{
-					Si::visit<void>(m_waiting_or_storing,
-					                [this, &receiver](unit)
-					                {
-						                m_waiting_or_storing =
-						                    erased_observer<Element>(std::forward<Observer>(receiver));
-						            },
-					                [](erased_observer<Element> &)
-					                {
-						                SILICIUM_UNREACHABLE();
-						            },
-					                [&receiver](element_type &stored)
-					                {
-						                std::forward<Observer>(receiver).got_element(std::move(stored));
-						            });
+					Si::visit<void>(
+					    m_waiting_or_storing,
+					    [this, &receiver](unit)
+					    {
+						    m_waiting_or_storing = erased_observer<Element>(
+						        std::forward<Observer>(receiver));
+						},
+					    [](erased_observer<Element> &)
+					    {
+						    SILICIUM_UNREACHABLE();
+						},
+					    [&receiver](element_type &stored)
+					    {
+						    std::forward<Observer>(receiver)
+						        .got_element(std::move(stored));
+						});
 				}
 
 				void fulfill(Element element)
 				{
-					Si::visit<void>(m_waiting_or_storing,
-					                [this, &element](unit)
-					                {
-						                m_waiting_or_storing = std::move(element);
-						            },
-					                [this, &element](erased_observer<Element> &receiver)
-					                {
-						                auto moved_receiver = std::move(receiver);
-						                m_waiting_or_storing = unit();
-						                std::move(moved_receiver).got_element(std::move(element));
-						            },
-					                [](element_type &)
-					                {
-						                SILICIUM_UNREACHABLE();
-						            });
+					Si::visit<void>(
+					    m_waiting_or_storing,
+					    [this, &element](unit)
+					    {
+						    m_waiting_or_storing = std::move(element);
+						},
+					    [this, &element](erased_observer<Element> &receiver)
+					    {
+						    auto moved_receiver = std::move(receiver);
+						    m_waiting_or_storing = unit();
+						    std::move(moved_receiver)
+						        .got_element(std::move(element));
+						},
+					    [](element_type &)
+					    {
+						    SILICIUM_UNREACHABLE();
+						});
 				}
 
 			private:
-				variant<unit, erased_observer<Element>, Element> m_waiting_or_storing;
+				variant<unit, erased_observer<Element>, Element>
+				    m_waiting_or_storing;
 			};
 
 			template <class Element>
 			struct observable_handler
 			{
 				explicit observable_handler(use_observable_t)
-				    : m_observable(std::make_shared<future_observable<Element>>())
+				    : m_observable(
+				          std::make_shared<future_observable<Element>>())
 				{
 				}
 
@@ -104,7 +111,8 @@ namespace Si
 					}
 				}
 
-				std::shared_ptr<future_observable<Element>> const &get_observable() const
+				std::shared_ptr<future_observable<Element>> const &
+				get_observable() const
 				{
 					return m_observable;
 				}
@@ -123,9 +131,13 @@ namespace boost
 		template <class Element>
 		struct async_result<Si::asio::detail::observable_handler<Element>>
 		{
-			typedef Si::ptr_observable<Element, std::shared_ptr<Si::asio::detail::future_observable<Element>>> type;
+			typedef Si::ptr_observable<
+			    Element,
+			    std::shared_ptr<Si::asio::detail::future_observable<Element>>>
+			    type;
 
-			explicit async_result(Si::asio::detail::observable_handler<Element> &handler)
+			explicit async_result(
+			    Si::asio::detail::observable_handler<Element> &handler)
 			    : m_observable(handler.get_observable())
 			{
 			}
@@ -136,17 +148,21 @@ namespace boost
 			}
 
 		private:
-			std::shared_ptr<Si::asio::detail::future_observable<Element>> m_observable;
+			std::shared_ptr<Si::asio::detail::future_observable<Element>>
+			    m_observable;
 		};
 
 		template <typename ReturnType>
-		struct handler_type<Si::asio::use_observable_t, ReturnType(boost::system::error_code)>
+		struct handler_type<Si::asio::use_observable_t,
+		                    ReturnType(boost::system::error_code)>
 		{
-			typedef Si::asio::detail::observable_handler<boost::system::error_code> type;
+			typedef Si::asio::detail::observable_handler<
+			    boost::system::error_code> type;
 		};
 
 		template <typename ReturnType, class A2>
-		struct handler_type<Si::asio::use_observable_t, ReturnType(boost::system::error_code, A2)>
+		struct handler_type<Si::asio::use_observable_t,
+		                    ReturnType(boost::system::error_code, A2)>
 		{
 			typedef Si::asio::detail::observable_handler<Si::error_or<A2>> type;
 		};

@@ -28,7 +28,8 @@ namespace Si
 		iterator_range<element_type *> make_append_space(std::size_t size)
 		{
 			assert(m_destination);
-			std::size_t remaining_capacity = m_destination->max_size() - m_committed;
+			std::size_t remaining_capacity =
+			    m_destination->max_size() - m_committed;
 			std::size_t growth = std::min(size, remaining_capacity);
 			std::size_t new_size = m_committed + growth;
 			m_destination->resize(new_size);

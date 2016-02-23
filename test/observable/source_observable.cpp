@@ -35,7 +35,8 @@ namespace
 BOOST_AUTO_TEST_CASE(source_observable_empty)
 {
 	std::vector<char> const empty;
-	auto observable = Si::make_source_observable<char>(Si::make_container_source(empty));
+	auto observable =
+	    Si::make_source_observable<char>(Si::make_container_source(empty));
 	end_observer<char> observer;
 	observable.async_get_one(observer);
 	BOOST_CHECK(observer.has_ended);
@@ -44,7 +45,8 @@ BOOST_AUTO_TEST_CASE(source_observable_empty)
 BOOST_AUTO_TEST_CASE(source_observable_non_empty)
 {
 	std::string const input = "A";
-	auto observable = Si::make_source_observable<char>(Si::make_container_source(input));
+	auto observable =
+	    Si::make_source_observable<char>(Si::make_container_source(input));
 	{
 		bool got_element = false;
 		auto observer = Si::consume<char>([&got_element](char c)

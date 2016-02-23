@@ -45,7 +45,8 @@ namespace ranges
 			struct concat_integer_sequence;
 
 			template <std::size_t... N1, std::size_t... N2>
-			struct concat_integer_sequence<integer_sequence<N1...>, integer_sequence<N2...>>
+			struct concat_integer_sequence<integer_sequence<N1...>,
+			                               integer_sequence<N2...>>
 			{
 				using type = integer_sequence<N1..., (sizeof...(N1) + N2)...>;
 			};
@@ -53,8 +54,10 @@ namespace ranges
 
 		// generate integer_sequence [0,N) in O(log(N)) time
 		template <std::size_t N>
-		struct make_integer_sequence : detail::concat_integer_sequence<typename make_integer_sequence<N / 2>::type,
-		                                                               typename make_integer_sequence<N - N / 2>::type>
+		struct make_integer_sequence
+		    : detail::concat_integer_sequence<
+		          typename make_integer_sequence<N / 2>::type,
+		          typename make_integer_sequence<N - N / 2>::type>
 		{
 		};
 

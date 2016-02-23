@@ -24,16 +24,20 @@ namespace Si
 		template <class RangeObservable>
 		struct error_or_enumerated_element
 		{
-			typedef typename value_type_of_error_or<typename RangeObservable::element_type>::type range_type;
-			typedef typename std::decay<decltype(*boost::begin(std::declval<range_type>()))>::type type;
+			typedef typename value_type_of_error_or<
+			    typename RangeObservable::element_type>::type range_type;
+			typedef typename std::decay<decltype(
+			    *boost::begin(std::declval<range_type>()))>::type type;
 		};
 	}
 
 #if SILICIUM_HAS_ERROR_OR_ENUMERATE
 	template <class RangeObservable>
-	struct error_or_enumerator : private observer<typename RangeObservable::element_type>
+	struct error_or_enumerator
+	    : private observer<typename RangeObservable::element_type>
 	{
-		typedef error_or<typename detail::error_or_enumerated_element<RangeObservable>::type> element_type;
+		typedef error_or<typename detail::error_or_enumerated_element<
+		    RangeObservable>::type> element_type;
 		typedef error_or<typename RangeObservable::element_type> range_type;
 
 		error_or_enumerator()
@@ -70,23 +74,26 @@ namespace Si
 		{
 			assert(!receiver_);
 			receiver_ = receiver.get();
-			visit<void>(buffered,
-			            [this](std::queue<element_type> const &elements)
-			            {
-				            if (elements.empty())
-				            {
-					            input.async_get_one(Si::observe_by_ref(
-					                static_cast<observer<typename RangeObservable::element_type> &>(*this)));
-				            }
-				            else
-				            {
-					            pop();
-				            }
-				        },
-			            [this](boost::system::error_code const &)
-			            {
-				            pop();
-				        });
+			visit<void>(
+			    buffered,
+			    [this](std::queue<element_type> const &elements)
+			    {
+				    if (elements.empty())
+				    {
+					    input.async_get_one(Si::observe_by_ref(
+					        static_cast<observer<
+					            typename RangeObservable::element_type> &>(
+					            *this)));
+				    }
+				    else
+				    {
+					    pop();
+				    }
+				},
+			    [this](boost::system::error_code const &)
+			    {
+				    pop();
+				});
 		}
 
 	private:
@@ -94,7 +101,8 @@ namespace Si
 		variant<std::queue<element_type>, boost::system::error_code> buffered;
 		observer<element_type> *receiver_;
 
-		virtual void got_element(typename RangeObservable::element_type value) SILICIUM_OVERRIDE
+		virtual void got_element(typename RangeObservable::element_type value)
+		    SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
 			visit<void>(buffered,
@@ -145,7 +153,8 @@ namespace Si
 			            {
 				            auto element = std::move(elements.front());
 				            elements.pop();
-				            exchange(receiver_, nullptr)->got_element(std::move(element));
+				            exchange(receiver_, nullptr)
+				                ->got_element(std::move(element));
 				        },
 			            [this](boost::system::error_code const ec_copy)
 			            {
@@ -158,9 +167,11 @@ namespace Si
 	};
 
 	template <class RangeObservable>
-	auto error_or_enumerate(RangeObservable &&ranges) -> error_or_enumerator<typename std::decay<RangeObservable>::type>
+	auto error_or_enumerate(RangeObservable &&ranges)
+	    -> error_or_enumerator<typename std::decay<RangeObservable>::type>
 	{
-		return error_or_enumerator<typename std::decay<RangeObservable>::type>(std::forward<RangeObservable>(ranges));
+		return error_or_enumerator<typename std::decay<RangeObservable>::type>(
+		    std::forward<RangeObservable>(ranges));
 	}
 #endif
 }

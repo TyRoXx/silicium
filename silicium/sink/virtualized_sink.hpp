@@ -7,7 +7,8 @@
 namespace Si
 {
 	template <class Next>
-	struct virtualized_sink : Sink<typename Next::element_type, typename Next::error_type>::interface
+	struct virtualized_sink : Sink<typename Next::element_type,
+	                               typename Next::error_type>::interface
 	{
 		typedef typename Next::element_type element_type;
 		typedef typename Next::error_type error_type;
@@ -21,7 +22,8 @@ namespace Si
 		{
 		}
 
-		virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+		virtual error_type
+		append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 		{
 			return m_next.append(data);
 		}
@@ -49,17 +51,20 @@ namespace Si
 	    -> virtualized_sink<typename std::decay<Next>::type>
 #endif
 	{
-		return virtualized_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
+		return virtualized_sink<typename std::decay<Next>::type>(
+		    std::forward<Next>(next));
 	}
 
 	template <class Next>
 	auto erase_sink(Next &&next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> ptr_sink<typename std::decay<Next>::type, std::unique_ptr<typename std::decay<Next>::type>>
+	    -> ptr_sink<typename std::decay<Next>::type,
+	                std::unique_ptr<typename std::decay<Next>::type>>
 #endif
 	{
 		typedef typename std::decay<Next>::type clean;
-		return ptr_sink<clean, std::unique_ptr<clean>>(to_unique(virtualize_sink(std::forward<Next>(next))));
+		return ptr_sink<clean, std::unique_ptr<clean>>(
+		    to_unique(virtualize_sink(std::forward<Next>(next))));
 	}
 }
 

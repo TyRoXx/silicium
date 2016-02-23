@@ -32,7 +32,8 @@ namespace Si
 	{
 		if (close(file) < 0)
 		{
-			// it is intended that this will terminate the process because of noexcept
+			// it is intended that this will terminate the process because of
+			// noexcept
 			throw_last_error();
 		}
 	}

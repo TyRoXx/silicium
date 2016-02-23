@@ -39,14 +39,17 @@ namespace Si
 	template <class Function>
 	struct function_observer
 	{
-		typedef typename detail::element_from_optional_like<
-		    typename std::decay<typename detail::argument_of<Function>::type>::type>::type element_type;
+		typedef typename detail::element_from_optional_like<typename std::decay<
+		    typename detail::argument_of<Function>::type>::type>::type
+		    element_type;
 
 		template <class F>
 		explicit function_observer(
 		    F &&function,
-		    typename boost::enable_if_c<!std::is_same<function_observer, typename std::decay<F>::type>::value,
-		                                void>::type * = nullptr)
+		    typename boost::enable_if_c<
+		        !std::is_same<function_observer,
+		                      typename std::decay<F>::type>::value,
+		        void>::type * = nullptr)
 		    : m_function(std::forward<F>(function))
 		{
 		}
@@ -71,9 +74,9 @@ namespace Si
 
 	private:
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-		typedef
-		    typename detail::proper_value_function<Function, void, typename detail::argument_of<Function>::type>::type
-		        function_holder;
+		typedef typename detail::proper_value_function<
+		    Function, void, typename detail::argument_of<Function>::type>::type
+		    function_holder;
 #else
 		typedef Function function_holder;
 #endif
@@ -81,8 +84,10 @@ namespace Si
 		function_holder m_function;
 	};
 
-	BOOST_STATIC_ASSERT(
-	    (std::is_same<int, function_observer<void (*)(boost::optional<int> const &)>::element_type>::value));
+	BOOST_STATIC_ASSERT((
+	    std::is_same<int,
+	                 function_observer<void (*)(
+	                     boost::optional<int> const &)>::element_type>::value));
 
 	template <class Function>
 	auto make_function_observer(Function &&function)
@@ -90,7 +95,8 @@ namespace Si
 	    -> function_observer<typename std::decay<Function>::type>
 #endif
 	{
-		return function_observer<typename std::decay<Function>::type>(std::forward<Function>(function));
+		return function_observer<typename std::decay<Function>::type>(
+		    std::forward<Function>(function));
 	}
 }
 

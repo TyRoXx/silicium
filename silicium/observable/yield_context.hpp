@@ -15,7 +15,8 @@ namespace Si
 	{
 		struct basic_yield_context
 		{
-			typedef Observable<unit, ptr_observer<observer<unit>>>::interface observable_type;
+			typedef Observable<
+			    unit, ptr_observer<observer<unit>>>::interface observable_type;
 			virtual ~basic_yield_context()
 			{
 			}
@@ -37,11 +38,15 @@ namespace Si
 		}
 
 		template <class Observable>
-		boost::optional<typename std::decay<Observable>::type::element_type> get_one(Observable &&from) const
+		boost::optional<typename std::decay<Observable>::type::element_type>
+		get_one(Observable &&from) const
 		{
-			boost::optional<typename std::decay<Observable>::type::element_type> result;
+			boost::optional<typename std::decay<Observable>::type::element_type>
+			    result;
 			auto tf = Si::virtualize_observable<ptr_observer<observer<unit>>>(
-			    Si::transform(Si::ref(from), [&result](typename std::decay<Observable>::type::element_type element)
+			    Si::transform(Si::ref(from),
+			                  [&result](typename std::decay<
+			                            Observable>::type::element_type element)
 			                  {
 				                  assert(!result);
 				                  result = std::move(element);
@@ -52,11 +57,16 @@ namespace Si
 		}
 
 		template <class Observable>
-		bool get_one(Observable &&from, typename std::decay<Observable>::type::element_type &result) const
+		bool get_one(
+		    Observable &&from,
+		    typename std::decay<Observable>::type::element_type &result) const
 		{
 			bool got_result = false;
-			auto tf = Si::virtualize_observable<ptr_observer<observer<unit>>>(Si::transform(
-			    Si::ref(from), [&result, &got_result](typename std::decay<Observable>::type::element_type element)
+			auto tf = Si::virtualize_observable<
+			    ptr_observer<observer<unit>>>(Si::transform(
+			    Si::ref(from),
+			    [&result, &got_result](
+			        typename std::decay<Observable>::type::element_type element)
 			    {
 				    result = std::move(element);
 				    got_result = true;
@@ -80,7 +90,8 @@ namespace Si
 
 		void operator()(Element result) const
 		{
-			return static_cast<detail::push_context_impl<Element> *>(impl)->push_result(std::move(result));
+			return static_cast<detail::push_context_impl<Element> *>(impl)
+			    ->push_result(std::move(result));
 		}
 	};
 #endif

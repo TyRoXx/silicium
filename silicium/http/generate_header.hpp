@@ -27,7 +27,9 @@ namespace Si
 		namespace detail
 		{
 			template <class CharSink>
-			void generate_header_map(CharSink &&out, std::map<noexcept_string, noexcept_string> const &arguments)
+			void generate_header_map(
+			    CharSink &&out,
+			    std::map<noexcept_string, noexcept_string> const &arguments)
 			{
 				for (auto const &argument : arguments)
 				{

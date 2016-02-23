@@ -56,8 +56,9 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_bridge)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::observable<int, Si::ptr_observer<Si::observer<int>>>>> first(
-		    bridge);
+		Si::ptr_observable<int, std::shared_ptr<Si::observable<
+		                            int, Si::ptr_observer<Si::observer<int>>>>>
+		    first(bridge);
 		auto ones = Si::make_generator_observable([]
 		                                          {
 			                                          return 1;
@@ -65,7 +66,8 @@ namespace Si
 		auto both = Si::make_tuple(first, ones);
 		auto added = Si::transform(both, [](std::tuple<int, int> const &element)
 		                           {
-			                           return std::get<0>(element) + std::get<1>(element);
+			                           return std::get<0>(element) +
+			                                  std::get<1>(element);
 			                       });
 		std::vector<int> generated;
 		auto consumer = Si::consume<int>([&generated](int element)
@@ -86,7 +88,9 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(reactive_make_buffer)
 	{
 		auto bridge = std::make_shared<Si::bridge<int>>();
-		Si::ptr_observable<int, std::shared_ptr<Si::Observable<int, Si::ptr_observer<Si::observer<int>>>::interface>>
+		Si::ptr_observable<
+		    int, std::shared_ptr<Si::Observable<
+		             int, Si::ptr_observer<Si::observer<int>>>::interface>>
 		    first(bridge);
 		auto buf = Si::make_buffer_observable(first, 2);
 		buf.prefetch();
@@ -134,10 +138,11 @@ namespace Si
 
 		typedef Si::variant<int, string> variant;
 		std::vector<variant> produced;
-		auto consumer = Si::consume<variant>([&produced](variant element)
-		                                     {
-			                                     produced.emplace_back(std::move(element));
-			                                 });
+		auto consumer =
+		    Si::consume<variant>([&produced](variant element)
+		                         {
+			                         produced.emplace_back(std::move(element));
+			                     });
 
 		variants.async_get_one(Si::observe_by_ref(consumer));
 		BOOST_CHECK(produced.empty());
@@ -159,9 +164,11 @@ namespace Si
 		boost::asio::io_service *dispatcher;
 		boost::optional<boost::asio::io_service::work> blocker;
 		Action action;
-		typename Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface *from;
+		typename Si::Observable<
+		    Element, Si::ptr_observer<Si::observer<Element>>>::interface *from;
 
-		explicit blocking_then_state(boost::asio::io_service &dispatcher, Action action)
+		explicit blocking_then_state(boost::asio::io_service &dispatcher,
+		                             Action action)
 		    : dispatcher(&dispatcher)
 		    , blocker(boost::in_place(boost::ref(dispatcher)))
 		    , action(std::move(action))
@@ -181,25 +188,31 @@ namespace Si
 		virtual void got_element(Element value) SILICIUM_OVERRIDE
 		{
 			assert(dispatcher);
-			dispatcher->post(boost::bind<void>(action, boost::make_optional(std::move(value))));
+			dispatcher->post(boost::bind<void>(
+			    action, boost::make_optional(std::move(value))));
 			blocker.reset();
 		}
 
 		virtual void ended() SILICIUM_OVERRIDE
 		{
 			assert(dispatcher);
-			dispatcher->post(boost::bind<void>(action, boost::optional<Element>()));
+			dispatcher->post(
+			    boost::bind<void>(action, boost::optional<Element>()));
 			blocker.reset();
 		}
 	};
 
 	template <class Element, class Action>
-	auto blocking_then(boost::asio::io_service &io,
-	                   typename Si::Observable<Element, Si::ptr_observer<Si::observer<Element>>>::interface &from,
-	                   Action &&action)
-	    -> std::shared_ptr<blocking_then_state<Element, typename std::decay<Action>::type>>
+	auto blocking_then(
+	    boost::asio::io_service &io,
+	    typename Si::Observable<
+	        Element, Si::ptr_observer<Si::observer<Element>>>::interface &from,
+	    Action &&action)
+	    -> std::shared_ptr<
+	        blocking_then_state<Element, typename std::decay<Action>::type>>
 	{
-		auto state = std::make_shared<blocking_then_state<Element, typename std::decay<Action>::type>>(
+		auto state = std::make_shared<
+		    blocking_then_state<Element, typename std::decay<Action>::type>>(
 		    io, std::forward<Action>(action));
 		from.async_get_one(*state);
 		state->from = &from;
@@ -222,7 +235,8 @@ namespace Si
 	};
 
 	template <class Element>
-	struct connection : Observable<Element, ptr_observer<observer<Element>>>::interface
+	struct connection
+	    : Observable<Element, ptr_observer<observer<Element>>>::interface
 	{
 		typedef Element element_type;
 
@@ -232,7 +246,8 @@ namespace Si
 		{
 		}
 
-		explicit connection(typename signal_observer_map<Element>::type &connections)
+		explicit connection(
+		    typename signal_observer_map<Element>::type &connections)
 		    : connections(&connections)
 		    , receiver_(nullptr)
 		{
@@ -262,10 +277,12 @@ namespace Si
 			connections->erase(receiver_);
 		}
 
-		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(
+		    ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
 			auto *const old_receiver = receiver_;
-			connections->insert(std::make_pair(receiver.get(), true)).first->second = true;
+			connections->insert(std::make_pair(receiver.get(), true))
+			    .first->second = true;
 			if (old_receiver && (old_receiver != receiver.get()))
 			{
 				auto i = connections->find(receiver_);
@@ -318,11 +335,12 @@ namespace
 		auto con1 = s.connect();
 		auto con2 = s.connect();
 		std::vector<int> generated;
-		auto consumer = Si::consume<int>([&generated](boost::optional<int> value)
-		                                 {
-			                                 BOOST_REQUIRE(value);
-			                                 generated.emplace_back(*value);
-			                             });
+		auto consumer =
+		    Si::consume<int>([&generated](boost::optional<int> value)
+		                     {
+			                     BOOST_REQUIRE(value);
+			                     generated.emplace_back(*value);
+			                 });
 		con1.async_get_one(Si::observe_by_ref(consumer));
 		s.emit_one(2);
 		con2 = std::move(con1);

@@ -10,8 +10,10 @@
 
 namespace Si
 {
-	template <class Element, class Input, class Transformation, class Observer = ptr_observer<observer<Element>>>
-	struct conditional_transformer : private observer<typename Input::element_type>
+	template <class Element, class Input, class Transformation,
+	          class Observer = ptr_observer<observer<Element>>>
+	struct conditional_transformer
+	    : private observer<typename Input::element_type>
 	{
 		typedef Element element_type;
 
@@ -20,7 +22,8 @@ namespace Si
 		{
 		}
 
-		explicit conditional_transformer(Input original, Transformation transform)
+		explicit conditional_transformer(Input original,
+		                                 Transformation transform)
 		    : original(std::move(original))
 		    , transform(std::move(transform))
 		    , receiver_()
@@ -29,7 +32,8 @@ namespace Si
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
 		conditional_transformer(conditional_transformer &&) = default;
-		conditional_transformer &operator=(conditional_transformer &&) = default;
+		conditional_transformer &
+		operator=(conditional_transformer &&) = default;
 #else
 		conditional_transformer(conditional_transformer &&other)
 		    : original(std::move(other.original))
@@ -58,15 +62,19 @@ namespace Si
 		Transformation transform; // TODO: optimize for emptiness
 		optional<Observer> receiver_;
 
-		SILICIUM_DELETED_FUNCTION(conditional_transformer(conditional_transformer const &))
-		SILICIUM_DELETED_FUNCTION(conditional_transformer &operator=(conditional_transformer const &))
+		SILICIUM_DELETED_FUNCTION(
+		    conditional_transformer(conditional_transformer const &))
+		SILICIUM_DELETED_FUNCTION(
+		    conditional_transformer &operator=(conditional_transformer const &))
 
 		void fetch()
 		{
-			original.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
+			original.async_get_one(observe_by_ref(
+			    static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
-		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
+		virtual void
+		got_element(typename Input::element_type value) SILICIUM_OVERRIDE
 		{
 			auto converted = transform(std::move(value));
 			if (converted)
@@ -87,11 +95,14 @@ namespace Si
 
 	template <class Element, class Input, class Transformation>
 	auto transform_if_initialized(Input &&input, Transformation &&transform)
-	    -> conditional_transformer<Element, typename std::decay<Input>::type, typename std::decay<Transformation>::type>
+	    -> conditional_transformer<Element, typename std::decay<Input>::type,
+	                               typename std::decay<Transformation>::type>
 	{
-		return conditional_transformer<Element, typename std::decay<Input>::type,
-		                               typename std::decay<Transformation>::type>(
-		    std::forward<Input>(input), std::forward<Transformation>(transform));
+		return conditional_transformer<
+		    Element, typename std::decay<Input>::type,
+		    typename std::decay<Transformation>::type>(
+		    std::forward<Input>(input),
+		    std::forward<Transformation>(transform));
 	}
 }
 

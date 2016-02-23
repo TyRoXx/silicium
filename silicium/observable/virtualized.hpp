@@ -8,7 +8,8 @@
 namespace Si
 {
 	template <class Observable, class Observer>
-	struct virtualized_observable : Si::Observable<typename Observable::element_type, Observer>::interface
+	struct virtualized_observable
+	    : Si::Observable<typename Observable::element_type, Observer>::interface
 	{
 		typedef typename Observable::element_type element_type;
 
@@ -44,9 +45,11 @@ namespace Si
 	};
 
 	template <class Observer, class Observable>
-	virtualized_observable<typename std::decay<Observable>::type, Observer> virtualize_observable(Observable &&next)
+	virtualized_observable<typename std::decay<Observable>::type, Observer>
+	virtualize_observable(Observable &&next)
 	{
-		return virtualized_observable<typename std::decay<Observable>::type, Observer>(std::forward<Observable>(next));
+		return virtualized_observable<typename std::decay<Observable>::type,
+		                              Observer>(std::forward<Observable>(next));
 	}
 }
 

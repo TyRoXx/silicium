@@ -11,19 +11,22 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <iostream>
 
-#define SILICIUM_EXAMPLE_IS_AVAILABLE (SILICIUM_HAS_SPAWN_COROUTINE && SILICIUM_HAS_TRANSFORM_OBSERVABLE)
+#define SILICIUM_EXAMPLE_IS_AVAILABLE                                          \
+	(SILICIUM_HAS_SPAWN_COROUTINE && SILICIUM_HAS_TRANSFORM_OBSERVABLE)
 
 #if SILICIUM_EXAMPLE_IS_AVAILABLE
 namespace
 {
 	template <class YieldContext>
-	void serve_client(boost::asio::ip::tcp::socket &client, YieldContext &&yield)
+	void serve_client(boost::asio::ip::tcp::socket &client,
+	                  YieldContext &&yield)
 	{
 		auto maybe_request = Si::http::receive_request(client, yield);
 		if (maybe_request.is_error())
 		{
 			// The header was incomplete, maybe the connecting was closed.
-			// If we want to know the reason, the error_extracting_source remembered it:
+			// If we want to know the reason, the error_extracting_source
+			// remembered it:
 			boost::system::error_code error = maybe_request.error();
 			boost::ignore_unused_variable_warning(error);
 			return;
@@ -45,16 +48,19 @@ namespace
 			std::vector<char> response;
 			{
 				auto response_writer = Si::make_container_sink(response);
-				Si::http::generate_status_line(response_writer, "HTTP/1.0", "200", "OK");
+				Si::http::generate_status_line(
+				    response_writer, "HTTP/1.0", "200", "OK");
 				boost::string_ref const content = "Hello, visitor!";
-				Si::http::generate_header(response_writer, "Content-Length",
-				                          boost::lexical_cast<Si::noexcept_string>(content.size()));
+				Si::http::generate_header(
+				    response_writer, "Content-Length",
+				    boost::lexical_cast<Si::noexcept_string>(content.size()));
 				Si::http::finish_headers(response_writer);
 				Si::append(response_writer, content);
 			}
 
 			// you can handle the error if you want
-			boost::system::error_code error = Si::asio::write(client, Si::make_memory_range(response), yield);
+			boost::system::error_code error =
+			    Si::asio::write(client, Si::make_memory_range(response), yield);
 			boost::ignore_unused_variable_warning(error);
 		}
 
@@ -67,7 +73,8 @@ namespace
 	{
 		boost::system::error_code ec;
 
-		// use a unique_ptr to support older versions of Boost where acceptor was not movable
+		// use a unique_ptr to support older versions of Boost where acceptor
+		// was not movable
 		auto acceptor = Si::make_unique<boost::asio::ip::tcp::acceptor>(io);
 
 		acceptor->open(boost::asio::ip::tcp::v4(), ec);
@@ -76,7 +83,9 @@ namespace
 			return ec;
 		}
 
-		acceptor->bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080), ec);
+		acceptor->bind(
+		    boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080),
+		    ec);
 		if (ec)
 		{
 			return ec;
@@ -88,15 +97,16 @@ namespace
 			return ec;
 		}
 
-		Si::spawn_observable(Si::transform(Si::asio::make_tcp_acceptor(std::move(acceptor)),
-		                                   [](Si::asio::tcp_acceptor_result maybe_client)
-		                                   {
-			                                   auto client = maybe_client.get();
-			                                   Si::spawn_coroutine([client](Si::spawn_context yield)
-			                                                       {
-				                                                       serve_client(*client, yield);
-				                                                   });
-			                               }));
+		Si::spawn_observable(Si::transform(
+		    Si::asio::make_tcp_acceptor(std::move(acceptor)),
+		    [](Si::asio::tcp_acceptor_result maybe_client)
+		    {
+			    auto client = maybe_client.get();
+			    Si::spawn_coroutine([client](Si::spawn_context yield)
+			                        {
+				                        serve_client(*client, yield);
+				                    });
+			}));
 
 		return {};
 	}

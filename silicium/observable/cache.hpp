@@ -9,13 +9,16 @@
 namespace Si
 {
 	template <class Input>
-	struct cache_observable : public Observable<typename Input::element_type,
-	                                            ptr_observer<observer<typename Input::element_type>>>::interface,
-	                          private observer<typename Input::element_type>
+	struct cache_observable
+	    : public Observable<
+	          typename Input::element_type,
+	          ptr_observer<observer<typename Input::element_type>>>::interface,
+	      private observer<typename Input::element_type>
 	{
 		typedef typename Input::element_type element_type;
 
-		explicit cache_observable(Input input, boost::optional<element_type> cached)
+		explicit cache_observable(Input input,
+		                          boost::optional<element_type> cached)
 		    : input(std::move(input))
 		    , receiver_(nullptr)
 		    , cached(std::move(cached))
@@ -43,7 +46,8 @@ namespace Si
 		}
 #endif
 
-		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(
+		    ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
 			assert(!receiver_);
 			receiver_ = receiver.get();
@@ -57,7 +61,8 @@ namespace Si
 			}
 
 			is_fetching = true;
-			input.async_get_one(Si::observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
+			input.async_get_one(Si::observe_by_ref(
+			    static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
 	private:
@@ -87,16 +92,19 @@ namespace Si
 	};
 
 	template <class Input>
-	auto cache(Input &&input) -> cache_observable<typename std::decay<Input>::type>
+	auto cache(Input &&input)
+	    -> cache_observable<typename std::decay<Input>::type>
 	{
-		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input), boost::none);
+		return cache_observable<typename std::decay<Input>::type>(
+		    std::forward<Input>(input), boost::none);
 	}
 
 	template <class Input, class Cached>
-	auto cache(Input &&input, Cached &&initially) -> cache_observable<typename std::decay<Input>::type>
+	auto cache(Input &&input, Cached &&initially)
+	    -> cache_observable<typename std::decay<Input>::type>
 	{
-		return cache_observable<typename std::decay<Input>::type>(std::forward<Input>(input),
-		                                                          std::forward<Cached>(initially));
+		return cache_observable<typename std::decay<Input>::type>(
+		    std::forward<Input>(input), std::forward<Cached>(initially));
 	}
 }
 

@@ -222,34 +222,37 @@ BOOST_AUTO_TEST_CASE(optional_variadic_fmap_one_none)
 
 BOOST_AUTO_TEST_CASE(optional_variadic_fmap_two_both)
 {
-	BOOST_CHECK_EQUAL(Si::optional<long>(7), Si::variadic_fmap(
-	                                             [](int first, long second)
-	                                             {
-		                                             return first + second - 1;
-		                                         },
-	                                             Si::optional<int>(3), Si::optional<long>(5)));
+	BOOST_CHECK_EQUAL(Si::optional<long>(7),
+	                  Si::variadic_fmap(
+	                      [](int first, long second)
+	                      {
+		                      return first + second - 1;
+		                  },
+	                      Si::optional<int>(3), Si::optional<long>(5)));
 }
 
 BOOST_AUTO_TEST_CASE(optional_variadic_fmap_two_either)
 {
-	BOOST_CHECK_EQUAL(Si::optional<long>(), Si::variadic_fmap(
-	                                            [](int, long)
-	                                            {
-		                                            BOOST_FAIL("unreachable");
-		                                            return 0L;
-		                                        },
-	                                            Si::optional<int>(3), Si::optional<long>()));
+	BOOST_CHECK_EQUAL(
+	    Si::optional<long>(), Si::variadic_fmap(
+	                              [](int, long)
+	                              {
+		                              BOOST_FAIL("unreachable");
+		                              return 0L;
+		                          },
+	                              Si::optional<int>(3), Si::optional<long>()));
 }
 
 BOOST_AUTO_TEST_CASE(optional_variadic_fmap_two_neither)
 {
-	BOOST_CHECK_EQUAL(Si::optional<long>(), Si::variadic_fmap(
-	                                            [](int, long)
-	                                            {
-		                                            BOOST_FAIL("unreachable");
-		                                            return 0L;
-		                                        },
-	                                            Si::optional<int>(), Si::optional<long>()));
+	BOOST_CHECK_EQUAL(
+	    Si::optional<long>(), Si::variadic_fmap(
+	                              [](int, long)
+	                              {
+		                              BOOST_FAIL("unreachable");
+		                              return 0L;
+		                          },
+	                              Si::optional<int>(), Si::optional<long>()));
 }
 
 #if SILICIUM_HAS_EXCEPTIONS
@@ -267,15 +270,17 @@ BOOST_AUTO_TEST_CASE(optional_or_throw_bad)
 {
 	Si::optional<int> o;
 	bool was_thrown = false;
-	BOOST_CHECK_EXCEPTION(o.or_throw([&]
-	                                 {
-		                                 was_thrown = true;
-		                                 throw std::runtime_error("expected exception for this test");
-		                             }),
-	                      std::runtime_error, [](std::runtime_error const &)
-	                      {
-		                      return true;
-		                  });
+	BOOST_CHECK_EXCEPTION(
+	    o.or_throw([&]
+	               {
+		               was_thrown = true;
+		               throw std::runtime_error(
+		                   "expected exception for this test");
+		           }),
+	    std::runtime_error, [](std::runtime_error const &)
+	    {
+		    return true;
+		});
 	BOOST_CHECK(was_thrown);
 }
 #endif

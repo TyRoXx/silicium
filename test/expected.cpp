@@ -95,7 +95,8 @@ BOOST_AUTO_TEST_CASE(expected_construct_exception)
 	{
 		Si::expected<int> e((boost::current_exception()));
 		BOOST_CHECK(!e.valid());
-		BOOST_CHECK_EXCEPTION(e.value(), test_exception, [&dummy](test_exception const &ex)
+		BOOST_CHECK_EXCEPTION(e.value(), test_exception,
+		                      [&dummy](test_exception const &ex)
 		                      {
 			                      return (&dummy == ex.payload);
 			                  });
@@ -103,7 +104,8 @@ BOOST_AUTO_TEST_CASE(expected_construct_exception)
 		Si::expected<int> moved = std::move(e);
 		BOOST_CHECK(!moved.valid());
 		BOOST_CHECK(!e.valid());
-		BOOST_CHECK_EXCEPTION(moved.value(), test_exception, [&dummy](test_exception const &ex)
+		BOOST_CHECK_EXCEPTION(moved.value(), test_exception,
+		                      [&dummy](test_exception const &ex)
 		                      {
 			                      return (&dummy == ex.payload);
 			                  });
@@ -113,7 +115,8 @@ BOOST_AUTO_TEST_CASE(expected_construct_exception)
 
 		BOOST_CHECK(!moved.valid());
 		BOOST_CHECK(!move_assigned.valid());
-		BOOST_CHECK_EXCEPTION(move_assigned.value(), test_exception, [&dummy](test_exception const &ex)
+		BOOST_CHECK_EXCEPTION(move_assigned.value(), test_exception,
+		                      [&dummy](test_exception const &ex)
 		                      {
 			                      return (&dummy == ex.payload);
 			                  });
@@ -121,7 +124,8 @@ BOOST_AUTO_TEST_CASE(expected_construct_exception)
 		moved = std::move(move_assigned);
 		BOOST_CHECK(!moved.valid());
 		BOOST_CHECK(!move_assigned.valid());
-		BOOST_CHECK_EXCEPTION(moved.value(), test_exception, [&dummy](test_exception const &ex)
+		BOOST_CHECK_EXCEPTION(moved.value(), test_exception,
+		                      [&dummy](test_exception const &ex)
 		                      {
 			                      return (&dummy == ex.payload);
 			                  });

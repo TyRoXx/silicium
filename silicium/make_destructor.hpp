@@ -41,7 +41,8 @@ namespace Si
 	    -> destructor<typename std::decay<Callable>::type>
 #endif
 	{
-		return destructor<typename std::decay<Callable>::type>(std::forward<Callable>(action));
+		return destructor<typename std::decay<Callable>::type>(
+		    std::forward<Callable>(action));
 	}
 }
 

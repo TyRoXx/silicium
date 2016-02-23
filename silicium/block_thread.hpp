@@ -33,7 +33,8 @@ namespace Si
 				{
 				}
 
-				blocking_thread_handler &operator=(blocking_thread_handler &&other)
+				blocking_thread_handler &
+				operator=(blocking_thread_handler &&other)
 				{
 					m_promised = std::move(other.m_promised);
 					return *this;
@@ -70,7 +71,8 @@ namespace boost
 		{
 			typedef Element type;
 
-			explicit async_result(Si::asio::detail::blocking_thread_handler<Element> &handler)
+			explicit async_result(
+			    Si::asio::detail::blocking_thread_handler<Element> &handler)
 			    : m_result(handler.get_future())
 			{
 			}

@@ -38,12 +38,15 @@ namespace Si
 	{
 		variant<int, noexcept_string> v, w(noexcept_string("S"));
 		BOOST_CHECK_EQUAL(0, *try_get_ptr<int>(v));
-		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(w));
+		BOOST_CHECK_EQUAL(
+		    noexcept_string("S"), *try_get_ptr<noexcept_string>(w));
 		v = w;
 		BOOST_CHECK_EQUAL(v.which(), w.which());
 		BOOST_CHECK_EQUAL(v.which(), 1u);
-		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(v));
-		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(w));
+		BOOST_CHECK_EQUAL(
+		    noexcept_string("S"), *try_get_ptr<noexcept_string>(v));
+		BOOST_CHECK_EQUAL(
+		    noexcept_string("S"), *try_get_ptr<noexcept_string>(w));
 	}
 
 	struct is_int_visitor : boost::static_visitor<bool>
@@ -80,7 +83,8 @@ namespace Si
 	{
 		variant<variant<int>, noexcept_string> f;
 		f = noexcept_string("S");
-		BOOST_CHECK_EQUAL(noexcept_string("S"), *try_get_ptr<noexcept_string>(f));
+		BOOST_CHECK_EQUAL(
+		    noexcept_string("S"), *try_get_ptr<noexcept_string>(f));
 
 		f = variant<int>(2);
 		BOOST_CHECK(variant<int>(2) == *try_get_ptr<variant<int>>(f));
@@ -101,7 +105,8 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(variant_less)
 	{
-		variant<int, noexcept_string> f(1), g(2), h(noexcept_string("a")), i(noexcept_string("b"));
+		variant<int, noexcept_string> f(1), g(2), h(noexcept_string("a")),
+		    i(noexcept_string("b"));
 		BOOST_CHECK(f < g);
 		BOOST_CHECK(f < h);
 		BOOST_CHECK(f < i);
@@ -185,7 +190,8 @@ namespace Si
 		typedef variant<std::unique_ptr<int>, double> variant;
 		variant v(Si::make_unique<int>(23));
 		v = std::move(v);
-		std::unique_ptr<int> *const content = Si::try_get_ptr<std::unique_ptr<int>>(v);
+		std::unique_ptr<int> *const content =
+		    Si::try_get_ptr<std::unique_ptr<int>>(v);
 		BOOST_REQUIRE(content);
 		BOOST_CHECK_EQUAL(23, **content);
 	}
@@ -231,7 +237,8 @@ namespace Si
 		typedef variant<std::shared_ptr<int>, double> variant;
 		variant v(std::make_shared<int>(23));
 		v = v;
-		std::shared_ptr<int> *const content = Si::try_get_ptr<std::shared_ptr<int>>(v);
+		std::shared_ptr<int> *const content =
+		    Si::try_get_ptr<std::shared_ptr<int>>(v);
 		BOOST_REQUIRE(content);
 		BOOST_CHECK_EQUAL(23, **content);
 	}
@@ -495,12 +502,14 @@ namespace Si
 		}
 	};
 
-	bool operator==(needs_inplace_construction const &left, needs_inplace_construction const &right)
+	bool operator==(needs_inplace_construction const &left,
+	                needs_inplace_construction const &right)
 	{
 		return left.v == right.v;
 	}
 
-	std::ostream &operator<<(std::ostream &out, needs_inplace_construction const &value)
+	std::ostream &operator<<(std::ostream &out,
+	                         needs_inplace_construction const &value)
 	{
 		return out << value.v;
 	}
@@ -512,7 +521,8 @@ namespace Si
 
 	BOOST_AUTO_TEST_CASE(variant_construct_inplace)
 	{
-		typedef variant<int, float, unit, std::string, needs_inplace_construction> var;
+		typedef variant<int, float, unit, std::string,
+		                needs_inplace_construction> var;
 		{
 			var a(Si::inplace<int>(), 12);
 			var b(12);
@@ -536,93 +546,132 @@ namespace Si
 		{
 			var a((Si::inplace<needs_inplace_construction>()), 123);
 			BOOST_CHECK_EQUAL(a, a);
-			BOOST_CHECK_EQUAL(123, Si::visit<optional<int>>(a,
-			                                                [](int)
-			                                                {
-				                                                BOOST_FAIL("unexpected type");
-				                                                return none;
-				                                            },
-			                                                [](float)
-			                                                {
-				                                                BOOST_FAIL("unexpected type");
-				                                                return none;
-				                                            },
-			                                                [](unit)
-			                                                {
-				                                                BOOST_FAIL("unexpected type");
-				                                                return none;
-				                                            },
-			                                                [](std::string const &)
-			                                                {
-				                                                BOOST_FAIL("unexpected type");
-				                                                return none;
-				                                            },
-			                                                [](needs_inplace_construction const &value)
-			                                                {
-				                                                return value.v;
-				                                            }));
+			BOOST_CHECK_EQUAL(
+			    123, Si::visit<optional<int>>(
+			             a,
+			             [](int)
+			             {
+				             BOOST_FAIL("unexpected type");
+				             return none;
+				         },
+			             [](float)
+			             {
+				             BOOST_FAIL("unexpected type");
+				             return none;
+				         },
+			             [](unit)
+			             {
+				             BOOST_FAIL("unexpected type");
+				             return none;
+				         },
+			             [](std::string const &)
+			             {
+				             BOOST_FAIL("unexpected type");
+				             return none;
+				         },
+			             [](needs_inplace_construction const &value)
+			             {
+				             return value.v;
+				         }));
 		}
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_std_ostream)
 	{
-		BOOST_CHECK_EQUAL("123", boost::lexical_cast<std::string>(Si::variant<int>(123)));
+		BOOST_CHECK_EQUAL(
+		    "123", boost::lexical_cast<std::string>(Si::variant<int>(123)));
 	}
 }
 
 BOOST_AUTO_TEST_CASE(variant_try_get_ptr)
 {
-	Si::variant<Si::unit, int, std::unique_ptr<long>> u, v(123), w(Si::make_unique<long>(456));
-	BOOST_STATIC_ASSERT((std::is_same<Si::unit *, decltype(Si::try_get_ptr<Si::unit>(u))>::value));
-	BOOST_STATIC_ASSERT((std::is_same<int *, decltype(Si::try_get_ptr<int>(u))>::value));
+	Si::variant<Si::unit, int, std::unique_ptr<long>> u, v(123),
+	    w(Si::make_unique<long>(456));
 	BOOST_STATIC_ASSERT(
-	    (std::is_same<std::unique_ptr<long> *, decltype(Si::try_get_ptr<std::unique_ptr<long>>(u))>::value));
-	BOOST_CHECK_NE(static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(u));
-	BOOST_CHECK_EQUAL(static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(v));
-	BOOST_CHECK_EQUAL(static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(w));
+	    (std::is_same<Si::unit *,
+	                  decltype(Si::try_get_ptr<Si::unit>(u))>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<int *, decltype(Si::try_get_ptr<int>(u))>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<std::unique_ptr<long> *,
+	                  decltype(
+	                      Si::try_get_ptr<std::unique_ptr<long>>(u))>::value));
+	BOOST_CHECK_NE(
+	    static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(u));
+	BOOST_CHECK_EQUAL(
+	    static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(v));
+	BOOST_CHECK_EQUAL(
+	    static_cast<Si::unit *>(nullptr), Si::try_get_ptr<Si::unit>(w));
 	BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), Si::try_get_ptr<int>(u));
 	BOOST_REQUIRE_NE(static_cast<int *>(nullptr), Si::try_get_ptr<int>(v));
 	BOOST_CHECK_EQUAL(static_cast<int *>(nullptr), Si::try_get_ptr<int>(w));
-	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(u));
-	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(v));
-	BOOST_REQUIRE_NE(static_cast<std::unique_ptr<long> *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(w));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> *>(nullptr),
+	                  Si::try_get_ptr<std::unique_ptr<long>>(u));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> *>(nullptr),
+	                  Si::try_get_ptr<std::unique_ptr<long>>(v));
+	BOOST_REQUIRE_NE(static_cast<std::unique_ptr<long> *>(nullptr),
+	                 Si::try_get_ptr<std::unique_ptr<long>>(w));
 	BOOST_CHECK_EQUAL(123, *Si::try_get_ptr<int>(v));
 	BOOST_CHECK_EQUAL(456, **Si::try_get_ptr<std::unique_ptr<long>>(w));
 }
 
 BOOST_AUTO_TEST_CASE(variant_const_try_get_ptr)
 {
-	Si::variant<Si::unit, int, std::unique_ptr<long>> const u, v(123), w(Si::make_unique<long>(456));
-	BOOST_STATIC_ASSERT((std::is_same<Si::unit const *, decltype(Si::try_get_ptr<Si::unit>(u))>::value));
-	BOOST_STATIC_ASSERT((std::is_same<int const *, decltype(Si::try_get_ptr<int>(u))>::value));
+	Si::variant<Si::unit, int, std::unique_ptr<long>> const u, v(123),
+	    w(Si::make_unique<long>(456));
 	BOOST_STATIC_ASSERT(
-	    (std::is_same<std::unique_ptr<long> const *, decltype(Si::try_get_ptr<std::unique_ptr<long>>(u))>::value));
-	BOOST_CHECK_NE(static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(u));
-	BOOST_CHECK_EQUAL(static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(v));
-	BOOST_CHECK_EQUAL(static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(w));
-	BOOST_CHECK_EQUAL(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(u));
-	BOOST_REQUIRE_NE(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(v));
-	BOOST_CHECK_EQUAL(static_cast<int const *>(nullptr), Si::try_get_ptr<int>(w));
-	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> const *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(u));
-	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> const *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(v));
-	BOOST_REQUIRE_NE(static_cast<std::unique_ptr<long> const *>(nullptr), Si::try_get_ptr<std::unique_ptr<long>>(w));
+	    (std::is_same<Si::unit const *,
+	                  decltype(Si::try_get_ptr<Si::unit>(u))>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<int const *, decltype(Si::try_get_ptr<int>(u))>::value));
+	BOOST_STATIC_ASSERT(
+	    (std::is_same<std::unique_ptr<long> const *,
+	                  decltype(
+	                      Si::try_get_ptr<std::unique_ptr<long>>(u))>::value));
+	BOOST_CHECK_NE(
+	    static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(u));
+	BOOST_CHECK_EQUAL(
+	    static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(v));
+	BOOST_CHECK_EQUAL(
+	    static_cast<Si::unit const *>(nullptr), Si::try_get_ptr<Si::unit>(w));
+	BOOST_CHECK_EQUAL(
+	    static_cast<int const *>(nullptr), Si::try_get_ptr<int>(u));
+	BOOST_REQUIRE_NE(
+	    static_cast<int const *>(nullptr), Si::try_get_ptr<int>(v));
+	BOOST_CHECK_EQUAL(
+	    static_cast<int const *>(nullptr), Si::try_get_ptr<int>(w));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> const *>(nullptr),
+	                  Si::try_get_ptr<std::unique_ptr<long>>(u));
+	BOOST_CHECK_EQUAL(static_cast<std::unique_ptr<long> const *>(nullptr),
+	                  Si::try_get_ptr<std::unique_ptr<long>>(v));
+	BOOST_REQUIRE_NE(static_cast<std::unique_ptr<long> const *>(nullptr),
+	                 Si::try_get_ptr<std::unique_ptr<long>>(w));
 	BOOST_CHECK_EQUAL(123, *Si::try_get_ptr<int>(v));
 	BOOST_CHECK_EQUAL(456, **Si::try_get_ptr<std::unique_ptr<long>>(w));
 }
 
 BOOST_AUTO_TEST_CASE(variant_sizeof)
 {
-	BOOST_CHECK_EQUAL((sizeof(std::string) + sizeof(std::ptrdiff_t)), sizeof(Si::variant<std::string>));
-	BOOST_CHECK_EQUAL(sizeof(boost::uint8_t), sizeof(Si::variant<boost::uint8_t>));
-	BOOST_CHECK_EQUAL(sizeof(boost::uint16_t), sizeof(Si::variant<boost::uint16_t>));
-	BOOST_CHECK_EQUAL(sizeof(boost::uint32_t), sizeof(Si::variant<boost::uint32_t>));
-	BOOST_CHECK_EQUAL(sizeof(boost::uint64_t), sizeof(Si::variant<boost::uint64_t>));
+	BOOST_CHECK_EQUAL((sizeof(std::string) + sizeof(std::ptrdiff_t)),
+	                  sizeof(Si::variant<std::string>));
+	BOOST_CHECK_EQUAL(
+	    sizeof(boost::uint8_t), sizeof(Si::variant<boost::uint8_t>));
+	BOOST_CHECK_EQUAL(
+	    sizeof(boost::uint16_t), sizeof(Si::variant<boost::uint16_t>));
+	BOOST_CHECK_EQUAL(
+	    sizeof(boost::uint32_t), sizeof(Si::variant<boost::uint32_t>));
+	BOOST_CHECK_EQUAL(
+	    sizeof(boost::uint64_t), sizeof(Si::variant<boost::uint64_t>));
 	BOOST_CHECK_EQUAL(sizeof(int *), sizeof(Si::variant<int *>));
-	BOOST_CHECK_EQUAL(sizeof(std::hash<Si::variant<int>>), sizeof(Si::variant<std::hash<Si::variant<int>>>));
-	BOOST_CHECK_EQUAL((Si::alignment_of<int *>::value + sizeof(int *)), sizeof(Si::variant<int *, int, Si::unit>));
-	BOOST_CHECK_EQUAL((Si::alignment_of<std::string>::value + sizeof(std::string)),
-	                  sizeof(Si::variant<std::string, Si::unit>));
-	BOOST_CHECK_EQUAL((sizeof(unsigned char) + sizeof(Si::unit)), sizeof(Si::variant<Si::unit, Si::none_t>));
+	BOOST_CHECK_EQUAL(sizeof(std::hash<Si::variant<int>>),
+	                  sizeof(Si::variant<std::hash<Si::variant<int>>>));
+	BOOST_CHECK_EQUAL((Si::alignment_of<int *>::value + sizeof(int *)),
+	                  sizeof(Si::variant<int *, int, Si::unit>));
+	BOOST_CHECK_EQUAL(
+	    (Si::alignment_of<std::string>::value + sizeof(std::string)),
+	    sizeof(Si::variant<std::string, Si::unit>));
+	BOOST_CHECK_EQUAL((sizeof(unsigned char) + sizeof(Si::unit)),
+	                  sizeof(Si::variant<Si::unit, Si::none_t>));
 }
 
 struct leaf
@@ -680,13 +729,15 @@ BOOST_AUTO_TEST_CASE(variant_move_throws)
 	BOOST_CHECK_EQUAL(2, weak_content.use_count());
 	content.reset();
 	BOOST_CHECK_EQUAL(1, weak_content.use_count());
-	BOOST_CHECK_EXCEPTION(v = throws_on_move(), throws_on_move_exception, [](throws_on_move_exception const &)
+	BOOST_CHECK_EXCEPTION(v = throws_on_move(), throws_on_move_exception,
+	                      [](throws_on_move_exception const &)
 	                      {
 		                      return true;
 		                  });
 	BOOST_CHECK_EQUAL(0, weak_content.use_count());
 	BOOST_CHECK(!v.is_valid());
-	BOOST_CHECK_EXCEPTION(Si::apply_visitor(null_visitor(), v), Si::invalid_variant_exception,
+	BOOST_CHECK_EXCEPTION(Si::apply_visitor(null_visitor(), v),
+	                      Si::invalid_variant_exception,
 	                      [](Si::invalid_variant_exception const &)
 	                      {
 		                      return true;
@@ -744,8 +795,10 @@ namespace
 BOOST_AUTO_TEST_CASE(variant_of_incomplete_types)
 {
 	std::unique_ptr<expression> right = Si::make_unique<expression>(
-	    add{Si::make_unique<expression>(reference{"b"}), Si::make_unique<expression>(literal{1})});
-	expression root = add{Si::make_unique<expression>(reference{"a"}), std::move(right)};
+	    add{Si::make_unique<expression>(reference{"b"}),
+	        Si::make_unique<expression>(literal{1})});
+	expression root =
+	    add{Si::make_unique<expression>(reference{"a"}), std::move(right)};
 	std::ostringstream buffer;
 	print(buffer, root);
 	BOOST_CHECK_EQUAL("(a + (b + 1))", buffer.str());

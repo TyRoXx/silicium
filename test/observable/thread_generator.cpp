@@ -10,38 +10,42 @@
 #if SILICIUM_HAS_THREAD_GENERATOR
 BOOST_AUTO_TEST_CASE(make_thread_generator_empty)
 {
-	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &)
-	                                                           {
-		                                                       });
-	auto consumer = Si::consume<int>([](int element)
-	                                 {
-		                                 boost::ignore_unused_variable_warning(element);
-		                                 BOOST_FAIL("No element expected here");
-		                             });
+	auto a = Si::make_thread_generator<int, Si::std_threading>(
+	    [](Si::push_context<int> &)
+	    {
+		});
+	auto consumer =
+	    Si::consume<int>([](int element)
+	                     {
+		                     boost::ignore_unused_variable_warning(element);
+		                     BOOST_FAIL("No element expected here");
+		                 });
 	a.async_get_one(Si::observe_by_ref(consumer));
 	a.wait();
 }
 
 BOOST_AUTO_TEST_CASE(make_thread_generator_non_empty)
 {
-	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
-	                                                           {
-		                                                           yield(1);
-		                                                           yield(2);
-		                                                           yield(3);
-		                                                       });
+	auto a = Si::make_thread_generator<int, Si::std_threading>(
+	    [](Si::push_context<int> &yield)
+	    {
+		    yield(1);
+		    yield(2);
+		    yield(3);
+		});
 	std::vector<int> const expected{1, 2, 3};
 	std::vector<int> produced;
 	std::unique_ptr<Si::observer<int>> pusher;
-	pusher = Si::to_unique(Si::consume<int>([&](int element)
-	                                        {
-		                                        produced.emplace_back(element);
-		                                        if (produced.size() == expected.size())
-		                                        {
-			                                        return;
-		                                        }
-		                                        a.async_get_one(Si::observe_by_ref(*pusher));
-		                                    }));
+	pusher = Si::to_unique(
+	    Si::consume<int>([&](int element)
+	                     {
+		                     produced.emplace_back(element);
+		                     if (produced.size() == expected.size())
+		                     {
+			                     return;
+		                     }
+		                     a.async_get_one(Si::observe_by_ref(*pusher));
+		                 }));
 	a.async_get_one(Si::observe_by_ref(*pusher));
 	a.wait();
 	BOOST_CHECK(expected == produced);
@@ -49,17 +53,19 @@ BOOST_AUTO_TEST_CASE(make_thread_generator_non_empty)
 
 BOOST_AUTO_TEST_CASE(make_thread_generator_owning_observer)
 {
-	auto a = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
-	                                                           {
-		                                                           yield(23);
-		                                                       });
+	auto a = Si::make_thread_generator<int, Si::std_threading>(
+	    [](Si::push_context<int> &yield)
+	    {
+		    yield(23);
+		});
 	Si::optional<int> got_element;
-	a.async_get_one(Si::make_function_observer([&got_element](Si::optional<int> element)
-	                                           {
-		                                           BOOST_REQUIRE(!got_element);
-		                                           got_element = element;
-		                                           BOOST_CHECK(got_element);
-		                                       }));
+	a.async_get_one(
+	    Si::make_function_observer([&got_element](Si::optional<int> element)
+	                               {
+		                               BOOST_REQUIRE(!got_element);
+		                               got_element = element;
+		                               BOOST_CHECK(got_element);
+		                           }));
 	a.wait();
 	BOOST_CHECK_EQUAL(Si::make_optional(23), got_element);
 }
@@ -69,12 +75,13 @@ BOOST_AUTO_TEST_CASE(make_thread_generator_nesting)
 	auto a = Si::make_thread_generator<int, Si::std_threading>(
 	    [](Si::push_context<int> &yield)
 	    {
-		    auto b = Si::make_thread_generator<int, Si::std_threading>([](Si::push_context<int> &yield)
-		                                                               {
-			                                                               yield(1);
-			                                                               yield(2);
-			                                                               yield(3);
-			                                                           });
+		    auto b = Si::make_thread_generator<int, Si::std_threading>(
+		        [](Si::push_context<int> &yield)
+		        {
+			        yield(1);
+			        yield(2);
+			        yield(3);
+			    });
 		    for (;;)
 		    {
 			    auto e = yield.get_one(b);
@@ -89,15 +96,16 @@ BOOST_AUTO_TEST_CASE(make_thread_generator_nesting)
 	std::vector<int> const expected{1, 2, 3};
 	std::vector<int> produced;
 	std::unique_ptr<Si::observer<int>> pusher;
-	pusher = Si::to_unique(Si::consume<int>([&](int element)
-	                                        {
-		                                        produced.emplace_back(element);
-		                                        if (produced.size() == expected.size())
-		                                        {
-			                                        return;
-		                                        }
-		                                        a.async_get_one(Si::observe_by_ref(*pusher));
-		                                    }));
+	pusher = Si::to_unique(
+	    Si::consume<int>([&](int element)
+	                     {
+		                     produced.emplace_back(element);
+		                     if (produced.size() == expected.size())
+		                     {
+			                     return;
+		                     }
+		                     a.async_get_one(Si::observe_by_ref(*pusher));
+		                 }));
 	a.async_get_one(Si::observe_by_ref(*pusher));
 	a.wait();
 	BOOST_CHECK(expected == produced);

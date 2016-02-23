@@ -22,14 +22,18 @@ namespace Si
 			}
 
 #if SILICIUM_COMPILER_GENERATES_MOVES
-			basic_dynamic_library(basic_dynamic_library &&) BOOST_NOEXCEPT = default;
-			basic_dynamic_library &operator=(basic_dynamic_library &&) BOOST_NOEXCEPT = default;
+			basic_dynamic_library(basic_dynamic_library &&)
+			    BOOST_NOEXCEPT = default;
+			basic_dynamic_library &
+			operator=(basic_dynamic_library &&) BOOST_NOEXCEPT = default;
 #else
-			basic_dynamic_library(basic_dynamic_library &&other) BOOST_NOEXCEPT : handle(std::move(other.handle))
+			basic_dynamic_library(basic_dynamic_library &&other) BOOST_NOEXCEPT
+			    : handle(std::move(other.handle))
 			{
 			}
 
-			basic_dynamic_library &operator=(basic_dynamic_library &&other) BOOST_NOEXCEPT
+			basic_dynamic_library &
+			operator=(basic_dynamic_library &&other) BOOST_NOEXCEPT
 			{
 				handle = std::move(other.handle);
 				return *this;
@@ -41,7 +45,8 @@ namespace Si
 
 			void open(native_path_string file)
 			{
-				std::unique_ptr<void, deleter> new_handle(DynamicLibraryImpl::open(file));
+				std::unique_ptr<void, deleter> new_handle(
+				    DynamicLibraryImpl::open(file));
 				if (new_handle)
 				{
 					handle = std::move(new_handle);
@@ -73,8 +78,10 @@ namespace Si
 
 			std::unique_ptr<void, deleter> handle;
 
-			SILICIUM_DELETED_FUNCTION(basic_dynamic_library(basic_dynamic_library const &))
-			SILICIUM_DELETED_FUNCTION(basic_dynamic_library &operator=(basic_dynamic_library const &))
+			SILICIUM_DELETED_FUNCTION(
+			    basic_dynamic_library(basic_dynamic_library const &))
+			SILICIUM_DELETED_FUNCTION(
+			    basic_dynamic_library &operator=(basic_dynamic_library const &))
 		};
 	}
 }

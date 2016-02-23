@@ -40,9 +40,13 @@ namespace Si
 			{
 				assert(stream);
 				boost::asio::async_write(
-				    *stream, boost::asio::buffer(m_buffer.begin(), static_cast<std::size_t>(m_buffer.size())),
-				    [SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](
-				        boost::system::error_code ec, std::size_t bytes_sent) mutable
+				    *stream, boost::asio::buffer(
+				                 m_buffer.begin(),
+				                 static_cast<std::size_t>(m_buffer.size())),
+				    [SILICIUM_CAPTURE_EXPRESSION(
+				        receiver, std::forward<Observer>(receiver))](
+				        boost::system::error_code ec,
+				        std::size_t bytes_sent) mutable
 				    {
 					    (void)bytes_sent;
 					    std::forward<Observer>(receiver).got_element(ec);
@@ -64,7 +68,8 @@ namespace Si
 		}
 
 		template <class AsyncStream, class YieldContext>
-		boost::system::error_code write(AsyncStream &stream, memory_range data, YieldContext &&yield)
+		boost::system::error_code write(AsyncStream &stream, memory_range data,
+		                                YieldContext &&yield)
 		{
 			auto writer = make_writing_observable(stream);
 			writer.set_buffer(data);

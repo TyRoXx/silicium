@@ -54,7 +54,8 @@ namespace Si
 			input.async_get_one(*this);
 		}
 
-		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
+		virtual void
+		got_element(typename Input::element_type value) SILICIUM_OVERRIDE
 		{
 			boost::ignore_unused_variable_warning(value);
 			next();
@@ -73,7 +74,8 @@ namespace Si
 	    -> end_observable<typename std::decay<Input>::type>
 #endif
 	{
-		return end_observable<typename std::decay<Input>::type>(std::forward<Input>(input));
+		return end_observable<typename std::decay<Input>::type>(
+		    std::forward<Input>(input));
 	}
 }
 

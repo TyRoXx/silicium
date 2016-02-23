@@ -32,9 +32,11 @@ namespace Si
 	};
 
 	template <class Element, class Consume>
-	auto consume(Consume con) -> consumer<Element, typename std::decay<Consume>::type>
+	auto consume(Consume con)
+	    -> consumer<Element, typename std::decay<Consume>::type>
 	{
-		return consumer<Element, typename std::decay<Consume>::type>(std::move(con));
+		return consumer<Element, typename std::decay<Consume>::type>(
+		    std::move(con));
 	}
 }
 

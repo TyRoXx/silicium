@@ -77,7 +77,8 @@ namespace Si
 	    -> ptr_adaptor<typename std::decay<Pointee>::type>
 #endif
 	{
-		return ptr_adaptor<typename std::decay<Pointee>::type>(std::forward<Pointee>(value));
+		return ptr_adaptor<typename std::decay<Pointee>::type>(
+		    std::forward<Pointee>(value));
 	}
 }
 

@@ -11,7 +11,8 @@ namespace Si
 	template <class SuccessElement, class ThreadingAPI>
 	struct thread_observable
 	{
-		typedef typename ThreadingAPI::template future<SuccessElement>::type element_type;
+		typedef typename ThreadingAPI::template future<SuccessElement>::type
+		    element_type;
 
 		thread_observable()
 		    : m_has_finished(false)
@@ -33,22 +34,27 @@ namespace Si
 			}
 			assert(m_action);
 			auto action = std::move(m_action);
-			optional<typename std::decay<Observer>::type> maybe_observer{std::forward<Observer>(observer)};
+			optional<typename std::decay<Observer>::type> maybe_observer{
+			    std::forward<Observer>(observer)};
 			m_worker = ThreadingAPI::launch_async(
 			    [
 				  this,
-				  SILICIUM_CAPTURE_EXPRESSION(maybe_observer, std::move(maybe_observer)),
+				  SILICIUM_CAPTURE_EXPRESSION(
+				      maybe_observer, std::move(maybe_observer)),
 				  SILICIUM_CAPTURE_EXPRESSION(action, std::move(action))
 				]() mutable
 			    {
 				    m_has_finished = true;
-				    typename ThreadingAPI::template packaged_task<SuccessElement>::type task(action);
+				    typename ThreadingAPI::template packaged_task<
+				        SuccessElement>::type task(action);
 				    auto result = task.get_future();
 				    task();
 				    assert(maybe_observer);
 				    auto observer_ = std::forward<Observer>(*maybe_observer);
-				    std::forward<Observer>(observer_).got_element(std::move(result));
-				    // kill the observer with fire so that it cannot keep any shared state alive
+				    std::forward<Observer>(observer_)
+				        .got_element(std::move(result));
+				    // kill the observer with fire so that it cannot keep any
+				    // shared state alive
 				    maybe_observer = none;
 				});
 		}
@@ -81,7 +87,8 @@ namespace Si
 		bool m_has_finished;
 
 		SILICIUM_DELETED_FUNCTION(thread_observable(thread_observable const &))
-		SILICIUM_DELETED_FUNCTION(thread_observable &operator=(thread_observable const &))
+		SILICIUM_DELETED_FUNCTION(
+		    thread_observable &operator=(thread_observable const &))
 	};
 
 	template <class ThreadingAPI, class Action>
@@ -90,7 +97,8 @@ namespace Si
 	    -> thread_observable<decltype(action()), ThreadingAPI>
 #endif
 	{
-		return thread_observable<decltype(action()), ThreadingAPI>(std::forward<Action>(action));
+		return thread_observable<decltype(action()), ThreadingAPI>(
+		    std::forward<Action>(action));
 	}
 #endif
 }

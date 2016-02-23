@@ -12,8 +12,9 @@ namespace Si
 {
 #if SILICIUM_HAS_BUFFERING_SINK
 	template <class Next, class Error = typename Next::error_type,
-	          class Buffer =
-	              std::array<typename Next::element_type, ((1U << 13U) / sizeof(typename Next::element_type))>>
+	          class Buffer = std::array<typename Next::element_type,
+	                                    ((1U << 13U) /
+	                                     sizeof(typename Next::element_type))>>
 	struct buffering_sink SILICIUM_FINAL
 	{
 		typedef typename Next::element_type element_type;
@@ -33,7 +34,9 @@ namespace Si
 		iterator_range<element_type *> make_append_space(std::size_t size)
 		{
 			m_buffer_used = (std::min)(size, m_fallback_buffer.size());
-			return make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used);
+			return make_iterator_range(
+			    m_fallback_buffer.data(),
+			    m_fallback_buffer.data() + m_buffer_used);
 		}
 
 		Error flush_append_space()
@@ -50,9 +53,11 @@ namespace Si
 
 		Error append(iterator_range<element_type const *> data)
 		{
-			if (static_cast<size_t>(data.size()) <= (m_fallback_buffer.size() - m_buffer_used))
+			if (static_cast<size_t>(data.size()) <=
+			    (m_fallback_buffer.size() - m_buffer_used))
 			{
-				boost::range::copy(data, m_fallback_buffer.begin() + m_buffer_used);
+				boost::range::copy(
+				    data, m_fallback_buffer.begin() + m_buffer_used);
 				m_buffer_used += static_cast<size_t>(data.size());
 				return default_construct<Error>();
 			}
@@ -73,8 +78,9 @@ namespace Si
 			return then(
 			    [this]
 			    {
-				    return m_destination.append(
-				        make_iterator_range(m_fallback_buffer.data(), m_fallback_buffer.data() + m_buffer_used));
+				    return m_destination.append(make_iterator_range(
+				        m_fallback_buffer.data(),
+				        m_fallback_buffer.data() + m_buffer_used));
 				},
 			    [this]
 			    {
@@ -95,7 +101,8 @@ namespace Si
 	    -> buffering_sink<typename std::decay<Next>::type>
 #endif
 	{
-		return buffering_sink<typename std::decay<Next>::type>(std::forward<Next>(next));
+		return buffering_sink<typename std::decay<Next>::type>(
+		    std::forward<Next>(next));
 	}
 #endif
 }

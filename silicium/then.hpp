@@ -69,10 +69,12 @@ namespace Si
 	}
 
 	template <class First, class... Sequence>
-	auto then(First &&first, Sequence &&... actions) -> decltype(std::forward<First>(first)())
+	auto then(First &&first, Sequence &&... actions)
+	    -> decltype(std::forward<First>(first)())
 	{
 		typedef decltype(std::forward<First>(first)()) result_type;
-		return detail::then_impl<result_type>()(std::forward<First>(first), std::forward<Sequence>(actions)...);
+		return detail::then_impl<result_type>()(
+		    std::forward<First>(first), std::forward<Sequence>(actions)...);
 	}
 #endif
 }

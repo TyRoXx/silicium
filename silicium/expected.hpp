@@ -40,14 +40,16 @@ namespace Si
 		explicit expected(A0 &&a0, Args &&... args)
 		    : m_state(has_value)
 		{
-			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<Args>(args)...);
+			new (&value_address())
+			    value_type(std::forward<A0>(a0), std::forward<Args>(args)...);
 		}
 #else
 		template <class A0, class A1>
 		expected(A0 &&a0, A1 &&a1)
 		    : m_state(has_value)
 		{
-			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<A1>(a1));
+			new (&value_address())
+			    value_type(std::forward<A0>(a0), std::forward<A1>(a1));
 		}
 #endif
 
@@ -63,11 +65,13 @@ namespace Si
 			switch (m_state)
 			{
 			case has_value:
-				new (&value_address()) value_type(std::move(other.value_address()));
+				new (&value_address())
+				    value_type(std::move(other.value_address()));
 				break;
 
 			case has_exception:
-				new (&exception_address()) exception_ptr(std::move(other.exception_address()));
+				new (&exception_address())
+				    exception_ptr(std::move(other.exception_address()));
 				break;
 			}
 		}
@@ -82,7 +86,8 @@ namespace Si
 				break;
 
 			case has_exception:
-				new (&exception_address()) exception_ptr(other.exception_address());
+				new (&exception_address())
+				    exception_ptr(other.exception_address());
 				break;
 			}
 		}
@@ -137,7 +142,8 @@ namespace Si
 
 				case has_exception:
 					value_address().~value_type();
-					new (&exception_address()) exception_ptr(std::move(other.exception_address()));
+					new (&exception_address())
+					    exception_ptr(std::move(other.exception_address()));
 					break;
 				}
 				break;
@@ -147,7 +153,8 @@ namespace Si
 				{
 				case has_value:
 					exception_address().~exception_ptr();
-					new (&value_address()) value_type(std::move(other.value_address()));
+					new (&value_address())
+					    value_type(std::move(other.value_address()));
 					break;
 
 				case has_exception:
@@ -173,7 +180,8 @@ namespace Si
 
 				case has_exception:
 					value_address().~value_type();
-					new (&exception_address()) exception_ptr(other.exception_address());
+					new (&exception_address())
+					    exception_ptr(other.exception_address());
 					break;
 				}
 				break;
@@ -318,7 +326,8 @@ namespace Si
 				exception_address().~exception_ptr();
 				break;
 			}
-			new (&value_address()) value_type(std::forward<A0>(a0), std::forward<A1>(a1));
+			new (&value_address())
+			    value_type(std::forward<A0>(a0), std::forward<A1>(a1));
 		}
 #endif
 
@@ -343,9 +352,11 @@ namespace Si
 
 		union
 		{
-			typename std::aligned_storage<sizeof(T), boost::alignment_of<T>::value>::type m_value;
-			typename std::aligned_storage<sizeof(exception_ptr), boost::alignment_of<exception_ptr>::value>::type
-			    m_exception;
+			typename std::aligned_storage<
+			    sizeof(T), boost::alignment_of<T>::value>::type m_value;
+			typename std::aligned_storage<
+			    sizeof(exception_ptr),
+			    boost::alignment_of<exception_ptr>::value>::type m_exception;
 		};
 		state m_state;
 
@@ -370,7 +381,8 @@ namespace Si
 		}
 	};
 
-	BOOST_STATIC_ASSERT(sizeof(expected<void *>) <= (sizeof(boost::exception_ptr) + sizeof(void *)));
+	BOOST_STATIC_ASSERT(sizeof(expected<void *>) <=
+	                    (sizeof(boost::exception_ptr) + sizeof(void *)));
 }
 #endif
 

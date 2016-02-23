@@ -46,7 +46,8 @@ namespace Si
 	    -> source_observable<Element, typename std::decay<Source>::type>
 #endif
 	{
-		return source_observable<Element, typename std::decay<Source>::type>(std::forward<Source>(source));
+		return source_observable<Element, typename std::decay<Source>::type>(
+		    std::forward<Source>(source));
 	}
 }
 

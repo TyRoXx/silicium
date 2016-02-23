@@ -11,7 +11,8 @@ namespace Si
 	namespace http
 	{
 		template <class Output>
-		struct request_parser_sink : Sink<char, typename Output::error_type>::interface
+		struct request_parser_sink
+		    : Sink<char, typename Output::error_type>::interface
 		{
 			typedef char element_type;
 			typedef typename Output::error_type error_type;
@@ -22,7 +23,8 @@ namespace Si
 			{
 			}
 
-			virtual error_type append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
+			virtual error_type
+			append(iterator_range<element_type const *> data) SILICIUM_OVERRIDE
 			{
 				while (!data.empty())
 				{
@@ -32,13 +34,17 @@ namespace Si
 					case state::path:
 					{
 						auto space = std::find(data.begin(), data.end(), ' ');
-						noexcept_string &buffer = (m_state == state::method) ? m_result.method : m_result.path;
+						noexcept_string &buffer = (m_state == state::method)
+						                              ? m_result.method
+						                              : m_result.path;
 						buffer.insert(buffer.end(), data.begin(), space);
 						data.pop_front(std::distance(data.begin(), space));
 						if (space != data.end())
 						{
 							data.pop_front(1);
-							m_state = (m_state == state::method) ? state::path : state::version;
+							m_state = (m_state == state::method)
+							              ? state::path
+							              : state::version;
 						}
 						break;
 					}
@@ -73,7 +79,9 @@ namespace Si
 						{
 							data.pop_front();
 							m_state = state::end_of_headers_lf;
-							error_type error = m_output.append(Si::make_iterator_range(&m_result, &m_result + 1));
+							error_type error =
+							    m_output.append(Si::make_iterator_range(
+							        &m_result, &m_result + 1));
 							m_result.path.clear();
 							m_result.method.clear();
 							m_result.http_version.clear();
@@ -113,7 +121,8 @@ namespace Si
 						if (cr != data.end())
 						{
 							data.pop_front(1);
-							m_result.arguments.insert(std::make_pair(std::move(m_key), std::move(m_value)));
+							m_result.arguments.insert(std::make_pair(
+							    std::move(m_key), std::move(m_value)));
 							m_key.clear();
 							m_value.clear();
 							m_state = state::value_lf;
@@ -172,7 +181,9 @@ namespace Si
 		    -> request_parser_sink<typename std::remove_reference<Output>::type>
 #endif
 		{
-			return request_parser_sink<typename std::remove_reference<Output>::type>(std::forward<Output>(output));
+			return request_parser_sink<
+			    typename std::remove_reference<Output>::type>(
+			    std::forward<Output>(output));
 		}
 	}
 }

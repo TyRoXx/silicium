@@ -21,11 +21,13 @@ namespace Si
 		{
 		}
 
-		function(function &&other) BOOST_NOEXCEPT : m_content(std::move(other.m_content))
+		function(function &&other) BOOST_NOEXCEPT
+		    : m_content(std::move(other.m_content))
 		{
 		}
 
-		function(function const &other) BOOST_NOEXCEPT : m_content(other.m_content)
+		function(function const &other) BOOST_NOEXCEPT
+		    : m_content(other.m_content)
 		{
 		}
 
@@ -42,9 +44,13 @@ namespace Si
 		}
 
 		template <class F>
-		function(F &&content, typename boost::enable_if_c<!std::is_same<function, typename std::decay<F>::type>::value,
-		                                                  void>::type * = nullptr)
-		    : m_content(std::make_shared<holder<typename std::decay<F>::type>>(std::forward<F>(content)))
+		function(
+		    F &&content,
+		    typename boost::enable_if_c<
+		        !std::is_same<function, typename std::decay<F>::type>::value,
+		        void>::type * = nullptr)
+		    : m_content(std::make_shared<holder<typename std::decay<F>::type>>(
+		          std::forward<F>(content)))
 		{
 		}
 

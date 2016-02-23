@@ -52,7 +52,8 @@ namespace Si
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		ostream_sink(ostream_sink &&other) BOOST_NOEXCEPT : m_file(std::move(other.m_file))
+		ostream_sink(ostream_sink &&other) BOOST_NOEXCEPT
+		    : m_file(std::move(other.m_file))
 		{
 		}
 
@@ -75,10 +76,12 @@ namespace Si
 	inline std::unique_ptr<Sink<char, boost::system::error_code>::interface>
 	make_file_sink(boost::filesystem::path const &name)
 	{
-		std::unique_ptr<std::ostream> file(new std::ofstream(name.string(), std::ios::binary));
+		std::unique_ptr<std::ostream> file(
+		    new std::ofstream(name.string(), std::ios::binary));
 		if (!*file)
 		{
-			boost::throw_exception(std::runtime_error("Cannot open file for writing: " + name.string()));
+			boost::throw_exception(std::runtime_error(
+			    "Cannot open file for writing: " + name.string()));
 		}
 		return to_unique(virtualize_sink(ostream_sink(std::move(file))));
 	}

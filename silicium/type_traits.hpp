@@ -16,9 +16,11 @@
 #endif
 #include <boost/type_traits/has_nothrow_destructor.hpp>
 
-#define SILICIUM_HAS_COPY_TRAITS ((!SILICIUM_VC || SILICIUM_VC2013_OR_LATER) && !SILICIUM_GCC46)
+#define SILICIUM_HAS_COPY_TRAITS                                               \
+	((!SILICIUM_VC || SILICIUM_VC2013_OR_LATER) && !SILICIUM_GCC46)
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__)
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||       \
+    defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 #include <type_traits>
 namespace Si
@@ -35,7 +37,8 @@ namespace Si
 
 namespace Si
 {
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || SILICIUM_VC2012_OR_LATER
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||       \
+    defined(__clang__) || SILICIUM_VC2012_OR_LATER
 }
 #include <type_traits>
 namespace Si
@@ -48,7 +51,9 @@ namespace Si
 #if SILICIUM_VC2012
 	template <class T>
 	struct is_nothrow_move_assignable
-	    : std::integral_constant<bool, std::is_pod<T>::value || std::has_nothrow_copy_assign<T>::value>
+	    : std::integral_constant<bool,
+	                             std::is_pod<T>::value ||
+	                                 std::has_nothrow_copy_assign<T>::value>
 	{
 	};
 #else  // SILICIUM_VC2012
@@ -98,19 +103,22 @@ namespace Si
 	using std::is_nothrow_destructible;
 #endif
 
-#else // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#else // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||
+	// defined(__clang__) || defined(_MSC_VER)
 	template <class T>
-	struct is_default_constructible : std::conditional<std::is_reference<T>::value, std::false_type,
+	struct is_default_constructible
+	    : std::conditional<std::is_reference<T>::value, std::false_type,
 #if !defined(_MSC_VER) || SILICIUM_VC2012_OR_LATER
-	                                                   std::is_constructible<T>
+	                       std::is_constructible<T>
 #else
-	                                                   boost::has_trivial_constructor<T>
+	                       boost::has_trivial_constructor<T>
 #endif
-	                                                   >::type
+	                       >::type
 	{
 	};
 	template <class T>
-	struct is_nothrow_default_constructible : std::has_nothrow_default_constructor<T>
+	struct is_nothrow_default_constructible
+	    : std::has_nothrow_default_constructor<T>
 	{
 	};
 
@@ -142,7 +150,8 @@ namespace Si
 #endif
 
 	template <class T>
-	struct is_move_assignable : std::integral_constant<bool, __has_nothrow_assign(T)>
+	struct is_move_assignable
+	    : std::integral_constant<bool, __has_nothrow_assign(T)>
 	{
 	};
 	template <class T>
@@ -150,14 +159,16 @@ namespace Si
 	{
 	};
 	template <class T>
-	struct is_move_constructible : std::integral_constant<bool, __has_nothrow_copy(T)>
+	struct is_move_constructible
+	    : std::integral_constant<bool, __has_nothrow_copy(T)>
 	{
 	};
 	template <class T>
 	struct is_move_constructible<std::unique_ptr<T>> : std::true_type
 	{
 	};
-#endif // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) || defined(_MSC_VER)
+#endif // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||
+	   // defined(__clang__) || defined(_MSC_VER)
 
 	BOOST_STATIC_ASSERT(is_default_constructible<int>::value);
 	BOOST_STATIC_ASSERT(is_nothrow_default_constructible<int>::value);
@@ -173,9 +184,12 @@ namespace Si
 
 	BOOST_STATIC_ASSERT(is_default_constructible<std::unique_ptr<int>>::value);
 #if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
-	BOOST_STATIC_ASSERT(is_nothrow_default_constructible<std::unique_ptr<int>>::value);
-	BOOST_STATIC_ASSERT(is_nothrow_move_constructible<std::unique_ptr<int>>::value);
-	BOOST_STATIC_ASSERT(is_nothrow_move_assignable<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(
+	    is_nothrow_default_constructible<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(
+	    is_nothrow_move_constructible<std::unique_ptr<int>>::value);
+	BOOST_STATIC_ASSERT(
+	    is_nothrow_move_assignable<std::unique_ptr<int>>::value);
 	BOOST_STATIC_ASSERT(is_nothrow_destructible<std::unique_ptr<int>>::value);
 #endif
 	BOOST_STATIC_ASSERT(is_move_assignable<std::unique_ptr<int>>::value);

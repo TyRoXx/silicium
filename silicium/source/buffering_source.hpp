@@ -10,12 +10,14 @@ namespace Si
 	template <class Element>
 	struct mutable_source : Source<Element>::interface
 	{
-		virtual iterator_range<Element *> map_next_mutable(std::size_t size) = 0;
+		virtual iterator_range<Element *>
+		map_next_mutable(std::size_t size) = 0;
 		virtual std::size_t skip(std::size_t count) = 0;
 	};
 
 	template <class Next>
-	struct buffering_source SILICIUM_FINAL : mutable_source<typename Next::element_type>
+	struct buffering_source SILICIUM_FINAL
+	    : mutable_source<typename Next::element_type>
 	{
 		typedef typename Next::element_type element_type;
 
@@ -25,19 +27,23 @@ namespace Si
 		{
 		}
 
-		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type const *>
+		map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty())
 			{
 				pull();
 			}
 			auto one = m_buffer.array_one();
-			return make_iterator_range(one.first, one.first + std::min(size, one.second));
+			return make_iterator_range(
+			    one.first, one.first + std::min(size, one.second));
 		}
 
-		virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		virtual element_type *
+		copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
 		{
-			if (m_buffer.empty() && (static_cast<size_t>(destination.size()) < m_buffer.capacity()))
+			if (m_buffer.empty() &&
+			    (static_cast<size_t>(destination.size()) < m_buffer.capacity()))
 			{
 				pull();
 			}
@@ -45,14 +51,16 @@ namespace Si
 			element_type *next = destination.begin();
 
 			std::size_t taken_from_buffer = 0;
-			for (auto b = m_buffer.begin(); (b != m_buffer.end()) && (next != destination.end());
+			for (auto b = m_buffer.begin();
+			     (b != m_buffer.end()) && (next != destination.end());
 			     ++next, ++b, ++taken_from_buffer)
 			{
 				*next = *b; // TODO move?
 			}
 
 			assert(m_next);
-			element_type *const result = m_next->copy_next(make_iterator_range(next, destination.end()));
+			element_type *const result =
+			    m_next->copy_next(make_iterator_range(next, destination.end()));
 			m_buffer.erase_begin(taken_from_buffer);
 			return result;
 		}
@@ -65,14 +73,16 @@ namespace Si
 			return skipped_buffer;
 		}
 
-		virtual iterator_range<element_type *> map_next_mutable(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type *>
+		map_next_mutable(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (m_buffer.empty())
 			{
 				pull();
 			}
 			auto one = m_buffer.array_one();
-			return make_iterator_range(one.first, one.first + std::min(size, one.second));
+			return make_iterator_range(
+			    one.first, one.first + std::min(size, one.second));
 		}
 
 	private:
@@ -84,14 +94,18 @@ namespace Si
 			m_buffer.resize(m_buffer.capacity());
 			auto one = m_buffer.array_one();
 			assert(m_next);
-			auto copied = m_next->copy_next(make_iterator_range(one.first, one.first + one.second));
-			std::size_t new_buffer_size = static_cast<std::size_t>(std::distance(one.first, copied));
+			auto copied = m_next->copy_next(
+			    make_iterator_range(one.first, one.first + one.second));
+			std::size_t new_buffer_size =
+			    static_cast<std::size_t>(std::distance(one.first, copied));
 			if ((one.first + one.second) == copied)
 			{
 				auto two = m_buffer.array_two();
 				assert(m_next);
-				copied = m_next->copy_next(make_iterator_range(two.first, two.first + two.second));
-				new_buffer_size += static_cast<std::size_t>(std::distance(two.first, copied));
+				copied = m_next->copy_next(
+				    make_iterator_range(two.first, two.first + two.second));
+				new_buffer_size +=
+				    static_cast<std::size_t>(std::distance(two.first, copied));
 			}
 			m_buffer.resize(new_buffer_size);
 		}
@@ -105,7 +119,8 @@ namespace Si
 
 	template <class Element>
 	struct mutable_source_iterator SILICIUM_FINAL
-	    : boost::iterator_facade<mutable_source_iterator<Element>, Element, std::input_iterator_tag>
+	    : boost::iterator_facade<mutable_source_iterator<Element>, Element,
+	                             std::input_iterator_tag>
 	{
 		mutable_source_iterator() BOOST_NOEXCEPT : m_source(nullptr)
 		{
@@ -128,7 +143,8 @@ namespace Si
 
 		bool equal(mutable_source_iterator const &other) const BOOST_NOEXCEPT
 		{
-			assert(!m_source || !other.m_source || (m_source == other.m_source));
+			assert(!m_source || !other.m_source ||
+			       (m_source == other.m_source));
 			return (m_source == other.m_source);
 		}
 

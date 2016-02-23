@@ -20,7 +20,8 @@ namespace Si
 			swap(other);
 		}
 
-		explicit file_handle(native_file_descriptor handle) BOOST_NOEXCEPT : handle(handle)
+		explicit file_handle(native_file_descriptor handle) BOOST_NOEXCEPT
+		    : handle(handle)
 		{
 		}
 

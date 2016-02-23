@@ -23,8 +23,10 @@ namespace Si
 	template <class ErrorOrSource>
 	struct error_extracting_source
 	{
-		typedef typename detail::get_error_parameters<typename ErrorOrSource::element_type>::value_type element_type;
-		typedef typename detail::get_error_parameters<typename ErrorOrSource::element_type>::error_type error_type;
+		typedef typename detail::get_error_parameters<
+		    typename ErrorOrSource::element_type>::value_type element_type;
+		typedef typename detail::get_error_parameters<
+		    typename ErrorOrSource::element_type>::error_type error_type;
 
 		error_extracting_source()
 		{
@@ -53,7 +55,8 @@ namespace Si
 				m_last_error = front.error();
 				return {};
 			}
-			BOOST_STATIC_ASSERT(std::is_reference<decltype(front.get())>::value);
+			BOOST_STATIC_ASSERT(
+			    std::is_reference<decltype(front.get())>::value);
 			element_type const &value = front.get();
 			return make_iterator_range(&value, &value + 1);
 		}
@@ -99,7 +102,9 @@ namespace Si
 	    -> error_extracting_source<typename std::decay<ErrorOrSource>::type>
 #endif
 	{
-		return error_extracting_source<typename std::decay<ErrorOrSource>::type>(std::forward<ErrorOrSource>(input));
+		return error_extracting_source<
+		    typename std::decay<ErrorOrSource>::type>(
+		    std::forward<ErrorOrSource>(input));
 	}
 }
 

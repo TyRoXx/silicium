@@ -6,10 +6,11 @@
 
 BOOST_AUTO_TEST_CASE(multi_sink_empty)
 {
-	auto sink = Si::make_multi_sink<int, Si::success>([]()
-	                                                  {
-		                                                  return Si::iterator_range<Si::Sink<int>::interface **>();
-		                                              });
+	auto sink = Si::make_multi_sink<int, Si::success>(
+	    []()
+	    {
+		    return Si::iterator_range<Si::Sink<int>::interface **>();
+		});
 	BOOST_CHECK(!Si::append(sink, 23));
 }
 
@@ -40,20 +41,26 @@ BOOST_AUTO_TEST_CASE(multi_sink_error)
 	                                {
 		                                BOOST_REQUIRE_EQUAL(data.size(), 1);
 		                                BOOST_REQUIRE_EQUAL(data[0], 42);
-		                                return boost::system::error_code(111, boost::system::generic_category());
+		                                return boost::system::error_code(
+		                                    111,
+		                                    boost::system::generic_category());
 		                            }));
 	auto b = Si::Sink<int, boost::system::error_code>::make_box(
-	    Si::make_function_sink<int>([](Si::iterator_range<int const *>) -> boost::system::error_code
-	                                {
-		                                BOOST_FAIL("the second sink shall not be called");
-		                                SILICIUM_UNREACHABLE();
-		                            }));
+	    Si::make_function_sink<int>(
+	        [](Si::iterator_range<int const *>) -> boost::system::error_code
+	        {
+		        BOOST_FAIL("the second sink shall not be called");
+		        SILICIUM_UNREACHABLE();
+		    }));
 	auto sinks = Si::make_array(a.original.get(), b.original.get());
-	auto sink = Si::make_multi_sink<int, boost::system::error_code>([sinks]()
-	                                                                {
-		                                                                return sinks;
-		                                                            });
+	auto sink =
+	    Si::make_multi_sink<int, boost::system::error_code>([sinks]()
+	                                                        {
+		                                                        return sinks;
+		                                                    });
 	boost::system::error_code error = Si::append(sink, 42);
-	BOOST_CHECK_EQUAL(boost::system::error_code(111, boost::system::generic_category()), error);
+	BOOST_CHECK_EQUAL(
+	    boost::system::error_code(111, boost::system::generic_category()),
+	    error);
 }
 #endif

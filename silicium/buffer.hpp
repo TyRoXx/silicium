@@ -120,20 +120,24 @@ namespace Si
 				return;
 			}
 			fetching = true;
-			from.async_get_one(observe_by_ref(static_cast<observer<Element> &>(*this)));
+			from.async_get_one(
+			    observe_by_ref(static_cast<observer<Element> &>(*this)));
 		}
 
 		SILICIUM_DELETED_FUNCTION(buffer_observable(buffer_observable const &))
-		SILICIUM_DELETED_FUNCTION(buffer_observable &operator=(buffer_observable const &))
+		SILICIUM_DELETED_FUNCTION(
+		    buffer_observable &operator=(buffer_observable const &))
 	};
 
 	template <class Original>
 	auto make_buffer_observable(Original &&from, std::size_t size)
-	    -> buffer_observable<typename std::decay<Original>::type::element_type, typename std::decay<Original>::type>
+	    -> buffer_observable<typename std::decay<Original>::type::element_type,
+	                         typename std::decay<Original>::type>
 	{
 		typedef typename std::decay<Original>::type clean_original;
 		typedef typename clean_original::element_type element;
-		return buffer_observable<element, clean_original>(std::forward<Original>(from), size);
+		return buffer_observable<element, clean_original>(
+		    std::forward<Original>(from), size);
 	}
 }
 

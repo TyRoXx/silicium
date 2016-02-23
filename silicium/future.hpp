@@ -5,7 +5,8 @@
 #include <boost/version.hpp>
 
 #define SILICIUM_DETAIL_ASIO_ASYNC_RESULT (BOOST_VERSION >= 105400)
-#define SILICIUM_HAS_FUTURE (SILICIUM_HAS_VARIANT && SILICIUM_DETAIL_ASIO_ASYNC_RESULT)
+#define SILICIUM_HAS_FUTURE                                                    \
+	(SILICIUM_HAS_VARIANT && SILICIUM_DETAIL_ASIO_ASYNC_RESULT)
 
 #if SILICIUM_HAS_FUTURE
 #include <boost/asio/async_result.hpp>
@@ -27,7 +28,8 @@ namespace Si
 			{
 			}
 
-			explicit link(link &other_side, avoid_msvc_warning_about_multiple_copy_ctors)
+			explicit link(link &other_side,
+			              avoid_msvc_warning_about_multiple_copy_ctors)
 			    : m_other_side(&other_side)
 			{
 				assert(!other_side.m_other_side);
@@ -91,7 +93,8 @@ namespace Si
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		SILICIUM_DISABLE_COPY(future)
 	public:
-		future(future &&other) BOOST_NOEXCEPT : m_state(std::move(other.m_state))
+		future(future &&other) BOOST_NOEXCEPT
+		    : m_state(std::move(other.m_state))
 		{
 		}
 
@@ -108,18 +111,23 @@ namespace Si
 		}
 
 		explicit future(detail::link &promise) BOOST_NOEXCEPT
-		    : m_state(detail::link(promise, detail::avoid_msvc_warning_about_multiple_copy_ctors()))
+		    : m_state(detail::link(
+		          promise,
+		          detail::avoid_msvc_warning_about_multiple_copy_ctors()))
 		{
 		}
 
 		template <class Handler>
-		auto async_get(Handler &&handler) ->
-		    typename boost::asio::async_result<typename boost::asio::handler_type<Handler, void(T)>::type>::type
+		auto async_get(Handler &&handler) -> typename boost::asio::async_result<
+		    typename boost::asio::handler_type<Handler, void(T)>::type>::type
 		{
-			typename boost::asio::handler_type<Handler, void(T)>::type real_handler(std::forward<Handler>(handler));
-			typename boost::asio::async_result<decltype(real_handler)> result(real_handler);
+			typename boost::asio::handler_type<Handler, void(T)>::type
+			    real_handler(std::forward<Handler>(handler));
+			typename boost::asio::async_result<decltype(real_handler)> result(
+			    real_handler);
 			{
-				std::lock_guard<typename ThreadSafety::future_mutex> lock(m_mutex);
+				std::lock_guard<typename ThreadSafety::future_mutex> lock(
+				    m_mutex);
 				visit<void>(m_state,
 				            [](empty)
 				            {
@@ -132,7 +140,8 @@ namespace Si
 					        },
 				            [this, &real_handler](detail::link &promise)
 				            {
-					            m_state = getting(std::move(promise), std::move(real_handler));
+					            m_state = getting(std::move(promise),
+					                              std::move(real_handler));
 					        },
 				            [](getting &)
 				            {
@@ -184,8 +193,10 @@ namespace Si
 			detail::link promise;
 			function<void(T)> handler;
 
-			getting(detail::link promise, function<void(T)> handler) BOOST_NOEXCEPT : promise(std::move(promise)),
-			                                                                          handler(std::move(handler))
+			getting(detail::link promise,
+			        function<void(T)> handler) BOOST_NOEXCEPT
+			    : promise(std::move(promise)),
+			      handler(std::move(handler))
 			{
 			}
 
@@ -194,8 +205,9 @@ namespace Si
 			{
 			}
 
-			getting(getting &&other) BOOST_NOEXCEPT : promise(std::move(other.promise)),
-			                                          handler(std::move(other.handler))
+			getting(getting &&other) BOOST_NOEXCEPT
+			    : promise(std::move(other.promise)),
+			      handler(std::move(other.handler))
 			{
 			}
 
@@ -215,9 +227,11 @@ namespace Si
 	};
 
 	template <class ThreadSafety, class T>
-	future<typename std::decay<T>::type, ThreadSafety> make_ready_future(T &&value)
+	future<typename std::decay<T>::type, ThreadSafety>
+	make_ready_future(T &&value)
 	{
-		return future<typename std::decay<T>::type, ThreadSafety>(std::forward<T>(value));
+		return future<typename std::decay<T>::type, ThreadSafety>(
+		    std::forward<T>(value));
 	}
 
 	template <class T, class ThreadSafety>
@@ -230,7 +244,8 @@ namespace Si
 #if !SILICIUM_COMPILER_GENERATES_MOVES
 		SILICIUM_DISABLE_COPY(promise)
 	public:
-		promise(promise &&other) BOOST_NOEXCEPT : m_state(std::move(other.m_state))
+		promise(promise &&other) BOOST_NOEXCEPT
+		    : m_state(std::move(other.m_state))
 		{
 		}
 
@@ -248,7 +263,8 @@ namespace Si
 			    [this](empty)
 			    {
 				    m_state = waiting_for_set_value();
-				    return future<T, ThreadSafety>(try_get_ptr<waiting_for_set_value>(m_state)->future);
+				    return future<T, ThreadSafety>(
+				        try_get_ptr<waiting_for_set_value>(m_state)->future);
 				},
 			    [this](T &value)
 			    {
@@ -258,9 +274,12 @@ namespace Si
 				},
 			    [](waiting_for_set_value &) -> future<T, ThreadSafety>
 			    {
-				    boost::throw_exception(std::logic_error("get_future can only be called once"));
+				    boost::throw_exception(
+				        std::logic_error("get_future can only be called once"));
 #if defined(BOOST_GCC) || (!SILICIUM_HAS_EXCEPTIONS && defined(BOOST_MSVC))
-				    // avoid warnings because boost::throw_exception is not always "noreturn"
+				    // avoid warnings because boost::throw_exception is not
+				    // always
+				    // "noreturn"
 				    SILICIUM_UNREACHABLE();
 #endif
 				});
@@ -281,9 +300,11 @@ namespace Si
 				        },
 			            [this, &arg](waiting_for_set_value &waiting)
 			            {
-				            // A dirty hack, but it works as long as the class layouts are as expected.
+				            // A dirty hack, but it works as long as the class
+				            // layouts are as expected.
 				            future<T, ThreadSafety> &future_ =
-				                *reinterpret_cast<future<T, ThreadSafety> *>(waiting.future.get_other_side());
+				                *reinterpret_cast<future<T, ThreadSafety> *>(
+				                    waiting.future.get_other_side());
 				            // TODO: change state in a safe way
 				            future_.internal_set_value(std::move(arg));
 				        });
@@ -303,11 +324,13 @@ namespace Si
 			{
 			}
 
-			waiting_for_set_value(waiting_for_set_value &&other) BOOST_NOEXCEPT : future(std::move(other.future))
+			waiting_for_set_value(waiting_for_set_value &&other) BOOST_NOEXCEPT
+			    : future(std::move(other.future))
 			{
 			}
 
-			waiting_for_set_value &operator=(waiting_for_set_value &&other) BOOST_NOEXCEPT
+			waiting_for_set_value &
+			operator=(waiting_for_set_value &&other) BOOST_NOEXCEPT
 			{
 				future = std::move(other.future);
 				return *this;

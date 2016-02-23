@@ -11,9 +11,12 @@
 namespace Si
 {
 	template <class RangeSource>
-	struct enumerating_source : Source<typename boost::range_value<typename RangeSource::element_type>::type>::interface
+	struct enumerating_source
+	    : Source<typename boost::range_value<
+	          typename RangeSource::element_type>::type>::interface
 	{
-		typedef typename boost::range_value<typename RangeSource::element_type>::type element_type;
+		typedef typename boost::range_value<
+		    typename RangeSource::element_type>::type element_type;
 		typedef typename RangeSource::element_type range_type;
 
 		enumerating_source()
@@ -38,11 +41,13 @@ namespace Si
 		}
 #endif
 
-		virtual iterator_range<element_type const *> map_next(std::size_t size) SILICIUM_OVERRIDE
+		virtual iterator_range<element_type const *>
+		map_next(std::size_t size) SILICIUM_OVERRIDE
 		{
 			if (!m_rest.empty())
 			{
-				iterator_range<element_type const *> result(m_rest.begin(), m_rest.end());
+				iterator_range<element_type const *> result(
+				    m_rest.begin(), m_rest.end());
 				m_rest = range_type();
 				return result;
 			}
@@ -52,15 +57,18 @@ namespace Si
 			{
 				return iterator_range<element_type const *>();
 			}
-			return iterator_range<element_type const *>(element->begin(), element->end());
+			return iterator_range<element_type const *>(
+			    element->begin(), element->end());
 		}
 
-		virtual element_type *copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
+		virtual element_type *
+		copy_next(iterator_range<element_type *> destination) SILICIUM_OVERRIDE
 		{
 			element_type *copied = destination.begin();
 			for (;;)
 			{
-				std::size_t const requested = static_cast<std::size_t>(std::distance(copied, destination.end()));
+				std::size_t const requested = static_cast<std::size_t>(
+				    std::distance(copied, destination.end()));
 				if (requested == 0)
 				{
 					break;
@@ -74,7 +82,8 @@ namespace Si
 					}
 					m_rest = std::move(*element);
 				}
-				std::size_t const provided = static_cast<std::size_t>(m_rest.size());
+				std::size_t const provided =
+				    static_cast<std::size_t>(m_rest.size());
 				if (provided == 0)
 				{
 					break;
@@ -97,7 +106,8 @@ namespace Si
 	    -> enumerating_source<typename std::decay<RangeSource>::type>
 #endif
 	{
-		return enumerating_source<typename std::decay<RangeSource>::type>(std::forward<RangeSource>(input));
+		return enumerating_source<typename std::decay<RangeSource>::type>(
+		    std::forward<RangeSource>(input));
 	}
 }
 

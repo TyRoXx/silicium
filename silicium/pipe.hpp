@@ -15,7 +15,8 @@ namespace Si
 	namespace detail
 	{
 #ifndef _WIN32
-		inline boost::system::error_code set_close_on_exec(native_file_descriptor file) BOOST_NOEXCEPT
+		inline boost::system::error_code
+		set_close_on_exec(native_file_descriptor file) BOOST_NOEXCEPT
 		{
 			if (fcntl(file, F_SETFD, fcntl(file, F_GETFD) | FD_CLOEXEC) < 0)
 			{
@@ -46,7 +47,8 @@ namespace Si
 		}
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		pipe(pipe &&other) BOOST_NOEXCEPT : write(std::move(other.write)), read(std::move(other.read))
+		pipe(pipe &&other) BOOST_NOEXCEPT : write(std::move(other.write)),
+		                                    read(std::move(other.read))
 		{
 		}
 

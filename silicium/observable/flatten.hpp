@@ -14,7 +14,8 @@
 namespace Si
 {
 	template <class ObservableObservable, class Mutex>
-	struct flattener : private observer<typename ObservableObservable::element_type>
+	struct flattener
+	    : private observer<typename ObservableObservable::element_type>
 	{
 		typedef typename ObservableObservable::element_type sub_observable;
 		typedef typename sub_observable::element_type element_type;
@@ -68,7 +69,8 @@ namespace Si
 		}
 
 	private:
-		struct child : private observer<element_type>, private boost::noncopyable
+		struct child : private observer<element_type>,
+		               private boost::noncopyable
 		{
 			flattener &parent;
 			sub_observable observed;
@@ -81,13 +83,16 @@ namespace Si
 
 			void start()
 			{
-				observed.async_get_one(observe_by_ref(static_cast<observer<element_type> &>(*this)));
+				observed.async_get_one(observe_by_ref(
+				    static_cast<observer<element_type> &>(*this)));
 			}
 
 			virtual void got_element(element_type value) SILICIUM_OVERRIDE
 			{
-				Si::exchange(parent.receiver_, nullptr)->got_element(std::move(value));
-				// TODO: fix the race condition between got_element and async_get_one
+				Si::exchange(parent.receiver_, nullptr)
+				    ->got_element(std::move(value));
+				// TODO: fix the race condition between got_element and
+				// async_get_one
 				return start();
 			}
 
@@ -107,8 +112,10 @@ namespace Si
 		void fetch()
 		{
 			assert(is_fetching);
-			return input.async_get_one(
-			    observe_by_ref(static_cast<observer<typename ObservableObservable::element_type> &>(*this)));
+			return input.async_get_one(observe_by_ref(
+			    static_cast<
+			        observer<typename ObservableObservable::element_type> &>(
+			        *this)));
 		}
 
 		void remove_child(child &removing)
@@ -147,10 +154,11 @@ namespace Si
 	};
 
 	template <class Mutex, class ObservableObservable>
-	auto flatten(ObservableObservable &&input) -> flattener<typename std::decay<ObservableObservable>::type, Mutex>
+	auto flatten(ObservableObservable &&input)
+	    -> flattener<typename std::decay<ObservableObservable>::type, Mutex>
 	{
-		return flattener<typename std::decay<ObservableObservable>::type, Mutex>(
-		    std::forward<ObservableObservable>(input));
+		return flattener<typename std::decay<ObservableObservable>::type,
+		                 Mutex>(std::forward<ObservableObservable>(input));
 	}
 }
 

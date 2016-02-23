@@ -25,10 +25,11 @@ namespace Si
 			{
 			}
 
-			response(response &&other) BOOST_NOEXCEPT : http_version(std::move(other.http_version)),
-			                                            status(other.status),
-			                                            status_text(std::move(other.status_text)),
-			                                            arguments(std::move(other.arguments))
+			response(response &&other) BOOST_NOEXCEPT
+			    : http_version(std::move(other.http_version)),
+			      status(other.status),
+			      status_text(std::move(other.status_text)),
+			      arguments(std::move(other.arguments))
 			{
 			}
 
@@ -36,7 +37,8 @@ namespace Si
 			    : http_version(other.http_version)
 			    , status(other.status)
 			    , status_text(other.status_text)
-			    , arguments(other.arguments ? to_unique(*other.arguments) : nullptr)
+			    , arguments(other.arguments ? to_unique(*other.arguments)
+			                                : nullptr)
 			{
 			}
 
@@ -54,7 +56,8 @@ namespace Si
 				http_version = other.http_version;
 				status = other.status;
 				status_text = other.status_text;
-				arguments = other.arguments ? to_unique(*other.arguments) : nullptr;
+				arguments =
+				    other.arguments ? to_unique(*other.arguments) : nullptr;
 				return *this;
 			}
 		};
@@ -69,9 +72,11 @@ namespace Si
 				return none;
 			}
 			response header;
-			header.arguments = Si::make_unique<std::map<noexcept_string, noexcept_string>>();
+			header.arguments =
+			    Si::make_unique<std::map<noexcept_string, noexcept_string>>();
 			{
-				auto const version_end = std::find(first_line->begin(), first_line->end(), ' ');
+				auto const version_end =
+				    std::find(first_line->begin(), first_line->end(), ' ');
 				if (version_end == first_line->end())
 				{
 					return none;
@@ -79,14 +84,16 @@ namespace Si
 				header.http_version.assign(first_line->begin(), version_end);
 
 				auto const status_begin = version_end + 1;
-				auto const status_end = std::find(status_begin, first_line->end(), ' ');
+				auto const status_end =
+				    std::find(status_begin, first_line->end(), ' ');
 				if (status_end == first_line->end())
 				{
 					return none;
 				}
 				try
 				{
-					header.status = boost::lexical_cast<unsigned>(std::string(status_begin, status_end));
+					header.status = boost::lexical_cast<unsigned>(
+					    std::string(status_begin, status_end));
 				}
 				catch (boost::bad_lexical_cast const &)
 				{

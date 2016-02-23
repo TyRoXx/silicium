@@ -89,7 +89,8 @@ namespace Si
 		{
 			using std::min;
 			using std::max;
-			auto result = bounded_int<Int, NewMinimum, NewMaximum>::create(max(NewMinimum, min(NewMaximum, value())));
+			auto result = bounded_int<Int, NewMinimum, NewMaximum>::create(
+			    max(NewMinimum, min(NewMaximum, value())));
 			assert(result);
 			return *result;
 		}
@@ -109,39 +110,48 @@ namespace Si
 		}
 	};
 
-	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
+	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight,
+	          Int MaximumRight>
 	bool operator==(bounded_int<Int, MinimumLeft, MaximumLeft> const &left,
 	                bounded_int<Int, MinimumRight, MaximumRight> const &right)
 	{
-		BOOST_STATIC_ASSERT(((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) ||
-		                    ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
+		BOOST_STATIC_ASSERT(
+		    ((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) ||
+		    ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
 		return left.value() == right.value();
 	}
 
-	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
+	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight,
+	          Int MaximumRight>
 	bool operator<(bounded_int<Int, MinimumLeft, MaximumLeft> const &left,
 	               bounded_int<Int, MinimumRight, MaximumRight> const &right)
 	{
-		BOOST_STATIC_ASSERT(((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) ||
-		                    ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
+		BOOST_STATIC_ASSERT(
+		    ((MaximumLeft > MinimumRight) && (MinimumLeft <= MinimumRight)) ||
+		    ((MaximumRight > MinimumLeft) && (MinimumRight <= MinimumLeft)));
 		return left.value() < right.value();
 	}
 
 	template <class Int, Int Minimum, Int Maximum>
-	std::ostream &operator<<(std::ostream &out, bounded_int<Int, Minimum, Maximum> const &value)
+	std::ostream &operator<<(std::ostream &out,
+	                         bounded_int<Int, Minimum, Maximum> const &value)
 	{
-		// Propagate char types to int by adding zero so that ostream will properly format them as numbers.
+		// Propagate char types to int by adding zero so that ostream will
+		// properly format them as numbers.
 		auto printable = (0 + value.value());
 		return out << printable;
 	}
 
-	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
+	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight,
+	          Int MaximumRight>
 	bounded_int<Int, MinimumLeft + MinimumRight, MaximumLeft + MaximumRight>
 	operator+(bounded_int<Int, MinimumLeft, MaximumLeft> const &left,
 	          bounded_int<Int, MinimumRight, MaximumRight> const &right)
 	{
-		auto result = bounded_int<Int, MinimumLeft + MinimumRight, MaximumLeft + MaximumRight>::create(left.value() +
-		                                                                                               right.value());
+		auto result =
+		    bounded_int<Int, MinimumLeft + MinimumRight,
+		                MaximumLeft + MaximumRight>::create(left.value() +
+		                                                    right.value());
 		assert(result);
 		return *result;
 	}
@@ -149,19 +159,25 @@ namespace Si
 	template <class Left, class Right>
 	struct is_always_less;
 
-	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight, Int MaximumRight>
-	struct is_always_less<bounded_int<Int, MinimumLeft, MaximumLeft>, bounded_int<Int, MinimumRight, MaximumRight>>
+	template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight,
+	          Int MaximumRight>
+	struct is_always_less<bounded_int<Int, MinimumLeft, MaximumLeft>,
+	                      bounded_int<Int, MinimumRight, MaximumRight>>
 	    : std::integral_constant<bool, (MaximumLeft < MinimumRight)>
 	{
 		BOOST_STATIC_ASSERT(MinimumLeft <= MaximumLeft);
 		BOOST_STATIC_ASSERT(MinimumRight <= MaximumRight);
 	};
 
-	BOOST_STATIC_ASSERT(is_always_less<bounded_int<int, 0, 0>, bounded_int<int, 1, 2>>::value);
-	BOOST_STATIC_ASSERT(is_always_less<bounded_int<unsigned, 0, 0>, bounded_int<unsigned, 1, 2>>::value);
+	BOOST_STATIC_ASSERT(
+	    is_always_less<bounded_int<int, 0, 0>, bounded_int<int, 1, 2>>::value);
+	BOOST_STATIC_ASSERT(is_always_less<bounded_int<unsigned, 0, 0>,
+	                                   bounded_int<unsigned, 1, 2>>::value);
 
-	BOOST_STATIC_ASSERT(!is_always_less<bounded_int<int, 0, 0>, bounded_int<int, 0, 2>>::value);
-	BOOST_STATIC_ASSERT(!is_always_less<bounded_int<unsigned, 0, 0>, bounded_int<unsigned, 0, 2>>::value);
+	BOOST_STATIC_ASSERT(
+	    !is_always_less<bounded_int<int, 0, 0>, bounded_int<int, 0, 2>>::value);
+	BOOST_STATIC_ASSERT(!is_always_less<bounded_int<unsigned, 0, 0>,
+	                                    bounded_int<unsigned, 0, 2>>::value);
 
 	template <class Int, Int Value>
 	bounded_int<Int, Value, Value> literal()

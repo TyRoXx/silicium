@@ -75,7 +75,8 @@ namespace Si
 	};
 
 	template <class Action>
-	auto wrap_blocking(Action &&act) -> blocking_observable<typename std::decay<Action>::type>
+	auto wrap_blocking(Action &&act)
+	    -> blocking_observable<typename std::decay<Action>::type>
 	{
 		return blocking_observable<typename std::decay<Action>::type>(act);
 	}
@@ -93,15 +94,17 @@ namespace
 
 BOOST_AUTO_TEST_CASE(wrap_blocking_coroutine)
 {
-	auto coro = Si::make_coroutine_generator<int>([](Si::push_context<int> &yield)
-	                                              {
-		                                              auto blocking = Si::wrap_blocking(blocking_stuff);
-		                                              auto const intermediate_result = yield.get_one(blocking);
-		                                              BOOST_REQUIRE(intermediate_result);
-		                                              yield(*intermediate_result + 3);
-		                                          });
+	auto coro = Si::make_coroutine_generator<int>(
+	    [](Si::push_context<int> &yield)
+	    {
+		    auto blocking = Si::wrap_blocking(blocking_stuff);
+		    auto const intermediate_result = yield.get_one(blocking);
+		    BOOST_REQUIRE(intermediate_result);
+		    yield(*intermediate_result + 3);
+		});
 	boost::asio::io_service io;
-	std::unique_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(io));
+	std::unique_ptr<boost::asio::io_service::work> work(
+	    new boost::asio::io_service::work(io));
 	auto consumer = Si::consume<int>([&work](int element)
 	                                 {
 		                                 BOOST_CHECK_EQUAL(5, element);

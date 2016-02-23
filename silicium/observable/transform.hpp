@@ -10,7 +10,8 @@
 #include <functional>
 #include <boost/config.hpp>
 
-#define SILICIUM_HAS_TRANSFORM_OBSERVABLE (SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && !SILICIUM_GCC46)
+#define SILICIUM_HAS_TRANSFORM_OBSERVABLE                                      \
+	(SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && !SILICIUM_GCC46)
 
 namespace Si
 {
@@ -18,7 +19,8 @@ namespace Si
 	template <class Transform, class Original>
 	struct transformation : private observer<typename Original::element_type>
 	{
-		typedef typename std::result_of<Transform(typename Original::element_type)>::type element_type;
+		typedef typename std::result_of<Transform(
+		    typename Original::element_type)>::type element_type;
 
 		BOOST_STATIC_ASSERT(!std::is_void<element_type>::value);
 
@@ -63,9 +65,11 @@ namespace Si
 		{
 			assert(!this->receiver);
 			this->receiver = receiver.get();
-			original.async_get_one(
-			    extend(std::forward<Observer>(receiver),
-			           observe_by_ref(static_cast<observer<typename Original::element_type> &>(*this))));
+			original.async_get_one(extend(
+			    std::forward<Observer>(receiver),
+			    observe_by_ref(
+			        static_cast<observer<typename Original::element_type> &>(
+			            *this))));
 		}
 
 		Original &get_input()
@@ -75,7 +79,8 @@ namespace Si
 
 	private:
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-		typedef typename detail::proper_value_function<Transform, element_type, from_type>::type proper_transform;
+		typedef typename detail::proper_value_function<
+		    Transform, element_type, from_type>::type proper_transform;
 		proper_transform transform; // TODO empty base optimization
 #else
 		Transform transform;
@@ -101,7 +106,8 @@ namespace Si
 		}
 
 		SILICIUM_DELETED_FUNCTION(transformation(transformation const &))
-		SILICIUM_DELETED_FUNCTION(transformation &operator=(transformation const &))
+		SILICIUM_DELETED_FUNCTION(
+		    transformation &operator=(transformation const &))
 	};
 
 	namespace detail
@@ -116,7 +122,8 @@ namespace Si
 		struct void_to_nothing_wrapper
 		{
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
-			typename detail::proper_value_function<F, void, Argument>::type original;
+			typename detail::proper_value_function<F, void, Argument>::type
+			    original;
 #else
 			F original;
 #endif
@@ -130,7 +137,8 @@ namespace Si
 		};
 
 		template <class Argument, class F>
-		void_to_nothing_wrapper<typename std::decay<F>::type, Argument> nothingify(F &&f, std::true_type)
+		void_to_nothing_wrapper<typename std::decay<F>::type, Argument>
+		nothingify(F &&f, std::true_type)
 		{
 			return {std::forward<F>(f)};
 		}
@@ -140,19 +148,27 @@ namespace Si
 	auto transform(Original &&original, Transform &&transform)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	    -> transformation<
-	        typename std::decay<decltype(detail::nothingify<typename std::decay<Original>::type::element_type>(
+	        typename std::decay<decltype(detail::nothingify<typename std::decay<
+	                                         Original>::type::element_type>(
 	            std::forward<Transform>(transform),
-	            std::is_void<
-	                decltype(transform(std::declval<typename std::decay<Original>::type::element_type>()))>()))>::type,
+	            std::is_void<decltype(transform(
+	                std::declval<typename std::decay<
+	                    Original>::type::element_type>()))>()))>::type,
 	        typename std::decay<Original>::type>
 #endif
 	{
 		typedef typename std::decay<Original>::type clean_original;
-		typedef std::is_void<decltype(transform(std::declval<typename clean_original::element_type>()))> returns_void;
-		auto transform_that_returns_non_void = detail::nothingify<typename clean_original::element_type>(
-		    std::forward<Transform>(transform), returns_void());
-		return transformation<typename std::decay<decltype(transform_that_returns_non_void)>::type, clean_original>(
-		    std::move(transform_that_returns_non_void), std::forward<Original>(original));
+		typedef std::is_void<decltype(
+		    transform(std::declval<typename clean_original::element_type>()))>
+		    returns_void;
+		auto transform_that_returns_non_void =
+		    detail::nothingify<typename clean_original::element_type>(
+		        std::forward<Transform>(transform), returns_void());
+		return transformation<typename std::decay<decltype(
+		                          transform_that_returns_non_void)>::type,
+		                      clean_original>(
+		    std::move(transform_that_returns_non_void),
+		    std::forward<Original>(original));
 	}
 #endif
 }

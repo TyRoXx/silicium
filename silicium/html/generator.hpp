@@ -86,7 +86,8 @@ namespace Si
 		}
 
 		template <class CharSink, class KeyStringLike, class ValueStringLike>
-		void add_attribute(CharSink &&sink, KeyStringLike const &key, ValueStringLike const &value)
+		void add_attribute(CharSink &&sink, KeyStringLike const &key,
+		                   ValueStringLike const &value)
 		{
 			append(sink, " ");
 			append(sink, key);
@@ -172,7 +173,8 @@ namespace Si
 			}
 
 			template <class AttributeMaker, class ContentMaker>
-			void element(name_type const &name, AttributeMaker make_attributes, ContentMaker make_content)
+			void element(name_type const &name, AttributeMaker make_attributes,
+			             ContentMaker make_content)
 			{
 				open_attributed_element(m_out, name);
 				make_attributes();
@@ -182,7 +184,8 @@ namespace Si
 			}
 
 			template <class AttributeMaker>
-			void element(name_type const &name, AttributeMaker make_attributes, empty_t)
+			void element(name_type const &name, AttributeMaker make_attributes,
+			             empty_t)
 			{
 				open_attributed_element(m_out, name);
 				make_attributes();
@@ -191,7 +194,8 @@ namespace Si
 			}
 
 			template <class KeyStringLike, class ValueStringLike>
-			void attribute(KeyStringLike const &key, ValueStringLike const &value)
+			void attribute(KeyStringLike const &key,
+			               ValueStringLike const &value)
 			{
 				add_attribute(m_out, key, value);
 			}
@@ -210,7 +214,8 @@ namespace Si
 #endif
 
 			template <class StringLike>
-			void element_with_text(name_type const &name, StringLike const &text)
+			void element_with_text(name_type const &name,
+			                       StringLike const &text)
 			{
 				open_element(m_out, name);
 				write(text);
@@ -234,9 +239,11 @@ namespace Si
 		};
 
 		template <class CharSink>
-		auto make_generator(CharSink &&sink) -> generator<typename std::decay<CharSink>::type>
+		auto make_generator(CharSink &&sink)
+		    -> generator<typename std::decay<CharSink>::type>
 		{
-			return generator<typename std::decay<CharSink>::type>(std::forward<CharSink>(sink));
+			return generator<typename std::decay<CharSink>::type>(
+			    std::forward<CharSink>(sink));
 		}
 	}
 }

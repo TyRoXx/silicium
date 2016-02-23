@@ -30,13 +30,15 @@ namespace Si
 		{
 			assert(!receiver_);
 			receiver_ = receiver.get();
-			input.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
+			input.async_get_one(observe_by_ref(
+			    static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
 	private:
 		typedef
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-		    typename detail::proper_value_function<Predicate, bool, element_type const &>::type
+		    typename detail::proper_value_function<Predicate, bool,
+		                                           element_type const &>::type
 #else
 		    Predicate
 #endif
@@ -49,9 +51,13 @@ namespace Si
 		virtual void got_element(element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
-			if (!is_propagated(static_cast<typename std::add_const<element_type>::type &>(value)))
+			if (!is_propagated(
+			        static_cast<typename std::add_const<element_type>::type &>(
+			            value)))
 			{
-				input.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
+				input.async_get_one(observe_by_ref(
+				    static_cast<observer<typename Input::element_type> &>(
+				        *this)));
 				return;
 			}
 			exchange(receiver_, nullptr)->got_element(std::move(value));
@@ -66,9 +72,11 @@ namespace Si
 
 	template <class Input, class Predicate>
 	auto make_filter_observable(Input &&input, Predicate &&is_propagated)
-	    -> filter_observable<typename std::decay<Input>::type, typename std::decay<Predicate>::type>
+	    -> filter_observable<typename std::decay<Input>::type,
+	                         typename std::decay<Predicate>::type>
 	{
-		return filter_observable<typename std::decay<Input>::type, typename std::decay<Predicate>::type>(
+		return filter_observable<typename std::decay<Input>::type,
+		                         typename std::decay<Predicate>::type>(
 		    std::forward<Input>(input), std::forward<Predicate>(is_propagated));
 	}
 }

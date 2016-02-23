@@ -49,8 +49,11 @@ namespace Si
 		{
 			assert(!receiver_);
 			receiver_ = receiver.get();
-			input.async_get_one(extend(std::forward<Observer>(receiver),
-			                           observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this))));
+			input.async_get_one(extend(
+			    std::forward<Observer>(receiver),
+			    observe_by_ref(
+			        static_cast<observer<typename Input::element_type> &>(
+			            *this))));
 		}
 
 	private:
@@ -58,7 +61,8 @@ namespace Si
 		ElementPredicate is_not_end;
 		observer<element_type> *receiver_;
 
-		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
+		virtual void
+		got_element(typename Input::element_type value) SILICIUM_OVERRIDE
 		{
 			assert(receiver_);
 			if (is_not_end(value))
@@ -80,10 +84,13 @@ namespace Si
 
 	template <class Input, class ElementPredicate>
 	auto while_(Input &&input, ElementPredicate &&is_not_end)
-	    -> while_observable<typename std::decay<Input>::type, typename std::decay<ElementPredicate>::type>
+	    -> while_observable<typename std::decay<Input>::type,
+	                        typename std::decay<ElementPredicate>::type>
 	{
-		return while_observable<typename std::decay<Input>::type, typename std::decay<ElementPredicate>::type>(
-		    std::forward<Input>(input), std::forward<ElementPredicate>(is_not_end));
+		return while_observable<typename std::decay<Input>::type,
+		                        typename std::decay<ElementPredicate>::type>(
+		    std::forward<Input>(input),
+		    std::forward<ElementPredicate>(is_not_end));
 	}
 }
 

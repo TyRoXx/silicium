@@ -32,7 +32,8 @@ namespace Si
 		void mark_as_read(std::size_t ready_read);
 
 		template <class Handler>
-		void async_read(array_view<element_type> destination, Handler &&handle_finished);
+		void async_read(array_view<element_type> destination,
+		                Handler &&handle_finished);
 	};
 }
 
@@ -54,11 +55,13 @@ struct accumulator
 		if (m_sum_changed)
 		{
 			return typename Si::async_reader<element_type>::writer_buffered(
-			    Si::array_view<element_type>(m_sum, Si::bounded_size_t::literal<1>()));
+			    Si::array_view<element_type>(
+			        m_sum, Si::bounded_size_t::literal<1>()));
 		}
 		else
 		{
-			return typename Si::async_reader<element_type>::writer_buffered(Si::array_view<element_type>());
+			return typename Si::async_reader<element_type>::writer_buffered(
+			    Si::array_view<element_type>());
 		}
 	}
 
@@ -67,7 +70,8 @@ struct accumulator
 	}
 
 	template <class Handler>
-	void async_read(Si::array_view<element_type> destination, Handler &&handle_finished)
+	void async_read(Si::array_view<element_type> destination,
+	                Handler &&handle_finished)
 	{
 	}
 
@@ -79,12 +83,15 @@ private:
 };
 
 template <class Sum, class Input, class Combinator>
-accumulator<typename std::decay<Sum>::type, typename std::decay<Input>::type, typename std::decay<Combinator>::type>
+accumulator<typename std::decay<Sum>::type, typename std::decay<Input>::type,
+            typename std::decay<Combinator>::type>
 make_accumulator(Sum &&initial_sum, Input &&input, Combinator &&combinator)
 {
-	return accumulator<typename std::decay<Sum>::type, typename std::decay<Input>::type,
+	return accumulator<typename std::decay<Sum>::type,
+	                   typename std::decay<Input>::type,
 	                   typename std::decay<Combinator>::type>(
-	    std::forward<Sum>(initial_sum), std::forward<Input>(input), std::forward<Combinator>(combinator));
+	    std::forward<Sum>(initial_sum), std::forward<Input>(input),
+	    std::forward<Combinator>(combinator));
 }
 
 BOOST_AUTO_TEST_CASE(async_read_write_test)

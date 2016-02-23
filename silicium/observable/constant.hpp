@@ -47,7 +47,8 @@ namespace Si
 	    -> constant_observable<typename std::decay<Element>::type>
 #endif
 	{
-		return constant_observable<typename std::decay<Element>::type>(std::forward<Element>(value));
+		return constant_observable<typename std::decay<Element>::type>(
+		    std::forward<Element>(value));
 	}
 }
 

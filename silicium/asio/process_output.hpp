@@ -27,9 +27,10 @@ namespace Si
 		{
 		}
 
-		process_output(process_output &&other) BOOST_NOEXCEPT : m_pipe_reader(std::move(other.m_pipe_reader)),
-		                                                        m_buffer(std::move(other.m_buffer)),
-		                                                        m_observable(std::move(other.m_observable))
+		process_output(process_output &&other) BOOST_NOEXCEPT
+		    : m_pipe_reader(std::move(other.m_pipe_reader)),
+		      m_buffer(std::move(other.m_buffer)),
+		      m_observable(std::move(other.m_observable))
 		{
 		}
 
@@ -63,7 +64,8 @@ namespace Si
 	};
 
 	template <class AsioFileStream>
-	SILICIUM_USE_RESULT AsioFileStream make_asio_file_stream(boost::asio::io_service &io, file_handle file)
+	SILICIUM_USE_RESULT AsioFileStream
+	make_asio_file_stream(boost::asio::io_service &io, file_handle file)
 	{
 		return AsioFileStream(io, file.release());
 	}

@@ -9,8 +9,8 @@
 namespace Si
 {
 	template <class Generator,
-	          class Element =
-	              typename detail::element_from_optional_like<typename std::result_of<Generator()>::type>::type>
+	          class Element = typename detail::element_from_optional_like<
+	              typename std::result_of<Generator()>::type>::type>
 	struct generator_observable
 	{
 		typedef Element element_type;
@@ -54,7 +54,8 @@ namespace Si
 			boost::optional<Element> element = generate();
 			if (element)
 			{
-				std::forward<Observer>(receiver).got_element(std::move(*element));
+				std::forward<Observer>(receiver)
+				    .got_element(std::move(*element));
 			}
 			else
 			{
@@ -65,7 +66,8 @@ namespace Si
 	private:
 		typedef
 #if SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION
-		    typename detail::proper_value_function<Generator, typename std::result_of<Generator()>::type>::type
+		    typename detail::proper_value_function<
+		        Generator, typename std::result_of<Generator()>::type>::type
 #else
 		    Generator
 #endif
@@ -80,7 +82,8 @@ namespace Si
 	    -> generator_observable<typename std::decay<Generator>::type>
 #endif
 	{
-		return generator_observable<typename std::decay<Generator>::type>(std::forward<Generator>(generate));
+		return generator_observable<typename std::decay<Generator>::type>(
+		    std::forward<Generator>(generate));
 	}
 }
 

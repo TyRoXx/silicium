@@ -10,7 +10,8 @@ BOOST_AUTO_TEST_CASE(append_long)
 	Si::append(sink, 2);
 	Si::append(sink, static_cast<short>(3));
 	std::array<long, 3> const expected = {{1, 2, 3}};
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    expected.begin(), expected.end(), output.begin(), output.end());
 }
 
 BOOST_AUTO_TEST_CASE(append_string)
@@ -21,7 +22,8 @@ BOOST_AUTO_TEST_CASE(append_string)
 	Si::append(sink, "b");
 	Si::append(sink, static_cast<char const *>("c"));
 	std::array<std::string, 3> const expected = {{"a", "b", "c"}};
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    expected.begin(), expected.end(), output.begin(), output.end());
 }
 
 BOOST_AUTO_TEST_CASE(append_char_to_vector)
@@ -41,7 +43,8 @@ BOOST_AUTO_TEST_CASE(append_char_to_vector)
 #endif
 	           ("f"));
 	std::string const expected = "abcdef";
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    expected.begin(), expected.end(), output.begin(), output.end());
 }
 
 BOOST_AUTO_TEST_CASE(append_char_to_std_string)
@@ -61,7 +64,8 @@ BOOST_AUTO_TEST_CASE(append_char_to_std_string)
 #endif
 	           ("f"));
 	std::string const expected = "abcdef";
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    expected.begin(), expected.end(), output.begin(), output.end());
 }
 
 BOOST_AUTO_TEST_CASE(append_char_to_boost_string)
@@ -81,5 +85,6 @@ BOOST_AUTO_TEST_CASE(append_char_to_boost_string)
 #endif
 	           ("f"));
 	std::string const expected = "abcdef";
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), output.begin(), output.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    expected.begin(), expected.end(), output.begin(), output.end());
 }

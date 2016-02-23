@@ -64,7 +64,8 @@ namespace Si
 		template <class ErrorCode>
 		struct category
 		{
-			typedef typename std::decay<decltype(std::declval<ErrorCode>().category())>::type type;
+			typedef typename std::decay<decltype(
+			    std::declval<ErrorCode>().category())>::type type;
 		};
 	}
 
@@ -77,7 +78,8 @@ namespace Si
 		    : code(0)
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
 		          ,
-		      value_(Value()) // initialize so that reading the value does not have undefined behaviour
+		      value_(Value()) // initialize so that reading the value does not
+                              // have undefined behaviour
 #endif
 		{
 #if !SILICIUM_COMPILER_HAS_CXX11_UNION
@@ -87,11 +89,13 @@ namespace Si
 
 		template <class ConvertibleToValue>
 		error_or(ConvertibleToValue &&value,
-		         typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, void>::type * = nullptr)
-		    BOOST_NOEXCEPT : code(0)
+		         typename std::enable_if<
+		             std::is_convertible<ConvertibleToValue, Value>::value,
+		             void>::type * = nullptr) BOOST_NOEXCEPT
+		    : code(0)
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-		                         ,
-		                     value_(std::forward<ConvertibleToValue>(value))
+		          ,
+		      value_(std::forward<ConvertibleToValue>(value))
 #endif
 		{
 #if !SILICIUM_COMPILER_HAS_CXX11_UNION
@@ -121,7 +125,8 @@ namespace Si
 #endif
 		}
 
-		error_or(Error error) BOOST_NOEXCEPT : code(error.value()), category(&error.category())
+		error_or(Error error) BOOST_NOEXCEPT : code(error.value()),
+		                                       category(&error.category())
 		{
 		}
 
@@ -323,7 +328,8 @@ namespace Si
 		}
 
 		template <class ConvertibleToValue>
-		typename std::enable_if<std::is_convertible<ConvertibleToValue, Value>::value, bool>::type
+		typename std::enable_if<
+		    std::is_convertible<ConvertibleToValue, Value>::value, bool>::type
 		equals(ConvertibleToValue const &right) const
 		{
 			if (is_error())
@@ -333,7 +339,9 @@ namespace Si
 			return get() ==
 			       detail::convert_if_necessary<Value>(
 			           right,
-			           std::is_same<typename std::decay<Value>::type, typename std::decay<ConvertibleToValue>::type>());
+			           std::is_same<
+			               typename std::decay<Value>::type,
+			               typename std::decay<ConvertibleToValue>::type>());
 		}
 
 		bool equals(Error const &right) const
@@ -401,8 +409,8 @@ namespace Si
 	}
 
 	template <class Anything, class Value, class Error>
-	typename std::enable_if<!is_error_or<Anything>::value, bool>::type operator==(Anything const &left,
-	                                                                              error_or<Value, Error> const &right)
+	typename std::enable_if<!is_error_or<Anything>::value, bool>::type
+	operator==(Anything const &left, error_or<Value, Error> const &right)
 	{
 		return right.equals(left);
 	}
@@ -420,7 +428,8 @@ namespace Si
 	}
 
 	template <class Value, class Error>
-	bool operator<(error_or<Value, Error> const &left, error_or<Value, Error> const &right)
+	bool operator<(error_or<Value, Error> const &left,
+	               error_or<Value, Error> const &right)
 	{
 		if (left.is_error())
 		{
@@ -462,7 +471,8 @@ namespace Si
 	}
 
 	template <class Value, class Error>
-	std::ostream &operator<<(std::ostream &out, error_or<Value, Error> const &value)
+	std::ostream &operator<<(std::ostream &out,
+	                         error_or<Value, Error> const &value)
 	{
 		if (value.is_error())
 		{
@@ -474,7 +484,8 @@ namespace Si
 	namespace detail
 	{
 		template <class T>
-		typename std::remove_reference<T>::type &&move_if(boost::mpl::true_, T &&ref)
+		typename std::remove_reference<T>::type &&move_if(boost::mpl::true_,
+		                                                  T &&ref)
 		{
 			return std::move(ref);
 		}
@@ -489,7 +500,8 @@ namespace Si
 	template <class ErrorOr, class OnValue>
 	auto map(ErrorOr &&maybe, OnValue &&on_value) -> typename std::enable_if<
 	    is_error_or<typename std::decay<ErrorOr>::type>::value,
-	    error_or<decltype(std::forward<OnValue>(on_value)(std::forward<ErrorOr>(maybe).get()))>>::type
+	    error_or<decltype(std::forward<OnValue>(on_value)(
+	        std::forward<ErrorOr>(maybe).get()))>>::type
 	{
 		if (maybe.is_error())
 		{
@@ -497,7 +509,8 @@ namespace Si
 		}
 		return std::forward<OnValue>(on_value)(
 #if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-		    detail::move_if(boost::mpl::bool_<!boost::is_lvalue_reference<ErrorOr>::value>(),
+		    detail::move_if(boost::mpl::bool_<
+		                        !boost::is_lvalue_reference<ErrorOr>::value>(),
 #endif
 		                    std::forward<ErrorOr>(maybe).get()
 #if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER

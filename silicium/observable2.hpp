@@ -9,8 +9,9 @@ namespace Si
 	namespace observables2
 	{
 		template <class T>
-		SILICIUM_TRAIT_WITH_TYPEDEFS(Observable, typedef T value_type;
-		                             , ((observe, (1, (function<void(value_type)>)), void)))
+		SILICIUM_TRAIT_WITH_TYPEDEFS(
+		    Observable, typedef T value_type;
+		    , ((observe, (1, (function<void(value_type)>)), void)))
 
 		template <class T>
 		struct never
@@ -77,7 +78,8 @@ namespace Si
 		template <class T>
 		std::pair<pipe_reader<T>, pipe_writer<T>> create_pipe()
 		{
-			std::shared_ptr<pipe_shared<T>> shared = std::make_shared<pipe_shared<T>>();
+			std::shared_ptr<pipe_shared<T>> shared =
+			    std::make_shared<pipe_shared<T>>();
 			pipe_reader<T> reader(shared);
 			pipe_writer<T> writer(std::move(shared));
 			return std::make_pair(std::move(reader), std::move(writer));
@@ -87,7 +89,8 @@ namespace Si
 		struct transformation
 		{
 			typedef typename Input::value_type input_value_type;
-			typedef decltype(std::declval<Transformation>()(std::declval<input_value_type>())) value_type;
+			typedef decltype(std::declval<Transformation>()(
+			    std::declval<input_value_type>())) value_type;
 
 			transformation(Input input, Transformation transform)
 			    : m_input(std::move(input))
@@ -98,8 +101,11 @@ namespace Si
 			template <class Handler>
 			void observe(Handler &&handler)
 			{
-				m_input.observe([ this, SILICIUM_CAPTURE_EXPRESSION(handler, std::forward<Handler>(handler)) ](
-				    input_value_type value)
+				m_input.observe([
+					this,
+					SILICIUM_CAPTURE_EXPRESSION(
+					    handler, std::forward<Handler>(handler))
+				](input_value_type value)
 				                {
 					                handler(m_transform(std::move(value)));
 					            });
@@ -112,10 +118,13 @@ namespace Si
 
 		template <class Input, class Transformation>
 		auto transform(Input &&input, Transformation &&transform)
-		    -> transformation<typename std::decay<Input>::type, typename std::decay<Transformation>::type>
+		    -> transformation<typename std::decay<Input>::type,
+		                      typename std::decay<Transformation>::type>
 		{
-			return transformation<typename std::decay<Input>::type, typename std::decay<Transformation>::type>(
-			    std::forward<Input>(input), std::forward<Transformation>(transform));
+			return transformation<typename std::decay<Input>::type,
+			                      typename std::decay<Transformation>::type>(
+			    std::forward<Input>(input),
+			    std::forward<Transformation>(transform));
 		}
 	}
 }

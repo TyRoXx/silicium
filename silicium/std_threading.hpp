@@ -37,7 +37,8 @@ namespace Si
 		static auto launch_async(Action &&action, Args &&... args)
 		    -> std::future<decltype(action(std::forward<Args>(args)...))>
 		{
-			return std::async(std::launch::async, std::forward<Action>(action), std::forward<Args>(args)...);
+			return std::async(std::launch::async, std::forward<Action>(action),
+			                  std::forward<Args>(args)...);
 		}
 #endif
 	};

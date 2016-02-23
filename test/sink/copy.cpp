@@ -10,5 +10,6 @@ BOOST_AUTO_TEST_CASE(copy_source_to_sink)
 	std::vector<int> output;
 	auto sink = Si::make_container_sink(output);
 	Si::copy(source, sink);
-	BOOST_CHECK_EQUAL_COLLECTIONS(input.begin(), input.end(), output.begin(), output.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    input.begin(), input.end(), output.begin(), output.end());
 }

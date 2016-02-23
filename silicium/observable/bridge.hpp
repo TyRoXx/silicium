@@ -10,7 +10,9 @@
 namespace Si
 {
 	template <class Element>
-	struct bridge : Observable<Element, ptr_observer<observer<Element>>>::interface, observer<Element>
+	struct bridge
+	    : Observable<Element, ptr_observer<observer<Element>>>::interface,
+	      observer<Element>
 	{
 		typedef Element element_type;
 
@@ -36,7 +38,8 @@ namespace Si
 			Si::exchange(receiver_, nullptr)->ended();
 		}
 
-		virtual void async_get_one(ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
+		virtual void async_get_one(
+		    ptr_observer<observer<element_type>> receiver) SILICIUM_OVERRIDE
 		{
 			assert(!this->receiver_);
 			this->receiver_ = receiver.get();

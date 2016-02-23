@@ -4,7 +4,8 @@
 BOOST_AUTO_TEST_CASE(container_buffer_make)
 {
 	std::vector<int> v;
-	Si::container_buffer<std::vector<int>> buffer = Si::make_container_buffer(v);
+	Si::container_buffer<std::vector<int>> buffer =
+	    Si::make_container_buffer(v);
 	BOOST_CHECK(v.empty());
 	BOOST_CHECK(!buffer.flush_append_space());
 	BOOST_CHECK(v.empty());
@@ -13,7 +14,8 @@ BOOST_AUTO_TEST_CASE(container_buffer_make)
 BOOST_AUTO_TEST_CASE(container_buffer_shrink_append_space)
 {
 	std::vector<int> v;
-	Si::container_buffer<std::vector<int>> buffer = Si::make_container_buffer(v);
+	Si::container_buffer<std::vector<int>> buffer =
+	    Si::make_container_buffer(v);
 	Si::iterator_range<int *> space = buffer.make_append_space(100);
 	BOOST_CHECK_EQUAL(100, space.size());
 	BOOST_CHECK_EQUAL(100u, v.size());
@@ -30,7 +32,8 @@ BOOST_AUTO_TEST_CASE(container_buffer_shrink_append_space)
 BOOST_AUTO_TEST_CASE(container_buffer_grow_append_space)
 {
 	std::vector<int> v;
-	Si::container_buffer<std::vector<int>> buffer = Si::make_container_buffer(v);
+	Si::container_buffer<std::vector<int>> buffer =
+	    Si::make_container_buffer(v);
 	Si::iterator_range<int *> space = buffer.make_append_space(100);
 	BOOST_CHECK_EQUAL(100, space.size());
 	BOOST_CHECK_EQUAL(100u, v.size());
@@ -47,7 +50,8 @@ BOOST_AUTO_TEST_CASE(container_buffer_flush_append_space)
 {
 	std::vector<int> v;
 	v.reserve(200);
-	Si::container_buffer<std::vector<int>> buffer = Si::make_container_buffer(v);
+	Si::container_buffer<std::vector<int>> buffer =
+	    Si::make_container_buffer(v);
 	Si::iterator_range<int *> space = buffer.make_append_space(100);
 	buffer.flush_append_space();
 	BOOST_CHECK_EQUAL(100u, v.size());

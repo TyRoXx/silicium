@@ -56,7 +56,8 @@ namespace Si
 	    -> single_source<typename std::decay<Element>::type>
 #endif
 	{
-		return single_source<typename std::decay<Element>::type>(std::forward<Element>(element));
+		return single_source<typename std::decay<Element>::type>(
+		    std::forward<Element>(element));
 	}
 }
 

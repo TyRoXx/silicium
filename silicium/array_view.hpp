@@ -120,9 +120,11 @@ namespace Si
 		}
 
 		template <std::size_t MinIndex, std::size_t MaxIndex>
-		value_type &operator[](bounded_int<std::size_t, MinIndex, MaxIndex> index) const
+		value_type &
+		operator[](bounded_int<std::size_t, MinIndex, MaxIndex> index) const
 		{
-			BOOST_STATIC_ASSERT((is_always_less<decltype(index), Length>::value));
+			BOOST_STATIC_ASSERT(
+			    (is_always_less<decltype(index), Length>::value));
 			return data()[index.value()];
 		}
 
@@ -136,45 +138,53 @@ namespace Si
 	};
 
 	template <class T, std::size_t N>
-	array_view<T, bounded_int<std::size_t, N, N>> make_array_view(std::array<T, N> &array)
+	array_view<T, bounded_int<std::size_t, N, N>>
+	make_array_view(std::array<T, N> &array)
 	{
 		return array_view<T, bounded_int<std::size_t, N, N>>(array);
 	}
 
 	template <class T, std::size_t N>
-	array_view<T const, bounded_int<std::size_t, N, N>> make_array_view(std::array<T, N> const &array)
+	array_view<T const, bounded_int<std::size_t, N, N>>
+	make_array_view(std::array<T, N> const &array)
 	{
 		return array_view<T const, bounded_int<std::size_t, N, N>>(array);
 	}
 
 	template <class T, std::size_t N>
-	array_view<T, bounded_int<std::size_t, N, N>> make_array_view(boost::array<T, N> &array)
+	array_view<T, bounded_int<std::size_t, N, N>>
+	make_array_view(boost::array<T, N> &array)
 	{
 		return array_view<T, bounded_int<std::size_t, N, N>>(array);
 	}
 
 	template <class T, std::size_t N>
-	array_view<T const, bounded_int<std::size_t, N, N>> make_array_view(boost::array<T, N> const &array)
+	array_view<T const, bounded_int<std::size_t, N, N>>
+	make_array_view(boost::array<T, N> const &array)
 	{
 		return array_view<T const, bounded_int<std::size_t, N, N>>(array);
 	}
 
 	template <class T, class Allocator>
-	array_view<T, bounded_size_t> make_array_view(std::vector<T, Allocator> &vector)
+	array_view<T, bounded_size_t>
+	make_array_view(std::vector<T, Allocator> &vector)
 	{
 		return array_view<T, bounded_size_t>(vector);
 	}
 
 	template <class T, class Allocator>
-	array_view<T const, bounded_size_t> make_array_view(std::vector<T, Allocator> const &vector)
+	array_view<T const, bounded_size_t>
+	make_array_view(std::vector<T, Allocator> const &vector)
 	{
 		return array_view<T const, bounded_size_t>(vector);
 	}
 
 	template <class T>
-	array_view<T, bounded_int<std::size_t, 1, 1>> make_single_element_view(T &element)
+	array_view<T, bounded_int<std::size_t, 1, 1>>
+	make_single_element_view(T &element)
 	{
-		return array_view<T, bounded_int<std::size_t, 1, 1>>(element, bounded_int<std::size_t, 1, 1>::literal<1>());
+		return array_view<T, bounded_int<std::size_t, 1, 1>>(
+		    element, bounded_int<std::size_t, 1, 1>::literal<1>());
 	}
 }
 

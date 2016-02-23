@@ -14,8 +14,9 @@ namespace Si
 		{
 			typedef boost::system::error_code element_type;
 
-			explicit connecting_observable(boost::asio::ip::tcp::socket &socket,
-			                               boost::asio::ip::tcp::endpoint destination)
+			explicit connecting_observable(
+			    boost::asio::ip::tcp::socket &socket,
+			    boost::asio::ip::tcp::endpoint destination)
 			    : socket(&socket)
 			    , destination(destination)
 			    , receiver_(nullptr)
@@ -27,10 +28,11 @@ namespace Si
 				assert(socket);
 				assert(!receiver_);
 				receiver_ = receiver.get();
-				socket->async_connect(destination, [this](boost::system::error_code ec)
-				                      {
-					                      Si::exchange(receiver_, nullptr)->got_element(ec);
-					                  });
+				socket->async_connect(
+				    destination, [this](boost::system::error_code ec)
+				    {
+					    Si::exchange(receiver_, nullptr)->got_element(ec);
+					});
 			}
 
 		private:

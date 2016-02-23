@@ -14,7 +14,8 @@ namespace Si
 	};
 
 	template <class Char, class Traits>
-	std::basic_ostream<Char, Traits> &operator<<(std::basic_ostream<Char, Traits> &out, overflow_type)
+	std::basic_ostream<Char, Traits> &
+	operator<<(std::basic_ostream<Char, Traits> &out, overflow_type)
 	{
 		return out << "overflow";
 	}
@@ -54,7 +55,9 @@ namespace Si
 	};
 
 	template <class Char, class Traits, class T>
-	std::basic_ostream<Char, Traits> &operator<<(std::basic_ostream<Char, Traits> &out, overflow_or<T> const &value)
+	std::basic_ostream<Char, Traits> &
+	operator<<(std::basic_ostream<Char, Traits> &out,
+	           overflow_or<T> const &value)
 	{
 		if (value.is_overflow())
 		{
@@ -64,7 +67,8 @@ namespace Si
 	}
 
 	template <class Unsigned>
-	bool operator==(overflow_or<Unsigned> const &left, overflow_or<Unsigned> const &right)
+	bool operator==(overflow_or<Unsigned> const &left,
+	                overflow_or<Unsigned> const &right)
 	{
 		if (left.is_overflow() && right.is_overflow())
 		{

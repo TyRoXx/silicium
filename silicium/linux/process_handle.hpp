@@ -62,7 +62,8 @@ namespace Si
 		pid_t m_id;
 
 		SILICIUM_DELETED_FUNCTION(process_handle(process_handle const &))
-		SILICIUM_DELETED_FUNCTION(process_handle &operator=(process_handle const &))
+		SILICIUM_DELETED_FUNCTION(
+		    process_handle &operator=(process_handle const &))
 	};
 }
 

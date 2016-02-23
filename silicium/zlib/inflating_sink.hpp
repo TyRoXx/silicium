@@ -31,22 +31,25 @@ namespace Si
 			swap(m_stream, other.m_stream);
 		}
 
-		zlib_inflate_stream &operator=(zlib_inflate_stream &&other) BOOST_NOEXCEPT
+		zlib_inflate_stream &
+		operator=(zlib_inflate_stream &&other) BOOST_NOEXCEPT
 		{
 			using std::swap;
 			swap(m_stream, other.m_stream);
 			return *this;
 		}
 
-		std::pair<std::size_t, std::size_t> inflate(iterator_range<char const *> deflated,
-		                                            iterator_range<char *> original, int flush) BOOST_NOEXCEPT
+		std::pair<std::size_t, std::size_t>
+		inflate(iterator_range<char const *> deflated,
+		        iterator_range<char *> original, int flush) BOOST_NOEXCEPT
 		{
 			assert(m_stream);
 			assert(original.begin());
 			assert(original.size());
 			assert(deflated.begin());
 			assert(deflated.size());
-			m_stream->next_in = reinterpret_cast<Bytef *>(const_cast<char *>(deflated.begin()));
+			m_stream->next_in =
+			    reinterpret_cast<Bytef *>(const_cast<char *>(deflated.begin()));
 			m_stream->avail_in = static_cast<uInt>(deflated.size());
 			m_stream->next_out = reinterpret_cast<Bytef *>(original.begin());
 			m_stream->avail_out = static_cast<uInt>(original.size());
@@ -69,12 +72,15 @@ namespace Si
 	private:
 		optional<z_stream> m_stream;
 
-		explicit zlib_inflate_stream(z_stream stream) BOOST_NOEXCEPT : m_stream(stream)
+		explicit zlib_inflate_stream(z_stream stream) BOOST_NOEXCEPT
+		    : m_stream(stream)
 		{
 		}
 
-		SILICIUM_DELETED_FUNCTION(zlib_inflate_stream(zlib_inflate_stream const &))
-		SILICIUM_DELETED_FUNCTION(zlib_inflate_stream &operator=(zlib_inflate_stream const &))
+		SILICIUM_DELETED_FUNCTION(
+		    zlib_inflate_stream(zlib_inflate_stream const &))
+		SILICIUM_DELETED_FUNCTION(
+		    zlib_inflate_stream &operator=(zlib_inflate_stream const &))
 	};
 }
 #endif

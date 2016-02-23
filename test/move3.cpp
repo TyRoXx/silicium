@@ -26,7 +26,8 @@ namespace Si
 			explicit val(Args &&... args)
 			    : m_is_set(true)
 			{
-				new (static_cast<void *>(&get())) T(std::forward<Args>(args)...);
+				new (static_cast<void *>(&get()))
+				    T(std::forward<Args>(args)...);
 			}
 
 			~val() BOOST_NOEXCEPT
@@ -88,7 +89,8 @@ namespace Si
 			{
 				if (!m_is_set)
 				{
-					boost::throw_exception(std::logic_error("expected non-empty val"));
+					boost::throw_exception(
+					    std::logic_error("expected non-empty val"));
 				}
 				return get();
 			}
@@ -109,11 +111,13 @@ namespace Si
 
 		private:
 			bool m_is_set;
-			typename std::aligned_storage<sizeof(T), alignof(T)>::type m_storage;
+			typename std::aligned_storage<sizeof(T), alignof(T)>::type
+			    m_storage;
 
 			T &get()
 			{
-				return reinterpret_cast<T &>(reinterpret_cast<char &>(m_storage));
+				return reinterpret_cast<T &>(
+				    reinterpret_cast<char &>(m_storage));
 			}
 		};
 
@@ -126,7 +130,9 @@ namespace Si
 		template <class T, class Deleter>
 		struct unique_ref : private Deleter
 		{
-			explicit unique_ref(T &ref, Deleter deleter) BOOST_NOEXCEPT : Deleter(deleter), m_ptr(&ref)
+			explicit unique_ref(T &ref, Deleter deleter) BOOST_NOEXCEPT
+			    : Deleter(deleter),
+			      m_ptr(&ref)
 			{
 			}
 
@@ -180,29 +186,35 @@ namespace Si
 		template <class T, class... Args>
 		val<unique_ref<T, new_deleter>> make_unique(Args &&... args)
 		{
-			return val<unique_ref<T, new_deleter>>(*new T(std::forward<Args>(args)...), new_deleter());
+			return val<unique_ref<T, new_deleter>>(
+			    *new T(std::forward<Args>(args)...), new_deleter());
 		}
 
 		template <class T>
-		val<unique_ref<T, malloc_deleter>> allocate_array_storage(std::size_t length)
+		val<unique_ref<T, malloc_deleter>>
+		allocate_array_storage(std::size_t length)
 		{
 			void *const storage = std::calloc(length, sizeof(T));
 			if (!storage)
 			{
 				boost::throw_exception(std::bad_alloc());
 			}
-			return val<unique_ref<T, malloc_deleter>>(*static_cast<T *>(storage), malloc_deleter());
+			return val<unique_ref<T, malloc_deleter>>(
+			    *static_cast<T *>(storage), malloc_deleter());
 		}
 
 		template <class T, class Length>
 		struct dynamic_array : private Length
 		{
 			template <class ElementGenerator>
-			dynamic_array(Length length, ElementGenerator &&generate_elements) BOOST_NOEXCEPT
+			dynamic_array(Length length,
+			              ElementGenerator &&generate_elements) BOOST_NOEXCEPT
 			    : Length(length),
 			      m_elements(allocate_array_storage<T>(length.value()))
 			{
-				for (typename Length::value_type i = 0, c = this->length().value(); i < c; ++i)
+				for (typename Length::value_type i = 0,
+				                                 c = this->length().value();
+				     i < c; ++i)
 				{
 					generate_elements().transfer((&m_elements.ref())[i]);
 				}
@@ -217,7 +229,8 @@ namespace Si
 
 			~dynamic_array() BOOST_NOEXCEPT
 			{
-				for (typename Length::value_type i = 0, c = length().value(); i < c; ++i)
+				for (typename Length::value_type i = 0, c = length().value();
+				     i < c; ++i)
 				{
 					(&m_elements.ref())[c - i - 1].~T();
 				}
@@ -276,14 +289,15 @@ namespace Si
 		struct tuple_impl<Head, Tail...> : private tuple_impl<Tail...>
 		{
 			template <class First, class... Rest>
-			explicit tuple_impl(First &&first, Rest &&... rest) BOOST_NOEXCEPT : base(std::forward<Rest>(rest)...),
-			                                                                     m_head(std::forward<First>(first))
+			explicit tuple_impl(First &&first, Rest &&... rest) BOOST_NOEXCEPT
+			    : base(std::forward<Rest>(rest)...),
+			      m_head(std::forward<First>(first))
 			{
 			}
 
-			explicit tuple_impl(tuple_impl<Head, Tail...> const &stolen) BOOST_NOEXCEPT
-			    : base(static_cast<base const &>(stolen)),
-			      m_head(steal(stolen.m_head))
+			explicit tuple_impl(tuple_impl<Head, Tail...> const &stolen)
+			    BOOST_NOEXCEPT : base(static_cast<base const &>(stolen)),
+			                     m_head(steal(stolen.m_head))
 			{
 			}
 
@@ -293,9 +307,11 @@ namespace Si
 			}
 
 			template <std::size_t I>
-			typename type_at<I - 1, Tail...>::type &get(std::integral_constant<std::size_t, I>)
+			typename type_at<I - 1, Tail...>::type &
+			    get(std::integral_constant<std::size_t, I>)
 			{
-				return base::template get(std::integral_constant<std::size_t, I - 1>());
+				return base::template get(
+				    std::integral_constant<std::size_t, I - 1>());
 			}
 
 		private:
@@ -308,11 +324,13 @@ namespace Si
 		struct tuple : private tuple_impl<T...>
 		{
 			template <class... Elements>
-			explicit tuple(Elements &&... elements) BOOST_NOEXCEPT : base(std::forward<Elements>(elements)...)
+			explicit tuple(Elements &&... elements) BOOST_NOEXCEPT
+			    : base(std::forward<Elements>(elements)...)
 			{
 			}
 
-			explicit tuple(val<tuple> other) BOOST_NOEXCEPT : base(static_cast<base const &>(other.require()))
+			explicit tuple(val<tuple> other) BOOST_NOEXCEPT
+			    : base(static_cast<base const &>(other.require()))
 			{
 				other.release();
 			}
@@ -320,7 +338,8 @@ namespace Si
 			template <std::size_t I>
 			typename type_at<I, T...>::type &get()
 			{
-				return base::template get(std::integral_constant<std::size_t, I>());
+				return base::template get(
+				    std::integral_constant<std::size_t, I>());
 			}
 
 		private:
@@ -346,10 +365,11 @@ namespace Si
 		};
 
 		template <class... T>
-		auto make_tuple(T &&... elements)
-		    -> val<tuple<typename make_tuple_decay<typename std::decay<T>::type>::type>...>
+		auto make_tuple(T &&... elements) -> val<tuple<
+		    typename make_tuple_decay<typename std::decay<T>::type>::type>...>
 		{
-			return val<tuple<typename make_tuple_decay<typename std::decay<T>::type>::type>...>(
+			return val<tuple<typename make_tuple_decay<
+			    typename std::decay<T>::type>::type>...>(
 			    std::forward<T>(elements)...);
 		}
 #endif
@@ -374,14 +394,17 @@ BOOST_AUTO_TEST_CASE(move3_val)
 BOOST_AUTO_TEST_CASE(move3_vector_ref_emplace_back)
 {
 	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
-	dynamic_array<unique_ref<int, new_deleter>, length_type> const v(length_type::literal<1>(), []()
-	                                                                 {
-		                                                                 return make_unique<int>(23);
-		                                                             });
+	dynamic_array<unique_ref<int, new_deleter>, length_type> const v(
+	    length_type::literal<1>(), []()
+	    {
+		    return make_unique<int>(23);
+		});
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), v.length());
-	Si::array_view<unique_ref<int, new_deleter>, length_type> const range = v.as_view();
+	Si::array_view<unique_ref<int, new_deleter>, length_type> const range =
+	    v.as_view();
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), range.length());
-	unique_ref<int, new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
+	unique_ref<int, new_deleter> const &element =
+	    range[Si::literal<std::size_t, 0>()];
 	BOOST_CHECK_EQUAL(element.ref(), 23);
 }
 
@@ -390,24 +413,30 @@ BOOST_AUTO_TEST_CASE(move3_val_of_vector)
 	typedef Si::bounded_int<std::size_t, 1, 2> length_type;
 	auto create_array = []()
 	{
-		return val<dynamic_array<unique_ref<int, new_deleter>, length_type>>(length_type::literal<1>(), []()
-		                                                                     {
-			                                                                     return make_unique<int>(23);
-			                                                                 });
+		return val<dynamic_array<unique_ref<int, new_deleter>, length_type>>(
+		    length_type::literal<1>(), []()
+		    {
+			    return make_unique<int>(23);
+			});
 	};
-	val<dynamic_array<unique_ref<int, new_deleter>, length_type>> a = create_array();
-	dynamic_array<unique_ref<int, new_deleter>, length_type> const v(std::move(a));
+	val<dynamic_array<unique_ref<int, new_deleter>, length_type>> a =
+	    create_array();
+	dynamic_array<unique_ref<int, new_deleter>, length_type> const v(
+	    std::move(a));
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), v.length());
-	Si::array_view<unique_ref<int, new_deleter>, length_type> const range = v.as_view();
+	Si::array_view<unique_ref<int, new_deleter>, length_type> const range =
+	    v.as_view();
 	BOOST_REQUIRE_EQUAL(length_type::literal<1>(), range.length());
-	unique_ref<int, new_deleter> const &element = range[Si::literal<std::size_t, 0>()];
+	unique_ref<int, new_deleter> const &element =
+	    range[Si::literal<std::size_t, 0>()];
 	BOOST_CHECK_EQUAL(element.ref(), 23);
 }
 
 #if SILICIUM_M3_HAS_TUPLE
 BOOST_AUTO_TEST_CASE(move3_make_tuple)
 {
-	val<tuple<unique_ref<int, new_deleter>>> t = make_tuple(make_unique<int>(23));
+	val<tuple<unique_ref<int, new_deleter>>> t =
+	    make_tuple(make_unique<int>(23));
 	tuple<unique_ref<int, new_deleter>> u(std::move(t));
 	unique_ref<int, new_deleter> &element = get<0>(u);
 	BOOST_CHECK_EQUAL(23, element.ref());

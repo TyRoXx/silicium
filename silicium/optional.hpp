@@ -287,13 +287,13 @@ namespace Si
 			m_is_set = true;
 		}
 
-#define BOOST_PP_LOCAL_MACRO(N)                                                                                        \
-	template <BOOST_PP_ENUM_PARAMS(N, class A)>                                                                        \
-	void emplace(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                                                                 \
-	{                                                                                                                  \
-		*this = none;                                                                                                  \
-		new (data()) T(BOOST_PP_ENUM_PARAMS(N, a));                                                                    \
-		m_is_set = true;                                                                                               \
+#define BOOST_PP_LOCAL_MACRO(N)                                                \
+	template <BOOST_PP_ENUM_PARAMS(N, class A)>                                \
+	void emplace(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                         \
+	{                                                                          \
+		*this = none;                                                          \
+		new (data()) T(BOOST_PP_ENUM_PARAMS(N, a));                            \
+		m_is_set = true;                                                       \
 	}
 #define BOOST_PP_LOCAL_LIMITS (1, 10)
 #include BOOST_PP_LOCAL_ITERATE()
@@ -451,7 +451,8 @@ namespace Si
 #endif
 
 	template <class T>
-	SILICIUM_USE_RESULT bool operator==(optional<T> const &left, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator==(optional<T> const &left,
+	                                    optional<T> const &right)
 	{
 		if (left && right)
 		{
@@ -477,7 +478,8 @@ namespace Si
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT bool operator==(none_t const &, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator==(none_t const &,
+	                                    optional<T> const &right)
 	{
 		return !right;
 	}
@@ -489,13 +491,15 @@ namespace Si
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT bool operator!=(optional<T> const &left, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator!=(optional<T> const &left,
+	                                    optional<T> const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT bool operator<(optional<T> const &left, optional<T> const &right)
+	SILICIUM_USE_RESULT bool operator<(optional<T> const &left,
+	                                   optional<T> const &right)
 	{
 		if (left)
 		{
@@ -522,9 +526,11 @@ namespace Si
 	}
 
 	template <class T>
-	SILICIUM_USE_RESULT Si::optional<typename std::decay<T>::type> make_optional(T &&value)
+	SILICIUM_USE_RESULT Si::optional<typename std::decay<T>::type>
+	make_optional(T &&value)
 	{
-		return Si::optional<typename std::decay<T>::type>(std::forward<T>(value));
+		return Si::optional<typename std::decay<T>::type>(
+		    std::forward<T>(value));
 	}
 
 	inline std::ostream &operator<<(std::ostream &out, none_t const &)
@@ -560,9 +566,12 @@ namespace Si
 
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t>) == 2);
 	BOOST_STATIC_ASSERT(sizeof(optional<boost::int16_t>) == 4);
-	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) == (2 * sizeof(boost::uint32_t)));
-	BOOST_STATIC_ASSERT(sizeof(optional<char *>) == (alignment_of<char *>::value + sizeof(char *)));
-	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t &>) == sizeof(boost::int8_t *));
+	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) ==
+	                    (2 * sizeof(boost::uint32_t)));
+	BOOST_STATIC_ASSERT(sizeof(optional<char *>) ==
+	                    (alignment_of<char *>::value + sizeof(char *)));
+	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t &>) ==
+	                    sizeof(boost::int8_t *));
 
 	template <class T, class Transformation>
 	auto fmap(optional<T> const &value, Transformation &&transform)
@@ -598,7 +607,8 @@ namespace Si
 
 	template <class Transformation, class... Optionals>
 	auto variadic_fmap(Transformation &&transform, Optionals const &... values)
-	    -> optional<decltype(std::forward<Transformation>(transform)((*values)...))>
+	    -> optional<
+	        decltype(std::forward<Transformation>(transform)((*values)...))>
 	{
 		if (detail::all_of(values...))
 		{

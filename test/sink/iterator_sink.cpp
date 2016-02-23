@@ -13,5 +13,6 @@ BOOST_AUTO_TEST_CASE(iterator_sink_append)
 	Si::append(sink, 'B');
 	BOOST_CHECK(buffer.begin() + 2 == sink.position());
 	std::array<char, 10> expected = SILICIUM_INITIALIZE_ARRAY('A', 'B', 0);
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), buffer.begin(), buffer.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    expected.begin(), expected.end(), buffer.begin(), buffer.end());
 }

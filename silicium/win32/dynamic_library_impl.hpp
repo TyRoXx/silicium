@@ -31,7 +31,8 @@ namespace Si
 			SILICIUM_USE_RESULT
 			static void *find_symbol(void *handle, c_string name)
 			{
-				return GetProcAddress(static_cast<HMODULE>(handle), name.c_str());
+				return GetProcAddress(
+				    static_cast<HMODULE>(handle), name.c_str());
 			}
 		};
 	}

@@ -12,8 +12,10 @@ namespace Si
 	{
 		typedef Element element_type;
 		typedef std::size_t size_type;
-		typedef typename boost::container::vector<Element, Allocator>::iterator iterator;
-		typedef typename boost::container::vector<Element, Allocator>::const_iterator const_iterator;
+		typedef typename boost::container::vector<Element, Allocator>::iterator
+		    iterator;
+		typedef typename boost::container::vector<
+		    Element, Allocator>::const_iterator const_iterator;
 
 		vector() BOOST_NOEXCEPT
 		{
@@ -114,7 +116,8 @@ namespace Si
 	};
 
 	template <class Element, class Allocator>
-	bool operator==(vector<Element, Allocator> const &left, vector<Element, Allocator> const &right)
+	bool operator==(vector<Element, Allocator> const &left,
+	                vector<Element, Allocator> const &right)
 	{
 		return boost::range::equal(left, right);
 	}

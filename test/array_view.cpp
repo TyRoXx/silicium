@@ -2,9 +2,13 @@
 #include <boost/test/unit_test.hpp>
 
 // a fixed-size array_view should only contain one pointer
-BOOST_STATIC_ASSERT(sizeof(int *) == sizeof(Si::array_view<int, Si::bounded_int<std::size_t, 1, 1>>));
+BOOST_STATIC_ASSERT(
+    sizeof(int *) ==
+    sizeof(Si::array_view<int, Si::bounded_int<std::size_t, 1, 1>>));
 
-BOOST_STATIC_ASSERT((2 * sizeof(int *)) == sizeof(Si::array_view<int, Si::bounded_int<std::size_t, 1, 2>>));
+BOOST_STATIC_ASSERT(
+    (2 * sizeof(int *)) ==
+    sizeof(Si::array_view<int, Si::bounded_int<std::size_t, 1, 2>>));
 
 BOOST_AUTO_TEST_CASE(array_view_default_constructor)
 {
@@ -158,7 +162,8 @@ BOOST_AUTO_TEST_CASE(array_view_begin_end)
 {
 	std::array<int, 3> const arr = {{1, 2, 3}};
 	Si::array_view<int const> view = arr;
-	BOOST_CHECK_EQUAL_COLLECTIONS(arr.begin(), arr.end(), view.begin(), view.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    arr.begin(), arr.end(), view.begin(), view.end());
 	int sum = 0;
 	for (int e : view)
 	{
@@ -182,7 +187,8 @@ BOOST_AUTO_TEST_CASE(make_array_view)
 {
 	{
 		std::array<int, 3> std_arr = {{1, 2, -3}};
-		Si::array_view<int, Si::bounded_int<std::size_t, 3, 3>> view = Si::make_array_view(std_arr);
+		Si::array_view<int, Si::bounded_int<std::size_t, 3, 3>> view =
+		    Si::make_array_view(std_arr);
 
 		boost::array<int, 3> boost_arr = {{1, 2, -3}};
 		view = Si::make_array_view(boost_arr);
@@ -196,28 +202,34 @@ BOOST_AUTO_TEST_CASE(make_array_view_const)
 {
 	{
 		std::array<int, 3> const std_arr = {{1, 2, -3}};
-		Si::array_view<int const, Si::bounded_int<std::size_t, 3, 3>> view = Si::make_array_view(std_arr);
+		Si::array_view<int const, Si::bounded_int<std::size_t, 3, 3>> view =
+		    Si::make_array_view(std_arr);
 
 		boost::array<int, 3> const boost_arr = {{1, 2, -3}};
 		view = Si::make_array_view(boost_arr);
 	}
 	std::vector<int> const vector(7);
-	Si::array_view<int const, Si::bounded_size_t> view = Si::make_array_view(vector);
+	Si::array_view<int const, Si::bounded_size_t> view =
+	    Si::make_array_view(vector);
 	BOOST_CHECK_EQUAL(vector.size(), view.length().value());
 }
 
 BOOST_AUTO_TEST_CASE(make_array_view_implicit_widening)
 {
 	std::array<int, 3> const std_arr = {{1, 2, -3}};
-	Si::array_view<int const, Si::bounded_int<std::size_t, 3, 3>> view = Si::make_array_view(std_arr);
-	Si::array_view<int const, Si::bounded_int<std::size_t, 3, 4>> widened_view = view;
-	BOOST_CHECK_EQUAL_COLLECTIONS(view.begin(), view.end(), widened_view.begin(), widened_view.end());
+	Si::array_view<int const, Si::bounded_int<std::size_t, 3, 3>> view =
+	    Si::make_array_view(std_arr);
+	Si::array_view<int const, Si::bounded_int<std::size_t, 3, 4>> widened_view =
+	    view;
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    view.begin(), view.end(), widened_view.begin(), widened_view.end());
 }
 
 BOOST_AUTO_TEST_CASE(make_single_element_view_test)
 {
 	int x = 45;
-	Si::array_view<int, Si::bounded_int<std::size_t, 1, 1>> view = Si::make_single_element_view(x);
+	Si::array_view<int, Si::bounded_int<std::size_t, 1, 1>> view =
+	    Si::make_single_element_view(x);
 	BOOST_REQUIRE_EQUAL(1u, view.length().value());
 	BOOST_CHECK_EQUAL(45, view.front());
 }

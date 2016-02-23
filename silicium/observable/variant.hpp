@@ -15,7 +15,8 @@
 namespace Si
 {
 #if SILICIUM_RX_VARIANT_AVAILABLE
-	template <template <class... T> class Variant, class Lockable, class... Parts>
+	template <template <class... T> class Variant, class Lockable,
+	          class... Parts>
 	struct variant_observable
 	{
 		typedef Variant<typename Parts::element_type...> element_type;
@@ -68,7 +69,8 @@ namespace Si
 			{
 				assert(!cached);
 				boost::unique_lock<Lockable> lock(*combinator->mutex);
-				auto *const receiver = Si::exchange(Si::exchange(combinator, nullptr)->receiver_, nullptr);
+				auto *const receiver = Si::exchange(
+				    Si::exchange(combinator, nullptr)->receiver_, nullptr);
 				if (!receiver)
 				{
 					cached = std::move(value);
@@ -81,7 +83,8 @@ namespace Si
 			virtual void ended() SILICIUM_OVERRIDE
 			{
 				boost::unique_lock<Lockable> lock(*combinator->mutex);
-				auto *const receiver = Si::exchange(Si::exchange(combinator, nullptr)->receiver_, nullptr);
+				auto *const receiver = Si::exchange(
+				    Si::exchange(combinator, nullptr)->receiver_, nullptr);
 				if (!receiver)
 				{
 					return;
@@ -97,11 +100,13 @@ namespace Si
 		template <std::size_t... I>
 		struct make_observers<ranges::v3::integer_sequence<I...>>
 		{
-			typedef std::tuple<tuple_observer<typename Parts::element_type, I>...> type;
+			typedef std::tuple<
+			    tuple_observer<typename Parts::element_type, I>...> type;
 		};
 
-		typedef typename make_observers<typename ranges::v3::make_integer_sequence<sizeof...(Parts)>::type>::type
-		    observers_type;
+		typedef
+		    typename make_observers<typename ranges::v3::make_integer_sequence<
+		        sizeof...(Parts)>::type>::type observers_type;
 
 		std::tuple<Parts...> parts;
 		observers_type observers;
@@ -117,7 +122,8 @@ namespace Si
 				if (observer.cached)
 				{
 					auto value = std::move(*observer.cached);
-					Si::exchange(receiver_, nullptr)->got_element(std::move(value));
+					Si::exchange(receiver_, nullptr)
+					    ->got_element(std::move(value));
 					return;
 				}
 				observer.combinator = this;
@@ -132,27 +138,34 @@ namespace Si
 		{
 		}
 
-		SILICIUM_DELETED_FUNCTION(variant_observable(variant_observable const &))
-		SILICIUM_DELETED_FUNCTION(variant_observable &operator=(variant_observable const &))
+		SILICIUM_DELETED_FUNCTION(
+		    variant_observable(variant_observable const &))
+		SILICIUM_DELETED_FUNCTION(
+		    variant_observable &operator=(variant_observable const &))
 	};
 
 	template <class Lockable = boost::recursive_mutex, class... Parts>
 	auto make_variant(Parts &&... parts)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> variant_observable<Si::variant, Lockable, typename std::decay<Parts>::type...>
+	    -> variant_observable<Si::variant, Lockable,
+	                          typename std::decay<Parts>::type...>
 #endif
 	{
-		return variant_observable<Si::variant, Lockable, typename std::decay<Parts>::type...>(
+		return variant_observable<Si::variant, Lockable,
+		                          typename std::decay<Parts>::type...>(
 		    std::forward<Parts>(parts)...);
 	}
 
-	template <template <class... T> class variant, class Lockable = boost::recursive_mutex, class... Parts>
+	template <template <class... T> class variant,
+	          class Lockable = boost::recursive_mutex, class... Parts>
 	auto make_variant(Parts &&... parts)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> variant_observable<variant, Lockable, typename std::decay<Parts>::type...>
+	    -> variant_observable<variant, Lockable,
+	                          typename std::decay<Parts>::type...>
 #endif
 	{
-		return variant_observable<variant, Lockable, typename std::decay<Parts>::type...>(
+		return variant_observable<variant, Lockable,
+		                          typename std::decay<Parts>::type...>(
 		    std::forward<Parts>(parts)...);
 	}
 #endif

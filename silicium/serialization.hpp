@@ -16,7 +16,9 @@ namespace Si
 
 		struct big_endian
 		{
-			static BOOST_CONSTEXPR std::size_t byte_index_to_significance(std::size_t index, std::size_t total_size)
+			static BOOST_CONSTEXPR std::size_t
+			byte_index_to_significance(std::size_t index,
+			                           std::size_t total_size)
 			{
 				return (total_size - 1 - index);
 			}
@@ -24,21 +26,24 @@ namespace Si
 
 		struct little_endian
 		{
-			static BOOST_CONSTEXPR std::size_t byte_index_to_significance(std::size_t index, std::size_t)
+			static BOOST_CONSTEXPR std::size_t
+			byte_index_to_significance(std::size_t index, std::size_t)
 			{
 				return index;
 			}
 		};
 
 		template <class Unsigned, class Endianness, class InputIterator>
-		optional<std::pair<Unsigned, InputIterator>> bytes_to_integer_shortcut(InputIterator, InputIterator, Endianness,
-		                                                                       identity<Unsigned>) BOOST_NOEXCEPT
+		optional<std::pair<Unsigned, InputIterator>>
+		    bytes_to_integer_shortcut(InputIterator, InputIterator, Endianness,
+		                              identity<Unsigned>) BOOST_NOEXCEPT
 		{
 			return none;
 		}
 
 		inline optional<std::pair<boost::uint32_t, byte const *>>
-		bytes_to_integer_shortcut(byte const *begin, byte const *end, big_endian,
+		bytes_to_integer_shortcut(byte const *begin, byte const *end,
+		                          big_endian,
 		                          identity<boost::uint32_t>) BOOST_NOEXCEPT
 		{
 			if (static_cast<size_t>(end - begin) < sizeof(boost::uint32_t))
@@ -63,7 +68,8 @@ namespace Si
 
 			void set_byte(std::size_t significance, byte digit)
 			{
-				built |= (static_cast<Unsigned>(digit) << static_cast<Unsigned>(significance * 8U));
+				built |= (static_cast<Unsigned>(digit)
+				          << static_cast<Unsigned>(significance * 8U));
 			}
 		};
 
@@ -80,8 +86,9 @@ namespace Si
 			{
 				if (m_bytes_in_buffer == 0)
 				{
-					optional<std::pair<Unsigned, InputIterator>> const succeeded =
-					    bytes_to_integer_shortcut(begin, end, Endianness(), identity<Unsigned>());
+					optional<std::pair<Unsigned, InputIterator>> const
+					    succeeded = bytes_to_integer_shortcut(
+					        begin, end, Endianness(), identity<Unsigned>());
 					if (succeeded)
 					{
 						m_buffer.built = succeeded->first;
@@ -91,7 +98,8 @@ namespace Si
 				}
 				while ((begin != end) && (m_bytes_in_buffer < sizeof(Unsigned)))
 				{
-					m_buffer.set_byte(Endianness::byte_index_to_significance(m_bytes_in_buffer, sizeof(Unsigned)),
+					m_buffer.set_byte(Endianness::byte_index_to_significance(
+					                      m_bytes_in_buffer, sizeof(Unsigned)),
 					                  *begin);
 					++begin;
 					++m_bytes_in_buffer;

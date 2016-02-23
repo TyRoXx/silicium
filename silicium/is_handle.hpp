@@ -11,17 +11,21 @@ namespace Si
 	template <class T>
 	struct is_handle
 	    : std::integral_constant<
-	          bool, Si::is_nothrow_default_constructible<T>::value && Si::is_nothrow_move_assignable<T>::value &&
-	                    Si::is_nothrow_move_constructible<T>::value && Si::is_nothrow_destructible<T>::value>
+	          bool, Si::is_nothrow_default_constructible<T>::value &&
+	                    Si::is_nothrow_move_assignable<T>::value &&
+	                    Si::is_nothrow_move_constructible<T>::value &&
+	                    Si::is_nothrow_destructible<T>::value>
 	{
 	};
 #else
 #define SILICIUM_HAS_IS_HANDLE 0
 	template <class T>
 	struct is_handle
-	    : std::integral_constant<bool, !std::is_const<T>::value && !std::is_reference<T>::value &&
-	                                       Si::is_default_constructible<T>::value && Si::is_move_assignable<T>::value &&
-	                                       Si::is_move_constructible<T>::value>
+	    : std::integral_constant<
+	          bool, !std::is_const<T>::value && !std::is_reference<T>::value &&
+	                    Si::is_default_constructible<T>::value &&
+	                    Si::is_move_assignable<T>::value &&
+	                    Si::is_move_constructible<T>::value>
 	{
 	};
 #endif
@@ -50,9 +54,11 @@ namespace Si
 #ifndef _MSC_VER
 		struct non_assignable
 		{
-			SILICIUM_DELETED_FUNCTION(non_assignable &operator=(non_assignable const &))
+			SILICIUM_DELETED_FUNCTION(
+			    non_assignable &operator=(non_assignable const &))
 		};
-		// VC++ 2013 std::is_{move,copy}_assignable do not return the correct result
+		// VC++ 2013 std::is_{move,copy}_assignable do not return the correct
+		// result
 		BOOST_STATIC_ASSERT(!Si::is_move_assignable<non_assignable>::value);
 #if !SILICIUM_GCC || (SILICIUM_GCC > 406)
 		BOOST_STATIC_ASSERT(!Si::is_copy_assignable<non_assignable>::value);
@@ -63,13 +69,15 @@ namespace Si
 #if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
 		struct non_noexcept_move_constructible
 		{
-			non_noexcept_move_constructible(non_noexcept_move_constructible &&) BOOST_NOEXCEPT_IF(false);
+			non_noexcept_move_constructible(non_noexcept_move_constructible &&)
+			    BOOST_NOEXCEPT_IF(false);
 		};
 		BOOST_STATIC_ASSERT(!is_handle<non_noexcept_move_constructible>::value);
 
 		struct non_noexcept_move_assignable
 		{
-			non_noexcept_move_assignable &operator=(non_noexcept_move_assignable &&) BOOST_NOEXCEPT_IF(false);
+			non_noexcept_move_assignable &
+			operator=(non_noexcept_move_assignable &&) BOOST_NOEXCEPT_IF(false);
 		};
 		BOOST_STATIC_ASSERT(!is_handle<non_noexcept_move_assignable>::value);
 #endif

@@ -21,6 +21,7 @@ int main()
 		                      return std::isnan(d);
 		                  });
 #else
-	std::cerr << "This example requires a more recent compiler for Si::variant to work\n";
+	std::cerr << "This example requires a more recent compiler for Si::variant "
+	             "to work\n";
 #endif
 }

@@ -63,9 +63,12 @@ namespace Si
 			void operator()(double) const;
 		};
 
-		BOOST_STATIC_ASSERT((std::is_same<int, argument_of<test_class>::type>::value));
-		BOOST_STATIC_ASSERT((std::is_same<double, argument_of<test_class_const>::type>::value));
-		BOOST_STATIC_ASSERT((std::is_same<int, argument_of<void (*)(int)>::type>::value));
+		BOOST_STATIC_ASSERT(
+		    (std::is_same<int, argument_of<test_class>::type>::value));
+		BOOST_STATIC_ASSERT(
+		    (std::is_same<double, argument_of<test_class_const>::type>::value));
+		BOOST_STATIC_ASSERT(
+		    (std::is_same<int, argument_of<void (*)(int)>::type>::value));
 	}
 }
 

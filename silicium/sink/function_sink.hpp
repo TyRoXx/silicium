@@ -32,12 +32,16 @@ namespace Si
 	template <class Element, class Function>
 	auto make_function_sink(Function &&function)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> function_sink<Element, typename std::result_of<Function(iterator_range<Element const *>)>::type,
+	    -> function_sink<Element, typename std::result_of<Function(
+	                                  iterator_range<Element const *>)>::type,
 	                     typename std::decay<Function>::type>
 #endif
 	{
-		typedef typename std::result_of<Function(iterator_range<Element const *>)>::type error;
-		return function_sink<Element, error, typename std::decay<Function>::type>(std::forward<Function>(function));
+		typedef typename std::result_of<Function(
+		    iterator_range<Element const *>)>::type error;
+		return function_sink<Element, error,
+		                     typename std::decay<Function>::type>(
+		    std::forward<Function>(function));
 	}
 }
 

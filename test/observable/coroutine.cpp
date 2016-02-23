@@ -56,11 +56,12 @@ BOOST_AUTO_TEST_CASE(coroutine_yield)
 BOOST_AUTO_TEST_CASE(coroutine_total_consumer)
 {
 	bool executed = false;
-	auto consumer = Si::make_total_consumer(Si::make_coroutine([&executed](Si::yield_context)
-	                                                           {
-		                                                           executed = true;
-		                                                           return Si::unit();
-		                                                       }));
+	auto consumer = Si::make_total_consumer(
+	    Si::make_coroutine([&executed](Si::yield_context)
+	                       {
+		                       executed = true;
+		                       return Si::unit();
+		                   }));
 	BOOST_CHECK(!executed);
 	consumer.start();
 	BOOST_CHECK(executed);
@@ -69,22 +70,25 @@ BOOST_AUTO_TEST_CASE(coroutine_total_consumer)
 BOOST_AUTO_TEST_CASE(coroutine_self_destruct)
 {
 	std::size_t steps_done = 0;
-	auto coro = Si::to_unique(Si::make_coroutine([&steps_done](Si::yield_context) -> Si::unit
-	                                             {
-		                                             BOOST_REQUIRE_EQUAL(1u, steps_done);
-		                                             ++steps_done;
-		                                             return {};
-		                                         }));
+	auto coro = Si::to_unique(
+	    Si::make_coroutine([&steps_done](Si::yield_context) -> Si::unit
+	                       {
+		                       BOOST_REQUIRE_EQUAL(1u, steps_done);
+		                       ++steps_done;
+		                       return {};
+		                   }));
 	BOOST_REQUIRE_EQUAL(0u, steps_done);
-	auto handler = Si::on_first(Si::ref(*coro), [&coro, &steps_done](Si::optional<Si::unit> value)
-	                            {
-		                            BOOST_CHECK(value);
-		                            // this function is called in the coroutine
-		                            BOOST_REQUIRE_EQUAL(2u, steps_done);
-		                            ++steps_done;
-		                            // destroying the coroutine itself now should not crash or anything, it just works.
-		                            coro.reset();
-		                        });
+	auto handler = Si::on_first(
+	    Si::ref(*coro), [&coro, &steps_done](Si::optional<Si::unit> value)
+	    {
+		    BOOST_CHECK(value);
+		    // this function is called in the coroutine
+		    BOOST_REQUIRE_EQUAL(2u, steps_done);
+		    ++steps_done;
+		    // destroying the coroutine itself now should not crash or anything,
+		    // it just works.
+		    coro.reset();
+		});
 	BOOST_REQUIRE_EQUAL(0u, steps_done);
 	++steps_done;
 	handler.start();
@@ -96,16 +100,18 @@ BOOST_AUTO_TEST_CASE(spawn_coroutine_get_one)
 {
 	bool elapsed = false;
 	boost::asio::io_service io;
-	Si::spawn_coroutine([&io, &elapsed](Si::spawn_context yield)
-	                    {
-		                    BOOST_REQUIRE(!elapsed);
-		                    auto timer = Si::asio::make_timer(io);
-		                    timer.expires_from_now(boost::chrono::microseconds(1));
-		                    Si::optional<Si::asio::timer_elapsed> e = yield.get_one(Si::ref(timer));
-		                    BOOST_CHECK(e);
-		                    BOOST_REQUIRE(!elapsed);
-		                    elapsed = true;
-		                });
+	Si::spawn_coroutine(
+	    [&io, &elapsed](Si::spawn_context yield)
+	    {
+		    BOOST_REQUIRE(!elapsed);
+		    auto timer = Si::asio::make_timer(io);
+		    timer.expires_from_now(boost::chrono::microseconds(1));
+		    Si::optional<Si::asio::timer_elapsed> e =
+		        yield.get_one(Si::ref(timer));
+		    BOOST_CHECK(e);
+		    BOOST_REQUIRE(!elapsed);
+		    elapsed = true;
+		});
 	BOOST_CHECK(!elapsed);
 	io.run();
 	BOOST_CHECK(elapsed);
@@ -115,20 +121,21 @@ BOOST_AUTO_TEST_CASE(spawn_observable)
 {
 	bool elapsed = false;
 	boost::asio::io_service io;
-	Si::spawn_observable(Si::transform(Si::make_limited_observable(
-	                                       [&io]()
-	                                       {
-		                                       auto timer = Si::asio::make_timer(io);
-		                                       timer.expires_from_now(boost::chrono::microseconds(1));
-		                                       return timer;
-		                                   }(),
-	                                       1ull),
-	                                   [&elapsed](Si::asio::timer_elapsed)
-	                                   {
-		                                   BOOST_REQUIRE(!elapsed);
-		                                   elapsed = true;
-		                                   return Si::unit();
-		                               }));
+	Si::spawn_observable(Si::transform(
+	    Si::make_limited_observable(
+	        [&io]()
+	        {
+		        auto timer = Si::asio::make_timer(io);
+		        timer.expires_from_now(boost::chrono::microseconds(1));
+		        return timer;
+		    }(),
+	        1ull),
+	    [&elapsed](Si::asio::timer_elapsed)
+	    {
+		    BOOST_REQUIRE(!elapsed);
+		    elapsed = true;
+		    return Si::unit();
+		}));
 	BOOST_CHECK(!elapsed);
 	io.run();
 	BOOST_CHECK(elapsed);

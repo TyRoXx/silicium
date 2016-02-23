@@ -25,7 +25,8 @@ namespace Si
 	};
 
 	template <class BidirectionalRange1, class BidirectionalRange2>
-	bool operator==(range_value<BidirectionalRange1> const &left, range_value<BidirectionalRange2> const &right)
+	bool operator==(range_value<BidirectionalRange1> const &left,
+	                range_value<BidirectionalRange2> const &right)
 	{
 		return boost::range::equal(left.range, right.range);
 	}
@@ -36,7 +37,8 @@ namespace Si
 	    -> range_value<typename std::decay<BidirectionalRange>::type>
 #endif
 	{
-		return range_value<typename std::decay<BidirectionalRange>::type>(std::forward<BidirectionalRange>(range));
+		return range_value<typename std::decay<BidirectionalRange>::type>(
+		    std::forward<BidirectionalRange>(range));
 	}
 }
 
@@ -45,7 +47,8 @@ namespace std
 	template <class BidirectionalRange>
 	struct hash<Si::range_value<BidirectionalRange>>
 	{
-		std::size_t operator()(Si::range_value<BidirectionalRange> const &value) const
+		std::size_t
+		operator()(Si::range_value<BidirectionalRange> const &value) const
 		{
 			using boost::begin;
 			using boost::end;

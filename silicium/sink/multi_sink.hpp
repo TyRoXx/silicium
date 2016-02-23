@@ -43,7 +43,8 @@ namespace Si
 	    -> multi_sink<Element, Error, typename std::decay<GetChildren>::type>
 #endif
 	{
-		return multi_sink<Element, Error, typename std::decay<GetChildren>::type>(
+		return multi_sink<Element, Error,
+		                  typename std::decay<GetChildren>::type>(
 		    std::forward<GetChildren>(get_children));
 	}
 }

@@ -4,8 +4,8 @@
 // enclosing namespace struct:
 
 #define DELEGATOR_TEMPLATE(...) template <__VA_ARGS__>
-#define DELEGATOR_NAME(name)                                                                                           \
-	struct name                                                                                                        \
+#define DELEGATOR_NAME(name)                                                   \
+	struct name                                                                \
 	{
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
 #define DELEGATOR_BASIC_METHOD(name, constness, result, ...)
@@ -20,14 +20,15 @@
 // abstract base class:
 
 #define DELEGATOR_TEMPLATE(...)
-#define DELEGATOR_NAME(name)                                                                                           \
-	struct abstract_base                                                                                               \
-	{                                                                                                                  \
-		virtual ~abstract_base()                                                                                       \
-		{                                                                                                              \
+#define DELEGATOR_NAME(name)                                                   \
+	struct abstract_base                                                       \
+	{                                                                          \
+		virtual ~abstract_base()                                               \
+		{                                                                      \
 		}
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
-#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) virtual result name(__VA_ARGS__) constness = 0;
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                   \
+	virtual result name(__VA_ARGS__) constness = 0;
 
 #include DELEGATOR_INCLUDE
 }
@@ -41,29 +42,32 @@
 // eraser:
 
 #define DELEGATOR_TEMPLATE(...)
-#define DELEGATOR_NAME(name)                                                                                           \
-	template <class Impl>                                                                                              \
-	struct eraser : abstract_base                                                                                      \
-	{                                                                                                                  \
-		explicit eraser(Impl impl)                                                                                     \
-		    : m_impl(std::move(impl))                                                                                  \
-		{                                                                                                              \
-		}                                                                                                              \
-                                                                                                                       \
-	private:                                                                                                           \
-		Impl m_impl;                                                                                                   \
-                                                                                                                       \
+#define DELEGATOR_NAME(name)                                                   \
+	template <class Impl>                                                      \
+	struct eraser : abstract_base                                              \
+	{                                                                          \
+		explicit eraser(Impl impl)                                             \
+		    : m_impl(std::move(impl))                                          \
+		{                                                                      \
+		}                                                                      \
+                                                                               \
+	private:                                                                   \
+		Impl m_impl;                                                           \
+                                                                               \
 	public:
 #define DELEGATOR_TYPEDEF(...)
-#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem) BOOST_PP_COMMA_IF(i) elem BOOST_PP_CAT(arg, i)
-#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem)                                                        \
+#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem)              \
+	BOOST_PP_COMMA_IF(i) elem BOOST_PP_CAT(arg, i)
+#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem)                \
 	BOOST_PP_COMMA_IF(i) std::forward<elem>(BOOST_PP_CAT(arg, i))
-#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
-	virtual result name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                           \
-	                                             BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) constness SILICIUM_OVERRIDE  \
-	{                                                                                                                  \
-		return m_impl.name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _,                          \
-		                                            BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));                          \
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                   \
+	virtual result name(BOOST_PP_LIST_FOR_EACH_I(                              \
+	    DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                            \
+	    BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) constness SILICIUM_OVERRIDE   \
+	{                                                                          \
+		return m_impl.name(                                                    \
+		    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _, \
+		                             BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))); \
 	}
 
 #include DELEGATOR_INCLUDE
@@ -94,15 +98,19 @@ struct fat_ref
 #define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
 #define DELEGATOR_TYPEDEF(...)
-#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem) BOOST_PP_COMMA_IF(i) elem BOOST_PP_CAT(arg, i)
-#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem)                                                        \
+#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem)              \
+	BOOST_PP_COMMA_IF(i) elem BOOST_PP_CAT(arg, i)
+#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem)                \
 	BOOST_PP_COMMA_IF(i) std::forward<elem>(BOOST_PP_CAT(arg, i))
-#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
-	[](void constness *impl, BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                      \
-	                                                  BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) -> result               \
-	{                                                                                                                  \
-		return static_cast<Impl constness *>(impl)->name(BOOST_PP_LIST_FOR_EACH_I(                                     \
-		    DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _, BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));                        \
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                   \
+	[](void constness *impl,                                                   \
+	   BOOST_PP_LIST_FOR_EACH_I(                                               \
+	       DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                         \
+	       BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) -> result                  \
+	{                                                                          \
+		return static_cast<Impl constness *>(impl)->name(                      \
+		    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _, \
+		                             BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))); \
 	},
 
 #include DELEGATOR_INCLUDE
@@ -122,15 +130,19 @@ struct fat_ref
 #define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
 #define DELEGATOR_TYPEDEF(...) __VA_ARGS__
-#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem) BOOST_PP_COMMA_IF(i) elem BOOST_PP_CAT(arg, i)
-#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem)                                                        \
+#define DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER(r, data, i, elem)              \
+	BOOST_PP_COMMA_IF(i) elem BOOST_PP_CAT(arg, i)
+#define DELEGATOR_BASIC_METHOD_DETAIL_FORWARD(r, data, i, elem)                \
 	BOOST_PP_COMMA_IF(i) std::forward<elem>(BOOST_PP_CAT(arg, i))
-#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                                                           \
-	result name(BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                                   \
-	                                     BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) constness                            \
-	{                                                                                                                  \
-		return m_virtuals->name(m_impl, BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _,             \
-		                                                         BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)));             \
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                   \
+	result name(BOOST_PP_LIST_FOR_EACH_I(                                      \
+	    DELEGATOR_BASIC_METHOD_DETAIL_PARAMETER, _,                            \
+	    BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))) constness                     \
+	{                                                                          \
+		return m_virtuals->name(                                               \
+		    m_impl,                                                            \
+		    BOOST_PP_LIST_FOR_EACH_I(DELEGATOR_BASIC_METHOD_DETAIL_FORWARD, _, \
+		                             BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__))); \
 	}
 
 #include DELEGATOR_INCLUDE
@@ -150,7 +162,8 @@ private:
 #define DELEGATOR_TEMPLATE(...)
 #define DELEGATOR_NAME(name)
 #define DELEGATOR_TYPEDEF(...)
-#define DELEGATOR_BASIC_METHOD(name, constness, result, ...) result (*name)(void constness *, __VA_ARGS__);
+#define DELEGATOR_BASIC_METHOD(name, constness, result, ...)                   \
+	result (*name)(void constness *, __VA_ARGS__);
 
 #include DELEGATOR_INCLUDE
 

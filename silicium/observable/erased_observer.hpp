@@ -17,7 +17,8 @@ namespace Si
 
 		template <class Observer>
 		explicit erased_observer(Observer &&observer)
-		    : m_original(to_unique(virtualize_observer(std::forward<Observer>(observer))))
+		    : m_original(to_unique(
+		          virtualize_observer(std::forward<Observer>(observer))))
 		{
 		}
 
@@ -25,7 +26,8 @@ namespace Si
 		erased_observer(erased_observer &&) BOOST_NOEXCEPT = default;
 		erased_observer &operator=(erased_observer &&) BOOST_NOEXCEPT = default;
 #else
-		erased_observer(erased_observer &&other) BOOST_NOEXCEPT : m_original(std::move(other.m_original))
+		erased_observer(erased_observer &&other) BOOST_NOEXCEPT
+		    : m_original(std::move(other.m_original))
 		{
 		}
 
@@ -57,7 +59,8 @@ namespace Si
 		std::unique_ptr<observer<Element>> m_original;
 
 		SILICIUM_DELETED_FUNCTION(erased_observer(erased_observer const &))
-		SILICIUM_DELETED_FUNCTION(erased_observer &operator=(erased_observer const &))
+		SILICIUM_DELETED_FUNCTION(
+		    erased_observer &operator=(erased_observer const &))
 	};
 }
 

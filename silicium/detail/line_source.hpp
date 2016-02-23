@@ -22,12 +22,15 @@ namespace Si
 			{
 			}
 
-			virtual iterator_range<std::vector<char> const *> map_next(std::size_t) SILICIUM_OVERRIDE
+			virtual iterator_range<std::vector<char> const *>
+			    map_next(std::size_t) SILICIUM_OVERRIDE
 			{
 				return iterator_range<std::vector<char> const *>();
 			}
 
-			virtual std::vector<char> *copy_next(iterator_range<std::vector<char> *> destination) SILICIUM_OVERRIDE
+			virtual std::vector<char> *
+			copy_next(iterator_range<std::vector<char> *> destination)
+			    SILICIUM_OVERRIDE
 			{
 				assert(m_next);
 				auto i = begin(destination);
@@ -74,7 +77,8 @@ namespace Si
 		}
 
 		template <class CharRange>
-		std::pair<noexcept_string, noexcept_string> split_value_line(CharRange const &line)
+		std::pair<noexcept_string, noexcept_string>
+		split_value_line(CharRange const &line)
 		{
 			auto colon = boost::range::find(line, ':');
 			auto second_begin = colon + 1;
@@ -82,7 +86,8 @@ namespace Si
 			{
 				++second_begin;
 			}
-			return std::make_pair(noexcept_string(begin(line), colon), noexcept_string(second_begin, end(line)));
+			return std::make_pair(noexcept_string(begin(line), colon),
+			                      noexcept_string(second_begin, end(line)));
 		}
 	}
 }

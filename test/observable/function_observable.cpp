@@ -6,10 +6,11 @@
 
 BOOST_AUTO_TEST_CASE(function_observable_trivial)
 {
-	auto o = Si::make_function_observable<int>([](Si::ptr_observer<Si::observer<int>> receiver)
-	                                           {
-		                                           receiver.got_element(2);
-		                                       });
+	auto o = Si::make_function_observable<int>(
+	    [](Si::ptr_observer<Si::observer<int>> receiver)
+	    {
+		    receiver.got_element(2);
+		});
 	boost::optional<int> result;
 	auto consumer = Si::consume<int>([&result](int r)
 	                                 {

@@ -53,7 +53,8 @@ namespace Si
 
 		ForwardRange m_range;
 
-		iterator_range<element_type const *> map_next_impl(std::size_t size, std::true_type)
+		iterator_range<element_type const *> map_next_impl(std::size_t size,
+		                                                   std::true_type)
 		{
 			boost::ignore_unused_variable_warning(size);
 			if (m_range.empty())
@@ -64,7 +65,8 @@ namespace Si
 			return make_iterator_range(data, data + m_range.size());
 		}
 
-		iterator_range<element_type const *> map_next_impl(std::size_t size, std::false_type)
+		iterator_range<element_type const *> map_next_impl(std::size_t size,
+		                                                   std::false_type)
 		{
 			boost::ignore_unused_variable_warning(size);
 			return {};
@@ -77,7 +79,8 @@ namespace Si
 	    -> range_source<typename std::decay<ForwardRange>::type>
 #endif
 	{
-		return range_source<typename std::decay<ForwardRange>::type>(std::forward<ForwardRange>(range));
+		return range_source<typename std::decay<ForwardRange>::type>(
+		    std::forward<ForwardRange>(range));
 	}
 }
 

@@ -12,7 +12,9 @@ namespace Si
 {
 	template <class Message>
 	SILICIUM_TRAIT_WITH_TYPEDEFS(Awaitable, typedef Message message_type;
-	                             , ((async_wait, (1, (function<void(message_type)>)), void)))
+	                             ,
+	                             ((async_wait,
+	                               (1, (function<void(message_type)>)), void)))
 
 	template <class Element>
 	struct async_pipe_reader
@@ -57,7 +59,8 @@ namespace Si
 		{
 			typedef unit message_type;
 
-			explicit awaitable_read(std::shared_ptr<shared_state<Element, Dispatcher>> shared)
+			explicit awaitable_read(
+			    std::shared_ptr<shared_state<Element, Dispatcher>> shared)
 			    : m_shared(std::move(shared))
 			{
 			}
@@ -77,7 +80,8 @@ namespace Si
 		{
 			typedef unit message_type;
 
-			explicit awaitable_write(std::shared_ptr<shared_state<Element, Dispatcher>> shared)
+			explicit awaitable_write(
+			    std::shared_ptr<shared_state<Element, Dispatcher>> shared)
 			    : m_shared(std::move(shared))
 			{
 			}
@@ -98,29 +102,36 @@ namespace Si
 			typedef Element element_type;
 			typedef success error_type;
 
-			explicit async_pipe_sink(std::shared_ptr<shared_state<Element, Dispatcher>> shared)
+			explicit async_pipe_sink(
+			    std::shared_ptr<shared_state<Element, Dispatcher>> shared)
 			    : m_shared(std::move(shared))
 			{
 			}
 
 			error_type append(iterator_range<element_type const *> elements)
 			{
-				std::ptrdiff_t const free =
-				    static_cast<std::ptrdiff_t>(m_shared->buffer.capacity() - m_shared->buffer.size());
+				std::ptrdiff_t const free = static_cast<std::ptrdiff_t>(
+				    m_shared->buffer.capacity() - m_shared->buffer.size());
 				std::ptrdiff_t const copied = (std::min)(elements.size(), free);
-				// TODO: this Sink breaks its promise to handle all elements because we use a limited buffer. At the
-				// same time we do not really want to enlarge the buffer of the pipe indefinitely. This shows that the
+				// TODO: this Sink breaks its promise to handle all elements
+				// because we use a limited buffer. At the
+				// same time we do not really want to enlarge the buffer of the
+				// pipe indefinitely. This shows that the
 				// Sink
-				// is an unsuitable abstraction for the writer's side. We have to use something else, maybe
+				// is an unsuitable abstraction for the writer's side. We have
+				// to use something else, maybe
 				// async_write-like.
-				m_shared->buffer.insert(m_shared->buffer.end(), elements.begin(), elements.begin() + copied);
-				function<void(unit)> readable_callback =
-				    Si::exchange(m_shared->readable_callback, function<void(unit)>());
+				m_shared->buffer.insert(m_shared->buffer.end(),
+				                        elements.begin(),
+				                        elements.begin() + copied);
+				function<void(unit)> readable_callback = Si::exchange(
+				    m_shared->readable_callback, function<void(unit)>());
 				if (!readable_callback)
 				{
 					return error_type();
 				}
-				m_shared->dispatcher.post([SILICIUM_CAPTURE_EXPRESSION(readable_callback, std::move(readable_callback))]
+				m_shared->dispatcher.post([SILICIUM_CAPTURE_EXPRESSION(
+				    readable_callback, std::move(readable_callback))]
 				                          {
 					                          readable_callback(unit());
 					                      });
@@ -136,7 +147,8 @@ namespace Si
 		{
 			typedef Element element_type;
 
-			explicit async_pipe_source(std::shared_ptr<shared_state<Element, Dispatcher>> shared)
+			explicit async_pipe_source(
+			    std::shared_ptr<shared_state<Element, Dispatcher>> shared)
 			    : m_shared(std::move(shared))
 			{
 			}
@@ -151,7 +163,9 @@ namespace Si
 			element_type *copy_next(iterator_range<element_type *> destination)
 			{
 				element_type *until = destination.begin();
-				for (; !m_shared->buffer.empty() && (until != destination.end()); ++until)
+				for (;
+				     !m_shared->buffer.empty() && (until != destination.end());
+				     ++until)
 				{
 					// TODO: better exception safety
 					*until = m_shared->buffer.front();
@@ -159,16 +173,18 @@ namespace Si
 				}
 				if (until != destination.begin())
 				{
-					// removed something from the buffer. Writing is possible again.
-					function<void(unit)> writeable_callback =
-					    Si::exchange(m_shared->writeable_callback, function<void(unit)>());
+					// removed something from the buffer. Writing is possible
+					// again.
+					function<void(unit)> writeable_callback = Si::exchange(
+					    m_shared->writeable_callback, function<void(unit)>());
 					if (writeable_callback)
 					{
-						m_shared->dispatcher.post(
-						    [SILICIUM_CAPTURE_EXPRESSION(writeable_callback, std::move(writeable_callback))]
-						    {
-							    writeable_callback(unit());
-							});
+						m_shared->dispatcher.post([SILICIUM_CAPTURE_EXPRESSION(
+						    writeable_callback, std::move(writeable_callback))]
+						                          {
+							                          writeable_callback(
+							                              unit());
+							                      });
 					}
 				}
 				return until;
@@ -180,16 +196,23 @@ namespace Si
 	}
 
 	template <class Element, class Dispatcher>
-	async_pipe<Element> make_async_pipe(std::size_t buffered_elements, Dispatcher &dispatcher)
+	async_pipe<Element> make_async_pipe(std::size_t buffered_elements,
+	                                    Dispatcher &dispatcher)
 	{
-		auto shared = std::make_shared<detail::shared_state<Element, Dispatcher>>(buffered_elements, dispatcher);
+		auto shared =
+		    std::make_shared<detail::shared_state<Element, Dispatcher>>(
+		        buffered_elements, dispatcher);
 		return async_pipe<Element>{
 		    async_pipe_reader<Element>{
-		        Source<Element>::make_box(detail::async_pipe_source<Element, Dispatcher>(shared)),
-		        Awaitable<unit>::make_box(detail::awaitable_read<Element, Dispatcher>(shared))},
+		        Source<Element>::make_box(
+		            detail::async_pipe_source<Element, Dispatcher>(shared)),
+		        Awaitable<unit>::make_box(
+		            detail::awaitable_read<Element, Dispatcher>(shared))},
 		    async_pipe_writer<Element>{
-		        Sink<Element, success>::make_box(detail::async_pipe_sink<Element, Dispatcher>(shared)),
-		        Awaitable<unit>::make_box(detail::awaitable_write<Element, Dispatcher>(shared))}};
+		        Sink<Element, success>::make_box(
+		            detail::async_pipe_sink<Element, Dispatcher>(shared)),
+		        Awaitable<unit>::make_box(
+		            detail::awaitable_write<Element, Dispatcher>(shared))}};
 	}
 }
 

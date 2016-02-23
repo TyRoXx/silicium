@@ -76,7 +76,9 @@ namespace Si
 	    -> iterator_sink<Element, typename std::decay<OutputIterator>::type>
 #endif
 	{
-		return iterator_sink<Element, typename std::decay<OutputIterator>::type>(std::move(out));
+		return iterator_sink<Element,
+		                     typename std::decay<OutputIterator>::type>(
+		    std::move(out));
 	}
 
 	template <class Container>
@@ -98,7 +100,8 @@ namespace Si
 		success append(iterator_range<element_type const *> data) const
 		{
 			assert(m_destination);
-			m_destination->insert(m_destination->end(), data.begin(), data.end());
+			m_destination->insert(
+			    m_destination->end(), data.begin(), data.end());
 			return success();
 		}
 

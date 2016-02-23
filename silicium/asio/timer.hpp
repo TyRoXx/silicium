@@ -60,10 +60,15 @@ namespace Si
 				    {
 					    if (!!error)
 					    {
-						    assert(error == boost::asio::error::operation_aborted); // TODO: remove this assumption
+						    assert(error ==
+						           boost::asio::error::
+						               operation_aborted); // TODO: remove
+						                                   // this
+						                                   // assumption
 						    return;
 					    }
-					    std::forward<Observer>(receiver).got_element(timer_elapsed());
+					    std::forward<Observer>(receiver)
+					        .got_element(timer_elapsed());
 					});
 			}
 
@@ -85,10 +90,13 @@ namespace Si
 
 		inline auto make_timer(boost::asio::io_service &io)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> timer<boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>
+		    -> timer<
+		        boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>
 #endif
 		{
-			return timer<boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>(io);
+			return timer<
+			    boost::asio::basic_waitable_timer<boost::chrono::steady_clock>>(
+			    io);
 		}
 	}
 }

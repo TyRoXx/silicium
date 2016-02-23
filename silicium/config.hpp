@@ -87,7 +87,8 @@
 #define SILICIUM_AVOID_URIPARSER 0
 #endif
 
-#define SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES (SILICIUM_GCC || SILICIUM_VC2013_OR_LATER)
+#define SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES                               \
+	(SILICIUM_GCC || SILICIUM_VC2013_OR_LATER)
 
 #if defined(NDEBUG) || !SILICIUM_HAS_EXCEPTIONS
 #ifdef _MSC_VER
@@ -96,19 +97,22 @@
 #define SILICIUM_UNREACHABLE() __builtin_unreachable()
 #endif
 #else
-#define SILICIUM_UNREACHABLE()                                                                                         \
-	throw ::std::logic_error("SILICIUM_UNREACHABLE was executed at " __FILE__ ":" BOOST_STRINGIZE(__LINE__))
+#define SILICIUM_UNREACHABLE()                                                 \
+	throw ::std::logic_error("SILICIUM_UNREACHABLE was executed at " __FILE__  \
+	                         ":" BOOST_STRINGIZE(__LINE__))
 #endif
 
-#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__) ||                       \
-    (defined(_MSC_VER) && (_MSC_VER >= 1900))
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) ||     \
+    defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
 #define SILICIUM_COMPILER_GENERATES_MOVES 1
 #else
 #define SILICIUM_COMPILER_GENERATES_MOVES 0
 #endif
 
-#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) || defined(__clang__) ||                        \
-     (defined(_MSC_VER) && (_MSC_VER >= 1900)) && !defined(BOOST_NO_EXCEPTIONS))
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) ||      \
+     defined(__clang__) ||                                                     \
+     (defined(_MSC_VER) && (_MSC_VER >= 1900)) &&                              \
+         !defined(BOOST_NO_EXCEPTIONS))
 #define SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT 1
 #else
 #define SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT 0
@@ -121,28 +125,31 @@
 #define SILICIUM_NORETURN __attribute__((__noreturn__))
 #endif
 
-#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || defined(__clang__) ||                       \
-    (defined(_MSC_VER) && (_MSC_VER >= 1900))
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) ||     \
+    defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
 #define SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER 1
 #else
 #define SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER 0
 #endif
 
-#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) && SILICIUM_COMPILER_CXX14) ||                  \
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408) &&      \
+     SILICIUM_COMPILER_CXX14) ||                                               \
     defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
 #define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 1
 #else
 #define SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE 0
 #endif
 
-#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 409) && SILICIUM_COMPILER_CXX14) ||                  \
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 409) &&      \
+     SILICIUM_COMPILER_CXX14) ||                                               \
     (defined(_MSC_VER) && (_MSC_VER >= 1900))
 #define SILICIUM_COMPILER_HAS_DECLTYPE_AUTO 1
 #else
 #define SILICIUM_COMPILER_HAS_DECLTYPE_AUTO 0
 #endif
 
-#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
+#if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) ||     \
+    (defined(_MSC_VER) && (_MSC_VER >= 1900))
 #define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 1
 #else
 #define SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE 0
@@ -154,15 +161,16 @@
 #define SILICIUM_CAPTURE_EXPRESSION(name, value) name
 #endif
 
-#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && (__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||          \
+#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && (__GNUC__) &&                  \
+        (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||                        \
     defined(__clang__) || defined(_MSC_VER)
 #define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 1
 #else
 #define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 0
 #endif
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) || defined(__clang__) ||                         \
-    (defined(_MSC_VER) && (_MSC_VER >= 1800))
+#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||       \
+    defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1800))
 #define SILICIUM_COMPILER_HAS_USING 1
 #else
 #define SILICIUM_COMPILER_HAS_USING 0
@@ -183,26 +191,26 @@
 #ifdef BOOST_DELETED_FUNCTION
 #define SILICIUM_DELETED_FUNCTION BOOST_DELETED_FUNCTION
 #else
-#define SILICIUM_DELETED_FUNCTION(f)                                                                                   \
+#define SILICIUM_DELETED_FUNCTION(f)                                           \
 	\
-private:                                                                                                               \
+private:                                                                       \
 	f;
 #endif
 
-#define SILICIUM_DISABLE_COPY(struct_name)                                                                             \
-	SILICIUM_DELETED_FUNCTION(struct_name(struct_name const &))                                                        \
+#define SILICIUM_DISABLE_COPY(struct_name)                                     \
+	SILICIUM_DELETED_FUNCTION(struct_name(struct_name const &))                \
 	SILICIUM_DELETED_FUNCTION(struct_name &operator=(struct_name const &))
 
-#define SILICIUM_DEFAULT_NOEXCEPT_MOVE(struct_name)                                                                    \
-	struct_name(struct_name &&) BOOST_NOEXCEPT = default;                                                              \
+#define SILICIUM_DEFAULT_NOEXCEPT_MOVE(struct_name)                            \
+	struct_name(struct_name &&) BOOST_NOEXCEPT = default;                      \
 	struct_name &operator=(struct_name &&) BOOST_NOEXCEPT = default;
 
-#define SILICIUM_DEFAULT_MOVE(struct_name)                                                                             \
-	struct_name(struct_name &&) = default;                                                                             \
+#define SILICIUM_DEFAULT_MOVE(struct_name)                                     \
+	struct_name(struct_name &&) = default;                                     \
 	struct_name &operator=(struct_name &&) = default;
 
-#define SILICIUM_DEFAULT_COPY(struct_name)                                                                             \
-	struct_name(struct_name const &) = default;                                                                        \
+#define SILICIUM_DEFAULT_COPY(struct_name)                                     \
+	struct_name(struct_name const &) = default;                                \
 	struct_name &operator=(struct_name const &) = default;
 
 #ifdef _MSC_VER
@@ -211,7 +219,8 @@ private:                                                                        
 #define SILICIUM_DEPRECATED __attribute__((deprecated))
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ <= 4) && (__GNUC__ < 4 || __GNUC_MINOR__ <= 6)
+#if defined(__GNUC__) && (__GNUC__ <= 4) &&                                    \
+    (__GNUC__ < 4 || __GNUC_MINOR__ <= 6)
 #define SILICIUM_OVERRIDE
 #define SILICIUM_FINAL
 #else
@@ -228,11 +237,14 @@ private:                                                                        
 // TODO
 #define SILICIUM_CXX14_CONSTEXPR
 
-#define SILICIUM_IF(condition, value) BOOST_PP_IF(condition, value, BOOST_PP_EMPTY())
-#define SILICIUM_IF_NOT(condition, value) BOOST_PP_IF(condition, BOOST_PP_EMPTY(), value)
+#define SILICIUM_IF(condition, value)                                          \
+	BOOST_PP_IF(condition, value, BOOST_PP_EMPTY())
+#define SILICIUM_IF_NOT(condition, value)                                      \
+	BOOST_PP_IF(condition, BOOST_PP_EMPTY(), value)
 
-#define SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(should_be_rvalue)                                            \
-	BOOST_PP_IF(SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER, (should_be_rvalue), std::move((should_be_rvalue)))
+#define SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(should_be_rvalue)    \
+	BOOST_PP_IF(SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER,                   \
+	            (should_be_rvalue), std::move((should_be_rvalue)))
 
 namespace Si
 {
@@ -274,7 +286,8 @@ namespace Si
 	template <class T, class A0, class A1>
 	std::unique_ptr<T> make_unique(A0 &&a0, A1 &&a1)
 	{
-		return std::unique_ptr<T>(new T(std::forward<A0>(a0), std::forward<A1>(a1)));
+		return std::unique_ptr<T>(
+		    new T(std::forward<A0>(a0), std::forward<A1>(a1)));
 	}
 #endif // SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 
@@ -285,7 +298,8 @@ namespace Si
 	{
 // TODO: check that the cast makes sense
 #ifdef __GNUC__
-		// silence Warnung: ISO C++ forbids casting between pointer-to-function and pointer-to-object [enabled by
+		// silence Warnung: ISO C++ forbids casting between pointer-to-function
+		// and pointer-to-object [enabled by
 		// default]
 		__extension__
 #endif

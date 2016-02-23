@@ -14,9 +14,9 @@ namespace Si
 	template <class RangeObservable>
 	struct enumerated_element
 	{
-		typedef
-		    typename std::decay<decltype(*boost::begin(std::declval<typename RangeObservable::element_type>()))>::type
-		        type;
+		typedef typename std::decay<decltype(*boost::begin(
+		    std::declval<typename RangeObservable::element_type>()))>::type
+		    type;
 	};
 
 	template <class RangeObservable>
@@ -62,8 +62,9 @@ namespace Si
 			receiver_ = receiver.get();
 			if (buffered.empty())
 			{
-				input.async_get_one(
-				    Si::observe_by_ref(static_cast<observer<typename RangeObservable::element_type> &>(*this)));
+				input.async_get_one(Si::observe_by_ref(
+				    static_cast<observer<typename RangeObservable::element_type>
+				                    &>(*this)));
 			}
 			else
 			{
@@ -100,7 +101,8 @@ namespace Si
 		{
 			auto element = std::move(buffered.front());
 			buffered.pop();
-			return exchange(receiver_, nullptr)->got_element(std::move(element));
+			return exchange(receiver_, nullptr)
+			    ->got_element(std::move(element));
 		}
 
 		SILICIUM_DELETED_FUNCTION(enumerator(enumerator const &))
@@ -108,9 +110,11 @@ namespace Si
 	};
 
 	template <class RangeObservable>
-	auto enumerate(RangeObservable &&ranges) -> enumerator<typename std::decay<RangeObservable>::type>
+	auto enumerate(RangeObservable &&ranges)
+	    -> enumerator<typename std::decay<RangeObservable>::type>
 	{
-		return enumerator<typename std::decay<RangeObservable>::type>(std::forward<RangeObservable>(ranges));
+		return enumerator<typename std::decay<RangeObservable>::type>(
+		    std::forward<RangeObservable>(ranges));
 	}
 }
 

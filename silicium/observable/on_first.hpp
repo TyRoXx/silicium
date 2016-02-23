@@ -28,7 +28,8 @@ namespace Si
 		Input m_input;
 		Handler m_handler;
 
-		virtual void got_element(typename Input::element_type value) SILICIUM_OVERRIDE
+		virtual void
+		got_element(typename Input::element_type value) SILICIUM_OVERRIDE
 		{
 			std::move(m_handler)(std::move(value));
 		}
@@ -42,10 +43,12 @@ namespace Si
 	template <class Input, class Handler>
 	auto on_first(Input &&input, Handler &&handle_element)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>
+	    -> on_first_observable<typename std::decay<Input>::type,
+	                           typename std::decay<Handler>::type>
 #endif
 	{
-		return on_first_observable<typename std::decay<Input>::type, typename std::decay<Handler>::type>(
+		return on_first_observable<typename std::decay<Input>::type,
+		                           typename std::decay<Handler>::type>(
 		    std::forward<Input>(input), std::forward<Handler>(handle_element));
 	}
 }

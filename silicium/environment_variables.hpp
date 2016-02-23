@@ -10,7 +10,8 @@
 namespace Si
 {
 	SILICIUM_USE_RESULT
-	inline boost::system::error_code set_environment_variable(os_c_string key, os_c_string value)
+	inline boost::system::error_code set_environment_variable(os_c_string key,
+	                                                          os_c_string value)
 	{
 #ifdef _WIN32
 		if (!SetEnvironmentVariableW(key.c_str(), value.c_str()))

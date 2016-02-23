@@ -23,7 +23,9 @@ namespace Si
 	template <class ObserverPtr>
 	struct any_ptr_observer
 	{
-		typedef typename std::decay<decltype(*std::declval<ObserverPtr>())>::type observer_type;
+		typedef
+		    typename std::decay<decltype(*std::declval<ObserverPtr>())>::type
+		        observer_type;
 		typedef typename observer_type::element_type element_type;
 
 		any_ptr_observer()
@@ -119,7 +121,8 @@ namespace Si
 	    -> virtualized_observer<typename std::decay<Observer>::type>
 #endif
 	{
-		return virtualized_observer<typename std::decay<Observer>::type>(std::forward<Observer>(original));
+		return virtualized_observer<typename std::decay<Observer>::type>(
+		    std::forward<Observer>(original));
 	}
 
 	template <class Observer, class OtherObserver>

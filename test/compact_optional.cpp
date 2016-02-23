@@ -85,7 +85,8 @@ namespace Si
 	};
 
 	template <class Policy>
-	bool operator==(compact_optional<Policy> const &left, compact_optional<Policy> const &right)
+	bool operator==(compact_optional<Policy> const &left,
+	                compact_optional<Policy> const &right)
 	{
 		if (left)
 		{
@@ -106,7 +107,8 @@ namespace Si
 	}
 
 	template <class Policy>
-	bool operator==(compact_optional<Policy> const &left, typename Policy::value_type const &right)
+	bool operator==(compact_optional<Policy> const &left,
+	                typename Policy::value_type const &right)
 	{
 		if (left)
 		{
@@ -116,7 +118,8 @@ namespace Si
 	}
 
 	template <class Policy>
-	bool operator==(typename Policy::value_type const &left, compact_optional<Policy> const &right)
+	bool operator==(typename Policy::value_type const &left,
+	                compact_optional<Policy> const &right)
 	{
 		if (right)
 		{
@@ -138,7 +141,8 @@ namespace Si
 	}
 
 	template <class Policy>
-	bool operator!=(compact_optional<Policy> const &left, compact_optional<Policy> const &right)
+	bool operator!=(compact_optional<Policy> const &left,
+	                compact_optional<Policy> const &right)
 	{
 		return !(left == right);
 	}
@@ -156,7 +160,8 @@ namespace Si
 	}
 
 	template <class Policy>
-	std::ostream &operator<<(std::ostream &out, compact_optional<Policy> const &value)
+	std::ostream &operator<<(std::ostream &out,
+	                         compact_optional<Policy> const &value)
 	{
 		if (value)
 		{
@@ -214,8 +219,10 @@ namespace Si
 	typedef compact_optional<positive_number<boost::int32_t>> optional_int31;
 	BOOST_STATIC_ASSERT(sizeof(optional_int31) == sizeof(boost::uint32_t));
 
-	typedef compact_optional<non_empty_string<noexcept_string>> optional_non_empty_string;
-	BOOST_STATIC_ASSERT(sizeof(optional_non_empty_string) == sizeof(noexcept_string));
+	typedef compact_optional<non_empty_string<noexcept_string>>
+	    optional_non_empty_string;
+	BOOST_STATIC_ASSERT(sizeof(optional_non_empty_string) ==
+	                    sizeof(noexcept_string));
 
 #if SILICIUM_COMPILER_HAS_USING
 	template <class Pointee>

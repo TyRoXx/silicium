@@ -20,9 +20,11 @@ namespace Si
 	{
 		typedef typename std::decay<Input>::type::element_type element;
 #ifdef _MSC_VER
-		// VC++ cannot capture arbitrary lambda closures by value, but we can work around this
+		// VC++ cannot capture arbitrary lambda closures by value, but we can
+		// work around this
 		// limitation by wrapping the closure in a std::function.
-		std::function<void(element)> handle_element_capture(std::forward<Handler>(handle_element));
+		std::function<void(element)> handle_element_capture(
+		    std::forward<Handler>(handle_element));
 #else
 		auto &&handle_element_capture = handle_element;
 #endif
@@ -30,7 +32,8 @@ namespace Si
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		    erase_unique
 #endif
-		    (transform(std::forward<Input>(input), [handle_element_capture](element value) -> unit
+		    (transform(std::forward<Input>(input),
+		               [handle_element_capture](element value) -> unit
 		               {
 			               handle_element_capture(std::move(value));
 			               return unit();

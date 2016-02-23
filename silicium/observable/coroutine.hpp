@@ -4,9 +4,9 @@
 #include <silicium/config.hpp>
 #include <silicium/observable/yield_context.hpp>
 
-#define SILICIUM_HAS_COROUTINE_OBSERVABLE                                                                              \
-	((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_YIELD_CONTEXT &&                             \
-	 !SILICIUM_AVOID_BOOST_COROUTINE)
+#define SILICIUM_HAS_COROUTINE_OBSERVABLE                                      \
+	((BOOST_VERSION >= 105300) && SILICIUM_HAS_EXCEPTIONS &&                   \
+	 SILICIUM_HAS_YIELD_CONTEXT && !SILICIUM_AVOID_BOOST_COROUTINE)
 
 #if SILICIUM_HAS_COROUTINE_OBSERVABLE
 
@@ -24,9 +24,11 @@ namespace Si
 		struct coroutine_yield_context : basic_yield_context
 		{
 #if BOOST_VERSION >= 105500
-			typedef boost::coroutines::coroutine<observable_type *>::push_type consumer_type;
+			typedef boost::coroutines::coroutine<observable_type *>::push_type
+			    consumer_type;
 #else
-			typedef boost::coroutines::coroutine<observable_type *()>::caller_type consumer_type;
+			typedef boost::coroutines::coroutine<
+			    observable_type *()>::caller_type consumer_type;
 #endif
 
 			explicit coroutine_yield_context(consumer_type &consumer)
@@ -77,14 +79,16 @@ namespace Si
 			return *this;
 		}
 
-		void async_get_one(Si::ptr_observer<Si::observer<element_type>> receiver)
+		void
+		async_get_one(Si::ptr_observer<Si::observer<element_type>> receiver)
 		{
 			receiver_ = receiver.get();
 			next();
 		}
 
 	private:
-		typedef Observable<unit, ptr_observer<observer<unit>>>::interface *command_type;
+		typedef Observable<unit, ptr_observer<observer<unit>>>::interface *
+		    command_type;
 		typedef
 #if BOOST_VERSION >= 105500
 		    typename boost::coroutines::coroutine<command_type>::pull_type
@@ -135,18 +139,21 @@ namespace Si
 				new_state->coro_ = std::make_shared<coroutine_type>(
 				    [bound_action, this](
 #if BOOST_VERSION >= 105500
-				        typename boost::coroutines::coroutine<command_type>::push_type
+				        typename boost::coroutines::coroutine<
+				            command_type>::push_type
 #else
 				        typename coroutine_type::caller_type
 #endif
 				            &push)
 				    {
 					    detail::coroutine_yield_context yield_impl(push);
-					    yield_context yield(yield_impl); // TODO: save this indirection
+					    yield_context yield(
+					        yield_impl); // TODO: save this indirection
 					    auto result = bound_action(yield);
 					    assert(!state->has_finished);
 					    state->has_finished = true;
-					    Si::exchange(receiver_, nullptr)->got_element(std::move(result));
+					    Si::exchange(receiver_, nullptr)
+					        ->got_element(std::move(result));
 					});
 			}
 			else if (*state->coro_)
@@ -164,7 +171,8 @@ namespace Si
 			if (*state->coro_)
 			{
 				command_type command = state->coro_->get();
-				command->async_get_one(observe_by_ref(static_cast<observer<unit> &>(*this)));
+				command->async_get_one(
+				    observe_by_ref(static_cast<observer<unit> &>(*this)));
 			}
 			else
 			{
@@ -172,18 +180,21 @@ namespace Si
 			}
 		}
 
-		SILICIUM_DELETED_FUNCTION(coroutine_observable(coroutine_observable const &))
-		SILICIUM_DELETED_FUNCTION(coroutine_observable &operator=(coroutine_observable const &))
+		SILICIUM_DELETED_FUNCTION(
+		    coroutine_observable(coroutine_observable const &))
+		SILICIUM_DELETED_FUNCTION(
+		    coroutine_observable &operator=(coroutine_observable const &))
 	};
 
 	template <class Action>
 	auto make_coroutine(Action &&action)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>
+	    -> coroutine_observable<
+	        decltype(std::declval<Action>()(std::declval<yield_context>()))>
 #endif
 	{
-		return coroutine_observable<decltype(std::declval<Action>()(std::declval<yield_context>()))>(
-		    std::forward<Action>(action));
+		return coroutine_observable<decltype(std::declval<Action>()(
+		    std::declval<yield_context>()))>(std::forward<Action>(action));
 	}
 }
 

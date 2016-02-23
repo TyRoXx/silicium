@@ -7,7 +7,9 @@
 #if SILICIUM_HAS_FUTURE
 
 // asio::spawn should be immediately resumable since 1.58
-#define SILICIUM_TEST_SPAWN ((BOOST_VERSION >= 105800) && SILICIUM_HAS_EXCEPTIONS && !SILICIUM_AVOID_BOOST_COROUTINE)
+#define SILICIUM_TEST_SPAWN                                                    \
+	((BOOST_VERSION >= 105800) && SILICIUM_HAS_EXCEPTIONS &&                   \
+	 !SILICIUM_AVOID_BOOST_COROUTINE)
 
 #if SILICIUM_TEST_SPAWN
 #include <boost/asio/spawn.hpp>
@@ -21,7 +23,8 @@ BOOST_AUTO_TEST_CASE(future_default_constructor)
 
 BOOST_AUTO_TEST_CASE(ready_future)
 {
-	Si::future<int, Si::single_threaded> f = Si::make_ready_future<Si::single_threaded>(5);
+	Si::future<int, Si::single_threaded> f =
+	    Si::make_ready_future<Si::single_threaded>(5);
 	BOOST_CHECK(f.valid());
 	boost::asio::io_service io;
 	bool got_result = false;
@@ -98,12 +101,13 @@ BOOST_AUTO_TEST_CASE(promise_late_in_thread)
 	Si::promise<int, Si::multi_threaded> p;
 	Si::future<int, Si::multi_threaded> f = p.get_future();
 	std::atomic<bool> once(false);
-	std::future<void> background_job = std::async(std::launch::async, [&once, &f]()
-	                                              {
-		                                              int result = f.async_get(Si::asio::block_thread);
-		                                              BOOST_REQUIRE(!once.exchange(true));
-		                                              BOOST_CHECK_EQUAL(23, result);
-		                                          });
+	std::future<void> background_job =
+	    std::async(std::launch::async, [&once, &f]()
+	               {
+		               int result = f.async_get(Si::asio::block_thread);
+		               BOOST_REQUIRE(!once.exchange(true));
+		               BOOST_CHECK_EQUAL(23, result);
+		           });
 	BOOST_REQUIRE(!once.load());
 	p.set_value(23);
 	background_job.get();
@@ -113,7 +117,8 @@ BOOST_AUTO_TEST_CASE(promise_late_in_thread)
 #if SILICIUM_TEST_SPAWN
 BOOST_AUTO_TEST_CASE(future_async_wait_in_asio_spawn)
 {
-	Si::future<int, Si::single_threaded> f = Si::make_ready_future<Si::single_threaded>(5);
+	Si::future<int, Si::single_threaded> f =
+	    Si::make_ready_future<Si::single_threaded>(5);
 	boost::asio::io_service io;
 	bool got_result = false;
 	boost::asio::spawn(io, [&got_result, &f](boost::asio::yield_context yield)

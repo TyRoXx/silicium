@@ -12,7 +12,8 @@ void sleep(boost::asio::io_service &io, YieldContext &&yield, Duration duration)
 	auto timer = Si::asio::make_timer(io);
 	timer.expires_from_now(duration);
 	// TODO: use the call operator instead of a get_one method?
-	Si::optional<Si::asio::timer_elapsed> result = yield.get_one(Si::ref(timer));
+	Si::optional<Si::asio::timer_elapsed> result =
+	    yield.get_one(Si::ref(timer));
 	// TODO: this should work without the optional wrapper
 	assert(result);
 }

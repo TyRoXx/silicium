@@ -14,7 +14,8 @@ namespace Si
 			{
 			}
 
-			boost::system::error_code operator()(boost::system::error_code error, identity<void>) const
+			boost::system::error_code
+			operator()(boost::system::error_code error, identity<void>) const
 			{
 				return error;
 			}
@@ -27,12 +28,14 @@ namespace Si
 			}
 
 			template <class Result>
-			Result operator()(boost::system::error_code error, identity<Result>) const
+			Result operator()(boost::system::error_code error,
+			                  identity<Result>) const
 			{
 				throw_error(error);
 			}
 
-			void operator()(boost::system::error_code error, identity<void>) const
+			void operator()(boost::system::error_code error,
+			                identity<void>) const
 			{
 				if (!error)
 				{
@@ -49,7 +52,8 @@ namespace Si
 			}
 
 			template <class Result>
-			error_or<Result> operator()(boost::system::error_code error, identity<Result>) const
+			error_or<Result> operator()(boost::system::error_code error,
+			                            identity<Result>) const
 			{
 				return error;
 			}

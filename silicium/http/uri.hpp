@@ -63,8 +63,10 @@ namespace Si
 			UriParserStateA parser;
 			UriUriA parsed;
 			parser.uri = &parsed;
-			std::unique_ptr<UriUriA, detail::uri_deleter> const parsed_clean_up(&parsed);
-			int const rc = uriParseUriExA(&parser, encoded.begin(), encoded.end());
+			std::unique_ptr<UriUriA, detail::uri_deleter> const parsed_clean_up(
+			    &parsed);
+			int const rc =
+			    uriParseUriExA(&parser, encoded.begin(), encoded.end());
 			if (rc != URI_SUCCESS)
 			{
 				return none;
@@ -82,15 +84,19 @@ namespace Si
 
 		typedef std::pair<std::string, optional<std::string>> html_query_pair;
 
-		inline optional<std::vector<html_query_pair>> parse_html_query(iterator_range<char const *> encoded_query)
+		inline optional<std::vector<html_query_pair>>
+		parse_html_query(iterator_range<char const *> encoded_query)
 		{
 			UriQueryListA *pairs = nullptr;
 			int pair_count = 0;
-			if (uriDissectQueryMallocA(&pairs, &pair_count, encoded_query.begin(), encoded_query.end()) != URI_SUCCESS)
+			if (uriDissectQueryMallocA(&pairs, &pair_count,
+			                           encoded_query.begin(),
+			                           encoded_query.end()) != URI_SUCCESS)
 			{
 				return none;
 			}
-			std::unique_ptr<UriQueryListA, detail::query_list_deleter> const pairs_clean_up(pairs);
+			std::unique_ptr<UriQueryListA, detail::query_list_deleter> const
+			    pairs_clean_up(pairs);
 			std::vector<html_query_pair> converted_pairs;
 			converted_pairs.reserve(static_cast<size_t>(pair_count));
 			for (UriQueryListA *p = pairs; p; p = p->next)

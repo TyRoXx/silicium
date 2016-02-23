@@ -13,20 +13,25 @@
 namespace
 {
 	template <class PathPredicate, class PathHandler>
-	void generate_sources_recursively(boost::filesystem::path const &sources, boost::filesystem::path const &headers,
-	                                  boost::filesystem::path const &relative_include_path,
-	                                  PathPredicate const &is_relevant_directory, PathHandler const &on_include)
+	void generate_sources_recursively(
+	    boost::filesystem::path const &sources,
+	    boost::filesystem::path const &headers,
+	    boost::filesystem::path const &relative_include_path,
+	    PathPredicate const &is_relevant_directory,
+	    PathHandler const &on_include)
 	{
-		for (boost::filesystem::directory_iterator i(headers); i != boost::filesystem::directory_iterator(); ++i)
+		for (boost::filesystem::directory_iterator i(headers);
+		     i != boost::filesystem::directory_iterator(); ++i)
 		{
 			switch (i->status().type())
 			{
 			case boost::filesystem::directory_file:
 				if (is_relevant_directory(i->path()))
 				{
-					generate_sources_recursively(sources / i->path().leaf(), i->path(),
-					                             relative_include_path / i->path().leaf(), is_relevant_directory,
-					                             on_include);
+					generate_sources_recursively(
+					    sources / i->path().leaf(), i->path(),
+					    relative_include_path / i->path().leaf(),
+					    is_relevant_directory, on_include);
 				}
 				break;
 
@@ -34,17 +39,23 @@ namespace
 			{
 				boost::filesystem::path const header_full = i->path();
 				boost::filesystem::path const header_leaf = header_full.leaf();
-				boost::filesystem::path const header_extension = header_leaf.extension();
+				boost::filesystem::path const header_extension =
+				    header_leaf.extension();
 				if (header_extension != ".hpp")
 				{
 					break;
 				}
-				boost::filesystem::path const header_no_extension = header_leaf.stem();
+				boost::filesystem::path const header_no_extension =
+				    header_leaf.stem();
 				boost::filesystem::create_directories(sources);
-				boost::filesystem::path const source = sources / (header_no_extension.string() + ".cpp");
+				boost::filesystem::path const source =
+				    sources / (header_no_extension.string() + ".cpp");
 				std::string header_name =
 				    "<silicium/" +
-				    boost::algorithm::replace_all_copy((relative_include_path / header_leaf).string(), "\\", "/") + ">";
+				    boost::algorithm::replace_all_copy(
+				        (relative_include_path / header_leaf).string(), "\\",
+				        "/") +
+				    ">";
 				on_include(header_name);
 				if (boost::filesystem::exists(source))
 				{
@@ -53,17 +64,25 @@ namespace
 				std::ofstream source_file(source.string());
 				if (!source_file)
 				{
-					throw std::runtime_error("Cannot open file " + source.string());
+					throw std::runtime_error("Cannot open file " +
+					                         source.string());
 				}
 				source_file << "#include " << header_name << "\n";
-				source_file << "#ifdef _MSC_VER\nnamespace {\n\t//\"This object file does not define any previously "
-				               "undefined public symbols, so it will not be used by any link operation that consumes "
-				               "this library\"\n"
-				               "\tint dummy_to_avoid_msvc_linker_warning_LNK4221;\n}\n#endif\n";
+				source_file
+				    << "#ifdef _MSC_VER\nnamespace {\n\t//\"This object file "
+				       "does not define any previously "
+				       "undefined public symbols, so it will not be used by "
+				       "any "
+				       "link operation that consumes "
+				       "this library\"\n"
+				       "\tint "
+				       "dummy_to_avoid_msvc_linker_warning_LNK4221;\n}\n#"
+				       "endif\n";
 				source_file.flush();
 				if (!source_file)
 				{
-					throw std::runtime_error("Could not write to " + source.string());
+					throw std::runtime_error("Could not write to " +
+					                         source.string());
 				}
 				break;
 			}
@@ -78,9 +97,11 @@ namespace
 int main()
 {
 	boost::filesystem::path const this_source_file = __FILE__;
-	boost::filesystem::path const test_includes_root = this_source_file.parent_path();
+	boost::filesystem::path const test_includes_root =
+	    this_source_file.parent_path();
 	boost::filesystem::path const sources_root = test_includes_root / "sources";
-	boost::filesystem::path const headers_root = test_includes_root.parent_path() / "silicium";
+	boost::filesystem::path const headers_root =
+	    test_includes_root.parent_path() / "silicium";
 	std::string const linux_system_name = "linux";
 	std::string const windows_system_name = "win32";
 	std::string const current_system_name =
@@ -98,7 +119,8 @@ int main()
 #endif
 	blacklist.erase(current_system_name);
 	blacklist.insert("delegator");
-	auto const is_relevant_directory = [&blacklist](boost::filesystem::path const &dir)
+	auto const is_relevant_directory =
+	    [&blacklist](boost::filesystem::path const &dir)
 	{
 		return blacklist.count(dir.leaf().string()) == 0;
 	};
@@ -109,13 +131,16 @@ int main()
 		// sort the headers by name for a deterministic ordering
 		all_headers.insert(header_name);
 	};
-	generate_sources_recursively(sources_root, headers_root, "", is_relevant_directory, add_header);
+	generate_sources_recursively(
+	    sources_root, headers_root, "", is_relevant_directory, add_header);
 
-	auto const all_headers_file_name = sources_root / current_system_name / "_all_headers_.cpp";
+	auto const all_headers_file_name =
+	    sources_root / current_system_name / "_all_headers_.cpp";
 	std::ofstream all_headers_file(all_headers_file_name.string());
 	if (!all_headers_file)
 	{
-		throw std::runtime_error("Cannot open file " + all_headers_file_name.string());
+		throw std::runtime_error("Cannot open file " +
+		                         all_headers_file_name.string());
 	}
 	for (std::string const &header_name : all_headers)
 	{

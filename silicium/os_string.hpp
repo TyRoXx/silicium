@@ -53,13 +53,16 @@ namespace Si
 #ifdef _WIN32
 	namespace win32
 	{
-		inline winapi_string utf8_to_winapi_string(char const *original, size_t length)
+		inline winapi_string utf8_to_winapi_string(char const *original,
+		                                           size_t length)
 		{
 			if (length > static_cast<size_t>((std::numeric_limits<int>::max)()))
 			{
-				throw std::invalid_argument("Input string is too long for WinAPI");
+				throw std::invalid_argument(
+				    "Input string is too long for WinAPI");
 			}
-			int const output_size = MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), nullptr, 0);
+			int const output_size = MultiByteToWideChar(
+			    CP_UTF8, 0, original, static_cast<int>(length), nullptr, 0);
 			assert(output_size >= 0);
 			if ((length > 0) && (output_size == 0))
 			{
@@ -69,12 +72,15 @@ namespace Si
 			result.resize(static_cast<size_t>(output_size));
 			if (!result.empty())
 			{
-				MultiByteToWideChar(CP_UTF8, 0, original, static_cast<int>(length), &result[0], output_size);
+				MultiByteToWideChar(CP_UTF8, 0, original,
+				                    static_cast<int>(length), &result[0],
+				                    output_size);
 			}
 			return result;
 		}
 
-		inline noexcept_string to_utf8_string(wchar_t const *utf16, size_t length)
+		inline noexcept_string to_utf8_string(wchar_t const *utf16,
+		                                      size_t length)
 		{
 			if (length == 0)
 			{
@@ -83,18 +89,21 @@ namespace Si
 			}
 			if (length > static_cast<size_t>((std::numeric_limits<int>::max)()))
 			{
-				throw std::invalid_argument("Input string is too long for WinAPI");
+				throw std::invalid_argument(
+				    "Input string is too long for WinAPI");
 			}
 			int const destination_length =
-			    WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), nullptr, 0, 0, FALSE);
+			    WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length),
+			                        nullptr, 0, 0, FALSE);
 			if (!destination_length)
 			{
 				throw_last_error();
 			}
 			std::string result;
 			result.resize(destination_length);
-			if (!WideCharToMultiByte(CP_UTF8, 0, utf16, static_cast<int>(length), &result.front(), destination_length,
-			                         0, FALSE))
+			if (!WideCharToMultiByte(CP_UTF8, 0, utf16,
+			                         static_cast<int>(length), &result.front(),
+			                         destination_length, 0, FALSE))
 			{
 				throw_last_error();
 			}

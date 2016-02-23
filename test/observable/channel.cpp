@@ -36,7 +36,8 @@ namespace Si
 		{
 			typedef Message element_type;
 
-			explicit channel_receiving_end(channel_common_state<Message, Lockable> &state)
+			explicit channel_receiving_end(
+			    channel_common_state<Message, Lockable> &state)
 			    : state(&state)
 			{
 			}
@@ -48,7 +49,8 @@ namespace Si
 				if (state->message)
 				{
 					auto *const message = Si::exchange(state->message, nullptr);
-					auto *const delivery = Si::exchange(state->delivery, nullptr);
+					auto *const delivery =
+					    Si::exchange(state->delivery, nullptr);
 					lock.unlock();
 					receiver.got_element(std::move(*message));
 					delivery->got_element(delivered());
@@ -68,19 +70,22 @@ namespace Si
 		{
 			typedef delivered element_type;
 
-			explicit channel_sending_end(channel_common_state<Message, Lockable> &state)
+			explicit channel_sending_end(
+			    channel_common_state<Message, Lockable> &state)
 			    : state(&state)
 			{
 			}
 
-			void async_get_one(ptr_observer<observer<element_type>> receiver, Message &message)
+			void async_get_one(ptr_observer<observer<element_type>> receiver,
+			                   Message &message)
 			{
 				boost::unique_lock<Lockable> lock(state->access);
 				assert(!state->message);
 				assert(!state->delivery);
 				if (state->receiver)
 				{
-					auto *const message_receiver = Si::exchange(state->receiver, nullptr);
+					auto *const message_receiver =
+					    Si::exchange(state->receiver, nullptr);
 					lock.unlock();
 					message_receiver->got_element(std::move(message));
 					receiver.got_element(delivered());
@@ -113,22 +118,25 @@ namespace Si
 		void send(Message message, YieldContext &yield)
 		{
 			auto message_bound = make_function_observable<detail::delivered>(
-			    [this, &message](ptr_observer<observer<detail::delivered>> receiver)
+			    [this,
+			     &message](ptr_observer<observer<detail::delivered>> receiver)
 			    {
 				    return sending.async_get_one(receiver, message);
 				});
 			yield.get_one(message_bound);
 		}
 
-		typename Observable<Message, ptr_observer<observer<Message>>>::interface &receiver()
+		typename Observable<Message,
+		                    ptr_observer<observer<Message>>>::interface &
+		receiver()
 		{
 			return receiving;
 		}
 
 	private:
 		detail::channel_common_state<Message, mutex> state;
-		virtualized_observable<detail::channel_receiving_end<Message, mutex>, ptr_observer<observer<Message>>>
-		    receiving;
+		virtualized_observable<detail::channel_receiving_end<Message, mutex>,
+		                       ptr_observer<observer<Message>>> receiving;
 		detail::channel_sending_end<Message, mutex> sending;
 	};
 }
@@ -137,23 +145,25 @@ namespace Si
 BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 {
 	Si::channel<int> channel;
-	auto t = Si::make_coroutine_generator<int>([&channel](Si::push_context<int> &yield)
-	                                           {
-		                                           channel.send(2, yield);
-		                                           channel.send(3, yield);
-		                                       });
-	auto s = Si::make_coroutine_generator<int>([&channel](Si::push_context<int> &yield)
-	                                           {
-		                                           auto a = yield.get_one(channel.receiver());
-		                                           BOOST_REQUIRE(a);
-		                                           BOOST_CHECK_EQUAL(2, *a);
-		                                           auto b = yield.get_one(channel.receiver());
-		                                           BOOST_REQUIRE(b);
-		                                           BOOST_CHECK_EQUAL(3, *b);
-		                                           int result = *a + *b;
-		                                           BOOST_CHECK_EQUAL(5, result);
-		                                           yield(result);
-		                                       });
+	auto t = Si::make_coroutine_generator<int>(
+	    [&channel](Si::push_context<int> &yield)
+	    {
+		    channel.send(2, yield);
+		    channel.send(3, yield);
+		});
+	auto s = Si::make_coroutine_generator<int>(
+	    [&channel](Si::push_context<int> &yield)
+	    {
+		    auto a = yield.get_one(channel.receiver());
+		    BOOST_REQUIRE(a);
+		    BOOST_CHECK_EQUAL(2, *a);
+		    auto b = yield.get_one(channel.receiver());
+		    BOOST_REQUIRE(b);
+		    BOOST_CHECK_EQUAL(3, *b);
+		    int result = *a + *b;
+		    BOOST_CHECK_EQUAL(5, result);
+		    yield(result);
+		});
 	bool got = false;
 	auto consumer = Si::consume<int>([&s, &got](int result)
 	                                 {
@@ -171,23 +181,25 @@ BOOST_AUTO_TEST_CASE(channel_with_coroutine)
 BOOST_AUTO_TEST_CASE(channel_with_thread)
 {
 	Si::channel<int> channel;
-	auto t = Si::make_thread_generator<int, Si::std_threading>([&channel](Si::push_context<int> &yield)
-	                                                           {
-		                                                           channel.send(2, yield);
-		                                                           channel.send(3, yield);
-		                                                       });
-	auto s = Si::make_thread_generator<int, Si::std_threading>([&channel](Si::push_context<int> &yield)
-	                                                           {
-		                                                           auto a = yield.get_one(channel.receiver());
-		                                                           BOOST_REQUIRE(a);
-		                                                           BOOST_CHECK_EQUAL(2, *a);
-		                                                           auto b = yield.get_one(channel.receiver());
-		                                                           BOOST_REQUIRE(b);
-		                                                           BOOST_CHECK_EQUAL(3, *b);
-		                                                           int result = *a + *b;
-		                                                           BOOST_CHECK_EQUAL(5, result);
-		                                                           yield(result);
-		                                                       });
+	auto t = Si::make_thread_generator<int, Si::std_threading>(
+	    [&channel](Si::push_context<int> &yield)
+	    {
+		    channel.send(2, yield);
+		    channel.send(3, yield);
+		});
+	auto s = Si::make_thread_generator<int, Si::std_threading>(
+	    [&channel](Si::push_context<int> &yield)
+	    {
+		    auto a = yield.get_one(channel.receiver());
+		    BOOST_REQUIRE(a);
+		    BOOST_CHECK_EQUAL(2, *a);
+		    auto b = yield.get_one(channel.receiver());
+		    BOOST_REQUIRE(b);
+		    BOOST_CHECK_EQUAL(3, *b);
+		    int result = *a + *b;
+		    BOOST_CHECK_EQUAL(5, result);
+		    yield(result);
+		});
 	bool got = false;
 	auto consumer = Si::consume<int>([&s, &got](int result)
 	                                 {
@@ -207,38 +219,41 @@ BOOST_AUTO_TEST_CASE(channel_select)
 {
 	Si::channel<int> channel_1;
 	Si::channel<long> channel_2;
-	auto t = Si::make_thread_generator<long, Si::std_threading>([&](Si::push_context<long> &yield)
-	                                                            {
-		                                                            channel_1.send(2, yield);
-		                                                            channel_2.send(3L, yield);
-		                                                        });
+	auto t = Si::make_thread_generator<long, Si::std_threading>(
+	    [&](Si::push_context<long> &yield)
+	    {
+		    channel_1.send(2, yield);
+		    channel_2.send(3L, yield);
+		});
 	auto s = Si::make_thread_generator<long, Si::std_threading>(
 	    [&](Si::push_context<long> &yield)
 	    {
-		    auto both = Si::make_variant(Si::ref(channel_1.receiver()), Si::ref(channel_2.receiver()));
+		    auto both = Si::make_variant(
+		        Si::ref(channel_1.receiver()), Si::ref(channel_2.receiver()));
 		    boost::optional<Si::variant<int, long>> a = yield.get_one(both);
 		    BOOST_REQUIRE(a);
 		    boost::optional<Si::variant<int, long>> b = yield.get_one(both);
 		    BOOST_REQUIRE(b);
-		    long const result = Si::visit<long>(*a,
-		                                        [&b](int left)
-		                                        {
-			                                        return Si::visit<long>(*b,
-			                                                               [](int) -> long
-			                                                               {
-				                                                               BOOST_FAIL("wrong type");
-				                                                               SILICIUM_UNREACHABLE();
-				                                                           },
-			                                                               [left](long right)
-			                                                               {
-				                                                               return left + right;
-				                                                           });
-			                                    },
-		                                        [](long) -> long
-		                                        {
-			                                        BOOST_FAIL("wrong type");
-			                                        SILICIUM_UNREACHABLE();
-			                                    });
+		    long const result = Si::visit<long>(
+		        *a,
+		        [&b](int left)
+		        {
+			        return Si::visit<long>(*b,
+			                               [](int) -> long
+			                               {
+				                               BOOST_FAIL("wrong type");
+				                               SILICIUM_UNREACHABLE();
+				                           },
+			                               [left](long right)
+			                               {
+				                               return left + right;
+				                           });
+			    },
+		        [](long) -> long
+		        {
+			        BOOST_FAIL("wrong type");
+			        SILICIUM_UNREACHABLE();
+			    });
 		    BOOST_CHECK_EQUAL(5L, result);
 		    yield(result);
 		});

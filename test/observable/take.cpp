@@ -25,11 +25,12 @@ BOOST_AUTO_TEST_CASE(take_observable)
 
 	{
 		bool got_element = false;
-		auto consumer = Si::consume<int>([&got_element](int)
-		                                 {
-			                                 got_element = true;
-			                                 BOOST_FAIL("we do not expect any further elements");
-			                             });
+		auto consumer = Si::consume<int>(
+		    [&got_element](int)
+		    {
+			    got_element = true;
+			    BOOST_FAIL("we do not expect any further elements");
+			});
 		o.async_get_one(Si::observe_by_ref(consumer));
 		BOOST_CHECK(!got_element);
 	}

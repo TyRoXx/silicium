@@ -36,7 +36,8 @@ namespace Si
 
 		void start()
 		{
-			input.async_get_one(observe_by_ref(static_cast<observer<typename Input::element_type> &>(*this)));
+			input.async_get_one(observe_by_ref(
+			    static_cast<observer<typename Input::element_type> &>(*this)));
 		}
 
 		Input &get_input()
@@ -59,9 +60,11 @@ namespace Si
 	};
 
 	template <class Input>
-	auto make_total_consumer(Input &&input) -> total_consumer<typename std::decay<Input>::type>
+	auto make_total_consumer(Input &&input)
+	    -> total_consumer<typename std::decay<Input>::type>
 	{
-		return total_consumer<typename std::decay<Input>::type>(std::forward<Input>(input));
+		return total_consumer<typename std::decay<Input>::type>(
+		    std::forward<Input>(input));
 	}
 }
 
