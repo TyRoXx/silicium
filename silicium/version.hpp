@@ -2,7 +2,7 @@
 #define SILICIUM_VERSION_HPP
 
 #define SILICIUM_MAJOR_VERSION 0
-#define SILICIUM_MINOR_VERSION 7
+#define SILICIUM_MINOR_VERSION 8
 #define SILICIUM_PATCH_VERSION 0
 
 #define SILICIUM_MAKE_VERSION(major, minor, patch) ((((major * 100) + minor) * 100) + patch)
