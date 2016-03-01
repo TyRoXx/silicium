@@ -71,6 +71,23 @@ namespace Si
 			return bounded_int(possible_value);
 		}
 
+		template <class OtherInt, OtherInt OtherMinimum, OtherInt OtherMaximum>
+		static optional<bounded_int>
+		create(bounded_int<OtherInt, OtherMinimum, OtherMaximum> possible_value)
+		{
+			value_type minimum = Minimum;
+			if (possible_value.value() < minimum)
+			{
+				return none;
+			}
+			value_type maximum = Maximum;
+			if (possible_value.value() > maximum)
+			{
+				return none;
+			}
+			return bounded_int(static_cast<Int>(possible_value.value()));
+		}
+
 		template <Int Literal>
 		static bounded_int literal()
 		{

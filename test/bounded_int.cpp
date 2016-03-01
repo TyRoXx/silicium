@@ -108,3 +108,41 @@ BOOST_AUTO_TEST_CASE(bounded_int_narrow_failure)
 	Si::optional<Si::bounded_int<int, 1, 2>> out = in.narrow<1, 2>();
 	BOOST_CHECK_EQUAL(Si::none, out);
 }
+
+BOOST_AUTO_TEST_CASE(bounded_int_create_from_bounded_int_same_success)
+{
+	Si::bounded_int<std::int32_t, 0, 2> a =
+	    Si::bounded_int<std::int32_t, 0, 2>::literal<1>();
+	Si::optional<Si::bounded_int<std::int32_t, 0, 2>> b =
+	    Si::bounded_int<std::int32_t, 0, 2>::create(a);
+	BOOST_REQUIRE(b);
+	BOOST_CHECK_EQUAL(1, b->value());
+}
+
+BOOST_AUTO_TEST_CASE(bounded_int_create_from_bounded_int_same_fail)
+{
+	Si::bounded_int<std::int32_t, 0, 2> a =
+	    Si::bounded_int<std::int32_t, 0, 2>::literal<2>();
+	Si::optional<Si::bounded_int<std::int32_t, 0, 1>> b =
+	    Si::bounded_int<std::int32_t, 0, 1>::create(a);
+	BOOST_CHECK(!b);
+}
+
+BOOST_AUTO_TEST_CASE(bounded_int_create_from_bounded_int_different_success)
+{
+	Si::bounded_int<std::int64_t, 0, 2> a =
+	    Si::bounded_int<std::int64_t, 0, 2>::literal<1>();
+	Si::optional<Si::bounded_int<std::int32_t, -1, 3>> b =
+	    Si::bounded_int<std::int32_t, -1, 3>::create(a);
+	BOOST_REQUIRE(b);
+	BOOST_CHECK_EQUAL(1, b->value());
+}
+
+BOOST_AUTO_TEST_CASE(bounded_int_create_from_bounded_int_different_fail)
+{
+	Si::bounded_int<std::int64_t, 0, 2> a =
+	    Si::bounded_int<std::int64_t, 0, 2>::literal<2>();
+	Si::optional<Si::bounded_int<std::int32_t, -1, 1>> b =
+	    Si::bounded_int<std::int32_t, -1, 1>::create(a);
+	BOOST_CHECK(!b);
+}
