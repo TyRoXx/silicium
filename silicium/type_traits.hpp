@@ -2,6 +2,7 @@
 #define SILICIUM_TYPE_TRAITS_HPP
 
 #include <silicium/config.hpp>
+#include <memory>
 #include <boost/static_assert.hpp>
 #if BOOST_VERSION >= 105700
 #include <boost/type_traits/is_copy_assignable.hpp>

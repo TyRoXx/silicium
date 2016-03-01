@@ -1,13 +1,10 @@
 #ifndef SILICIUM_CONFIG_HPP
 #define SILICIUM_CONFIG_HPP
 
-#include <memory>
-#include <stdexcept>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
-#include <boost/static_assert.hpp>
 
 #if defined(__GNUC__)
 #define SILICIUM_GCC ((__GNUC__ * 100) + __GNUC_MINOR__)
@@ -276,10 +273,6 @@ namespace Si
 }
 
 #define SILICIUM_COMPILER_HAS_FUTURE (SILICIUM_GCC || SILICIUM_VC2012_OR_LATER)
-
-#if SILICIUM_HAS_EXCEPTIONS && SILICIUM_COMPILER_HAS_FUTURE
-#include <future>
-#endif
 
 namespace Si
 {

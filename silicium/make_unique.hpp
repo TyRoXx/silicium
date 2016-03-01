@@ -2,6 +2,7 @@
 #define SILICIUM_MAKE_UNIQUE_HPP
 
 #include <silicium/config.hpp>
+#include <memory>
 
 namespace Si
 {

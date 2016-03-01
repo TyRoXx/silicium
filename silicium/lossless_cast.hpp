@@ -2,6 +2,7 @@
 #define SILICIUM_LOSSLESS_CAST_PP
 
 #include <silicium/config.hpp>
+#include <boost/static_assert.hpp>
 
 namespace Si
 {
