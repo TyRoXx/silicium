@@ -4,7 +4,7 @@
 #include <silicium/asio/socket_source.hpp>
 #include <silicium/source/virtualized_source.hpp>
 #include <silicium/source/buffering_source.hpp>
-#include <silicium/config.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/sink/ptr_sink.hpp>
 #include <silicium/sink/append.hpp>
 #include <silicium/sink/buffering_sink.hpp>

@@ -3,7 +3,7 @@
 
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
-#include <silicium/config.hpp>
+#include <silicium/make_unique.hpp>
 #include <algorithm>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/chrono/duration.hpp>

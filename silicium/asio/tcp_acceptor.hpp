@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/error_or.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <algorithm>
 #include <boost/asio/ip/tcp.hpp>

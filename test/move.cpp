@@ -1,4 +1,5 @@
 #include <silicium/move.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/move_if_noexcept.hpp>
 #include <boost/test/unit_test.hpp>
 

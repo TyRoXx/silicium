@@ -1,4 +1,5 @@
 #include <silicium/optional.hpp>
+#include <silicium/make_unique.hpp>
 #include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/io_service.hpp>

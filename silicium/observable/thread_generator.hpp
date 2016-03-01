@@ -2,7 +2,7 @@
 #define SILICIUM_THREAD_GENERATOR_HPP
 
 #include <silicium/observable/observer.hpp>
-#include <silicium/config.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/observable/yield_context.hpp>
 #include <silicium/observable/erased_observer.hpp>

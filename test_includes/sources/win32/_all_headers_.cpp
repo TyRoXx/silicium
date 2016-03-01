@@ -1,3 +1,4 @@
+#include <silicium/aligned_ref.hpp>
 #include <silicium/alignment_of.hpp>
 #include <silicium/arithmetic/add.hpp>
 #include <silicium/arithmetic/overflow_or.hpp>
@@ -58,8 +59,10 @@
 #include <silicium/initialize_array.hpp>
 #include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
+#include <silicium/lossless_cast.hpp>
 #include <silicium/make_array.hpp>
 #include <silicium/make_destructor.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/move.hpp>
 #include <silicium/move_if_noexcept.hpp>
@@ -124,6 +127,7 @@
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/sink/container_buffer.hpp>
 #include <silicium/sink/copy.hpp>
+#include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/function_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/multi_sink.hpp>

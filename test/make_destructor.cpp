@@ -1,4 +1,5 @@
 #include <silicium/make_destructor.hpp>
+#include <silicium/make_unique.hpp>
 #include <boost/test/unit_test.hpp>
 
 namespace

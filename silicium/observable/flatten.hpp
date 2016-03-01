@@ -2,7 +2,7 @@
 #define SILICIUM_REACTIVE_FLATTEN_HPP
 
 #include <silicium/observable/observer.hpp>
-#include <silicium/config.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/null_mutex.hpp>
 #include <memory>

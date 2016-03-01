@@ -4,6 +4,7 @@
 #include <silicium/exchange.hpp>
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/to_shared.hpp>
+#include <silicium/make_unique.hpp>
 #include <algorithm>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/strand.hpp>

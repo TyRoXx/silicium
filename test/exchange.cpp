@@ -1,4 +1,5 @@
 #include <silicium/exchange.hpp>
+#include <silicium/make_unique.hpp>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(exchange_noexcept_true)
