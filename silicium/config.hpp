@@ -1,7 +1,6 @@
 #ifndef SILICIUM_CONFIG_HPP
 #define SILICIUM_CONFIG_HPP
 
-#include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
