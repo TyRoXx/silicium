@@ -3,6 +3,7 @@
 
 #include <silicium/noexcept_string.hpp>
 #include <silicium/to_unique.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>

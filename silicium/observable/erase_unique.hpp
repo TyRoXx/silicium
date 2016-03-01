@@ -2,6 +2,7 @@
 #define SILICIUM_OBSERVABLE_ERASE_UNIQUE_HPP
 
 #include <silicium/observable/ptr.hpp>
+#include <silicium/make_unique.hpp>
 
 namespace Si
 {
