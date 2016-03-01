@@ -66,10 +66,12 @@ namespace Si
 	template <class Next, class Limit>
 	auto make_limited_observable(Next &&next, Limit &&limit)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> limited_observable<typename std::decay<Next>::type, typename std::decay<Limit>::type>
+	    -> limited_observable<typename std::decay<Next>::type,
+	                          typename std::decay<Limit>::type>
 #endif
 	{
-		return limited_observable<typename std::decay<Next>::type, typename std::decay<Limit>::type>(
+		return limited_observable<typename std::decay<Next>::type,
+		                          typename std::decay<Limit>::type>(
 		    std::forward<Next>(next), std::forward<Limit>(limit));
 	}
 }
