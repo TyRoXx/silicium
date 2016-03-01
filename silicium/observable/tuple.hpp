@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/config.hpp>
 #include <bitset>
+#include <tuple>
 
 #if (defined(_MSC_VER) && (MSC_VER < 1900)) || !SILICIUM_COMPILER_HAS_USING || \
     SILICIUM_GCC47 /*GCC 4.7 crashes when using tuple*/
