@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <boost/static_assert.hpp>
 #include <boost/functional/hash.hpp>
+#include <stdexcept>
 
 #if !SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 #include <boost/preprocessor/iteration/local.hpp>
