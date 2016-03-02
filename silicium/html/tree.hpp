@@ -92,14 +92,25 @@ namespace Si
 		                             , ((generate, (1, (destination_sink &)),
 		                                 void, const)))
 
-		template <class Length, class ContentGenerator>
+		template <class ContentGenerator>
 		auto dynamic(ContentGenerator &&generate)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		    -> decltype(detail::make_element<Length>(
 		        std::forward<ContentGenerator>(generate)))
 #endif
 		{
-			return detail::make_element<Length>(
+			return detail::make_element<min_length<0>>(
+			    std::forward<ContentGenerator>(generate));
+		}
+
+		template <std::size_t Length, class ContentGenerator>
+		auto fixed_length(ContentGenerator &&generate)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+		    -> decltype(detail::make_element<exact_length<Length>>(
+		        std::forward<ContentGenerator>(generate)))
+#endif
+		{
+			return detail::make_element<exact_length<Length>>(
 			    std::forward<ContentGenerator>(generate));
 		}
 
@@ -111,7 +122,7 @@ namespace Si
 		        exact_length<Length - 1>>
 #endif
 		{
-			return dynamic<exact_length<Length - 1>>(
+			return fixed_length<Length - 1>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 			    std::function<void(Sink<char, success>::interface &)>
 #endif

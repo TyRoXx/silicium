@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(html_tree)
 	    tag("head", tag("title", text("Title"))) +
 	        tag("body",
 	            text("Hello, ") + raw("<b>world</b>") +
-	                dynamic<min_length<0>>(
+	                fixed_length<0>(
 	                    [](Si::Sink<char, Si::success>::interface &destination)
 	                    {
 		                    Si::html::unpaired_element(destination, "br");
@@ -59,8 +59,8 @@ BOOST_AUTO_TEST_CASE(html_tree_unpaired_tag)
 BOOST_AUTO_TEST_CASE(html_tree_paired_empty_tag)
 {
 	using namespace Si::html;
-	auto document = tag("a", dynamic<exact_length<0>>(
-	                             [](Si::Sink<char, Si::success>::interface &)
+	auto document =
+	    tag("a", fixed_length<0>([](Si::Sink<char, Si::success>::interface &)
 	                             {
 		                         }));
 	BOOST_CHECK_EQUAL(7u, decltype(document)::length_type::value);
@@ -281,16 +281,15 @@ BOOST_AUTO_TEST_CASE(html_tree_produces_same_output_as_generator)
 	    "html",
 	    tag("head", tag("title", text("Silicium build tester"))) +
 	        tag("body",
-	            dynamic<min_length<0>>([build_triggered](
+	            dynamic([build_triggered](
 	                Si::Sink<char, Si::success>::interface &destination)
-	                                   {
-		                                   if (!build_triggered)
-		                                   {
-			                                   return;
-		                                   }
-		                                   text("build was triggered")
-		                                       .generate(destination);
-		                               }) +
+	                    {
+		                    if (!build_triggered)
+		                    {
+			                    return;
+		                    }
+		                    text("build was triggered").generate(destination);
+		                }) +
 	                tag("form",
 	                    attribute("action", "/") + attribute("method", "POST"),
 	                    tag("input", attribute("type", "submit") +
