@@ -6,6 +6,7 @@
 #include <silicium/detail/argument_of.hpp>
 #include <new>
 #include <array>
+#include <stdexcept>
 #include <memory>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/mpl/find.hpp>
