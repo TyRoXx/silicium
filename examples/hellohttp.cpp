@@ -82,7 +82,8 @@ int main()
 	    {
 		    auto clients = Si::virtualize_source(
 		        Si::asio::accepting_source(acceptor, yield));
-		    for (auto client : Si::make_buffer(clients, 1))
+		    auto range = Si::make_buffer(clients, 1);
+		    for (auto client : range)
 		    {
 			    boost::asio::spawn(
 			        acceptor.get_io_service(),
