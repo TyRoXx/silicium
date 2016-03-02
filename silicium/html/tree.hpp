@@ -95,7 +95,7 @@ namespace Si
 		template <class ContentGenerator>
 		auto dynamic(ContentGenerator &&generate)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> decltype(detail::make_element<Length>(
+		    -> decltype(detail::make_element<min_length<0>>(
 		        std::forward<ContentGenerator>(generate)))
 #endif
 		{
