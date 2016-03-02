@@ -13,6 +13,8 @@ namespace Si
 {
 	namespace html
 	{
+		typedef Sink<char, success>::interface code_sink;
+
 #if SILICIUM_HAS_HTML_TREE
 		template <std::size_t Length>
 		struct exact_length : std::integral_constant<std::size_t, Length>
@@ -85,12 +87,10 @@ namespace Si
 			}
 		}
 
-		typedef Sink<char, success>::interface destination_sink;
-
 		template <class Length = min_length<0>>
 		SILICIUM_TRAIT_WITH_TYPEDEFS(Element, typedef Length length_type;
-		                             , ((generate, (1, (destination_sink &)),
-		                                 void, const)))
+		                             , ((generate, (1, (code_sink &)), void,
+		                                 const)))
 
 		template <class ContentGenerator>
 		auto dynamic(ContentGenerator &&generate)
@@ -117,16 +117,15 @@ namespace Si
 		template <std::size_t Length>
 		auto raw(char const(&content)[Length])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        exact_length<Length - 1>>
+		    -> detail::element<std::function<void(code_sink &)>,
+		                       exact_length<Length - 1>>
 #endif
 		{
 			return fixed_length<Length - 1>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
-			    ([&content](Sink<char, success>::interface &destination)
+			    ([&content](code_sink &destination)
 			     {
 				     Si::append(destination, content);
 				 }));
@@ -142,15 +141,13 @@ namespace Si
 		auto tag(char const(&name)[NameLength], Attributes &&attributes,
 		         Element &&content)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        ResultLength>
+		    -> detail::element<std::function<void(code_sink &)>, ResultLength>
 #endif
 		{
 			auto &generate_content = content.generate;
 			return detail::make_element<ResultLength>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
 			    ([
 				   &name,
@@ -158,7 +155,7 @@ namespace Si
 				       generate_content, std::move(generate_content)),
 				   SILICIUM_CAPTURE_EXPRESSION(
 				       attributes, std::forward<Attributes>(attributes))
-				](Sink<char, success>::interface & destination)
+				](code_sink & destination)
 			     {
 				     html::open_attributed_element(destination, name);
 				     attributes.generate(destination);
@@ -175,20 +172,18 @@ namespace Si
 		auto tag(char const(&name)[NameLength], Attributes &&attributes,
 		         empty_t)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        ResultLength>
+		    -> detail::element<std::function<void(code_sink &)>, ResultLength>
 #endif
 		{
 			return detail::make_element<ResultLength>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
 			    ([
 				   &name,
 				   SILICIUM_CAPTURE_EXPRESSION(
 				       attributes, std::forward<Attributes>(attributes))
-				](Sink<char, success>::interface & destination)
+				](code_sink & destination)
 			     {
 				     html::open_attributed_element(destination, name);
 				     attributes.generate(destination);
@@ -198,7 +193,7 @@ namespace Si
 
 		namespace detail
 		{
-			inline void no_attributes(Sink<char, success>::interface &)
+			inline void no_attributes(code_sink &)
 			{
 			}
 		}
@@ -230,16 +225,15 @@ namespace Si
 		auto attribute(char const(&key)[KeyLength],
 		               char const(&value)[ValueLength])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        min_length<ResultLength>>
+		    -> detail::element<std::function<void(code_sink &)>,
+		                       min_length<ResultLength>>
 #endif
 		{
 			return detail::make_element<min_length<ResultLength>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
-			    ([&key, &value](Sink<char, success>::interface &destination)
+			    ([&key, &value](code_sink &destination)
 			     {
 				     add_attribute(destination, key, value);
 				 }));
@@ -251,17 +245,16 @@ namespace Si
 		                                     detail::quote>
 		auto attribute(char const(&key)[KeyLength], std::string value)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        min_length<ResultLength>>
+		    -> detail::element<std::function<void(code_sink &)>,
+		                       min_length<ResultLength>>
 #endif
 		{
 			return detail::make_element<min_length<ResultLength>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
 			    ([&key, SILICIUM_CAPTURE_EXPRESSION(value, std::move(value)) ](
-			        Sink<char, success>::interface & destination)
+			        code_sink & destination)
 			     {
 				     add_attribute(destination, key, value);
 				 }));
@@ -271,16 +264,15 @@ namespace Si
 		          std::size_t ResultLength = detail::space + (KeyLength - 1)>
 		auto attribute(char const(&key)[KeyLength])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        min_length<ResultLength>>
+		    -> detail::element<std::function<void(code_sink &)>,
+		                       min_length<ResultLength>>
 #endif
 		{
 			return detail::make_element<min_length<ResultLength>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
-			    ([&key](Sink<char, success>::interface &destination)
+			    ([&key](code_sink &destination)
 			     {
 				     add_attribute(destination, key);
 				 }));
@@ -289,16 +281,15 @@ namespace Si
 		template <std::size_t Length>
 		auto text(char const(&content)[Length])
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        min_length<Length - 1>>
+		    -> detail::element<std::function<void(code_sink &)>,
+		                       min_length<Length - 1>>
 #endif
 		{
 			return detail::make_element<min_length<Length - 1>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
-			    ([&content](Sink<char, success>::interface &destination)
+			    ([&content](code_sink &destination)
 			     {
 				     html::write_string(destination, content);
 				 }));
@@ -306,17 +297,15 @@ namespace Si
 
 		inline auto text(std::string content)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
-		        min_length<0>>
+		    -> detail::element<std::function<void(code_sink &)>, min_length<0>>
 #endif
 		{
 			return detail::make_element<min_length<0>>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
 			    ([SILICIUM_CAPTURE_EXPRESSION(content, std::move(content))](
-			        Sink<char, success>::interface & destination)
+			        code_sink & destination)
 			     {
 				     html::write_string(destination, content);
 				 }));
@@ -324,7 +313,7 @@ namespace Si
 
 		namespace detail
 		{
-			inline void no_content(Sink<char, success>::interface &)
+			inline void no_content(code_sink &)
 			{
 			}
 		}
@@ -342,7 +331,7 @@ namespace Si
 		auto sequence(Head &&head, Tail &&... tail)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 		    -> detail::element<
-		        std::function<void(Sink<char, success>::interface &)>,
+		        std::function<void(code_sink &)>,
 		        typename detail::concatenate<
 		            typename std::decay<Head>::type::length_type,
 		            typename identity<decltype(sequence(std::forward<Tail>(
@@ -356,7 +345,7 @@ namespace Si
 			    typename std::decay<Head>::type::length_type,
 			    typename decltype(tail_elements)::length_type>::type>(
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-			    std::function<void(Sink<char, success>::interface &)>
+			    std::function<void(code_sink &)>
 #endif
 			    ([
 				   SILICIUM_CAPTURE_EXPRESSION(
@@ -364,7 +353,7 @@ namespace Si
 				   SILICIUM_CAPTURE_EXPRESSION(
 				       generate_tail_elements,
 				       std::move(generate_tail_elements))
-				](Sink<char, success>::interface & destination)
+				](code_sink & destination)
 			     {
 				     generate_head(destination);
 				     generate_tail_elements(destination);
