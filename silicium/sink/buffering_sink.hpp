@@ -15,7 +15,7 @@ namespace Si
 	          class Buffer = std::array<typename Next::element_type,
 	                                    ((1U << 13U) /
 	                                     sizeof(typename Next::element_type))>>
-	struct buffering_sink SILICIUM_FINAL
+	struct buffering_sink
 	{
 		typedef typename Next::element_type element_type;
 		typedef typename Next::error_type error_type;

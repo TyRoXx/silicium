@@ -9,7 +9,7 @@
 namespace Si
 {
 	template <class From, class Transformation, class To>
-	struct transforming_source SILICIUM_FINAL
+	struct transforming_source
 	{
 		typedef To element_type;
 

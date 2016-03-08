@@ -10,7 +10,7 @@
 namespace Si
 {
 	template <class Element>
-	struct memory_source SILICIUM_FINAL
+	struct memory_source
 	{
 		typedef Element element_type;
 
@@ -45,7 +45,7 @@ namespace Si
 	};
 
 	template <class Element>
-	struct mutable_memory_source SILICIUM_FINAL
+	struct mutable_memory_source
 	{
 		typedef Element element_type;
 

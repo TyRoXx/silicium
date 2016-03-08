@@ -16,8 +16,7 @@ namespace Si
 	};
 
 	template <class Next>
-	struct buffering_source SILICIUM_FINAL
-	    : mutable_source<typename Next::element_type>
+	struct buffering_source : mutable_source<typename Next::element_type>
 	{
 		typedef typename Next::element_type element_type;
 
@@ -118,7 +117,7 @@ namespace Si
 	}
 
 	template <class Element>
-	struct mutable_source_iterator SILICIUM_FINAL
+	struct mutable_source_iterator
 	    : boost::iterator_facade<mutable_source_iterator<Element>, Element,
 	                             std::input_iterator_tag>
 	{

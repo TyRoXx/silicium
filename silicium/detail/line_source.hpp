@@ -10,7 +10,7 @@ namespace Si
 	namespace detail
 	{
 		template <class Next>
-		struct line_source SILICIUM_FINAL : Source<std::vector<char>>::interface
+		struct line_source : Source<std::vector<char>>::interface
 		{
 			line_source()
 			    : m_next(nullptr)
