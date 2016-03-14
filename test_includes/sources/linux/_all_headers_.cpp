@@ -31,6 +31,7 @@
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
+#include <silicium/detail/then.hpp>
 #include <silicium/dynamic_library.hpp>
 #include <silicium/environment_variables.hpp>
 #include <silicium/error_code.hpp>
@@ -154,7 +155,6 @@
 #include <silicium/steady_clock.hpp>
 #include <silicium/success.hpp>
 #include <silicium/terminate_on_exception.hpp>
-#include <silicium/then.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>

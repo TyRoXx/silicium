@@ -2,11 +2,11 @@
 #define SILICIUM_BUFFERING_SINK_HPP
 
 #include <silicium/sink/sink.hpp>
-#include <silicium/then.hpp>
+#include <silicium/detail/then.hpp>
 #include <array>
 #include <boost/range/algorithm/copy.hpp>
 
-#define SILICIUM_HAS_BUFFERING_SINK SILICIUM_HAS_THEN
+#define SILICIUM_HAS_BUFFERING_SINK SILICIUM_DETAIL_HAS_THEN
 
 namespace Si
 {
@@ -59,10 +59,10 @@ namespace Si
 				boost::range::copy(
 				    data, m_fallback_buffer.begin() + m_buffer_used);
 				m_buffer_used += static_cast<size_t>(data.size());
-				return default_construct<Error>();
+				return detail::default_construct<Error>();
 			}
 
-			return then(
+			return detail::then(
 			    [this]
 			    {
 				    return this->flush();
@@ -75,7 +75,7 @@ namespace Si
 
 		Error flush()
 		{
-			return then(
+			return detail::then(
 			    [this]
 			    {
 				    return m_destination.append(make_iterator_range(
