@@ -3,6 +3,7 @@
 
 #include <silicium/config.hpp>
 #include <boost/static_assert.hpp>
+#include <type_traits>
 
 namespace Si
 {
