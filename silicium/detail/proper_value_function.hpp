@@ -1,7 +1,7 @@
 #ifndef SILICIUM_DETAIL_PROPER_VALUE_FUNCTION_HPP
 #define SILICIUM_DETAIL_PROPER_VALUE_FUNCTION_HPP
 
-#include <silicium/config.hpp>
+#include <silicium/type_traits.hpp>
 #include <silicium/function.hpp>
 
 #define SILICIUM_DETAIL_HAS_PROPER_VALUE_FUNCTION SILICIUM_HAS_FUNCTION

@@ -2,6 +2,7 @@
 #include <silicium/error_or.hpp>
 #include <silicium/make_unique.hpp>
 #include <silicium/noexcept_string.hpp>
+#include <silicium/type_traits.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/container/map.hpp>

@@ -2,6 +2,7 @@
 #define SILICIUM_ALIGNMENT_OF_HPP
 
 #include <silicium/config.hpp>
+#include <type_traits>
 
 namespace Si
 {

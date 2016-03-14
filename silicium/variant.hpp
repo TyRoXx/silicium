@@ -1,7 +1,6 @@
 #ifndef SILICIUM_VARIANT_HPP
 #define SILICIUM_VARIANT_HPP
 
-#include <silicium/is_handle.hpp>
 #include <silicium/alignment_of.hpp>
 #include <silicium/detail/argument_of.hpp>
 #include <new>
@@ -981,11 +980,6 @@ namespace Si
 		Si::apply_visitor(detail::ostream_visitor(out), v);
 		return out;
 	}
-#endif
-
-#if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(is_handle<variant<int>>::value);
-	BOOST_STATIC_ASSERT((is_handle<variant<int, unit>>::value));
 #endif
 
 	template <class... T>

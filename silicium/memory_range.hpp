@@ -14,9 +14,6 @@ namespace Si
 	typedef iterator_range<char const *> memory_range;
 	typedef iterator_range<char *> mutable_memory_range;
 
-	BOOST_STATIC_ASSERT(is_handle<memory_range>::value);
-	BOOST_STATIC_ASSERT(is_handle<mutable_memory_range>::value);
-
 	template <class To, class From>
 	struct copy_const
 	{

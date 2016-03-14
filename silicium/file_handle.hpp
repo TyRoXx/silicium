@@ -3,7 +3,6 @@
 
 #include <silicium/native_file_descriptor.hpp>
 #include <silicium/exchange.hpp>
-#include <silicium/is_handle.hpp>
 
 namespace Si
 {
@@ -59,10 +58,6 @@ namespace Si
 		SILICIUM_DELETED_FUNCTION(file_handle(file_handle const &))
 		SILICIUM_DELETED_FUNCTION(file_handle &operator=(file_handle const &))
 	};
-
-#if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(Si::is_handle<file_handle>::value);
-#endif
 }
 
 #endif

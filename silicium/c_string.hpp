@@ -2,7 +2,7 @@
 #define SILICIUM_C_STRING_HPP
 
 #include <cassert>
-#include <silicium/is_handle.hpp>
+#include <silicium/config.hpp>
 
 namespace Si
 {
@@ -53,9 +53,6 @@ namespace Si
 
 	typedef basic_c_string<char> c_string;
 	typedef basic_c_string<wchar_t> cw_string;
-
-	BOOST_STATIC_ASSERT(is_handle<c_string>::value);
-	BOOST_STATIC_ASSERT(is_handle<cw_string>::value);
 
 	typedef
 #ifdef _WIN32

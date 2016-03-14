@@ -2,7 +2,6 @@
 #define SILICIUM_OPTIONAL_HPP
 
 #include <silicium/config.hpp>
-#include <silicium/is_handle.hpp>
 #include <silicium/alignment_of.hpp>
 #include <silicium/explicit_operator_bool.hpp>
 #include <ostream>
@@ -440,16 +439,6 @@ namespace Si
 	private:
 		T *m_data;
 	};
-
-#if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(is_handle<optional<int>>::value);
-	BOOST_STATIC_ASSERT(is_handle<optional<int *>>::value);
-	BOOST_STATIC_ASSERT(is_handle<optional<int const *>>::value);
-	BOOST_STATIC_ASSERT(is_handle<optional<int volatile>>::value);
-	BOOST_STATIC_ASSERT(is_handle<optional<unit>>::value);
-	BOOST_STATIC_ASSERT(is_handle<optional<int &>>::value);
-	BOOST_STATIC_ASSERT(is_handle<optional<int const &>>::value);
-#endif
 
 	template <class T>
 	SILICIUM_USE_RESULT bool operator==(optional<T> const &left,

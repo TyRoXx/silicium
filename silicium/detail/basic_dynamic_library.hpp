@@ -4,6 +4,7 @@
 #include <silicium/c_string.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
+#include <memory>
 
 namespace Si
 {
