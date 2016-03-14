@@ -1,8 +1,10 @@
 #ifndef SILICIUM_FUNCTION_HPP
 #define SILICIUM_FUNCTION_HPP
 
+#include <silicium/config.hpp>
 #include <silicium/explicit_operator_bool.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/static_assert.hpp>
 #include <memory>
 #include <cassert>
 
