@@ -21,28 +21,32 @@ namespace
 	{
 		std::vector<decltype(transform(in.front()))> result;
 		result.reserve(in.size());
-		std::transform(in.begin(), in.end(), std::back_inserter(result), transform);
+		std::transform(
+		    in.begin(), in.end(), std::back_inserter(result), transform);
 		return result;
 	}
 }
 
 BOOST_AUTO_TEST_CASE(uri_parse_http)
 {
-	Si::optional<Si::http::uri> const parsed =
-	    Si::http::parse_uri(Si::make_c_str_range("http://localhost:8080/a/b?k=0#h"));
+	Si::optional<Si::http::uri> const parsed = Si::http::parse_uri(
+	    Si::make_c_str_range("http://localhost:8080/a/b?k=0#h"));
 	BOOST_REQUIRE(parsed);
 	BOOST_CHECK_EQUAL("http", to_string(parsed->scheme));
 	BOOST_CHECK_EQUAL("k=0", to_string(parsed->query));
 	BOOST_CHECK_EQUAL("h", to_string(parsed->fragment));
-	std::vector<std::string> const expected_path = boost::assign::list_of("a")("b");
+	std::vector<std::string> const expected_path =
+	    boost::assign::list_of("a")("b");
 	std::vector<std::string> const parsed_path = map(parsed->path, to_string);
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected_path.begin(), expected_path.end(), parsed_path.begin(), parsed_path.end());
+	BOOST_CHECK_EQUAL_COLLECTIONS(expected_path.begin(), expected_path.end(),
+	                              parsed_path.begin(), parsed_path.end());
 }
 
 namespace boost
 {
 	template <class Key, class Value>
-	wrap_stringstream &operator<<(wrap_stringstream &out, std::pair<Key, Value> const &pair)
+	wrap_stringstream &operator<<(wrap_stringstream &out,
+	                              std::pair<Key, Value> const &pair)
 	{
 		return out << "{" << pair.first << "," << pair.second << "}";
 	}
@@ -53,9 +57,13 @@ BOOST_AUTO_TEST_CASE(uri_parse_html_query)
 	Si::optional<std::vector<Si::http::html_query_pair>> const parsed =
 	    Si::http::parse_html_query(Si::make_c_str_range("a=2&b=3&c=&d"));
 	BOOST_REQUIRE(parsed);
-	std::vector<Si::http::html_query_pair> const expected = boost::assign::list_of(
-	    std::make_pair("a", Si::optional<std::string>("2")))(std::make_pair("b", Si::optional<std::string>("3")))(
-	    std::make_pair("c", Si::optional<std::string>("")))(std::make_pair("d", Si::optional<std::string>()));
-	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), parsed->begin(), parsed->end());
+	std::vector<Si::http::html_query_pair> const expected =
+	    boost::assign::list_of(
+	        std::make_pair("a", Si::optional<std::string>("2")))(
+	        std::make_pair("b", Si::optional<std::string>("3")))(
+	        std::make_pair("c", Si::optional<std::string>("")))(
+	        std::make_pair("d", Si::optional<std::string>()));
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+	    expected.begin(), expected.end(), parsed->begin(), parsed->end());
 }
 #endif
