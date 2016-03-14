@@ -21,7 +21,6 @@
 #include <silicium/asio/writing_observable.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/bounded_int.hpp>
-#include <silicium/buffer.hpp>
 #include <silicium/byte.hpp>
 #include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
@@ -56,7 +55,6 @@
 #include <silicium/http/uri.hpp>
 #include <silicium/identity.hpp>
 #include <silicium/initialize_array.hpp>
-#include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/linux/dynamic_library_impl.hpp>
 #include <silicium/linux/process_handle.hpp>
@@ -71,6 +69,7 @@
 #include <silicium/noexcept_string.hpp>
 #include <silicium/null_mutex.hpp>
 #include <silicium/observable/bridge.hpp>
+#include <silicium/observable/buffer.hpp>
 #include <silicium/observable/cache.hpp>
 #include <silicium/observable/constant.hpp>
 #include <silicium/observable/consume.hpp>
@@ -161,7 +160,6 @@
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>
 #include <silicium/type_traits.hpp>
-#include <silicium/utility.hpp>
 #include <silicium/variant.hpp>
 #include <silicium/version.hpp>
 #include <silicium/write.hpp>

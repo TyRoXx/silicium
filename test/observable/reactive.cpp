@@ -1,4 +1,4 @@
-#include <silicium/buffer.hpp>
+#include <silicium/observable/buffer.hpp>
 #include <silicium/observable/variant.hpp>
 #include <silicium/observable/coroutine_generator.hpp>
 #include <silicium/observable/generator.hpp>
