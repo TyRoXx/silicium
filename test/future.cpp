@@ -1,5 +1,5 @@
 #include <silicium/future.hpp>
-#include <silicium/block_thread.hpp>
+#include <silicium/asio/block_thread.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/asio/io_service.hpp>
 #include <atomic>
