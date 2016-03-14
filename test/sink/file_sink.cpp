@@ -1,6 +1,6 @@
 #include <silicium/sink/file_sink.hpp>
 #include <silicium/sink/append.hpp>
-#include <silicium/read_file.hpp>
+#include <silicium/read.hpp>
 #include <silicium/pipe.hpp>
 #include <boost/test/unit_test.hpp>
 
