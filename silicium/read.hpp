@@ -2,6 +2,7 @@
 #define SILICIUM_READ_FILE_HPP
 
 #include <silicium/error_or.hpp>
+#include <silicium/get_last_error.hpp>
 #include <silicium/memory_range.hpp>
 #include <silicium/native_file_descriptor.hpp>
 

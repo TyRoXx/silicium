@@ -4,6 +4,10 @@
 #include <silicium/native_file_descriptor.hpp>
 #include <silicium/exchange.hpp>
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 namespace Si
 {
 	struct file_handle
@@ -48,10 +52,15 @@ namespace Si
 
 		~file_handle() BOOST_NOEXCEPT
 		{
-			if (handle != no_file_handle)
+			if (handle == no_file_handle)
 			{
-				terminating_close(handle);
+				return;
 			}
+#ifdef _WIN32
+			CloseHandle(handle);
+#else
+			::close(handle);
+#endif
 		}
 
 	private:
