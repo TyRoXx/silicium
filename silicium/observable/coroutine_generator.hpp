@@ -75,11 +75,12 @@ namespace Si
 		};
 
 		template <class Element>
-		struct coroutine_yield_context_impl : detail::push_context_impl<Element>
+		struct coroutine_yield_context_impl
+		    : ::Si::detail::push_context_impl<Element>
 		{
 #if BOOST_VERSION >= 105500
 			typedef typename boost::coroutines::coroutine<
-			    typename detail::make_command<Element>::type>::push_type
+			    typename ::Si::detail::make_command<Element>::type>::push_type
 			    consumer_type;
 #else
 			typedef typename boost::coroutines::coroutine<
@@ -94,14 +95,14 @@ namespace Si
 
 			virtual void push_result(Element result) SILICIUM_OVERRIDE
 			{
-				(*consumer)(detail::result<Element *>(&result));
+				(*consumer)(::Si::detail::result<Element *>(&result));
 			}
 
 			virtual void
 			get_one(Observable<unit, ptr_observer<observer<unit>>>::interface &
 			            target) SILICIUM_OVERRIDE
 			{
-				(*consumer)(detail::yield{&target});
+				(*consumer)(::Si::detail::yield{&target});
 			}
 
 		private:

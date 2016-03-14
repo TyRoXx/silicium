@@ -6,6 +6,7 @@
 #if BOOST_VERSION >= 105500
 #include <boost/utility/explicit_operator_bool.hpp>
 #endif
+#include <utility>
 
 namespace Si
 {

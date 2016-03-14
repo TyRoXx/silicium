@@ -2,7 +2,6 @@
 #define SILICIUM_VIRTUALIZED_SINK_HPP
 
 #include <silicium/sink/ptr_sink.hpp>
-#include <silicium/utility.hpp>
 
 namespace Si
 {
