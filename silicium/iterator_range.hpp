@@ -149,9 +149,7 @@ namespace Si
 
 	template <class Iterator1, class Iterator2>
 	BOOST_CONSTEXPR auto make_iterator_range(Iterator1 &&begin, Iterator2 &&end)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	    -> iterator_range<typename std::decay<Iterator1>::type>
-#endif
 	{
 		typedef typename std::decay<Iterator1>::type iterator_type;
 		BOOST_STATIC_ASSERT(
@@ -163,9 +161,7 @@ namespace Si
 
 	template <class Range>
 	auto make_iterator_range(Range &&range)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	    -> decltype(make_iterator_range(std::begin(range), std::end(range)))
-#endif
 	{
 		using std::begin;
 		using std::end;
@@ -174,10 +170,8 @@ namespace Si
 
 	template <class ContiguousIterator>
 	auto make_contiguous_range(ContiguousIterator begin, ContiguousIterator end)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> decltype(make_iterator_range(boost::addressof(begin),
-	                                    boost::addressof(end)))
-#endif
+	    -> decltype(make_iterator_range(boost::addressof(*begin),
+	                                    boost::addressof(*end)))
 	{
 		if (begin == end)
 		{
@@ -192,10 +186,8 @@ namespace Si
 
 	template <class ContiguousRange>
 	auto make_contiguous_range(ContiguousRange &&range)
-#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
 	    -> decltype(make_iterator_range(boost::addressof(*std::begin(range)),
 	                                    boost::addressof(*std::end(range))))
-#endif
 	{
 		using std::begin;
 		using std::end;
