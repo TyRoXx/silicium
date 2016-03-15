@@ -6,6 +6,7 @@
 #include <silicium/asio/accepting_source.hpp>
 #include <silicium/asio/async.hpp>
 #include <silicium/asio/async_source.hpp>
+#include <silicium/asio/block_thread.hpp>
 #include <silicium/asio/connecting_observable.hpp>
 #include <silicium/asio/connecting_source.hpp>
 #include <silicium/asio/post_forwarder.hpp>
@@ -18,10 +19,8 @@
 #include <silicium/asio/timer.hpp>
 #include <silicium/asio/use_observable.hpp>
 #include <silicium/asio/writing_observable.hpp>
-#include <silicium/block_thread.hpp>
 #include <silicium/boost_threading.hpp>
 #include <silicium/bounded_int.hpp>
-#include <silicium/buffer.hpp>
 #include <silicium/byte.hpp>
 #include <silicium/byte_order_intrinsics.hpp>
 #include <silicium/c_string.hpp>
@@ -32,6 +31,7 @@
 #include <silicium/detail/integer_sequence.hpp>
 #include <silicium/detail/line_source.hpp>
 #include <silicium/detail/proper_value_function.hpp>
+#include <silicium/detail/then.hpp>
 #include <silicium/dynamic_library.hpp>
 #include <silicium/environment_variables.hpp>
 #include <silicium/error_code.hpp>
@@ -42,7 +42,6 @@
 #include <silicium/explicit_operator_bool.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/function.hpp>
-#include <silicium/future.hpp>
 #include <silicium/get_last_error.hpp>
 #include <silicium/html/generator.hpp>
 #include <silicium/html/tree.hpp>
@@ -57,7 +56,6 @@
 #include <silicium/http/uri.hpp>
 #include <silicium/identity.hpp>
 #include <silicium/initialize_array.hpp>
-#include <silicium/is_handle.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/lossless_cast.hpp>
 #include <silicium/make_array.hpp>
@@ -70,6 +68,7 @@
 #include <silicium/noexcept_string.hpp>
 #include <silicium/null_mutex.hpp>
 #include <silicium/observable/bridge.hpp>
+#include <silicium/observable/buffer.hpp>
 #include <silicium/observable/cache.hpp>
 #include <silicium/observable/constant.hpp>
 #include <silicium/observable/consume.hpp>
@@ -112,7 +111,6 @@
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/while.hpp>
 #include <silicium/observable/yield_context.hpp>
-#include <silicium/observable2.hpp>
 #include <silicium/optional.hpp>
 #include <silicium/os_string.hpp>
 #include <silicium/pipe.hpp>
@@ -120,8 +118,7 @@
 #include <silicium/program_options.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
-#include <silicium/read_file.hpp>
-#include <silicium/serialization.hpp>
+#include <silicium/read.hpp>
 #include <silicium/sink/append.hpp>
 #include <silicium/sink/buffer.hpp>
 #include <silicium/sink/buffering_sink.hpp>
@@ -156,15 +153,12 @@
 #include <silicium/steady_clock.hpp>
 #include <silicium/success.hpp>
 #include <silicium/terminate_on_exception.hpp>
-#include <silicium/then.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <silicium/to_shared.hpp>
 #include <silicium/to_unique.hpp>
 #include <silicium/trait.hpp>
 #include <silicium/type_traits.hpp>
-#include <silicium/utility.hpp>
 #include <silicium/variant.hpp>
-#include <silicium/vector.hpp>
 #include <silicium/version.hpp>
 #include <silicium/win32/dynamic_library_impl.hpp>
 #include <silicium/win32/process_handle.hpp>
