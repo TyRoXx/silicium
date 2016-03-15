@@ -141,6 +141,7 @@
 #include <silicium/source/generator_source.hpp>
 #include <silicium/source/memory_source.hpp>
 #include <silicium/source/observable_source.hpp>
+#include <silicium/source/owning_source.hpp>
 #include <silicium/source/ptr_source.hpp>
 #include <silicium/source/range_source.hpp>
 #include <silicium/source/received_from_socket_source.hpp>

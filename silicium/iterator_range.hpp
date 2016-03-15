@@ -172,6 +172,24 @@ namespace Si
 		return make_iterator_range(begin(range), end(range));
 	}
 
+	template <class ContiguousIterator>
+	auto make_contiguous_range(ContiguousIterator begin, ContiguousIterator end)
+#if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
+	    -> decltype(make_iterator_range(boost::addressof(begin),
+	                                    boost::addressof(end)))
+#endif
+	{
+		if (begin == end)
+		{
+			typename std::remove_reference<decltype(*begin)>::type *data =
+			    nullptr;
+			return make_iterator_range(data, data);
+		}
+		auto *const data_begin = boost::addressof(*begin);
+		auto *const data_end = data_begin + std::distance(begin, end);
+		return make_iterator_range(data_begin, data_end);
+	}
+
 	template <class ContiguousRange>
 	auto make_contiguous_range(ContiguousRange &&range)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
@@ -183,15 +201,7 @@ namespace Si
 		using std::end;
 		auto begin_ = begin(range);
 		auto end_ = end(range);
-		if (begin_ == end_)
-		{
-			typename std::remove_reference<decltype(*begin_)>::type *data =
-			    nullptr;
-			return make_iterator_range(data, data);
-		}
-		auto *const data_begin = boost::addressof(*begin_);
-		auto *const data_end = data_begin + std::distance(begin_, end_);
-		return make_iterator_range(data_begin, data_end);
+		return make_contiguous_range(begin_, end_);
 	}
 }
 
