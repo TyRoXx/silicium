@@ -26,7 +26,7 @@ namespace Si
 		template <class T>
 		T default_construct()
 		{
-			return detail::default_construct<T>(std::is_same<T, void>());
+			return ::Si::detail::default_construct<T>(std::is_same<T, void>());
 		}
 
 		namespace detail
