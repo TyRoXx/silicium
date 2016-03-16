@@ -4,10 +4,12 @@
 #include <silicium/config.hpp>
 #include <silicium/alignment_of.hpp>
 #include <silicium/explicit_operator_bool.hpp>
+#include <silicium/type_traits.hpp>
 #include <ostream>
 #include <type_traits>
 #include <boost/static_assert.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/utility/declval.hpp>
 #include <stdexcept>
 
 #if !SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
