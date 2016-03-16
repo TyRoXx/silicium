@@ -284,6 +284,38 @@ BOOST_AUTO_TEST_CASE(optional_or_throw_bad)
 		});
 	BOOST_CHECK(was_thrown);
 }
+
+BOOST_AUTO_TEST_CASE(optional_value_failure)
+{
+	Si::optional<int> p;
+	BOOST_CHECK_EXCEPTION(p.value(), Si::bad_optional_access,
+	                      [](Si::bad_optional_access const &)
+	                      {
+		                      return true;
+		                  });
+}
+
+BOOST_AUTO_TEST_CASE(optional_ref_value_failure)
+{
+	Si::optional<int &> p;
+	BOOST_CHECK_EXCEPTION(p.value(), Si::bad_optional_access,
+	                      [](Si::bad_optional_access const &)
+	                      {
+		                      return true;
+		                  });
+}
 #endif
 
+BOOST_AUTO_TEST_CASE(optional_value_ok)
+{
+	Si::optional<int> p = 123;
+	BOOST_CHECK_EQUAL(123, p.value());
+}
+
+BOOST_AUTO_TEST_CASE(optional_ref_value_ok)
+{
+	int i = 123;
+	Si::optional<int &> p = i;
+	BOOST_CHECK_EQUAL(123, p.value());
+}
 #endif

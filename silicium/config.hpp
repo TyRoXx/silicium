@@ -189,8 +189,8 @@
 #else
 #define SILICIUM_DELETED_FUNCTION(f)                                           \
 	\
-private:                                                                       \
-	f;
+private:
+f;
 #endif
 
 #define SILICIUM_DISABLE_COPY(struct_name)                                     \

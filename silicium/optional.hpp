@@ -47,6 +47,14 @@ namespace Si
 
 	static some_t BOOST_CONSTEXPR_OR_CONST some;
 
+	struct bad_optional_access : std::logic_error
+	{
+		bad_optional_access()
+		    : std::logic_error("bad_optional_access")
+		{
+		}
+	};
+
 	template <class T>
 	struct optional
 	{
@@ -298,27 +306,11 @@ namespace Si
 #define BOOST_PP_LOCAL_LIMITS (1, 10)
 #include BOOST_PP_LOCAL_ITERATE()
 #undef BOOST_PP_LOCAL_MACRO
-
-#if 0
-		template <class A0>
-		void emplace(A0 &&a0)
-		{
-			*this = none;
-			new (data()) T(std::forward<A0>(a0));
-			m_is_set = true;
-		}
-
-		template <class A0, class A1>
-		void emplace(A0 &&a0, A1 &&a1)
-		{
-			*this = none;
-			new (data()) T(std::forward<A0>(a0), std::forward<A1>(a1));
-			m_is_set = true;
-		}
-#endif
 #endif
 
-		void swap(optional &other) BOOST_NOEXCEPT
+		void swap(optional &other) BOOST_NOEXCEPT_IF(
+		    Si::is_nothrow_move_constructible<T>::value &&BOOST_NOEXCEPT_EXPR(
+		        std::swap(declval<T &>(), declval<T &>())))
 		{
 			if (*this)
 			{
@@ -358,6 +350,38 @@ namespace Si
 			SILICIUM_UNREACHABLE();
 		}
 
+		T &value()
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+		    &
+#endif
+		{
+			throw_if_empty();
+			return **this;
+		}
+
+		T const &value() const
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+		    &
+#endif
+		{
+			throw_if_empty();
+			return **this;
+		}
+
+#if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
+		T &value() &&
+		{
+			throw_if_empty();
+			return **this;
+		}
+
+		T const &value() const &&
+		{
+			throw_if_empty();
+			return **this;
+		}
+#endif
+
 	private:
 		enum
 		{
@@ -375,6 +399,15 @@ namespace Si
 		T const *data() const BOOST_NOEXCEPT
 		{
 			return reinterpret_cast<T const *>(&m_storage);
+		}
+
+		void throw_if_empty()
+		{
+			if (*this)
+			{
+				return;
+			}
+			throw bad_optional_access();
 		}
 	};
 
@@ -436,8 +469,29 @@ namespace Si
 			return m_data;
 		}
 
+		T &value()
+		{
+			throw_if_empty();
+			return **this;
+		}
+
+		T const &value() const
+		{
+			throw_if_empty();
+			return **this;
+		}
+
 	private:
 		T *m_data;
+
+		void throw_if_empty()
+		{
+			if (*this)
+			{
+				return;
+			}
+			throw bad_optional_access();
+		}
 	};
 
 	template <class T>
