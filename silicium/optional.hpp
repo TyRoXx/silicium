@@ -10,6 +10,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/utility/declval.hpp>
+#include <boost/throw_exception.hpp>
 #include <stdexcept>
 
 #if !SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
@@ -409,7 +410,7 @@ namespace Si
 			{
 				return;
 			}
-			throw bad_optional_access();
+			boost::throw_exception(bad_optional_access());
 		}
 	};
 
@@ -492,7 +493,7 @@ namespace Si
 			{
 				return;
 			}
-			throw bad_optional_access();
+			boost::throw_exception(bad_optional_access());
 		}
 	};
 
