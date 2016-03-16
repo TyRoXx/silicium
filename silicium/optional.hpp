@@ -310,7 +310,7 @@ namespace Si
 
 		void swap(optional &other) BOOST_NOEXCEPT_IF(
 		    Si::is_nothrow_move_constructible<T>::value &&BOOST_NOEXCEPT_EXPR(
-		        std::swap(declval<T &>(), declval<T &>())))
+		        std::swap(boost::declval<T &>(), boost::declval<T &>())))
 		{
 			if (*this)
 			{
