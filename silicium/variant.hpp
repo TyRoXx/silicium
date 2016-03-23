@@ -635,9 +635,9 @@ namespace Si
 				m_storage.index(static_cast<unsigned char>(w));
 			}
 
-			void set_invalid() BOOST_NOEXCEPT
+			void set_valueless_by_exception() BOOST_NOEXCEPT
 			{
-				m_storage.set_invalid();
+				m_storage.set_valueless_by_exception();
 			}
 
 			void throw_if_invalid() const
