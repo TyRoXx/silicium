@@ -34,10 +34,9 @@ namespace Si
 	{
 	};
 
-	struct invalid_variant_exception : std::logic_error
+	struct bad_variant_access : std::exception
 	{
-		invalid_variant_exception()
-		    : std::logic_error("invalid_variant_exception")
+		bad_variant_access()
 		{
 		}
 	};
@@ -166,14 +165,14 @@ namespace Si
 				m_index = value;
 			}
 
-			void set_invalid() BOOST_NOEXCEPT
+			void set_valueless_by_exception() BOOST_NOEXCEPT
 			{
 				m_index = invalid_index;
 			}
 
-			bool is_valid() const BOOST_NOEXCEPT
+			bool valueless_by_exception() const BOOST_NOEXCEPT
 			{
-				return m_index != invalid_index;
+				return m_index == invalid_index;
 			}
 
 			char &storage() BOOST_NOEXCEPT
@@ -203,14 +202,14 @@ namespace Si
 
 		struct never_invalid
 		{
-			void set_invalid()
+			void set_valueless_by_exception()
 			{
 				SILICIUM_UNREACHABLE();
 			}
 
-			bool is_valid() const
+			bool valueless_by_exception() const
 			{
-				return true;
+				return false;
 			}
 		};
 
@@ -221,14 +220,14 @@ namespace Si
 			{
 			}
 
-			void set_invalid() BOOST_NOEXCEPT
+			void set_valueless_by_exception() BOOST_NOEXCEPT
 			{
 				m_is_valid = false;
 			}
 
-			bool is_valid() const BOOST_NOEXCEPT
+			bool valueless_by_exception() const BOOST_NOEXCEPT
 			{
-				return m_is_valid;
+				return !m_is_valid;
 			}
 
 		private:
@@ -455,7 +454,7 @@ namespace Si
 
 			~variant_base() BOOST_NOEXCEPT
 			{
-				if (!this->is_valid())
+				if (this->valueless_by_exception())
 				{
 					return;
 				}
@@ -545,13 +544,16 @@ namespace Si
 
 			index_type index() const BOOST_NOEXCEPT
 			{
-				assert(is_valid());
+				if (valueless_by_exception())
+				{
+					return -1;
+				}
 				return m_storage.index();
 			}
 
-			bool is_valid() const BOOST_NOEXCEPT
+			bool valueless_by_exception() const BOOST_NOEXCEPT
 			{
-				return m_storage.is_valid();
+				return m_storage.valueless_by_exception();
 			}
 
 			template <class Visitor>
@@ -640,11 +642,10 @@ namespace Si
 
 			void throw_if_invalid() const
 			{
-				if (is_valid())
+				if (valueless_by_exception())
 				{
-					return;
+					boost::throw_exception(bad_variant_access());
 				}
-				boost::throw_exception(invalid_variant_exception());
 			}
 
 			static void move_construct_storage(index_type index,
