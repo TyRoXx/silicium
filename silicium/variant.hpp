@@ -511,7 +511,7 @@ namespace Si
 #if SILICIUM_HAS_EXCEPTIONS
 				catch (...)
 				{
-					this->set_invalid();
+					this->set_valueless_by_exception();
 					throw;
 				}
 #endif

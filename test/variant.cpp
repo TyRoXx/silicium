@@ -731,10 +731,10 @@ BOOST_AUTO_TEST_CASE(variant_move_throws)
 		                      return true;
 		                  });
 	BOOST_CHECK_EQUAL(0, weak_content.use_count());
-	BOOST_CHECK(!v.is_valid());
+	BOOST_CHECK(v.valueless_by_exception());
 	BOOST_CHECK_EXCEPTION(Si::apply_visitor(null_visitor(), v),
-	                      Si::invalid_variant_exception,
-	                      [](Si::invalid_variant_exception const &)
+	                      Si::bad_variant_access,
+	                      [](Si::bad_variant_access const &)
 	                      {
 		                      return true;
 		                  });
