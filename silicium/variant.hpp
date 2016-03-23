@@ -150,30 +150,30 @@ namespace Si
 		template <class... T>
 		struct combined_storage
 		{
-			typedef unsigned char which_type;
+			typedef unsigned char index_type;
 
-			combined_storage() BOOST_NOEXCEPT : m_which(0)
+			combined_storage() BOOST_NOEXCEPT : m_index(0)
 			{
 			}
 
-			which_type which() const BOOST_NOEXCEPT
+			index_type index() const BOOST_NOEXCEPT
 			{
-				return m_which;
+				return m_index;
 			}
 
-			void which(which_type value) BOOST_NOEXCEPT
+			void index(index_type value) BOOST_NOEXCEPT
 			{
-				m_which = value;
+				m_index = value;
 			}
 
 			void set_invalid() BOOST_NOEXCEPT
 			{
-				m_which = invalid_which;
+				m_index = invalid_index;
 			}
 
 			bool is_valid() const BOOST_NOEXCEPT
 			{
-				return m_which != invalid_which;
+				return m_index != invalid_index;
 			}
 
 			char &storage() BOOST_NOEXCEPT
@@ -189,10 +189,10 @@ namespace Si
 		private:
 			enum
 			{
-				invalid_which = 255
+				invalid_index = 255
 			};
 			union_<T...> m_storage;
-			which_type m_which;
+			index_type m_index;
 		};
 
 		template <class T>
@@ -240,18 +240,18 @@ namespace Si
 		    : public std::conditional<can_ever_be_invalid<Single>::value,
 		                              sometimes_invalid, never_invalid>::type
 		{
-			typedef unsigned char which_type;
+			typedef unsigned char index_type;
 
 			combined_storage()
 			{
 			}
 
-			which_type which() const BOOST_NOEXCEPT
+			index_type index() const BOOST_NOEXCEPT
 			{
 				return 0;
 			}
 
-			void which(which_type value) BOOST_NOEXCEPT
+			void index(index_type value) BOOST_NOEXCEPT
 			{
 				assert(value == 0);
 				(void)value;
@@ -441,7 +441,7 @@ namespace Si
 #endif
 			};
 
-			typedef unsigned which_type;
+			typedef unsigned index_type;
 #if !SILICIUM_GCC46
 			typedef boost::mpl::vector<T...> element_types;
 #endif
@@ -459,31 +459,31 @@ namespace Si
 				{
 					return;
 				}
-				destroy_storage(this->which(), this->storage());
+				destroy_storage(this->index(), this->storage());
 			}
 
 			variant_base(variant_base &&other)
 			    BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
-				this->set_which(other.which());
+				this->set_index(other.index());
 				move_construct_storage(
-				    this->which(), this->storage(), other.storage());
+				    this->index(), this->storage(), other.storage());
 			}
 
 			variant_base &operator=(variant_base &&other)
 			    BOOST_NOEXCEPT_IF(is_noexcept_movable)
 			{
-				if (this->which() == other.which())
+				if (this->index() == other.index())
 				{
 					move_storage(
-					    this->which(), this->storage(), other.storage());
+					    this->index(), this->storage(), other.storage());
 				}
 				else
 				{
-					destroy_storage(this->which(), this->storage());
+					destroy_storage(this->index(), this->storage());
 					move_construct_storage(
-					    other.which(), this->storage(), other.storage());
-					this->set_which(other.which());
+					    other.index(), this->storage(), other.storage());
+					this->set_index(other.index());
 				}
 				return *this;
 			}
@@ -499,7 +499,7 @@ namespace Si
 			        void>::type>
 			variant_base &operator=(U &&value)
 			{
-				destroy_storage(this->which(), this->storage());
+				destroy_storage(this->index(), this->storage());
 #if SILICIUM_HAS_EXCEPTIONS
 				try
 #endif
@@ -516,7 +516,7 @@ namespace Si
 					throw;
 				}
 #endif
-				this->set_which(Index);
+				this->set_index(Index);
 				return *this;
 			}
 
@@ -531,7 +531,7 @@ namespace Si
 			        void>::type>
 			variant_base(U &&value)
 			{
-				this->set_which(Index);
+				this->set_index(Index);
 				new (&this->storage()) CleanU(std::forward<U>(value));
 			}
 
@@ -539,14 +539,14 @@ namespace Si
 			          std::size_t Index = index_of<Requested, T...>::value>
 			explicit variant_base(inplace<Requested>, Args &&... args)
 			{
-				this->set_which(Index);
+				this->set_index(Index);
 				new (&this->storage()) Requested(std::forward<Args>(args)...);
 			}
 
-			which_type which() const BOOST_NOEXCEPT
+			index_type index() const BOOST_NOEXCEPT
 			{
 				assert(is_valid());
-				return m_storage.which();
+				return m_storage.index();
 			}
 
 			bool is_valid() const BOOST_NOEXCEPT
@@ -563,7 +563,7 @@ namespace Si
 				static std::array<result (*)(Visitor &&, void *),
 				                  sizeof...(T)> const f{
 				    {&apply_visitor_impl<Visitor, T, result>...}};
-				return f[this->which()](
+				return f[this->index()](
 				    std::forward<Visitor>(visitor), &this->storage());
 			}
 
@@ -576,34 +576,34 @@ namespace Si
 				static std::array<result (*)(Visitor &&, void const *),
 				                  sizeof...(T)> const f{
 				    {&apply_visitor_const_impl<Visitor, T, result>...}};
-				return f[this->which()](
+				return f[this->index()](
 				    std::forward<Visitor>(visitor), &this->storage());
 			}
 
 			bool operator==(variant_base const &other) const
 			{
-				if (this->which() != other.which())
+				if (this->index() != other.index())
 				{
 					return false;
 				}
 				static std::array<bool (*)(void const *, void const *),
 				                  sizeof...(T)> const f = {{&equals<T>...}};
-				return f[this->which()](&this->storage(), &other.storage());
+				return f[this->index()](&this->storage(), &other.storage());
 			}
 
 			bool operator<(variant_base const &other) const
 			{
-				if (this->which() > other.which())
+				if (this->index() > other.index())
 				{
 					return false;
 				}
-				if (this->which() < other.which())
+				if (this->index() < other.index())
 				{
 					return true;
 				}
 				static std::array<bool (*)(void const *, void const *),
 				                  sizeof...(T)> const f = {{&less<T>...}};
-				return f[this->which()](&this->storage(), &other.storage());
+				return f[this->index()](&this->storage(), &other.storage());
 			}
 
 			template <bool IsOtherCopyable, class... U>
@@ -628,9 +628,9 @@ namespace Si
 				return m_storage.storage();
 			}
 
-			void set_which(which_type w) BOOST_NOEXCEPT
+			void set_index(index_type w) BOOST_NOEXCEPT
 			{
-				m_storage.which(static_cast<unsigned char>(w));
+				m_storage.index(static_cast<unsigned char>(w));
 			}
 
 			void set_invalid() BOOST_NOEXCEPT
@@ -647,12 +647,12 @@ namespace Si
 				boost::throw_exception(invalid_variant_exception());
 			}
 
-			static void move_construct_storage(which_type which,
+			static void move_construct_storage(index_type index,
 			                                   char &destination, char &source)
 			{
 				static std::array<void (*)(void *, void *), sizeof...(T)> const
 				    f = {{&detail::move_construct_storage<T>...}};
-				f[which](&destination, &source);
+				f[index](&destination, &source);
 			}
 
 			template <class From>
@@ -672,20 +672,20 @@ namespace Si
 				detail::copy_construct_storage<From>(&destination, &from);
 			}
 
-			static void destroy_storage(which_type which,
+			static void destroy_storage(index_type index,
 			                            char &destroyed) BOOST_NOEXCEPT
 			{
 				static std::array<void (*)(void *), sizeof...(T)> const f = {
 				    {&detail::destroy_storage<T>...}};
-				f[which](&destroyed);
+				f[index](&destroyed);
 			}
 
-			static void move_storage(which_type which, char &destination,
+			static void move_storage(index_type index, char &destination,
 			                         char &source) BOOST_NOEXCEPT
 			{
 				static std::array<void (*)(void *, void *), sizeof...(T)> const
 				    f = {{&detail::move_storage<T>...}};
-				f[which](&destination, &source);
+				f[index](&destination, &source);
 			}
 
 			SILICIUM_DELETED_FUNCTION(variant_base(variant_base const &))
@@ -697,7 +697,7 @@ namespace Si
 		struct variant_base<true, T...> : variant_base<false, T...>
 		{
 			typedef variant_base<false, T...> base;
-			typedef typename base::which_type which_type;
+			typedef typename base::index_type index_type;
 
 			variant_base() BOOST_NOEXCEPT
 			{
@@ -732,9 +732,9 @@ namespace Si
 			variant_base(variant_base const &other)
 			    : base()
 			{
-				this->set_which(other.which());
+				this->set_index(other.index());
 				copy_construct_storage(
-				    this->which(), this->storage(), other.storage());
+				    this->index(), this->storage(), other.storage());
 			}
 
 			variant_base &operator=(variant_base &&other)
@@ -761,22 +761,22 @@ namespace Si
 
 			variant_base &operator=(variant_base const &other)
 			{
-				if (this->which() == other.which())
+				if (this->index() == other.index())
 				{
 					copy_storage(
-					    this->which(), this->storage(), other.storage());
+					    this->index(), this->storage(), other.storage());
 				}
 				else
 				{
 					typename base::storage_type temporary;
-					copy_construct_storage(other.which(),
+					copy_construct_storage(other.index(),
 					                       reinterpret_cast<char &>(temporary),
 					                       other.storage());
-					base::destroy_storage(this->which(), this->storage());
+					base::destroy_storage(this->index(), this->storage());
 					base::move_construct_storage(
-					    other.which(), this->storage(),
+					    other.index(), this->storage(),
 					    reinterpret_cast<char &>(temporary));
-					this->set_which(other.which());
+					this->set_index(other.index());
 				}
 				return *this;
 			}
@@ -791,23 +791,23 @@ namespace Si
 			}
 
 		private:
-			static void copy_construct_storage(which_type which,
+			static void copy_construct_storage(index_type index,
 			                                   char &destination,
 			                                   char const &source)
 			{
 				static std::array<void (*)(void *, void const *),
 				                  sizeof...(T)> const f = {
 				    {&detail::copy_construct_storage<T>...}};
-				f[which](&destination, &source);
+				f[index](&destination, &source);
 			}
 
-			static void copy_storage(which_type which, char &destination,
+			static void copy_storage(index_type index, char &destination,
 			                         char const &source)
 			{
 				static std::array<void (*)(void *, void const *),
 				                  sizeof...(T)> const f = {
 				    {&detail::copy_storage<T>...}};
-				f[which](&destination, &source);
+				f[index](&destination, &source);
 			}
 		};
 

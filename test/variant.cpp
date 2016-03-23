@@ -15,7 +15,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(variant_single)
 	{
 		variant<int> v;
-		BOOST_CHECK_EQUAL(0U, v.which());
+		BOOST_CHECK_EQUAL(0U, v.index());
 		int *p = try_get_ptr<int>(v);
 		BOOST_REQUIRE(p);
 		BOOST_CHECK_EQUAL(0, *p);
@@ -28,8 +28,8 @@ namespace Si
 		BOOST_CHECK_EQUAL(1, *try_get_ptr<int>(v));
 		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(w));
 		v = w;
-		BOOST_CHECK_EQUAL(v.which(), w.which());
-		BOOST_CHECK_EQUAL(v.which(), 0u);
+		BOOST_CHECK_EQUAL(v.index(), w.index());
+		BOOST_CHECK_EQUAL(v.index(), 0u);
 		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(v));
 		BOOST_CHECK_EQUAL(2, *try_get_ptr<int>(w));
 	}
@@ -41,8 +41,8 @@ namespace Si
 		BOOST_CHECK_EQUAL(
 		    noexcept_string("S"), *try_get_ptr<noexcept_string>(w));
 		v = w;
-		BOOST_CHECK_EQUAL(v.which(), w.which());
-		BOOST_CHECK_EQUAL(v.which(), 1u);
+		BOOST_CHECK_EQUAL(v.index(), w.index());
+		BOOST_CHECK_EQUAL(v.index(), 1u);
 		BOOST_CHECK_EQUAL(
 		    noexcept_string("S"), *try_get_ptr<noexcept_string>(v));
 		BOOST_CHECK_EQUAL(
@@ -119,14 +119,14 @@ namespace Si
 	{
 		typedef variant<int> variant;
 		variant v;
-		BOOST_CHECK_EQUAL(0U, v.which());
+		BOOST_CHECK_EQUAL(0U, v.index());
 	}
 
 	BOOST_AUTO_TEST_CASE(variant_non_copyable_default)
 	{
 		typedef variant<std::unique_ptr<int>> variant;
 		variant v;
-		BOOST_CHECK_EQUAL(0U, v.which());
+		BOOST_CHECK_EQUAL(0U, v.index());
 	}
 
 	// move constructor
@@ -286,7 +286,7 @@ namespace Si
 		BOOST_CHECK(x != y);
 	}
 
-	BOOST_AUTO_TEST_CASE(variant_copyable_less_which)
+	BOOST_AUTO_TEST_CASE(variant_copyable_less_index)
 	{
 		variant<int, float> v(1), w(1.0f);
 		BOOST_CHECK(v < w);
@@ -298,7 +298,7 @@ namespace Si
 		BOOST_CHECK(v < w);
 	}
 
-	BOOST_AUTO_TEST_CASE(variant_copyable_less_equal_which)
+	BOOST_AUTO_TEST_CASE(variant_copyable_less_equal_index)
 	{
 		variant<int, float> v(1), w(1.0f);
 		BOOST_CHECK(v <= w);
@@ -314,7 +314,7 @@ namespace Si
 		BOOST_CHECK(w <= w);
 	}
 
-	BOOST_AUTO_TEST_CASE(variant_copyable_greater_which)
+	BOOST_AUTO_TEST_CASE(variant_copyable_greater_index)
 	{
 		variant<int, float> v(1), w(1.0f);
 		BOOST_CHECK(w > v);
@@ -331,7 +331,7 @@ namespace Si
 		BOOST_CHECK(!(w > w));
 	}
 
-	BOOST_AUTO_TEST_CASE(variant_copyable_greater_equal_which)
+	BOOST_AUTO_TEST_CASE(variant_copyable_greater_equal_index)
 	{
 		variant<int, float> v(1), w(1.0f);
 		BOOST_CHECK(w >= v);
@@ -420,7 +420,7 @@ namespace Si
 	{
 		variant<std::unique_ptr<int>> v(Si::make_unique<int>(2));
 		variant<float, std::unique_ptr<int>> w;
-		w.assign(std::move(v)); //would not compile because assign uses apply_visitor which does not forward rvalue-ness yet
+		w.assign(std::move(v)); //would not compile because assign uses apply_visitor index does not forward rvalue-ness yet
 		auto * const element = try_get_ptr<std::unique_ptr<int>>(w);
 		BOOST_REQUIRE(element);
 		BOOST_REQUIRE(*element);
