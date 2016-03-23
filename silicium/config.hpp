@@ -187,9 +187,7 @@
 #ifdef BOOST_DELETED_FUNCTION
 #define SILICIUM_DELETED_FUNCTION BOOST_DELETED_FUNCTION
 #else
-#define SILICIUM_DELETED_FUNCTION(f)                                           \
-	\
-private:
+#define SILICIUM_DELETED_FUNCTION(f) private:
 f;
 #endif
 

@@ -386,13 +386,28 @@ namespace Si
 #endif
 
 	private:
+#if SILICIUM_COMPILER_HAS_CXX11_UNION
+		union
+		{
+			T m_storage;
+		};
+
+		T *data() BOOST_NOEXCEPT
+		{
+			return &m_storage;
+		}
+
+		T const *data() const BOOST_NOEXCEPT
+		{
+			return &m_storage;
+		}
+#else
 		enum
 		{
 			alignment = alignment_of<T>::value
 		};
 
 		typename std::aligned_storage<sizeof(T), alignment>::type m_storage;
-		bool m_is_set;
 
 		T *data() BOOST_NOEXCEPT
 		{
@@ -403,6 +418,8 @@ namespace Si
 		{
 			return reinterpret_cast<T const *>(&m_storage);
 		}
+#endif
+		bool m_is_set;
 
 		void throw_if_empty()
 		{
