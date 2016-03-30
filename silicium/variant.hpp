@@ -434,7 +434,7 @@ namespace Si
 			{
 				is_noexcept_movable =
 #if SILICIUM_COMPILER_HAS_WORKING_NOEXCEPT
-				    detail::are_noexcept_movable<T...>::value
+				    ::Si::detail::are_noexcept_movable<T...>::value
 #else
 				    1
 #endif
@@ -652,7 +652,7 @@ namespace Si
 			                                   char &destination, char &source)
 			{
 				static std::array<void (*)(void *, void *), sizeof...(T)> const
-				    f = {{&detail::move_construct_storage<T>...}};
+				    f = {{&::Si::detail::move_construct_storage<T>...}};
 				f[index](&destination, &source);
 			}
 
@@ -661,8 +661,8 @@ namespace Si
 			                                           From &&from,
 			                                           std::false_type)
 			{
-				detail::move_construct_storage<typename std::decay<From>::type>(
-				    &destination, &from);
+				::Si::detail::move_construct_storage<
+				    typename std::decay<From>::type>(&destination, &from);
 			}
 
 			template <class From>
@@ -670,14 +670,14 @@ namespace Si
 			                                           From const &from,
 			                                           std::true_type)
 			{
-				detail::copy_construct_storage<From>(&destination, &from);
+				::Si::detail::copy_construct_storage<From>(&destination, &from);
 			}
 
 			static void destroy_storage(index_type index,
 			                            char &destroyed) BOOST_NOEXCEPT
 			{
 				static std::array<void (*)(void *), sizeof...(T)> const f = {
-				    {&detail::destroy_storage<T>...}};
+				    {&::Si::detail::destroy_storage<T>...}};
 				f[index](&destroyed);
 			}
 
@@ -685,7 +685,7 @@ namespace Si
 			                         char &source) BOOST_NOEXCEPT
 			{
 				static std::array<void (*)(void *, void *), sizeof...(T)> const
-				    f = {{&detail::move_storage<T>...}};
+				    f = {{&::Si::detail::move_storage<T>...}};
 				f[index](&destination, &source);
 			}
 
@@ -798,7 +798,7 @@ namespace Si
 			{
 				static std::array<void (*)(void *, void const *),
 				                  sizeof...(T)> const f = {
-				    {&detail::copy_construct_storage<T>...}};
+				    {&::Si::detail::copy_construct_storage<T>...}};
 				f[index](&destination, &source);
 			}
 
@@ -807,7 +807,7 @@ namespace Si
 			{
 				static std::array<void (*)(void *, void const *),
 				                  sizeof...(T)> const f = {
-				    {&detail::copy_storage<T>...}};
+				    {&::Si::detail::copy_storage<T>...}};
 				f[index](&destination, &source);
 			}
 		};
@@ -844,7 +844,7 @@ namespace Si
 		std::ostream &operator<<(std::ostream &out,
 		                         variant_base<IsCopyable, T...> const &v)
 		{
-			Si::apply_visitor(detail::ostream_visitor(out), v);
+			Si::apply_visitor(::Si::detail::ostream_visitor(out), v);
 			return out;
 		}
 #endif
@@ -852,15 +852,15 @@ namespace Si
 
 #if SILICIUM_COMPILER_HAS_USING
 	template <class... T>
-	using variant = detail::select_variant_base<T...>;
+	using variant = ::Si::detail::select_variant_base<T...>;
 
 	template <class... T>
-	using non_copyable_variant = detail::variant_base<false, T...>;
+	using non_copyable_variant = ::Si::detail::variant_base<false, T...>;
 #else
 	template <class... T>
-	struct variant : detail::select_variant_base<T...>::type
+	struct variant : ::Si::detail::select_variant_base<T...>::type
 	{
-		typedef typename detail::select_variant_base<T...>::type base;
+		typedef typename ::Si::detail::select_variant_base<T...>::type base;
 
 		variant() BOOST_NOEXCEPT
 		{
@@ -920,9 +920,9 @@ namespace Si
 	};
 
 	template <class... T>
-	struct non_copyable_variant : detail::variant_base<false, T...>
+	struct non_copyable_variant : ::Si::detail::variant_base<false, T...>
 	{
-		typedef typename detail::variant_base<false, T...> base;
+		typedef typename ::Si::detail::variant_base<false, T...> base;
 
 		non_copyable_variant() BOOST_NOEXCEPT
 		{
@@ -978,7 +978,7 @@ namespace Si
 	template <class... T>
 	std::ostream &operator<<(std::ostream &out, variant<T...> const &v)
 	{
-		Si::apply_visitor(detail::ostream_visitor(out), v);
+		Si::apply_visitor(::Si::detail::ostream_visitor(out), v);
 		return out;
 	}
 #endif
@@ -1045,8 +1045,8 @@ namespace Si
 	}
 #else
 	template <class Element, bool IsCopyable, class... T>
-	Element *
-	try_get_ptr(detail::variant_base<IsCopyable, T...> &from) BOOST_NOEXCEPT
+	Element *try_get_ptr(::Si::detail::variant_base<IsCopyable, T...> &from)
+	    BOOST_NOEXCEPT
 	{
 		BOOST_STATIC_ASSERT(
 		    (boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
@@ -1055,7 +1055,7 @@ namespace Si
 
 	template <class Element, bool IsCopyable, class... T>
 	typename std::add_const<Element>::type *try_get_ptr(
-	    detail::variant_base<IsCopyable, T...> const &from) BOOST_NOEXCEPT
+	    ::Si::detail::variant_base<IsCopyable, T...> const &from) BOOST_NOEXCEPT
 	{
 		BOOST_STATIC_ASSERT(
 		    (boost::mpl::contains<boost::mpl::vector<T...>, Element>::value));
@@ -1120,15 +1120,15 @@ namespace Si
 	template <class Result, class Variant, class... Visitors>
 	Result visit(Variant &&variant, Visitors &&... visitors)
 	{
-		detail::overloader<Result, Visitors...> ov(visitors...);
+		::Si::detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
 #else
 	template <class Result, bool IsCopyable, class... T, class... Visitors>
-	Result visit(detail::variant_base<IsCopyable, T...> &variant,
+	Result visit(::Si::detail::variant_base<IsCopyable, T...> &variant,
 	             Visitors &&... visitors)
 	{
-		detail::overloader<Result, Visitors...> ov(visitors...);
+		::Si::detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
 
@@ -1136,7 +1136,7 @@ namespace Si
 	Result visit(detail::variant_base<IsCopyable, T...> const &variant,
 	             Visitors &&... visitors)
 	{
-		detail::overloader<Result, Visitors...> ov(visitors...);
+		::Si::detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
 #endif

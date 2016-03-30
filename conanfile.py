@@ -3,7 +3,7 @@ import os
 
 class SiliciumConan(ConanFile):
     name = "silicium"
-    version = "0.9"
+    version = "0.10"
     generators = "cmake"
     requires = "Boost/1.60.0@lasote/stable", "websocketpp/0.7.0@TyRoXx/stable"
     url="http://github.com/tyroxx/silicium"
