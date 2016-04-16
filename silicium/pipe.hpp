@@ -69,7 +69,7 @@ namespace Si
 #ifdef _WIN32
 		SECURITY_ATTRIBUTES security = {};
 		security.nLength = sizeof(security);
-		//usually you do not want to inherit random handles from the parent
+		// usually you do not want to inherit random handles from the parent
 		security.bInheritHandle = FALSE;
 		HANDLE read, write;
 		if (!CreatePipe(&read, &write, &security, 0))

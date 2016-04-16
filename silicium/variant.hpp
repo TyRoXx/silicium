@@ -546,7 +546,7 @@ namespace Si
 			{
 				if (valueless_by_exception())
 				{
-					return static_cast<index_type >(-1);
+					return static_cast<index_type>(-1);
 				}
 				return m_storage.index();
 			}
