@@ -1066,7 +1066,9 @@ namespace Si
 #endif
 
 	template <std::size_t Index, class Variant>
-	auto *try_get(Variant &from)
+	typename boost::mpl::at<typename Variant::element_types,
+	                        boost::mpl::int_<Index>>::type *
+	try_get(Variant &from)
 	{
 		return try_get_ptr<typename boost::mpl::at<
 		    typename Variant::element_types, boost::mpl::int_<Index>>::type>(
