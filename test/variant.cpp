@@ -799,4 +799,88 @@ BOOST_AUTO_TEST_CASE(variant_of_incomplete_types)
 	print(buffer, root);
 	BOOST_CHECK_EQUAL("(a + (b + 1))", buffer.str());
 }
+
+#define SILICIUM_SWITCH2(variant, first, second)                               \
+	{                                                                          \
+		switch ((variant).index())                                             \
+		{                                                                      \
+		case 0:                                                                \
+		{                                                                      \
+			auto &value = *Si::try_get<0>((variant));                          \
+			first goto silicium_switch2_leave;                                 \
+		}                                                                      \
+		case 1:                                                                \
+		{                                                                      \
+			auto &value = *Si::try_get<1>((variant));                          \
+			second goto silicium_switch2_leave;                                \
+		}                                                                      \
+		}                                                                      \
+		SILICIUM_UNREACHABLE();                                                \
+	silicium_switch2_leave:                                                    \
+		(void)0;                                                               \
+	}
+
+#define SILICIUM_SWITCH2_BREAKABLE(variant, first, second)                     \
+	{                                                                          \
+		bool silicium_switch2_break_by_user = true;                            \
+		switch ((variant).index())                                             \
+		{                                                                      \
+		case 0:                                                                \
+		{                                                                      \
+			auto &value = *Si::try_get<0>((variant));                          \
+			first silicium_switch2_break_by_user = false;                      \
+			break;                                                             \
+		}                                                                      \
+		case 1:                                                                \
+		{                                                                      \
+			auto &value = *Si::try_get<1>((variant));                          \
+			second silicium_switch2_break_by_user = false;                     \
+			break;                                                             \
+		}                                                                      \
+		}                                                                      \
+		if (silicium_switch2_break_by_user)                                    \
+		{                                                                      \
+			break;                                                             \
+		}                                                                      \
+	}
+
+BOOST_AUTO_TEST_CASE(variant_switch)
+{
+	Si::variant<int, std::string> v = 123;
+	bool ok = false;
+	SILICIUM_SWITCH2(v,
+	                 {
+		                 BOOST_REQUIRE_EQUAL(123, value);
+		                 BOOST_REQUIRE(!ok);
+		                 ok = true;
+		             },
+	                 {
+		                 Si::ignore_unused_variable_warning(value);
+		                 BOOST_FAIL("wrong type");
+		             })
+	BOOST_CHECK(ok);
+}
+
+BOOST_AUTO_TEST_CASE(variant_switch_break)
+{
+	Si::variant<int, std::string> v = 123;
+	bool ok = false;
+	for (;;)
+	{
+		SILICIUM_SWITCH2_BREAKABLE(
+		    v,
+		    {
+			    BOOST_CHECK_EQUAL(123, value);
+			    BOOST_REQUIRE(!ok);
+			    ok = true;
+			    break;
+			},
+		    {
+			    Si::ignore_unused_variable_warning(value);
+			    BOOST_FAIL("wrong type");
+			})
+		BOOST_FAIL("unreachable");
+	}
+	BOOST_CHECK(ok);
+}
 #endif
