@@ -11,7 +11,7 @@
 #include <boost/config.hpp>
 
 #define SILICIUM_HAS_TRANSFORM_OBSERVABLE                                      \
-	(SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && !SILICIUM_GCC46)
+	SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 
 namespace Si
 {

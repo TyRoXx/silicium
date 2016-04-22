@@ -6,8 +6,7 @@
 #include <silicium/trait.hpp>
 #include <silicium/identity.hpp>
 
-#define SILICIUM_HAS_HTML_TREE                                                 \
-	(SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && !SILICIUM_GCC46)
+#define SILICIUM_HAS_HTML_TREE SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 
 namespace Si
 {

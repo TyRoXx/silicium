@@ -441,9 +441,7 @@ namespace Si
 			};
 
 			typedef unsigned index_type;
-#if !SILICIUM_GCC46
 			typedef boost::mpl::vector<T...> element_types;
-#endif
 
 			variant_base() BOOST_NOEXCEPT
 			{
@@ -1031,19 +1029,6 @@ namespace Si
 		}
 	};
 
-#if SILICIUM_GCC46
-	template <class Element, class Variant>
-	Element *try_get_ptr(Variant &from) BOOST_NOEXCEPT
-	{
-		return apply_visitor(try_get_ptr_visitor<Element>{}, from);
-	}
-
-	template <class Element, class Variant>
-	Element const *try_get_ptr(Variant const &from) BOOST_NOEXCEPT
-	{
-		return apply_visitor(try_get_ptr_visitor<Element const>{}, from);
-	}
-#else
 	template <class Element, bool IsCopyable, class... T>
 	Element *try_get_ptr(::Si::detail::variant_base<IsCopyable, T...> &from)
 	    BOOST_NOEXCEPT
@@ -1063,7 +1048,6 @@ namespace Si
 		    try_get_ptr_visitor<typename std::add_const<Element>::type>{},
 		    from);
 	}
-#endif
 
 	template <std::size_t Index, class Variant>
 	typename boost::mpl::at<typename Variant::element_types,
@@ -1126,14 +1110,6 @@ namespace Si
 		};
 	}
 
-#if SILICIUM_GCC46
-	template <class Result, class Variant, class... Visitors>
-	Result visit(Variant &&variant, Visitors &&... visitors)
-	{
-		::Si::detail::overloader<Result, Visitors...> ov(visitors...);
-		return Si::apply_visitor(ov, variant);
-	}
-#else
 	template <class Result, bool IsCopyable, class... T, class... Visitors>
 	Result visit(::Si::detail::variant_base<IsCopyable, T...> &variant,
 	             Visitors &&... visitors)
@@ -1149,7 +1125,6 @@ namespace Si
 		::Si::detail::overloader<Result, Visitors...> ov(visitors...);
 		return Si::apply_visitor(ov, variant);
 	}
-#endif
 #endif
 }
 

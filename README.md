@@ -14,7 +14,7 @@ compilers
 
 * [![Build Status](https://travis-ci.org/TyRoXx/silicium.svg?branch=master)](https://travis-ci.org/TyRoXx/silicium)
   the library is continuously tested with several versions of GCC on Ubuntu 12.04 (Boost 1.54 and 1.55)
-  * tested GCC versions: 4.6, 4.7, 4.8, 4.9, 5.2
+  * tested GCC versions: 4.7, 4.8, 4.9, 5.2
   * only works with at least C++11 enabled (``-std=c++0x``, ``-std=c++11``, ``-std=cpp1y`` etc)
 * [![Build status](https://ci.appveyor.com/api/projects/status/c3g0m66oe3t6e6ct/branch/master?svg=true)](https://ci.appveyor.com/project/TyRoXx/silicium/branch/master)
   * Visual Studio 2015 is tested with Boost 1.56

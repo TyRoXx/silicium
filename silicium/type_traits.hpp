@@ -17,11 +17,9 @@
 #endif
 #include <boost/type_traits/has_nothrow_destructor.hpp>
 
-#define SILICIUM_HAS_COPY_TRAITS                                               \
-	((!SILICIUM_VC || SILICIUM_VC2013_OR_LATER) && !SILICIUM_GCC46)
+#define SILICIUM_HAS_COPY_TRAITS (!SILICIUM_VC || SILICIUM_VC2013_OR_LATER)
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||       \
-    defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
 #define SILICIUM_HAS_PROPER_COPY_TRAITS 1
 #include <type_traits>
 namespace Si
@@ -38,8 +36,7 @@ namespace Si
 
 namespace Si
 {
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||       \
-    defined(__clang__) || SILICIUM_VC2012_OR_LATER
+#if defined(__GNUC__) || defined(__clang__) || SILICIUM_VC2012_OR_LATER
 }
 #include <type_traits>
 namespace Si
@@ -95,7 +92,7 @@ namespace Si
 
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1800)
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) == 407)
+#if defined(__GNUC__)
 	template <class T>
 	struct is_nothrow_destructible : std::true_type
 	{
@@ -104,8 +101,7 @@ namespace Si
 	using std::is_nothrow_destructible;
 #endif
 
-#else // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||
-	// defined(__clang__) || defined(_MSC_VER)
+#else
 	template <class T>
 	struct is_default_constructible
 	    : std::conditional<std::is_reference<T>::value, std::false_type,
@@ -168,8 +164,7 @@ namespace Si
 	struct is_move_constructible<std::unique_ptr<T>> : std::true_type
 	{
 	};
-#endif // defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||
-	   // defined(__clang__) || defined(_MSC_VER)
+#endif
 
 	BOOST_STATIC_ASSERT(is_default_constructible<int>::value);
 	BOOST_STATIC_ASSERT(is_nothrow_default_constructible<int>::value);

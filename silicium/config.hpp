@@ -11,12 +11,6 @@
 #define SILICIUM_GCC 0
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 6)
-#define SILICIUM_GCC46 1
-#else
-#define SILICIUM_GCC46 0
-#endif
-
 #if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 7)
 #define SILICIUM_GCC47 1
 #else
@@ -157,16 +151,10 @@
 #define SILICIUM_CAPTURE_EXPRESSION(name, value) name
 #endif
 
-#if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES && (__GNUC__) &&                  \
-        (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||                        \
-    defined(__clang__) || defined(_MSC_VER)
 #define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 1
-#else
-#define SILICIUM_COMPILER_HAS_VARIADIC_PACK_EXPANSION 0
-#endif
 
-#if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 407) ||       \
-    defined(__clang__) || (defined(_MSC_VER) && (_MSC_VER >= 1800))
+#if defined(__GNUC__) || defined(__clang__) ||                                 \
+    (defined(_MSC_VER) && (_MSC_VER >= 1800))
 #define SILICIUM_COMPILER_HAS_USING 1
 #else
 #define SILICIUM_COMPILER_HAS_USING 0
@@ -213,12 +201,7 @@ f;
 #define SILICIUM_DEPRECATED __attribute__((deprecated))
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ <= 4) &&                                    \
-    (__GNUC__ < 4 || __GNUC_MINOR__ <= 6)
-#define SILICIUM_OVERRIDE
-#else
 #define SILICIUM_OVERRIDE override
-#endif
 
 #ifdef _MSC_VER
 #define SILICIUM_USE_RESULT _Check_return_
