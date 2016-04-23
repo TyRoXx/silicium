@@ -6,16 +6,16 @@
 
 namespace
 {
-	std::experimental::generator<char> generate_something()
-	{
-		__yield_value 'x';
-	}
+    std::experimental::generator<char> generate_something()
+    {
+        __yield_value 'x';
+    }
 }
 
 int main()
 {
-	for (auto &&e : generate_something())
-	{
-		std::cout << e;
-	}
+    for (auto &&e : generate_something())
+    {
+        std::cout << e;
+    }
 }

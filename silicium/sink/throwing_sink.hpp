@@ -8,44 +8,44 @@
 
 namespace Si
 {
-	template <class Next>
-	struct throwing_sink
-	{
-		typedef typename Next::element_type element_type;
-		typedef success error_type;
+    template <class Next>
+    struct throwing_sink
+    {
+        typedef typename Next::element_type element_type;
+        typedef success error_type;
 
-		throwing_sink()
-		{
-		}
+        throwing_sink()
+        {
+        }
 
-		explicit throwing_sink(Next next)
-		    : next(next)
-		{
-		}
+        explicit throwing_sink(Next next)
+            : next(next)
+        {
+        }
 
-		error_type append(iterator_range<element_type const *> data)
-		{
-			auto error = next.append(data);
-			if (error)
-			{
-				boost::throw_exception(boost::system::system_error(error));
-			}
-			return {};
-		}
+        error_type append(iterator_range<element_type const *> data)
+        {
+            auto error = next.append(data);
+            if (error)
+            {
+                boost::throw_exception(boost::system::system_error(error));
+            }
+            return {};
+        }
 
-	private:
-		Next next;
-	};
+    private:
+        Next next;
+    };
 
-	template <class Next>
-	auto make_throwing_sink(Next &&next)
+    template <class Next>
+    auto make_throwing_sink(Next &&next)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> throwing_sink<typename std::decay<Next>::type>
+        -> throwing_sink<typename std::decay<Next>::type>
 #endif
-	{
-		return throwing_sink<typename std::decay<Next>::type>(
-		    std::forward<Next>(next));
-	}
+    {
+        return throwing_sink<typename std::decay<Next>::type>(
+            std::forward<Next>(next));
+    }
 }
 
 #endif

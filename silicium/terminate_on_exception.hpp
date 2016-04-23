@@ -7,11 +7,11 @@
 namespace boost
 {
 #ifdef BOOST_NO_EXCEPTIONS
-	void throw_exception(std::exception const &e)
-	{
-		Si::ignore_unused_variable_warning(e);
-		std::terminate();
-	}
+    void throw_exception(std::exception const &e)
+    {
+        Si::ignore_unused_variable_warning(e);
+        std::terminate();
+    }
 #endif
 }
 

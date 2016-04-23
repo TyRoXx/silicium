@@ -11,11 +11,11 @@
 // define an ostream operator for pair.
 namespace std
 {
-	template <class T, class U>
-	ostream &operator<<(ostream &s, const pair<T, U> &p)
-	{
-		return s << '<' << p.first << ',' << p.second << '>';
-	}
+    template <class T, class U>
+    ostream &operator<<(ostream &s, const pair<T, U> &p)
+    {
+        return s << '<' << p.first << ',' << p.second << '>';
+    }
 }
 #endif
 

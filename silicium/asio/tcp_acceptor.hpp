@@ -11,111 +11,111 @@
 
 namespace Si
 {
-	namespace asio
-	{
-		typedef error_or<std::shared_ptr<boost::asio::ip::tcp::socket>>
-		    tcp_acceptor_result; // until socket itself is noexcept-movable
+    namespace asio
+    {
+        typedef error_or<std::shared_ptr<boost::asio::ip::tcp::socket>>
+            tcp_acceptor_result; // until socket itself is noexcept-movable
 
-		template <class AcceptorPtrLike>
-		struct tcp_acceptor
-		{
-			typedef tcp_acceptor_result element_type;
+        template <class AcceptorPtrLike>
+        struct tcp_acceptor
+        {
+            typedef tcp_acceptor_result element_type;
 
-			tcp_acceptor()
-			    : underlying(nullptr)
-			{
-			}
+            tcp_acceptor()
+                : underlying(nullptr)
+            {
+            }
 
-			explicit tcp_acceptor(AcceptorPtrLike underlying)
-			    : underlying(std::move(underlying))
-			{
-			}
+            explicit tcp_acceptor(AcceptorPtrLike underlying)
+                : underlying(std::move(underlying))
+            {
+            }
 
-			tcp_acceptor(tcp_acceptor &&other) BOOST_NOEXCEPT
-			    : underlying(std::move(other.underlying)),
-			      next_client(std::move(other.next_client))
-			{
-			}
+            tcp_acceptor(tcp_acceptor &&other) BOOST_NOEXCEPT
+                : underlying(std::move(other.underlying)),
+                  next_client(std::move(other.next_client))
+            {
+            }
 
-			tcp_acceptor &operator=(tcp_acceptor &&other) BOOST_NOEXCEPT
-			{
-				underlying = std::move(other.underlying);
-				next_client = std::move(other.next_client);
-				return *this;
-			}
+            tcp_acceptor &operator=(tcp_acceptor &&other) BOOST_NOEXCEPT
+            {
+                underlying = std::move(other.underlying);
+                next_client = std::move(other.next_client);
+                return *this;
+            }
 
-			~tcp_acceptor()
-			{
-			}
+            ~tcp_acceptor()
+            {
+            }
 
-			template <class Observer>
-			void async_get_one(Observer &&receiver)
-			{
-				assert(underlying);
-				next_client = std::make_shared<boost::asio::ip::tcp::socket>(
-				    underlying->get_io_service());
-				underlying->async_accept(
-				    *next_client,
-				    [this, receiver](boost::system::error_code error) mutable
-				    {
-					    if (error)
-					    {
-						    if (error == boost::asio::error::operation_aborted)
-						    {
-							    return;
-						    }
-						    std::forward<Observer>(receiver)
-						        .got_element(tcp_acceptor_result{error});
-					    }
-					    else
-					    {
-						    std::forward<Observer>(receiver).got_element(
-						        tcp_acceptor_result{std::move(next_client)});
-					    }
-					});
-			}
+            template <class Observer>
+            void async_get_one(Observer &&receiver)
+            {
+                assert(underlying);
+                next_client = std::make_shared<boost::asio::ip::tcp::socket>(
+                    underlying->get_io_service());
+                underlying->async_accept(
+                    *next_client,
+                    [this, receiver](boost::system::error_code error) mutable
+                    {
+                        if (error)
+                        {
+                            if (error == boost::asio::error::operation_aborted)
+                            {
+                                return;
+                            }
+                            std::forward<Observer>(receiver)
+                                .got_element(tcp_acceptor_result{error});
+                        }
+                        else
+                        {
+                            std::forward<Observer>(receiver).got_element(
+                                tcp_acceptor_result{std::move(next_client)});
+                        }
+                    });
+            }
 
-		private:
-			AcceptorPtrLike underlying;
-			std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
+        private:
+            AcceptorPtrLike underlying;
+            std::shared_ptr<boost::asio::ip::tcp::socket> next_client;
 
-			SILICIUM_DELETED_FUNCTION(tcp_acceptor(tcp_acceptor const &))
-			SILICIUM_DELETED_FUNCTION(
-			    tcp_acceptor &operator=(tcp_acceptor const &))
-		};
+            SILICIUM_DELETED_FUNCTION(tcp_acceptor(tcp_acceptor const &))
+            SILICIUM_DELETED_FUNCTION(
+                tcp_acceptor &operator=(tcp_acceptor const &))
+        };
 
-		template <class AcceptorPtrLike>
-		auto make_tcp_acceptor(AcceptorPtrLike &&acceptor)
+        template <class AcceptorPtrLike>
+        auto make_tcp_acceptor(AcceptorPtrLike &&acceptor)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> tcp_acceptor<typename std::decay<AcceptorPtrLike>::type>
+            -> tcp_acceptor<typename std::decay<AcceptorPtrLike>::type>
 #endif
-		{
-			return tcp_acceptor<typename std::decay<AcceptorPtrLike>::type>(
-			    std::forward<AcceptorPtrLike>(acceptor));
-		}
+        {
+            return tcp_acceptor<typename std::decay<AcceptorPtrLike>::type>(
+                std::forward<AcceptorPtrLike>(acceptor));
+        }
 
-		template <class Protocol, class Service>
-		auto make_tcp_acceptor(
-		    boost::asio::basic_socket_acceptor<Protocol, Service> &&acceptor)
+        template <class Protocol, class Service>
+        auto make_tcp_acceptor(
+            boost::asio::basic_socket_acceptor<Protocol, Service> &&acceptor)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> decltype(
-		        make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor))))
+            -> decltype(
+                make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor))))
 #endif
-		{
-			return make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor)));
-		}
+        {
+            return make_tcp_acceptor(make_ptr_adaptor(std::move(acceptor)));
+        }
 
-		inline auto make_tcp_acceptor(boost::asio::io_service &io,
-		                              boost::asio::ip::tcp::endpoint endpoint)
+        inline auto make_tcp_acceptor(boost::asio::io_service &io,
+                                      boost::asio::ip::tcp::endpoint endpoint)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> decltype(make_tcp_acceptor(
-		        make_unique<boost::asio::ip::tcp::acceptor>(io, endpoint)))
+            -> decltype(make_tcp_acceptor(
+                make_unique<boost::asio::ip::tcp::acceptor>(io, endpoint)))
 #endif
-		{
-			return make_tcp_acceptor(
-			    make_unique<boost::asio::ip::tcp::acceptor>(io, endpoint));
-		}
-	}
+        {
+            return make_tcp_acceptor(
+                make_unique<boost::asio::ip::tcp::acceptor>(io, endpoint));
+        }
+    }
 }
 
 #endif

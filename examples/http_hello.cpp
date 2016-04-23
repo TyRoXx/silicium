@@ -11,109 +11,109 @@
 #include <iostream>
 
 #define SILICIUM_THIS_EXAMPLE_AVAILABLE                                        \
-	(SILICIUM_HAS_SPAWN_COROUTINE && SILICIUM_HAS_TRANSFORM_OBSERVABLE)
+    (SILICIUM_HAS_SPAWN_COROUTINE && SILICIUM_HAS_TRANSFORM_OBSERVABLE)
 
 #if SILICIUM_THIS_EXAMPLE_AVAILABLE
 namespace
 {
-	template <class YieldContext>
-	void serve_client(boost::asio::ip::tcp::socket &client,
-	                  YieldContext &&yield)
-	{
-		auto request = Si::http::receive_request(client, yield);
-		if (request.is_error())
-		{
-			// The header was incomplete, maybe the connecting was closed.
-			// If we want to know the reason, the error_extracting_source
-			// remembered it:
-			boost::system::error_code error = request.error();
-			boost::ignore_unused_variable_warning(error);
-			return;
-		}
+    template <class YieldContext>
+    void serve_client(boost::asio::ip::tcp::socket &client,
+                      YieldContext &&yield)
+    {
+        auto request = Si::http::receive_request(client, yield);
+        if (request.is_error())
+        {
+            // The header was incomplete, maybe the connecting was closed.
+            // If we want to know the reason, the error_extracting_source
+            // remembered it:
+            boost::system::error_code error = request.error();
+            boost::ignore_unused_variable_warning(error);
+            return;
+        }
 
-		if (!request.get())
-		{
-			// syntax error in the request
-			return;
-		}
+        if (!request.get())
+        {
+            // syntax error in the request
+            return;
+        }
 
-		std::vector<char> response;
-		{
-			auto response_writer = Si::make_container_sink(response);
-			Si::http::generate_status_line(
-			    response_writer, "HTTP/1.0", "200", "OK");
-			boost::string_ref const content = "Hello, visitor!";
-			Si::http::generate_header(
-			    response_writer, "Content-Length",
-			    boost::lexical_cast<Si::noexcept_string>(content.size()));
-			Si::http::finish_headers(response_writer);
-			Si::append(response_writer, content);
-		}
+        std::vector<char> response;
+        {
+            auto response_writer = Si::make_container_sink(response);
+            Si::http::generate_status_line(
+                response_writer, "HTTP/1.0", "200", "OK");
+            boost::string_ref const content = "Hello, visitor!";
+            Si::http::generate_header(
+                response_writer, "Content-Length",
+                boost::lexical_cast<Si::noexcept_string>(content.size()));
+            Si::http::finish_headers(response_writer);
+            Si::append(response_writer, content);
+        }
 
-		// you can handle the error if you want
-		boost::system::error_code error =
-		    Si::asio::write(client, Si::make_memory_range(response), yield);
+        // you can handle the error if you want
+        boost::system::error_code error =
+            Si::asio::write(client, Si::make_memory_range(response), yield);
 
-		// ignore shutdown failures, they do not matter here
-		client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
-	}
+        // ignore shutdown failures, they do not matter here
+        client.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+    }
 
-	boost::system::error_code spawn_server(boost::asio::io_service &io)
-	{
-		boost::system::error_code ec;
+    boost::system::error_code spawn_server(boost::asio::io_service &io)
+    {
+        boost::system::error_code ec;
 
-		// use a unique_ptr to support older versions of Boost where acceptor
-		// was not movable
-		auto acceptor = Si::make_unique<boost::asio::ip::tcp::acceptor>(io);
+        // use a unique_ptr to support older versions of Boost where acceptor
+        // was not movable
+        auto acceptor = Si::make_unique<boost::asio::ip::tcp::acceptor>(io);
 
-		acceptor->open(boost::asio::ip::tcp::v4(), ec);
-		if (ec)
-		{
-			return ec;
-		}
+        acceptor->open(boost::asio::ip::tcp::v4(), ec);
+        if (ec)
+        {
+            return ec;
+        }
 
-		acceptor->bind(
-		    boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080),
-		    ec);
-		if (ec)
-		{
-			return ec;
-		}
+        acceptor->bind(
+            boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(), 8080),
+            ec);
+        if (ec)
+        {
+            return ec;
+        }
 
-		acceptor->listen(boost::asio::ip::tcp::acceptor::max_connections, ec);
-		if (ec)
-		{
-			return ec;
-		}
+        acceptor->listen(boost::asio::ip::tcp::acceptor::max_connections, ec);
+        if (ec)
+        {
+            return ec;
+        }
 
-		Si::spawn_observable(Si::transform(
-		    Si::asio::make_tcp_acceptor(std::move(acceptor)),
-		    [](Si::asio::tcp_acceptor_result maybe_client)
-		    {
-			    auto client = maybe_client.get();
-			    Si::spawn_coroutine([client](Si::spawn_context yield)
-			                        {
-				                        serve_client(*client, yield);
-				                    });
-			}));
+        Si::spawn_observable(Si::transform(
+            Si::asio::make_tcp_acceptor(std::move(acceptor)),
+            [](Si::asio::tcp_acceptor_result maybe_client)
+            {
+                auto client = maybe_client.get();
+                Si::spawn_coroutine([client](Si::spawn_context yield)
+                                    {
+                                        serve_client(*client, yield);
+                                    });
+            }));
 
-		return boost::system::error_code();
-	}
+        return boost::system::error_code();
+    }
 }
 #endif
 
 int main()
 {
-	boost::asio::io_service io;
+    boost::asio::io_service io;
 #if SILICIUM_THIS_EXAMPLE_AVAILABLE
-	boost::system::error_code ec = spawn_server(io);
-	if (ec)
-	{
-		std::cerr << ec << ": " << ec.message() << '\n';
-		return 1;
-	}
+    boost::system::error_code ec = spawn_server(io);
+    if (ec)
+    {
+        std::cerr << ec << ": " << ec.message() << '\n';
+        return 1;
+    }
 #else
-	std::cerr << "This example requires coroutine support\n";
+    std::cerr << "This example requires coroutine support\n";
 #endif
-	io.run();
+    io.run();
 }

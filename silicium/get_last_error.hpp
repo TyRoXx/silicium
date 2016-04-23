@@ -12,17 +12,17 @@
 
 namespace Si
 {
-	SILICIUM_USE_RESULT
-	inline boost::system::error_code get_last_error()
-	{
-		auto const err =
+    SILICIUM_USE_RESULT
+    inline boost::system::error_code get_last_error()
+    {
+        auto const err =
 #ifdef _WIN32
-		    ::GetLastError();
+            ::GetLastError();
 #else
-		    errno;
+            errno;
 #endif
-		return boost::system::error_code(err, boost::system::system_category());
-	}
+        return boost::system::error_code(err, boost::system::system_category());
+    }
 }
 
 #endif

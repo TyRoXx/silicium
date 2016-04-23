@@ -8,33 +8,33 @@
 
 namespace Si
 {
-	namespace linux
-	{
-		struct dynamic_library_impl
-		{
-			SILICIUM_USE_RESULT
-			static void *open(c_string file)
-			{
-				void *const handle = dlopen(file.c_str(), RTLD_LAZY);
-				if (!handle)
-				{
-					boost::throw_exception(std::runtime_error(dlerror()));
-				}
-				return handle;
-			}
+    namespace linux
+    {
+        struct dynamic_library_impl
+        {
+            SILICIUM_USE_RESULT
+            static void *open(c_string file)
+            {
+                void *const handle = dlopen(file.c_str(), RTLD_LAZY);
+                if (!handle)
+                {
+                    boost::throw_exception(std::runtime_error(dlerror()));
+                }
+                return handle;
+            }
 
-			static void close(void *handle)
-			{
-				dlclose(handle);
-			}
+            static void close(void *handle)
+            {
+                dlclose(handle);
+            }
 
-			SILICIUM_USE_RESULT
-			static void *find_symbol(void *handle, c_string const &name)
-			{
-				return dlsym(handle, name.c_str());
-			}
-		};
-	}
+            SILICIUM_USE_RESULT
+            static void *find_symbol(void *handle, c_string const &name)
+            {
+                return dlsym(handle, name.c_str());
+            }
+        };
+    }
 }
 
 #endif

@@ -78,7 +78,7 @@
 #endif
 
 #define SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES                               \
-	(SILICIUM_GCC || SILICIUM_VC2013_OR_LATER)
+    (SILICIUM_GCC || SILICIUM_VC2013_OR_LATER)
 
 #if defined(NDEBUG) || !SILICIUM_HAS_EXCEPTIONS
 #ifdef _MSC_VER
@@ -88,8 +88,8 @@
 #endif
 #else
 #define SILICIUM_UNREACHABLE()                                                 \
-	throw ::std::logic_error("SILICIUM_UNREACHABLE was executed at " __FILE__  \
-	                         ":" BOOST_STRINGIZE(__LINE__))
+    throw ::std::logic_error("SILICIUM_UNREACHABLE was executed at " __FILE__  \
+                             ":" BOOST_STRINGIZE(__LINE__))
 #endif
 
 #if (defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 408)) ||     \
@@ -180,20 +180,20 @@ f;
 #endif
 
 #define SILICIUM_DISABLE_COPY(struct_name)                                     \
-	SILICIUM_DELETED_FUNCTION(struct_name(struct_name const &))                \
-	SILICIUM_DELETED_FUNCTION(struct_name &operator=(struct_name const &))
+    SILICIUM_DELETED_FUNCTION(struct_name(struct_name const &))                \
+    SILICIUM_DELETED_FUNCTION(struct_name &operator=(struct_name const &))
 
 #define SILICIUM_DEFAULT_NOEXCEPT_MOVE(struct_name)                            \
-	struct_name(struct_name &&) BOOST_NOEXCEPT = default;                      \
-	struct_name &operator=(struct_name &&) BOOST_NOEXCEPT = default;
+    struct_name(struct_name &&) BOOST_NOEXCEPT = default;                      \
+    struct_name &operator=(struct_name &&) BOOST_NOEXCEPT = default;
 
 #define SILICIUM_DEFAULT_MOVE(struct_name)                                     \
-	struct_name(struct_name &&) = default;                                     \
-	struct_name &operator=(struct_name &&) = default;
+    struct_name(struct_name &&) = default;                                     \
+    struct_name &operator=(struct_name &&) = default;
 
 #define SILICIUM_DEFAULT_COPY(struct_name)                                     \
-	struct_name(struct_name const &) = default;                                \
-	struct_name &operator=(struct_name const &) = default;
+    struct_name(struct_name const &) = default;                                \
+    struct_name &operator=(struct_name const &) = default;
 
 #ifdef _MSC_VER
 #define SILICIUM_DEPRECATED __declspec(deprecated)
@@ -213,41 +213,41 @@ f;
 #define SILICIUM_CXX14_CONSTEXPR
 
 #define SILICIUM_IF(condition, value)                                          \
-	BOOST_PP_IF(condition, value, BOOST_PP_EMPTY())
+    BOOST_PP_IF(condition, value, BOOST_PP_EMPTY())
 #define SILICIUM_IF_NOT(condition, value)                                      \
-	BOOST_PP_IF(condition, BOOST_PP_EMPTY(), value)
+    BOOST_PP_IF(condition, BOOST_PP_EMPTY(), value)
 
 #define SILICIUM_MOVE_IF_COMPILER_LACKS_RVALUE_QUALIFIERS(should_be_rvalue)    \
-	BOOST_PP_IF(SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER,                   \
-	            (should_be_rvalue), std::move((should_be_rvalue)))
+    BOOST_PP_IF(SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER,                   \
+                (should_be_rvalue), std::move((should_be_rvalue)))
 
 namespace Si
 {
-	struct unit
-	{
-		BOOST_CONSTEXPR unit() BOOST_NOEXCEPT
-		{
-		}
-	};
+    struct unit
+    {
+        BOOST_CONSTEXPR unit() BOOST_NOEXCEPT
+        {
+        }
+    };
 
-	inline bool operator==(unit const &, unit const &)
-	{
-		return true;
-	}
+    inline bool operator==(unit const &, unit const &)
+    {
+        return true;
+    }
 
-	template <class To, class From>
-	To function_ptr_cast(From from)
-	{
+    template <class To, class From>
+    To function_ptr_cast(From from)
+    {
 // TODO: check that the cast makes sense
 #ifdef __GNUC__
-		// silence Warnung: ISO C++ forbids casting between pointer-to-function
-		// and pointer-to-object [enabled by
-		// default]
-		__extension__
+        // silence Warnung: ISO C++ forbids casting between pointer-to-function
+        // and pointer-to-object [enabled by
+        // default]
+        __extension__
 #endif
-		    To result = reinterpret_cast<To>(from);
-		return result;
-	}
+            To result = reinterpret_cast<To>(from);
+        return result;
+    }
 }
 
 #define SILICIUM_COMPILER_HAS_FUTURE (SILICIUM_GCC || SILICIUM_VC2012_OR_LATER)
@@ -256,18 +256,18 @@ namespace Si
 {
 #if BOOST_VERSION <= 105400
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
-	typedef std::size_t uintptr_t;
+    typedef std::size_t uintptr_t;
 #else
-	typedef std::uintptr_t uintptr_t;
+    typedef std::uintptr_t uintptr_t;
 #endif
 #else
-	typedef boost::uintptr_t uintptr_t;
+    typedef boost::uintptr_t uintptr_t;
 #endif
 
-	template <class T>
-	void ignore_unused_variable_warning(T &&)
-	{
-	}
+    template <class T>
+    void ignore_unused_variable_warning(T &&)
+    {
+    }
 }
 
 #endif

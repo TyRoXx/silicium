@@ -8,13 +8,13 @@
 namespace Si
 {
 #ifdef _WIN32
-	typedef HANDLE native_file_descriptor;
+    typedef HANDLE native_file_descriptor;
 
-	native_file_descriptor const no_file_handle = INVALID_HANDLE_VALUE;
+    native_file_descriptor const no_file_handle = INVALID_HANDLE_VALUE;
 #else
-	typedef int native_file_descriptor;
+    typedef int native_file_descriptor;
 
-	native_file_descriptor const no_file_handle = -1;
+    native_file_descriptor const no_file_handle = -1;
 #endif
 }
 

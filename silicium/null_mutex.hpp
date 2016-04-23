@@ -3,16 +3,16 @@
 
 namespace Si
 {
-	struct null_mutex
-	{
-		void lock()
-		{
-		}
+    struct null_mutex
+    {
+        void lock()
+        {
+        }
 
-		void unlock()
-		{
-		}
-	};
+        void unlock()
+        {
+        }
+    };
 }
 
 #endif

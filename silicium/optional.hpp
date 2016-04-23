@@ -20,680 +20,680 @@
 
 namespace Si
 {
-	struct none_t
-	{
-		BOOST_CONSTEXPR none_t()
-		{
-		}
+    struct none_t
+    {
+        BOOST_CONSTEXPR none_t()
+        {
+        }
 
-		BOOST_CONSTEXPR bool operator!() const BOOST_NOEXCEPT
-		{
-			return true;
-		}
+        BOOST_CONSTEXPR bool operator!() const BOOST_NOEXCEPT
+        {
+            return true;
+        }
 
-		SILICIUM_EXPLICIT_OPERATOR_BOOL()
-	};
+        SILICIUM_EXPLICIT_OPERATOR_BOOL()
+    };
 
-	static none_t BOOST_CONSTEXPR_OR_CONST none;
+    static none_t BOOST_CONSTEXPR_OR_CONST none;
 
-	inline bool operator==(none_t, none_t)
-	{
-		return true;
-	}
+    inline bool operator==(none_t, none_t)
+    {
+        return true;
+    }
 
-	struct some_t
-	{
-		BOOST_CONSTEXPR some_t()
-		{
-		}
-	};
+    struct some_t
+    {
+        BOOST_CONSTEXPR some_t()
+        {
+        }
+    };
 
-	static some_t BOOST_CONSTEXPR_OR_CONST some;
+    static some_t BOOST_CONSTEXPR_OR_CONST some;
 
-	struct bad_optional_access : std::logic_error
-	{
-		bad_optional_access()
-		    : std::logic_error("bad_optional_access")
-		{
-		}
-	};
+    struct bad_optional_access : std::logic_error
+    {
+        bad_optional_access()
+            : std::logic_error("bad_optional_access")
+        {
+        }
+    };
 
-	template <class T>
-	struct optional
-	{
-		optional() BOOST_NOEXCEPT : m_is_set(false)
-		{
-		}
+    template <class T>
+    struct optional
+    {
+        optional() BOOST_NOEXCEPT : m_is_set(false)
+        {
+        }
 
-		optional(none_t) BOOST_NOEXCEPT : m_is_set(false)
-		{
-		}
+        optional(none_t) BOOST_NOEXCEPT : m_is_set(false)
+        {
+        }
 
-		optional(optional &&other) BOOST_NOEXCEPT : m_is_set(other.m_is_set)
-		{
-			if (m_is_set)
-			{
-				new (data()) T(std::move(*other));
-			}
-		}
+        optional(optional &&other) BOOST_NOEXCEPT : m_is_set(other.m_is_set)
+        {
+            if (m_is_set)
+            {
+                new (data()) T(std::move(*other));
+            }
+        }
 
-		optional(optional const &other)
-		    : m_is_set(other.m_is_set)
-		{
-			if (m_is_set)
-			{
-				new (data()) T(*other);
-			}
-		}
+        optional(optional const &other)
+            : m_is_set(other.m_is_set)
+        {
+            if (m_is_set)
+            {
+                new (data()) T(*other);
+            }
+        }
 
-		optional(T &&value) BOOST_NOEXCEPT : m_is_set(true)
-		{
-			new (data()) T(std::move(value));
-		}
+        optional(T &&value) BOOST_NOEXCEPT : m_is_set(true)
+        {
+            new (data()) T(std::move(value));
+        }
 
-		optional(T const &value)
-		    : m_is_set(true)
-		{
-			new (data()) T(value);
-		}
+        optional(T const &value)
+            : m_is_set(true)
+        {
+            new (data()) T(value);
+        }
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class... Args>
-		explicit optional(some_t, Args &&... args)
-		    : m_is_set(true)
-		{
-			new (data()) T(std::forward<Args>(args)...);
-		}
+        template <class... Args>
+        explicit optional(some_t, Args &&... args)
+            : m_is_set(true)
+        {
+            new (data()) T(std::forward<Args>(args)...);
+        }
 #else
-		explicit optional(some_t)
-		    : m_is_set(true)
-		{
-			new (data()) T();
-		}
+        explicit optional(some_t)
+            : m_is_set(true)
+        {
+            new (data()) T();
+        }
 
-		template <class A0>
-		explicit optional(some_t, A0 &&a0)
-		    : m_is_set(true)
-		{
-			new (data()) T(std::forward<A0>(a0));
-		}
+        template <class A0>
+        explicit optional(some_t, A0 &&a0)
+            : m_is_set(true)
+        {
+            new (data()) T(std::forward<A0>(a0));
+        }
 #endif
 
-		~optional() BOOST_NOEXCEPT
-		{
-			if (!m_is_set)
-			{
-				return;
-			}
-			data()->~T();
-		}
+        ~optional() BOOST_NOEXCEPT
+        {
+            if (!m_is_set)
+            {
+                return;
+            }
+            data()->~T();
+        }
 
-		optional &operator=(optional &&other) BOOST_NOEXCEPT
-		{
-			if (m_is_set)
-			{
-				if (other.m_is_set)
-				{
-					*data() = std::move(*other);
-				}
-				else
-				{
-					data()->~T();
-					m_is_set = false;
-				}
-			}
-			else
-			{
-				if (other.m_is_set)
-				{
-					new (data()) T(std::move(*other));
-					m_is_set = true;
-				}
-				else
-				{
-					// both are already empty
-				}
-			}
-			return *this;
-		}
+        optional &operator=(optional &&other) BOOST_NOEXCEPT
+        {
+            if (m_is_set)
+            {
+                if (other.m_is_set)
+                {
+                    *data() = std::move(*other);
+                }
+                else
+                {
+                    data()->~T();
+                    m_is_set = false;
+                }
+            }
+            else
+            {
+                if (other.m_is_set)
+                {
+                    new (data()) T(std::move(*other));
+                    m_is_set = true;
+                }
+                else
+                {
+                    // both are already empty
+                }
+            }
+            return *this;
+        }
 
-		optional &operator=(optional const &other)
-		{
-			if (m_is_set)
-			{
-				if (other.m_is_set)
-				{
-					*data() = *other;
-				}
-				else
-				{
-					data()->~T();
-					m_is_set = false;
-				}
-			}
-			else
-			{
-				if (other.m_is_set)
-				{
-					new (data()) T(*other);
-					m_is_set = true;
-				}
-				else
-				{
-					// both are already empty
-				}
-			}
-			return *this;
-		}
+        optional &operator=(optional const &other)
+        {
+            if (m_is_set)
+            {
+                if (other.m_is_set)
+                {
+                    *data() = *other;
+                }
+                else
+                {
+                    data()->~T();
+                    m_is_set = false;
+                }
+            }
+            else
+            {
+                if (other.m_is_set)
+                {
+                    new (data()) T(*other);
+                    m_is_set = true;
+                }
+                else
+                {
+                    // both are already empty
+                }
+            }
+            return *this;
+        }
 
-		optional &operator=(T const &value)
-		{
-			if (m_is_set)
-			{
-				*data() = value;
-			}
-			else
-			{
-				new (data()) T(value);
-				m_is_set = true;
-			}
-			return *this;
-		}
+        optional &operator=(T const &value)
+        {
+            if (m_is_set)
+            {
+                *data() = value;
+            }
+            else
+            {
+                new (data()) T(value);
+                m_is_set = true;
+            }
+            return *this;
+        }
 
-		optional &operator=(T &&value) BOOST_NOEXCEPT
-		{
-			if (m_is_set)
-			{
-				*data() = std::move(value);
-			}
-			else
-			{
-				new (data()) T(std::move(value));
-				m_is_set = true;
-			}
-			return *this;
-		}
+        optional &operator=(T &&value) BOOST_NOEXCEPT
+        {
+            if (m_is_set)
+            {
+                *data() = std::move(value);
+            }
+            else
+            {
+                new (data()) T(std::move(value));
+                m_is_set = true;
+            }
+            return *this;
+        }
 
-		optional &operator=(none_t const &) BOOST_NOEXCEPT
-		{
-			if (m_is_set)
-			{
-				data()->~T();
-				m_is_set = false;
-			}
-			return *this;
-		}
+        optional &operator=(none_t const &) BOOST_NOEXCEPT
+        {
+            if (m_is_set)
+            {
+                data()->~T();
+                m_is_set = false;
+            }
+            return *this;
+        }
 
-		SILICIUM_EXPLICIT_OPERATOR_BOOL()
+        SILICIUM_EXPLICIT_OPERATOR_BOOL()
 
-		SILICIUM_USE_RESULT
-		bool operator!() const BOOST_NOEXCEPT
-		{
-			return !m_is_set;
-		}
+        SILICIUM_USE_RESULT
+        bool operator!() const BOOST_NOEXCEPT
+        {
+            return !m_is_set;
+        }
 
 #if !SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-		SILICIUM_USE_RESULT
-		T &operator*() BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return *data();
-		}
+        SILICIUM_USE_RESULT
+        T &operator*() BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return *data();
+        }
 
-		SILICIUM_USE_RESULT
-		T const &operator*() const BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return *data();
-		}
+        SILICIUM_USE_RESULT
+        T const &operator*() const BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return *data();
+        }
 #else
-		SILICIUM_USE_RESULT
-		T &operator*() & BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return *data();
-		}
+        SILICIUM_USE_RESULT
+        T &operator*() & BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return *data();
+        }
 
-		SILICIUM_USE_RESULT
-		T &&operator*() && BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return std::move(*data());
-		}
+        SILICIUM_USE_RESULT
+        T &&operator*() && BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return std::move(*data());
+        }
 
-		SILICIUM_USE_RESULT
-		T const &operator*() const &BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return *data();
-		}
+        SILICIUM_USE_RESULT
+        T const &operator*() const &BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return *data();
+        }
 #endif
 
-		T *operator->() BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return data();
-		}
+        T *operator->() BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return data();
+        }
 
-		T const *operator->() const BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return data();
-		}
+        T const *operator->() const BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return data();
+        }
 
 #if SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
-		template <class... Args>
-		void emplace(Args &&... args)
-		{
-			*this = none;
-			new (data()) T{std::forward<Args>(args)...};
-			m_is_set = true;
-		}
+        template <class... Args>
+        void emplace(Args &&... args)
+        {
+            *this = none;
+            new (data()) T{std::forward<Args>(args)...};
+            m_is_set = true;
+        }
 #else
 
-		void emplace()
-		{
-			*this = none;
-			new (data()) T();
-			m_is_set = true;
-		}
+        void emplace()
+        {
+            *this = none;
+            new (data()) T();
+            m_is_set = true;
+        }
 
 #define BOOST_PP_LOCAL_MACRO(N)                                                \
-	template <BOOST_PP_ENUM_PARAMS(N, class A)>                                \
-	void emplace(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                         \
-	{                                                                          \
-		*this = none;                                                          \
-		new (data()) T(BOOST_PP_ENUM_PARAMS(N, a));                            \
-		m_is_set = true;                                                       \
-	}
+    template <BOOST_PP_ENUM_PARAMS(N, class A)>                                \
+    void emplace(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                         \
+    {                                                                          \
+        *this = none;                                                          \
+        new (data()) T(BOOST_PP_ENUM_PARAMS(N, a));                            \
+        m_is_set = true;                                                       \
+    }
 #define BOOST_PP_LOCAL_LIMITS (1, 10)
 #include BOOST_PP_LOCAL_ITERATE()
 #undef BOOST_PP_LOCAL_MACRO
 #endif
 
-		void swap(optional &other) BOOST_NOEXCEPT_IF(
-		    Si::is_nothrow_move_constructible<T>::value &&BOOST_NOEXCEPT_EXPR(
-		        std::swap(boost::declval<T &>(), boost::declval<T &>())))
-		{
-			if (*this)
-			{
-				if (other)
-				{
-					using std::swap;
-					swap(**this, *other);
-				}
-				else
-				{
-					other.emplace(std::move(*this));
-					*this = none;
-				}
-			}
-			else
-			{
-				if (other)
-				{
-					this->emplace(std::move(*other));
-					other = none;
-				}
-				else
-				{
-					// both empty -> nothing to be done here
-				}
-			}
-		}
+        void swap(optional &other) BOOST_NOEXCEPT_IF(
+            Si::is_nothrow_move_constructible<T>::value &&BOOST_NOEXCEPT_EXPR(
+                std::swap(boost::declval<T &>(), boost::declval<T &>())))
+        {
+            if (*this)
+            {
+                if (other)
+                {
+                    using std::swap;
+                    swap(**this, *other);
+                }
+                else
+                {
+                    other.emplace(std::move(*this));
+                    *this = none;
+                }
+            }
+            else
+            {
+                if (other)
+                {
+                    this->emplace(std::move(*other));
+                    other = none;
+                }
+                else
+                {
+                    // both empty -> nothing to be done here
+                }
+            }
+        }
 
-		template <class EmptyHandler>
-		T &or_throw(EmptyHandler &&handle_empty)
-		{
-			if (*this)
-			{
-				return **this;
-			}
-			std::forward<EmptyHandler>(handle_empty)();
-			SILICIUM_UNREACHABLE();
-		}
+        template <class EmptyHandler>
+        T &or_throw(EmptyHandler &&handle_empty)
+        {
+            if (*this)
+            {
+                return **this;
+            }
+            std::forward<EmptyHandler>(handle_empty)();
+            SILICIUM_UNREACHABLE();
+        }
 
-		T &value()
+        T &value()
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-		    &
+            &
 #endif
-		{
-			throw_if_empty();
-			return **this;
-		}
+        {
+            throw_if_empty();
+            return **this;
+        }
 
-		T const &value() const
+        T const &value() const
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-		    &
+            &
 #endif
-		{
-			throw_if_empty();
-			return **this;
-		}
+        {
+            throw_if_empty();
+            return **this;
+        }
 
 #if SILICIUM_COMPILER_HAS_RVALUE_THIS_QUALIFIER
-		T &value() &&
-		{
-			throw_if_empty();
-			return **this;
-		}
+        T &value() &&
+        {
+            throw_if_empty();
+            return **this;
+        }
 
-		T const &value() const &&
-		{
-			throw_if_empty();
-			return **this;
-		}
+        T const &value() const &&
+        {
+            throw_if_empty();
+            return **this;
+        }
 #endif
 
-	private:
+    private:
 #if SILICIUM_COMPILER_HAS_CXX11_UNION
-		union
-		{
-			T m_storage;
-		};
+        union
+        {
+            T m_storage;
+        };
 
-		T *data() BOOST_NOEXCEPT
-		{
-			return &m_storage;
-		}
+        T *data() BOOST_NOEXCEPT
+        {
+            return &m_storage;
+        }
 
-		T const *data() const BOOST_NOEXCEPT
-		{
-			return &m_storage;
-		}
+        T const *data() const BOOST_NOEXCEPT
+        {
+            return &m_storage;
+        }
 #else
-		enum
-		{
-			alignment = alignment_of<T>::value
-		};
+        enum
+        {
+            alignment = alignment_of<T>::value
+        };
 
-		typename std::aligned_storage<sizeof(T), alignment>::type m_storage;
+        typename std::aligned_storage<sizeof(T), alignment>::type m_storage;
 
-		T *data() BOOST_NOEXCEPT
-		{
-			return reinterpret_cast<T *>(&m_storage);
-		}
+        T *data() BOOST_NOEXCEPT
+        {
+            return reinterpret_cast<T *>(&m_storage);
+        }
 
-		T const *data() const BOOST_NOEXCEPT
-		{
-			return reinterpret_cast<T const *>(&m_storage);
-		}
+        T const *data() const BOOST_NOEXCEPT
+        {
+            return reinterpret_cast<T const *>(&m_storage);
+        }
 #endif
-		bool m_is_set;
+        bool m_is_set;
 
-		void throw_if_empty()
-		{
-			if (*this)
-			{
-				return;
-			}
-			boost::throw_exception(bad_optional_access());
-		}
-	};
+        void throw_if_empty()
+        {
+            if (*this)
+            {
+                return;
+            }
+            boost::throw_exception(bad_optional_access());
+        }
+    };
 
-	template <class T>
-	struct optional<T &>
-	{
-		optional() BOOST_NOEXCEPT : m_data(nullptr)
-		{
-		}
+    template <class T>
+    struct optional<T &>
+    {
+        optional() BOOST_NOEXCEPT : m_data(nullptr)
+        {
+        }
 
-		optional(T &data) BOOST_NOEXCEPT : m_data(&data)
-		{
-		}
+        optional(T &data) BOOST_NOEXCEPT : m_data(&data)
+        {
+        }
 
-		optional(some_t, T &data) BOOST_NOEXCEPT : m_data(&data)
-		{
-		}
+        optional(some_t, T &data) BOOST_NOEXCEPT : m_data(&data)
+        {
+        }
 
-		optional(none_t) BOOST_NOEXCEPT : m_data(nullptr)
-		{
-		}
+        optional(none_t) BOOST_NOEXCEPT : m_data(nullptr)
+        {
+        }
 
-		void emplace(T &data) BOOST_NOEXCEPT
-		{
-			m_data = &data;
-		}
+        void emplace(T &data) BOOST_NOEXCEPT
+        {
+            m_data = &data;
+        }
 
-		SILICIUM_USE_RESULT
-		bool operator!() const BOOST_NOEXCEPT
-		{
-			return m_data == nullptr;
-		}
+        SILICIUM_USE_RESULT
+        bool operator!() const BOOST_NOEXCEPT
+        {
+            return m_data == nullptr;
+        }
 
-		SILICIUM_EXPLICIT_OPERATOR_BOOL()
+        SILICIUM_EXPLICIT_OPERATOR_BOOL()
 
-		SILICIUM_USE_RESULT
-		T &operator*() BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return *m_data;
-		}
+        SILICIUM_USE_RESULT
+        T &operator*() BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return *m_data;
+        }
 
-		SILICIUM_USE_RESULT
-		T const &operator*() const BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return *m_data;
-		}
+        SILICIUM_USE_RESULT
+        T const &operator*() const BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return *m_data;
+        }
 
-		T *operator->() BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return m_data;
-		}
+        T *operator->() BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return m_data;
+        }
 
-		T const *operator->() const BOOST_NOEXCEPT
-		{
-			assert(*this);
-			return m_data;
-		}
+        T const *operator->() const BOOST_NOEXCEPT
+        {
+            assert(*this);
+            return m_data;
+        }
 
-		T &value()
-		{
-			throw_if_empty();
-			return **this;
-		}
+        T &value()
+        {
+            throw_if_empty();
+            return **this;
+        }
 
-		T const &value() const
-		{
-			throw_if_empty();
-			return **this;
-		}
+        T const &value() const
+        {
+            throw_if_empty();
+            return **this;
+        }
 
-	private:
-		T *m_data;
+    private:
+        T *m_data;
 
-		void throw_if_empty()
-		{
-			if (*this)
-			{
-				return;
-			}
-			boost::throw_exception(bad_optional_access());
-		}
-	};
+        void throw_if_empty()
+        {
+            if (*this)
+            {
+                return;
+            }
+            boost::throw_exception(bad_optional_access());
+        }
+    };
 
-	template <class T>
-	SILICIUM_USE_RESULT bool operator==(optional<T> const &left,
-	                                    optional<T> const &right)
-	{
-		if (left && right)
-		{
-			return (*left == *right);
-		}
-		return !left == !right;
-	}
+    template <class T>
+    SILICIUM_USE_RESULT bool operator==(optional<T> const &left,
+                                        optional<T> const &right)
+    {
+        if (left && right)
+        {
+            return (*left == *right);
+        }
+        return !left == !right;
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT bool operator==(optional<T> const &left, T const &right)
-	{
-		if (left)
-		{
-			return (*left == right);
-		}
-		return false;
-	}
+    template <class T>
+    SILICIUM_USE_RESULT bool operator==(optional<T> const &left, T const &right)
+    {
+        if (left)
+        {
+            return (*left == right);
+        }
+        return false;
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT bool operator==(T const &left, optional<T> const &right)
-	{
-		return (right == left);
-	}
+    template <class T>
+    SILICIUM_USE_RESULT bool operator==(T const &left, optional<T> const &right)
+    {
+        return (right == left);
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT bool operator==(none_t const &,
-	                                    optional<T> const &right)
-	{
-		return !right;
-	}
+    template <class T>
+    SILICIUM_USE_RESULT bool operator==(none_t const &,
+                                        optional<T> const &right)
+    {
+        return !right;
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT bool operator==(optional<T> const &left, none_t const &)
-	{
-		return !left;
-	}
+    template <class T>
+    SILICIUM_USE_RESULT bool operator==(optional<T> const &left, none_t const &)
+    {
+        return !left;
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT bool operator!=(optional<T> const &left,
-	                                    optional<T> const &right)
-	{
-		return !(left == right);
-	}
+    template <class T>
+    SILICIUM_USE_RESULT bool operator!=(optional<T> const &left,
+                                        optional<T> const &right)
+    {
+        return !(left == right);
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT bool operator<(optional<T> const &left,
-	                                   optional<T> const &right)
-	{
-		if (left)
-		{
-			if (right)
-			{
-				return (*left < *right);
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			if (right)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
+    template <class T>
+    SILICIUM_USE_RESULT bool operator<(optional<T> const &left,
+                                       optional<T> const &right)
+    {
+        if (left)
+        {
+            if (right)
+            {
+                return (*left < *right);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (right)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT Si::optional<typename std::decay<T>::type>
-	make_optional(T &&value)
-	{
-		return Si::optional<typename std::decay<T>::type>(
-		    std::forward<T>(value));
-	}
+    template <class T>
+    SILICIUM_USE_RESULT Si::optional<typename std::decay<T>::type>
+    make_optional(T &&value)
+    {
+        return Si::optional<typename std::decay<T>::type>(
+            std::forward<T>(value));
+    }
 
-	inline std::ostream &operator<<(std::ostream &out, none_t const &)
-	{
-		out << "none";
-		return out;
-	}
+    inline std::ostream &operator<<(std::ostream &out, none_t const &)
+    {
+        out << "none";
+        return out;
+    }
 
-	template <class T>
-	std::ostream &operator<<(std::ostream &out, optional<T> const &value)
-	{
-		if (value)
-		{
-			out << *value;
-		}
-		else
-		{
-			out << "none";
-		}
-		return out;
-	}
+    template <class T>
+    std::ostream &operator<<(std::ostream &out, optional<T> const &value)
+    {
+        if (value)
+        {
+            out << *value;
+        }
+        else
+        {
+            out << "none";
+        }
+        return out;
+    }
 
-	template <class T>
-	SILICIUM_USE_RESULT std::size_t hash_value(optional<T> const &value)
-	{
-		if (value)
-		{
-			using boost::hash_value;
-			return hash_value(*value);
-		}
-		return 0;
-	}
+    template <class T>
+    SILICIUM_USE_RESULT std::size_t hash_value(optional<T> const &value)
+    {
+        if (value)
+        {
+            using boost::hash_value;
+            return hash_value(*value);
+        }
+        return 0;
+    }
 
-	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t>) == 2);
-	BOOST_STATIC_ASSERT(sizeof(optional<boost::int16_t>) == 4);
-	BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) ==
-	                    (2 * sizeof(boost::uint32_t)));
-	BOOST_STATIC_ASSERT(sizeof(optional<char *>) ==
-	                    (alignment_of<char *>::value + sizeof(char *)));
-	BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t &>) ==
-	                    sizeof(boost::int8_t *));
+    BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t>) == 2);
+    BOOST_STATIC_ASSERT(sizeof(optional<boost::int16_t>) == 4);
+    BOOST_STATIC_ASSERT(sizeof(optional<boost::uint32_t>) ==
+                        (2 * sizeof(boost::uint32_t)));
+    BOOST_STATIC_ASSERT(sizeof(optional<char *>) ==
+                        (alignment_of<char *>::value + sizeof(char *)));
+    BOOST_STATIC_ASSERT(sizeof(optional<boost::int8_t &>) ==
+                        sizeof(boost::int8_t *));
 
-	template <class T, class Transformation>
-	auto fmap(optional<T> const &value, Transformation &&transform)
-	    -> optional<decltype(std::forward<Transformation>(transform)(*value))>
-	{
-		if (value)
-		{
-			return std::forward<Transformation>(transform)(*value);
-		}
-		return none;
-	}
+    template <class T, class Transformation>
+    auto fmap(optional<T> const &value, Transformation &&transform)
+        -> optional<decltype(std::forward<Transformation>(transform)(*value))>
+    {
+        if (value)
+        {
+            return std::forward<Transformation>(transform)(*value);
+        }
+        return none;
+    }
 
 #define SILICIUM_HAS_VARIADIC_FMAP SILICIUM_COMPILER_HAS_VARIADIC_TEMPLATES
 
 #if SILICIUM_HAS_VARIADIC_FMAP
-	namespace detail
-	{
-		inline bool all_of()
-		{
-			return true;
-		}
+    namespace detail
+    {
+        inline bool all_of()
+        {
+            return true;
+        }
 
-		template <class Head, class... Tail>
-		bool all_of(Head const &head, Tail const &... tail)
-		{
-			if (!head)
-			{
-				return false;
-			}
-			return all_of(tail...);
-		}
-	}
+        template <class Head, class... Tail>
+        bool all_of(Head const &head, Tail const &... tail)
+        {
+            if (!head)
+            {
+                return false;
+            }
+            return all_of(tail...);
+        }
+    }
 
-	template <class Transformation, class... Optionals>
-	auto variadic_fmap(Transformation &&transform, Optionals const &... values)
-	    -> optional<
-	        decltype(std::forward<Transformation>(transform)((*values)...))>
-	{
-		if (detail::all_of(values...))
-		{
-			return std::forward<Transformation>(transform)((*values)...);
-		}
-		return none;
-	}
+    template <class Transformation, class... Optionals>
+    auto variadic_fmap(Transformation &&transform, Optionals const &... values)
+        -> optional<
+            decltype(std::forward<Transformation>(transform)((*values)...))>
+    {
+        if (detail::all_of(values...))
+        {
+            return std::forward<Transformation>(transform)((*values)...);
+        }
+        return none;
+    }
 #endif
 }
 
 namespace std
 {
-	template <class T>
-	struct hash<Si::optional<T>>
-	{
-		SILICIUM_USE_RESULT
-		std::size_t operator()(Si::optional<T> const &value) const
-		{
-			return hash_value(value);
-		}
-	};
+    template <class T>
+    struct hash<Si::optional<T>>
+    {
+        SILICIUM_USE_RESULT
+        std::size_t operator()(Si::optional<T> const &value) const
+        {
+            return hash_value(value);
+        }
+    };
 }
 
 #endif

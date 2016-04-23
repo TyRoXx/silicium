@@ -13,69 +13,69 @@
 
 namespace Si
 {
-	namespace asio
-	{
-		template <class AsyncStream>
-		struct writing_observable
-		{
-			typedef boost::system::error_code element_type;
+    namespace asio
+    {
+        template <class AsyncStream>
+        struct writing_observable
+        {
+            typedef boost::system::error_code element_type;
 
-			writing_observable()
-			    : stream(nullptr)
-			{
-			}
+            writing_observable()
+                : stream(nullptr)
+            {
+            }
 
-			explicit writing_observable(AsyncStream &stream)
-			    : stream(&stream)
-			{
-			}
+            explicit writing_observable(AsyncStream &stream)
+                : stream(&stream)
+            {
+            }
 
-			void set_buffer(memory_range buffer)
-			{
-				m_buffer = buffer;
-			}
+            void set_buffer(memory_range buffer)
+            {
+                m_buffer = buffer;
+            }
 
-			template <class Observer>
-			void async_get_one(Observer &&receiver)
-			{
-				assert(stream);
-				boost::asio::async_write(
-				    *stream, boost::asio::buffer(
-				                 m_buffer.begin(),
-				                 static_cast<std::size_t>(m_buffer.size())),
-				    [SILICIUM_CAPTURE_EXPRESSION(
-				        receiver, std::forward<Observer>(receiver))](
-				        boost::system::error_code ec,
-				        std::size_t bytes_sent) mutable
-				    {
-					    (void)bytes_sent;
-					    std::forward<Observer>(receiver).got_element(ec);
-					});
-			}
+            template <class Observer>
+            void async_get_one(Observer &&receiver)
+            {
+                assert(stream);
+                boost::asio::async_write(
+                    *stream, boost::asio::buffer(
+                                 m_buffer.begin(),
+                                 static_cast<std::size_t>(m_buffer.size())),
+                    [SILICIUM_CAPTURE_EXPRESSION(
+                        receiver, std::forward<Observer>(receiver))](
+                        boost::system::error_code ec,
+                        std::size_t bytes_sent) mutable
+                    {
+                        (void)bytes_sent;
+                        std::forward<Observer>(receiver).got_element(ec);
+                    });
+            }
 
-		private:
-			AsyncStream *stream;
-			memory_range m_buffer;
-		};
+        private:
+            AsyncStream *stream;
+            memory_range m_buffer;
+        };
 
-		template <class AsyncStream>
-		auto make_writing_observable(AsyncStream &stream)
+        template <class AsyncStream>
+        auto make_writing_observable(AsyncStream &stream)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    -> writing_observable<AsyncStream>
+            -> writing_observable<AsyncStream>
 #endif
-		{
-			return writing_observable<AsyncStream>(stream);
-		}
+        {
+            return writing_observable<AsyncStream>(stream);
+        }
 
-		template <class AsyncStream, class YieldContext>
-		boost::system::error_code write(AsyncStream &stream, memory_range data,
-		                                YieldContext &&yield)
-		{
-			auto writer = make_writing_observable(stream);
-			writer.set_buffer(data);
-			return *yield.get_one(writer);
-		}
-	}
+        template <class AsyncStream, class YieldContext>
+        boost::system::error_code write(AsyncStream &stream, memory_range data,
+                                        YieldContext &&yield)
+        {
+            auto writer = make_writing_observable(stream);
+            writer.set_buffer(data);
+            return *yield.get_one(writer);
+        }
+    }
 }
 
 #endif

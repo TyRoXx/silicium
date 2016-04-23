@@ -7,50 +7,50 @@
 
 namespace Si
 {
-	template <class Observable, class Observer>
-	struct virtualized_observable
-	    : Si::Observable<typename Observable::element_type, Observer>::interface
-	{
-		typedef typename Observable::element_type element_type;
+    template <class Observable, class Observer>
+    struct virtualized_observable
+        : Si::Observable<typename Observable::element_type, Observer>::interface
+    {
+        typedef typename Observable::element_type element_type;
 
-		virtualized_observable()
-		{
-		}
+        virtualized_observable()
+        {
+        }
 
-		explicit virtualized_observable(Observable next)
-		    : next(std::move(next))
-		{
-		}
+        explicit virtualized_observable(Observable next)
+            : next(std::move(next))
+        {
+        }
 
 #if !SILICIUM_COMPILER_GENERATES_MOVES
-		virtualized_observable(virtualized_observable &&other)
-		    : next(std::move(other.next))
-		{
-		}
+        virtualized_observable(virtualized_observable &&other)
+            : next(std::move(other.next))
+        {
+        }
 
-		virtualized_observable &operator=(virtualized_observable &&other)
-		{
-			next = std::move(other.next);
-			return *this;
-		}
+        virtualized_observable &operator=(virtualized_observable &&other)
+        {
+            next = std::move(other.next);
+            return *this;
+        }
 #endif
 
-		virtual void async_get_one(Observer receiver) SILICIUM_OVERRIDE
-		{
-			return next.async_get_one(receiver);
-		}
+        virtual void async_get_one(Observer receiver) SILICIUM_OVERRIDE
+        {
+            return next.async_get_one(receiver);
+        }
 
-	private:
-		Observable next;
-	};
+    private:
+        Observable next;
+    };
 
-	template <class Observer, class Observable>
-	virtualized_observable<typename std::decay<Observable>::type, Observer>
-	virtualize_observable(Observable &&next)
-	{
-		return virtualized_observable<typename std::decay<Observable>::type,
-		                              Observer>(std::forward<Observable>(next));
-	}
+    template <class Observer, class Observable>
+    virtualized_observable<typename std::decay<Observable>::type, Observer>
+    virtualize_observable(Observable &&next)
+    {
+        return virtualized_observable<typename std::decay<Observable>::type,
+                                      Observer>(std::forward<Observable>(next));
+    }
 }
 
 #endif

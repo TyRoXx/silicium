@@ -9,25 +9,25 @@
 
 namespace Si
 {
-	template <class SourceOfErrorOrs>
-	auto make_throwing_source(SourceOfErrorOrs &&input)
+    template <class SourceOfErrorOrs>
+    auto make_throwing_source(SourceOfErrorOrs &&input)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> ptr_source<std::unique_ptr<typename Source<typename std::decay<
-	        SourceOfErrorOrs>::type::element_type::value_type>::interface>>
+        -> ptr_source<std::unique_ptr<typename Source<typename std::decay<
+            SourceOfErrorOrs>::type::element_type::value_type>::interface>>
 #endif
-	{
-		return
+    {
+        return
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		    erase_source
+            erase_source
 #endif
-		    (make_transforming_source(
-		        std::forward<SourceOfErrorOrs>(input),
-		        [](typename std::decay<SourceOfErrorOrs>::type::element_type
-		               element)
-		        {
-			        return std::move(element).get();
-			    }));
-	}
+            (make_transforming_source(
+                std::forward<SourceOfErrorOrs>(input),
+                [](typename std::decay<SourceOfErrorOrs>::type::element_type
+                       element)
+                {
+                    return std::move(element).get();
+                }));
+    }
 }
 
 #endif

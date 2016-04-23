@@ -8,22 +8,22 @@
 
 namespace Si
 {
-	template <class Element>
-	struct empty_source : Source<Element>::interface
-	{
-		virtual iterator_range<Element const *>
-		map_next(std::size_t size) SILICIUM_OVERRIDE
-		{
-			boost::ignore_unused_variable_warning(size);
-			return {};
-		}
+    template <class Element>
+    struct empty_source : Source<Element>::interface
+    {
+        virtual iterator_range<Element const *>
+        map_next(std::size_t size) SILICIUM_OVERRIDE
+        {
+            boost::ignore_unused_variable_warning(size);
+            return {};
+        }
 
-		virtual Element *
-		copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
-		{
-			return destination.begin();
-		}
-	};
+        virtual Element *
+        copy_next(iterator_range<Element *> destination) SILICIUM_OVERRIDE
+        {
+            return destination.begin();
+        }
+    };
 }
 
 #endif

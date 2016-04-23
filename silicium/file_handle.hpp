@@ -10,63 +10,63 @@
 
 namespace Si
 {
-	struct file_handle
-	{
-		native_file_descriptor handle;
+    struct file_handle
+    {
+        native_file_descriptor handle;
 
-		file_handle() BOOST_NOEXCEPT : handle(no_file_handle)
-		{
-		}
+        file_handle() BOOST_NOEXCEPT : handle(no_file_handle)
+        {
+        }
 
-		file_handle(file_handle &&other) BOOST_NOEXCEPT : handle(no_file_handle)
-		{
-			swap(other);
-		}
+        file_handle(file_handle &&other) BOOST_NOEXCEPT : handle(no_file_handle)
+        {
+            swap(other);
+        }
 
-		explicit file_handle(native_file_descriptor handle) BOOST_NOEXCEPT
-		    : handle(handle)
-		{
-		}
+        explicit file_handle(native_file_descriptor handle) BOOST_NOEXCEPT
+            : handle(handle)
+        {
+        }
 
-		file_handle &operator=(file_handle &&other) BOOST_NOEXCEPT
-		{
-			swap(other);
-			return *this;
-		}
+        file_handle &operator=(file_handle &&other) BOOST_NOEXCEPT
+        {
+            swap(other);
+            return *this;
+        }
 
-		void swap(file_handle &other) BOOST_NOEXCEPT
-		{
-			using std::swap;
-			swap(handle, other.handle);
-		}
+        void swap(file_handle &other) BOOST_NOEXCEPT
+        {
+            using std::swap;
+            swap(handle, other.handle);
+        }
 
-		void close() BOOST_NOEXCEPT
-		{
-			file_handle().swap(*this);
-		}
+        void close() BOOST_NOEXCEPT
+        {
+            file_handle().swap(*this);
+        }
 
-		native_file_descriptor release() BOOST_NOEXCEPT
-		{
-			return Si::exchange(handle, no_file_handle);
-		}
+        native_file_descriptor release() BOOST_NOEXCEPT
+        {
+            return Si::exchange(handle, no_file_handle);
+        }
 
-		~file_handle() BOOST_NOEXCEPT
-		{
-			if (handle == no_file_handle)
-			{
-				return;
-			}
+        ~file_handle() BOOST_NOEXCEPT
+        {
+            if (handle == no_file_handle)
+            {
+                return;
+            }
 #ifdef _WIN32
-			CloseHandle(handle);
+            CloseHandle(handle);
 #else
-			::close(handle);
+            ::close(handle);
 #endif
-		}
+        }
 
-	private:
-		SILICIUM_DELETED_FUNCTION(file_handle(file_handle const &))
-		SILICIUM_DELETED_FUNCTION(file_handle &operator=(file_handle const &))
-	};
+    private:
+        SILICIUM_DELETED_FUNCTION(file_handle(file_handle const &))
+        SILICIUM_DELETED_FUNCTION(file_handle &operator=(file_handle const &))
+    };
 }
 
 #endif

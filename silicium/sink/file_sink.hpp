@@ -6,24 +6,24 @@
 
 namespace Si
 {
-	struct file_sink
-	{
-		typedef char element_type;
-		typedef boost::system::error_code error_type;
+    struct file_sink
+    {
+        typedef char element_type;
+        typedef boost::system::error_code error_type;
 
-		explicit file_sink(native_file_descriptor file)
-		    : m_file(file)
-		{
-		}
+        explicit file_sink(native_file_descriptor file)
+            : m_file(file)
+        {
+        }
 
-		error_type append(iterator_range<element_type const *> data)
-		{
-			return write(m_file, data).error();
-		}
+        error_type append(iterator_range<element_type const *> data)
+        {
+            return write(m_file, data).error();
+        }
 
-	private:
-		native_file_descriptor m_file;
-	};
+    private:
+        native_file_descriptor m_file;
+    };
 }
 
 #endif

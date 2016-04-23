@@ -5,15 +5,15 @@
 
 namespace Si
 {
-	template <class Observable>
-	SILICIUM_USE_RESULT auto ref(Observable &identity)
+    template <class Observable>
+    SILICIUM_USE_RESULT auto ref(Observable &identity)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-	    -> ptr_observable<typename Observable::element_type, Observable *>
+        -> ptr_observable<typename Observable::element_type, Observable *>
 #endif
-	{
-		return ptr_observable<typename Observable::element_type, Observable *>(
-		    &identity);
-	}
+    {
+        return ptr_observable<typename Observable::element_type, Observable *>(
+            &identity);
+    }
 }
 
 #endif

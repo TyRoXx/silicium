@@ -5,17 +5,17 @@
 
 namespace Si
 {
-	template <class Element>
-	struct empty
-	{
-		typedef Element element_type;
+    template <class Element>
+    struct empty
+    {
+        typedef Element element_type;
 
-		template <class Observer>
-		void async_get_one(Observer &&receiver)
-		{
-			return std::forward<Observer>(receiver).ended();
-		}
-	};
+        template <class Observer>
+        void async_get_one(Observer &&receiver)
+        {
+            return std::forward<Observer>(receiver).ended();
+        }
+    };
 }
 
 #endif

@@ -6,26 +6,26 @@
 
 namespace Si
 {
-	namespace detail
-	{
-		template <class Element>
-		struct element_from_optional_like
-		{
-			typedef Element type;
-		};
+    namespace detail
+    {
+        template <class Element>
+        struct element_from_optional_like
+        {
+            typedef Element type;
+        };
 
-		template <class Element>
-		struct element_from_optional_like<boost::optional<Element>>
-		{
-			typedef Element type;
-		};
+        template <class Element>
+        struct element_from_optional_like<boost::optional<Element>>
+        {
+            typedef Element type;
+        };
 
-		template <class Element>
-		struct element_from_optional_like<optional<Element>>
-		{
-			typedef Element type;
-		};
-	}
+        template <class Element>
+        struct element_from_optional_like<optional<Element>>
+        {
+            typedef Element type;
+        };
+    }
 }
 
 #endif

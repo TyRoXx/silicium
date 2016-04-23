@@ -3,11 +3,11 @@
 
 namespace Si
 {
-	template <class T>
-	struct identity
-	{
-		typedef T type;
-	};
+    template <class T>
+    struct identity
+    {
+        typedef T type;
+    };
 }
 
 #endif

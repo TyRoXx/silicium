@@ -6,63 +6,63 @@
 
 namespace Si
 {
-	template <class Char>
-	struct basic_c_string
-	{
-		typedef Char char_type;
+    template <class Char>
+    struct basic_c_string
+    {
+        typedef Char char_type;
 
-		basic_c_string() BOOST_NOEXCEPT : m_begin(nullptr)
-		{
-		}
+        basic_c_string() BOOST_NOEXCEPT : m_begin(nullptr)
+        {
+        }
 
-		explicit basic_c_string(char_type const *begin)
-		    : m_begin(begin)
-		{
-			assert(m_begin);
-		}
+        explicit basic_c_string(char_type const *begin)
+            : m_begin(begin)
+        {
+            assert(m_begin);
+        }
 
-		template <size_t N>
-		basic_c_string(char_type const(&literal)[N])
-		    : m_begin(&literal[0])
-		{
-		}
+        template <size_t N>
+        basic_c_string(char_type const(&literal)[N])
+            : m_begin(&literal[0])
+        {
+        }
 
-		SILICIUM_USE_RESULT
-		bool is_set() const BOOST_NOEXCEPT
-		{
-			return m_begin != nullptr;
-		}
+        SILICIUM_USE_RESULT
+        bool is_set() const BOOST_NOEXCEPT
+        {
+            return m_begin != nullptr;
+        }
 
-		SILICIUM_USE_RESULT
-		bool empty() const BOOST_NOEXCEPT
-		{
-			assert(is_set());
-			return (*m_begin == '\0');
-		}
+        SILICIUM_USE_RESULT
+        bool empty() const BOOST_NOEXCEPT
+        {
+            assert(is_set());
+            return (*m_begin == '\0');
+        }
 
-		SILICIUM_USE_RESULT
-		char_type const *c_str() const BOOST_NOEXCEPT
-		{
-			assert(is_set());
-			return m_begin;
-		}
+        SILICIUM_USE_RESULT
+        char_type const *c_str() const BOOST_NOEXCEPT
+        {
+            assert(is_set());
+            return m_begin;
+        }
 
-	private:
-		char_type const *m_begin;
-	};
+    private:
+        char_type const *m_begin;
+    };
 
-	typedef basic_c_string<char> c_string;
-	typedef basic_c_string<wchar_t> cw_string;
+    typedef basic_c_string<char> c_string;
+    typedef basic_c_string<wchar_t> cw_string;
 
-	typedef
+    typedef
 #ifdef _WIN32
-	    cw_string
+        cw_string
 #else
-	    c_string
+        c_string
 #endif
-	        os_c_string;
+            os_c_string;
 
-	typedef os_c_string native_path_string;
+    typedef os_c_string native_path_string;
 
 #ifdef _WIN32
 #define SILICIUM_OS_STR(x) L##x

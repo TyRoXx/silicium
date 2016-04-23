@@ -7,41 +7,41 @@
 
 BOOST_AUTO_TEST_CASE(byte_zero)
 {
-	Si::byte b = Si::byte::zero;
-	BOOST_STATIC_ASSERT(sizeof(b) == 1);
-	BOOST_CHECK_EQUAL(0, static_cast<char>(b));
-	BOOST_CHECK_EQUAL(0, static_cast<signed char>(b));
-	BOOST_CHECK_EQUAL(0, static_cast<unsigned char>(b));
-	BOOST_CHECK_EQUAL(0, *reinterpret_cast<char *>(&b));
+    Si::byte b = Si::byte::zero;
+    BOOST_STATIC_ASSERT(sizeof(b) == 1);
+    BOOST_CHECK_EQUAL(0, static_cast<char>(b));
+    BOOST_CHECK_EQUAL(0, static_cast<signed char>(b));
+    BOOST_CHECK_EQUAL(0, static_cast<unsigned char>(b));
+    BOOST_CHECK_EQUAL(0, *reinterpret_cast<char *>(&b));
 }
 
 BOOST_AUTO_TEST_CASE(byte_std_hash)
 {
-	std::unordered_map<Si::byte, int> m;
-	m.insert(std::make_pair(Si::byte::one, 1));
+    std::unordered_map<Si::byte, int> m;
+    m.insert(std::make_pair(Si::byte::one, 1));
 }
 
 BOOST_AUTO_TEST_CASE(byte_boost_hash)
 {
-	boost::unordered_map<Si::byte, int> m;
-	m.insert(std::make_pair(Si::byte::one, 1));
+    boost::unordered_map<Si::byte, int> m;
+    m.insert(std::make_pair(Si::byte::one, 1));
 }
 
 BOOST_AUTO_TEST_CASE(byte_ostream)
 {
-	BOOST_CHECK_EQUAL("0", boost::lexical_cast<std::string>(Si::byte::zero));
-	BOOST_CHECK_EQUAL("1", boost::lexical_cast<std::string>(Si::byte::one));
-	BOOST_CHECK_EQUAL("0", boost::lexical_cast<std::string>(Si::byte::minimum));
-	BOOST_CHECK_EQUAL(
-	    "255", boost::lexical_cast<std::string>(Si::byte::maximum));
+    BOOST_CHECK_EQUAL("0", boost::lexical_cast<std::string>(Si::byte::zero));
+    BOOST_CHECK_EQUAL("1", boost::lexical_cast<std::string>(Si::byte::one));
+    BOOST_CHECK_EQUAL("0", boost::lexical_cast<std::string>(Si::byte::minimum));
+    BOOST_CHECK_EQUAL(
+        "255", boost::lexical_cast<std::string>(Si::byte::maximum));
 }
 
 BOOST_AUTO_TEST_CASE(byte_relational)
 {
-	std::set<Si::byte> s;
-	s.insert(Si::byte::zero);
-	s.insert(Si::byte::one);
-	BOOST_CHECK_EQUAL(1u, s.count(Si::byte::zero));
-	BOOST_CHECK_EQUAL(1u, s.count(Si::byte::one));
-	BOOST_CHECK_EQUAL(0u, s.count(Si::byte::maximum));
+    std::set<Si::byte> s;
+    s.insert(Si::byte::zero);
+    s.insert(Si::byte::one);
+    BOOST_CHECK_EQUAL(1u, s.count(Si::byte::zero));
+    BOOST_CHECK_EQUAL(1u, s.count(Si::byte::one));
+    BOOST_CHECK_EQUAL(0u, s.count(Si::byte::maximum));
 }

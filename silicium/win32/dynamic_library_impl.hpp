@@ -8,34 +8,34 @@
 namespace Si
 {
 #ifdef _WIN32
-	namespace win32
-	{
-		struct dynamic_library_impl
-		{
-			SILICIUM_USE_RESULT
-			static void *open(native_path_string file)
-			{
-				HMODULE const handle = LoadLibraryW(file.c_str());
-				if (!handle)
-				{
-					throw_last_error();
-				}
-				return handle;
-			}
+    namespace win32
+    {
+        struct dynamic_library_impl
+        {
+            SILICIUM_USE_RESULT
+            static void *open(native_path_string file)
+            {
+                HMODULE const handle = LoadLibraryW(file.c_str());
+                if (!handle)
+                {
+                    throw_last_error();
+                }
+                return handle;
+            }
 
-			static void close(void *handle)
-			{
-				FreeLibrary(static_cast<HMODULE>(handle));
-			}
+            static void close(void *handle)
+            {
+                FreeLibrary(static_cast<HMODULE>(handle));
+            }
 
-			SILICIUM_USE_RESULT
-			static void *find_symbol(void *handle, c_string name)
-			{
-				return GetProcAddress(
-				    static_cast<HMODULE>(handle), name.c_str());
-			}
-		};
-	}
+            SILICIUM_USE_RESULT
+            static void *find_symbol(void *handle, c_string name)
+            {
+                return GetProcAddress(
+                    static_cast<HMODULE>(handle), name.c_str());
+            }
+        };
+    }
 #endif
 }
 

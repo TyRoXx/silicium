@@ -10,10 +10,10 @@
 
 namespace Si
 {
-	inline void throw_last_error()
-	{
-		boost::throw_exception(boost::system::system_error(get_last_error()));
-	}
+    inline void throw_last_error()
+    {
+        boost::throw_exception(boost::system::system_error(get_last_error()));
+    }
 }
 
 #endif
