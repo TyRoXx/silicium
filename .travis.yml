@@ -46,7 +46,7 @@ script:
      sudo cp -fR cmake-3.0.2-Linux-64/* /usr;
      rm -rf cmake-3.0.2-Linux-64;
      rm cmake-3.0.2-Linux-64.tar.gz;
-     conan user TyRoXx || exit 1;
+     conan user TyRoXx -p $CONAN_PASSWORD || exit 1;
      conan export TyRoXx/master || exit 1;
      conan install silicium/0.11@TyRoXx/master --build=silicium || exit 1;
      conan upload --all silicium/0.11@TyRoXx/master || exit 1;
