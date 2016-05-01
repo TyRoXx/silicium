@@ -40,7 +40,7 @@ script:
      conan export TyRoXx/master || exit 1;
      conan install silicium/0.11@TyRoXx/master || exit 1;
      conan upload --all silicium/0.11@TyRoXx/master || exit 1;
-     exit 0
+     exit 0;
    fi
  - mkdir build-silicium
  - pushd build-silicium
