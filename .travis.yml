@@ -1,7 +1,7 @@
 language: cpp
 os:
  - linux
-sudo: false
+sudo: true
 notifications:
  email:
   on_success: change # [always|never|change] # default: change
@@ -37,6 +37,15 @@ before_install:
 
 script:
  - if [ $UPLOAD == "YES" ]; then
+     wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_8_6.deb -O conan.deb || exit 1;
+     sudo dpkg -i conan.deb || exit 1;
+     rm conan.deb || exit 1;
+     conan --version;
+     wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-Linux-64.tar.gz;
+     tar -xzf cmake-3.0.2-Linux-64.tar.gz;
+     sudo cp -fR cmake-3.0.2-Linux-64/* /usr;
+     rm -rf cmake-3.0.2-Linux-64;
+     rm cmake-3.0.2-Linux-64.tar.gz;
      conan export TyRoXx/master || exit 1;
      conan install silicium/0.11@TyRoXx/master || exit 1;
      conan upload --all silicium/0.11@TyRoXx/master || exit 1;
