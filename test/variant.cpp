@@ -764,6 +764,12 @@ namespace
     {
         expression left;
         expression right;
+
+        explicit add(expression left, expression right)
+            : left(std::move(left))
+            , right(std::move(right))
+        {
+        }
     };
 
     void print(std::ostream &out, expression const &root)
