@@ -67,12 +67,15 @@ struct accumulator
 
     void mark_as_read(std::size_t ready_read)
     {
+        Si::ignore_unused_variable_warning(ready_read);
     }
 
     template <class Handler>
     void async_read(Si::array_view<element_type> destination,
                     Handler &&handle_finished)
     {
+        Si::ignore_unused_variable_warning(destination);
+        Si::ignore_unused_variable_warning(handle_finished);
     }
 
 private:
