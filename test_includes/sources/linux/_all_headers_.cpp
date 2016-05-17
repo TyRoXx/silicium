@@ -58,7 +58,6 @@
 #include <silicium/initialize_array.hpp>
 #include <silicium/iterator_range.hpp>
 #include <silicium/linux/dynamic_library_impl.hpp>
-#include <silicium/linux/process_handle.hpp>
 #include <silicium/lossless_cast.hpp>
 #include <silicium/make_array.hpp>
 #include <silicium/make_destructor.hpp>
