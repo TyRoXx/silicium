@@ -116,7 +116,6 @@
 #include <silicium/optional.hpp>
 #include <silicium/os_string.hpp>
 #include <silicium/pipe.hpp>
-#include <silicium/process_handle.hpp>
 #include <silicium/program_options.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
