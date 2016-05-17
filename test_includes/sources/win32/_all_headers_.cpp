@@ -114,7 +114,6 @@
 #include <silicium/optional.hpp>
 #include <silicium/os_string.hpp>
 #include <silicium/pipe.hpp>
-#include <silicium/process_handle.hpp>
 #include <silicium/program_options.hpp>
 #include <silicium/ptr_adaptor.hpp>
 #include <silicium/range_value.hpp>
@@ -162,7 +161,6 @@
 #include <silicium/variant.hpp>
 #include <silicium/version.hpp>
 #include <silicium/win32/dynamic_library_impl.hpp>
-#include <silicium/win32/process_handle.hpp>
 #include <silicium/win32/win32.hpp>
 #include <silicium/write.hpp>
 #include <silicium/zlib/deflating_sink.hpp>
