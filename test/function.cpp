@@ -15,6 +15,18 @@ BOOST_AUTO_TEST_CASE(function_default_constructor)
     BOOST_CHECK(!g);
 }
 
+BOOST_AUTO_TEST_CASE(function_from_nullptr)
+{
+    Si::function<void()> f(nullptr);
+    BOOST_CHECK(!f);
+    Si::function<void()> g{std::move(f)};
+    BOOST_CHECK(!f);
+    BOOST_CHECK(!g);
+    f = std::move(g);
+    BOOST_CHECK(!f);
+    BOOST_CHECK(!g);
+}
+
 BOOST_AUTO_TEST_CASE(function_call)
 {
     Si::function<int(int)> inc = [](int a)

@@ -44,6 +44,10 @@ namespace Si
             return *this;
         }
 
+        function(std::nullptr_t) BOOST_NOEXCEPT
+        {
+        }
+
         template <class F>
         function(
             F &&content,
