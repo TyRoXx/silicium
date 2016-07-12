@@ -89,8 +89,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 	include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+	set(CONAN_SYSTEM_INCLUDES ON)
 	conan_basic_setup()
-
 	set(ZLIB_FOUND ON)
 else()
 	if(MSVC)
