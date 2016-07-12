@@ -21,6 +21,7 @@ namespace Si
         typedef typename Next::error_type error_type;
 
         buffering_sink()
+            : m_buffer_used(0)
         {
         }
 
