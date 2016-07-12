@@ -8,7 +8,7 @@ namespace
 {
     std::experimental::generator<char> generate_something()
     {
-        __yield_value 'x';
+        co_yield 'x';
     }
 }
 
