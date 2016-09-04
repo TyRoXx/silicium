@@ -1,6 +1,9 @@
 #ifndef SILICIUM_DELEGATOR_GENERATE_HPP
 #define SILICIUM_DELEGATOR_GENERATE_HPP
 
+#include <boost/preprocessor/list/for_each_i.hpp>
+#include <boost/preprocessor/variadic/to_list.hpp>
+
 // enclosing namespace struct:
 
 #define DELEGATOR_TEMPLATE(...) template <__VA_ARGS__>

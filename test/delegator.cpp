@@ -2,8 +2,6 @@
 #include <silicium/array_view.hpp>
 #include <silicium/function.hpp>
 #include <silicium/make_unique.hpp>
-#include <boost/preprocessor/list/for_each_i.hpp>
-#include <boost/preprocessor/variadic/to_list.hpp>
 namespace tests
 {
 #include <silicium/delegator/generate.hpp>
