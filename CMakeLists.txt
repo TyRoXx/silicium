@@ -197,3 +197,5 @@ add_subdirectory("examples")
 
 find_program(SILICIUM_CLANG_FORMAT NAMES clang-format clang-format-3.7 PATHS "C:/Program Files/LLVM/bin")
 add_custom_target(clang-format COMMAND ${SILICIUM_CLANG_FORMAT} -i ${formatted} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_custom_target(conan-install COMMAND conan install ${CMAKE_SOURCE_DIR} --build=missing WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
