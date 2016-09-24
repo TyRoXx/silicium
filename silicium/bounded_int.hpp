@@ -10,12 +10,12 @@ namespace Si
         template <class Int, Int Minimum, Int Maximum>
         struct compact_int
         {
-            explicit compact_int(Int value)
+            constexpr explicit compact_int(Int value)
                 : m_value(value)
             {
             }
 
-            Int value() const
+            constexpr Int value() const
             {
                 return m_value;
             }
@@ -28,13 +28,13 @@ namespace Si
         template <class Int, Int Value>
         struct compact_int<Int, Value, Value>
         {
-            explicit compact_int(Int value)
+            constexpr explicit compact_int(Int value)
             {
                 assert(Value == value);
                 ignore_unused_variable_warning(value);
             }
 
-            static Int value()
+            constexpr static Int value()
             {
                 return Value;
             }
@@ -71,6 +71,15 @@ namespace Si
             return bounded_int(possible_value);
         }
 
+        constexpr static bounded_int create_or_throw(Int possible_value)
+        {
+            return (possible_value < Minimum)
+                       ? throw std::out_of_range("bounded_int")
+                       : ((possible_value > Maximum)
+                              ? throw std::out_of_range("bounded_int")
+                              : bounded_int(possible_value));
+        }
+
         template <class OtherInt, OtherInt OtherMinimum, OtherInt OtherMaximum>
         static optional<bounded_int>
         create(bounded_int<OtherInt, OtherMinimum, OtherMaximum> possible_value)
@@ -89,14 +98,14 @@ namespace Si
         }
 
         template <Int Literal>
-        static bounded_int literal()
+        constexpr static bounded_int literal()
         {
             BOOST_STATIC_ASSERT(Literal >= Minimum);
             BOOST_STATIC_ASSERT(Literal <= Maximum);
             return bounded_int(Literal);
         }
 
-        Int value() const
+        constexpr Int value() const
         {
             return value_base::value();
         }
@@ -121,7 +130,7 @@ namespace Si
     private:
         typedef detail::compact_int<Int, Minimum, Maximum> value_base;
 
-        explicit bounded_int(Int value)
+        constexpr explicit bounded_int(Int value)
             : value_base(value)
         {
         }
@@ -173,6 +182,19 @@ namespace Si
         return *result;
     }
 
+    template <class Int, Int MinimumLeft, Int MaximumLeft, Int MinimumRight,
+              Int MaximumRight>
+    constexpr bounded_int<Int, MinimumLeft * MinimumRight,
+                          MaximumLeft * MaximumRight>
+    operator*(bounded_int<Int, MinimumLeft, MaximumLeft> const &left,
+              bounded_int<Int, MinimumRight, MaximumRight> const &right)
+    {
+        return bounded_int<Int, MinimumLeft * MinimumRight,
+                           MaximumLeft *
+                               MaximumRight>::create_or_throw(left.value() *
+                                                              right.value());
+    }
+
     template <class Left, class Right>
     struct is_always_less;
 
@@ -197,7 +219,7 @@ namespace Si
                                         bounded_int<unsigned, 0, 2>>::value);
 
     template <class Int, Int Value>
-    bounded_int<Int, Value, Value> literal()
+    constexpr bounded_int<Int, Value, Value> literal()
     {
         return bounded_int<Int, Value, Value>::template literal<Value>();
     }

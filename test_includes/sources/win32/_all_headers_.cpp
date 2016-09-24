@@ -43,7 +43,6 @@
 #include <silicium/http/parse_request.hpp>
 #include <silicium/http/parse_response.hpp>
 #include <silicium/http/request_parser_sink.hpp>
-#include <silicium/http/uri.hpp>
 #include <silicium/identity.hpp>
 #include <silicium/initialize_array.hpp>
 #include <silicium/iterator_range.hpp>

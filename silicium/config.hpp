@@ -175,7 +175,10 @@
 #ifdef BOOST_DELETED_FUNCTION
 #define SILICIUM_DELETED_FUNCTION BOOST_DELETED_FUNCTION
 #else
-#define SILICIUM_DELETED_FUNCTION(f) private: f;
+#define SILICIUM_DELETED_FUNCTION(f)                                           \
+    \
+private:                                                                       \
+    f;
 #endif
 
 #define SILICIUM_DISABLE_COPY(struct_name)                                     \
@@ -224,7 +227,7 @@ namespace Si
 {
     struct unit
     {
-        BOOST_CONSTEXPR unit() BOOST_NOEXCEPT
+        constexpr unit() BOOST_NOEXCEPT
         {
         }
     };
