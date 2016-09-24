@@ -144,13 +144,6 @@ if(WIN32)
 	add_definitions("-DBOOST_ASIO_HAS_IOCP")
 endif()
 
-find_package(UriParser)
-if(URIPARSER_FOUND)
-	include_directories(SYSTEM ${URIPARSER_INCLUDE_DIR})
-else()
-	add_definitions("-DSILICIUM_AVOID_URIPARSER=1")
-endif()
-
 find_package(Threads)
 
 option(SILICIUM_NO_EXCEPTIONS "disable try/catch and throw; when something would normally throw, the process will std::terminate() instead" OFF)
