@@ -28,10 +28,8 @@ namespace Si
         template <class Int, Int Value>
         struct compact_int<Int, Value, Value>
         {
-            constexpr explicit compact_int(Int value)
+            constexpr explicit compact_int(Int)
             {
-                assert(Value == value);
-                ignore_unused_variable_warning(value);
             }
 
             constexpr static Int value()
