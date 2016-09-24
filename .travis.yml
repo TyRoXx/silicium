@@ -33,7 +33,7 @@ before_install:
  - git submodule update --init --recursive
 
 install:
- - wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_11_1.deb -O conan.deb || exit 1
+ - wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_12_0.deb -O conan.deb || exit 1
  - sudo dpkg -i conan.deb || exit 1
  - rm conan.deb || exit 1
  - conan --version
