@@ -4,6 +4,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/version.hpp>
 #include <boost/preprocessor/if.hpp>
+#include <ostream>
 
 #if defined(__GNUC__)
 #define SILICIUM_GCC ((__GNUC__ * 100) + __GNUC_MINOR__)
@@ -235,6 +236,11 @@ namespace Si
     inline bool operator==(unit const &, unit const &)
     {
         return true;
+    }
+
+    inline std::ostream &operator<<(std::ostream &out, unit const &)
+    {
+        return out << "unit";
     }
 
     template <class To, class From>

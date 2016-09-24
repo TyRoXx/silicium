@@ -2,7 +2,7 @@
 #include <silicium/array_view.hpp>
 #include <silicium/function.hpp>
 #include <silicium/make_unique.hpp>
-namespace tests
+namespace
 {
 #include <silicium/delegator/generate.hpp>
 }
@@ -11,7 +11,7 @@ namespace tests
 #include <boost/test/unit_test.hpp>
 #include <algorithm>
 
-namespace tests
+namespace
 {
     template <class Element, class Error, class Function>
     struct function_sink
@@ -64,91 +64,81 @@ namespace tests
                              typename std::decay<Function>::type>(
             std::forward<Function>(function));
     }
+}
 
-    BOOST_AUTO_TEST_CASE(delegator_erase)
-    {
-        std::vector<std::unique_ptr<int>> results;
-        auto function_sink_ =
-            make_function_sink<std::unique_ptr<int>, Si::success>(
-                [&results](Si::array_view<std::unique_ptr<int>> elements)
-                    -> Si::success
-                {
-                    std::move(elements.begin(), elements.end(),
-                              std::back_inserter(results));
-                    return Si::success();
-                });
-        auto erased_sink_ =
-            tests::Sink<std::unique_ptr<int>, Si::success>::erase(
-                function_sink_);
-        std::unique_ptr<int> in = Si::make_unique<int>(23);
-        BOOST_CHECK(!erased_sink_.append(Si::make_single_element_view(in)));
-        BOOST_REQUIRE(!in);
-        BOOST_REQUIRE_EQUAL(1u, results.size());
-        BOOST_CHECK_EQUAL(23, *results.front());
-    }
+BOOST_AUTO_TEST_CASE(delegator_erase)
+{
+    std::vector<std::unique_ptr<int>> results;
+    auto function_sink_ = make_function_sink<std::unique_ptr<int>, Si::success>(
+        [&results](Si::array_view<std::unique_ptr<int>> elements) -> Si::success
+        {
+            std::move(
+                elements.begin(), elements.end(), std::back_inserter(results));
+            return Si::success();
+        });
+    auto erased_sink_ =
+        Sink<std::unique_ptr<int>, Si::success>::erase(function_sink_);
+    std::unique_ptr<int> in = Si::make_unique<int>(23);
+    BOOST_CHECK(!erased_sink_.append(Si::make_single_element_view(in)));
+    BOOST_REQUIRE(!in);
+    BOOST_REQUIRE_EQUAL(1u, results.size());
+    BOOST_CHECK_EQUAL(23, *results.front());
+}
 
-    void
-    append_example_value(Sink<std::unique_ptr<int>, Si::success>::fat_ref to)
-    {
-        std::unique_ptr<int> value = Si::make_unique<int>(23);
-        BOOST_CHECK(!to.append(Si::make_single_element_view(value)));
-    }
+void append_example_value(Sink<std::unique_ptr<int>, Si::success>::fat_ref to)
+{
+    std::unique_ptr<int> value = Si::make_unique<int>(23);
+    BOOST_CHECK(!to.append(Si::make_single_element_view(value)));
+}
 
-    BOOST_AUTO_TEST_CASE(delegator_fat_ref)
-    {
-        std::vector<std::unique_ptr<int>> results;
-        auto function_sink_ =
-            make_function_sink<std::unique_ptr<int>, Si::success>(
-                [&results](Si::array_view<std::unique_ptr<int>> elements)
-                    -> Si::success
-                {
-                    std::move(elements.begin(), elements.end(),
-                              std::back_inserter(results));
-                    return Si::success();
-                });
-        append_example_value(
-            Sink<std::unique_ptr<int>, Si::success>::fat_ref(function_sink_));
-        BOOST_REQUIRE_EQUAL(1u, results.size());
-        BOOST_CHECK_EQUAL(23, *results.front());
-    }
+BOOST_AUTO_TEST_CASE(delegator_fat_ref)
+{
+    std::vector<std::unique_ptr<int>> results;
+    auto function_sink_ = make_function_sink<std::unique_ptr<int>, Si::success>(
+        [&results](Si::array_view<std::unique_ptr<int>> elements) -> Si::success
+        {
+            std::move(
+                elements.begin(), elements.end(), std::back_inserter(results));
+            return Si::success();
+        });
+    append_example_value(
+        Sink<std::unique_ptr<int>, Si::success>::fat_ref(function_sink_));
+    BOOST_REQUIRE_EQUAL(1u, results.size());
+    BOOST_CHECK_EQUAL(23, *results.front());
+}
 
-    BOOST_AUTO_TEST_CASE(delegator_const_method)
-    {
-        std::vector<std::unique_ptr<int>> results;
-        auto function_sink_ =
-            make_function_sink<std::unique_ptr<int>, Si::success>(
-                [](Si::array_view<std::unique_ptr<int>>) -> Si::success
-                {
-                    return Si::success();
-                });
-        Sink<std::unique_ptr<int>, Si::success>::fat_ref const ref(
-            (function_sink_));
-        BOOST_CHECK_EQUAL(
-            Si::optional<boost::uint64_t>(), ref.max_size(Si::unit()));
-    }
+BOOST_AUTO_TEST_CASE(delegator_const_method)
+{
+    std::vector<std::unique_ptr<int>> results;
+    auto function_sink_ = make_function_sink<std::unique_ptr<int>, Si::success>(
+        [](Si::array_view<std::unique_ptr<int>>) -> Si::success
+        {
+            return Si::success();
+        });
+    Sink<std::unique_ptr<int>, Si::success>::fat_ref const ref(
+        (function_sink_));
+    BOOST_CHECK_EQUAL(
+        Si::optional<boost::uint64_t>(), ref.max_size(Si::unit()));
+}
 
-    BOOST_AUTO_TEST_CASE(delegator_two_arguments)
-    {
-        std::vector<std::unique_ptr<int>> results;
-        auto function_sink_ =
-            make_function_sink<std::unique_ptr<int>, Si::success>(
-                [&results](Si::array_view<std::unique_ptr<int>> elements)
-                    -> Si::success
-                {
-                    std::move(elements.begin(), elements.end(),
-                              std::back_inserter(results));
-                    return Si::success();
-                });
-        auto erased_sink_ =
-            tests::Sink<std::unique_ptr<int>, Si::success>::erase(
-                function_sink_);
-        BOOST_CHECK(!erased_sink_.append_n_times(
-            []()
-            {
-                return Si::make_unique<int>(23);
-            },
-            1));
-        BOOST_REQUIRE_EQUAL(1u, results.size());
-        BOOST_CHECK_EQUAL(23, *results.front());
-    }
+BOOST_AUTO_TEST_CASE(delegator_two_arguments)
+{
+    std::vector<std::unique_ptr<int>> results;
+    auto function_sink_ = make_function_sink<std::unique_ptr<int>, Si::success>(
+        [&results](Si::array_view<std::unique_ptr<int>> elements) -> Si::success
+        {
+            std::move(
+                elements.begin(), elements.end(), std::back_inserter(results));
+            return Si::success();
+        });
+    auto erased_sink_ =
+        Sink<std::unique_ptr<int>, Si::success>::erase(function_sink_);
+    BOOST_CHECK(!erased_sink_.append_n_times(
+        []()
+        {
+            return Si::make_unique<int>(23);
+        },
+        1));
+    BOOST_REQUIRE_EQUAL(1u, results.size());
+    BOOST_CHECK_EQUAL(23, *results.front());
 }
