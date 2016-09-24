@@ -267,7 +267,7 @@ namespace Si
 #endif
 
     template <class T>
-    void ignore_unused_variable_warning(T &&)
+    constexpr void ignore_unused_variable_warning(T &&)
     {
     }
 }
