@@ -5,7 +5,7 @@ class SiliciumConan(ConanFile):
     name = "silicium"
     version = "0.12"
     generators = "cmake"
-    requires = "Boost/1.63.0@eliaskousk/stable", "websocketpp/0.7.0@TyRoXx/stable"
+    requires = "Boost/1.60.0@lasote/stable", "websocketpp/0.7.0@TyRoXx/stable"
     url="http://github.com/tyroxx/silicium"
     license="MIT"
     exports="silicium/*"

@@ -144,6 +144,7 @@ if(WIN32)
 	add_definitions("-DBOOST_ASIO_HAS_IOCP")
 endif()
 
+add_definitions(-DBOOST_COROUTINE_NO_DEPRECATION_WARNING)
 add_definitions(-DBOOST_COROUTINES_NO_DEPRECATION_WARNING)
 
 find_package(Threads)
