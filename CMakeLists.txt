@@ -144,6 +144,8 @@ if(WIN32)
 	add_definitions("-DBOOST_ASIO_HAS_IOCP")
 endif()
 
+add_definitions(-DBOOST_COROUTINES_NO_DEPRECATION_WARNING)
+
 find_package(Threads)
 
 option(SILICIUM_NO_EXCEPTIONS "disable try/catch and throw; when something would normally throw, the process will std::terminate() instead" OFF)
