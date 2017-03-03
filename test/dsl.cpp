@@ -154,7 +154,11 @@ namespace dsl
     template <class Type, class Name>
     program<variable<Type, Name, true>, null_statement> declare(Name)
     {
-        return {};
+        return {
+#ifndef _MSC_VER
+            {}, {}
+#endif
+        };
     }
 }
 
