@@ -29,7 +29,7 @@ before_install:
  - git submodule update --init --recursive
 
 install:
- - wget https://github.com/conan-io/conan/releases/download/0.18.1/conan-ubuntu-64_0_18_1.deb -O conan.deb || exit 1
+ - wget https://github.com/conan-io/conan/releases/download/0.20.2/conan-ubuntu-64_0_20_2.deb -O conan.deb || exit 1
  - sudo dpkg -i conan.deb || exit 1
  - rm conan.deb || exit 1
  - conan --version
