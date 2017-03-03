@@ -154,11 +154,7 @@ namespace dsl
     template <class Type, class Name>
     program<variable<Type, Name, true>, null_statement> declare(Name)
     {
-        return {
-#ifndef _MSC_VER
-            {}, {}
-#endif
-        };
+        return program<variable<Type, Name, true>, null_statement>();
     }
 }
 
