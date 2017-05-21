@@ -172,6 +172,7 @@ if(SILICIUM_NO_RTTI)
 	endif()
 endif()
 
+add_definitions("-D_GLIBCXX_USE_CXX11_ABI=0")
 option(SILICIUM_NO_DEPRECATED "disable deprecated silicium APIs" OFF)
 if(SILICIUM_NO_DEPRECATED)
 	add_definitions("-DSILICIUM_NO_DEPRECATED")

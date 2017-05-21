@@ -1,2 +1,4 @@
 CMakeLists.txt.user*
 conanfile.pyc
+cmake-build-debug
+.idea
