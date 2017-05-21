@@ -1,5 +1,4 @@
 #pragma once
-
 #include <silicium/html/tree.hpp>
 
 namespace Si
